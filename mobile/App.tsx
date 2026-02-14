@@ -9,9 +9,10 @@ import {
   Linking,
   Platform,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
+import mobileAds, { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
 
 type CountryPrices = {
   country: string;
@@ -82,6 +83,8 @@ function formatPrice(v: number | null) {
 }
 
 export default function App() {
+  const insets = useSafeAreaInsets();
+
   const [data, setData] = useState<LatestEurope | null>(null);
   const [err, setErr] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -90,7 +93,8 @@ export default function App() {
 
   const t = i18n[lang];
 
-  const url = "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json";
+  const url =
+    "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json";
 
   const selected = useMemo(() => {
     if (!data) return null;
@@ -111,14 +115,17 @@ export default function App() {
         const exists = json.countries.some((c) => c.country === country);
         if (!exists) setCountry(json.countries[0].country);
       }
-    } catch (e: any) {
-      setErr(String(e?.message ?? e));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErr(msg);
     } finally {
       setRefreshing(false);
     }
   };
 
   useEffect(() => {
+    mobileAds().initialize();
+
     (async () => {
       const savedLang = (await AsyncStorage.getItem(STORAGE_LANG_KEY)) as Lang | null;
       if (savedLang === "en" || savedLang === "sq") setLang(savedLang);
@@ -126,6 +133,7 @@ export default function App() {
       const savedCountry = await AsyncStorage.getItem(STORAGE_COUNTRY_KEY);
       if (savedCountry) setCountry(savedCountry);
     })();
+
     load();
   }, []);
 
@@ -140,91 +148,101 @@ export default function App() {
     await AsyncStorage.setItem(STORAGE_COUNTRY_KEY, next);
   };
 
-  return (
-    <SafeAreaView style={styles.screen} edges={["top", "left", "right"]}>
-      <StatusBar barStyle="dark-content" />
+  const adUnitId = __DEV__ ? TestIds.BANNER : "ca-app-pub-2653462201538649/5444199958";
 
-      <View style={styles.header}>
-        <View style={styles.rowBetween}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.h1}>{t.title}</Text>
-            <Text style={styles.sub}>
-              {data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading}
+  return (
+    <SafeAreaView style={styles.screen} edges={["top", "left", "right", "bottom"]}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F6F7FB" />
+
+      <View style={[styles.content, { paddingTop: insets.top + 12 }]}>
+        <View style={styles.header}>
+          <View style={styles.rowBetween}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.h1}>{t.title}</Text>
+              <Text style={styles.sub}>
+                {data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading}
+              </Text>
+            </View>
+
+            <Pressable onPress={toggleLang} style={styles.langPill}>
+              <Text style={styles.langText}>{lang === "en" ? t.langSQ : t.langEN}</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {!data && !err ? (
+          <View style={styles.center}>
+            <ActivityIndicator />
+            <Text style={styles.muted}>{t.fetching}</Text>
+          </View>
+        ) : null}
+
+        {err ? (
+          <View style={[styles.card, styles.cardError]}>
+            <Text style={styles.errorTitle}>{t.couldntLoad}</Text>
+            <Text style={styles.errorText}>{err}</Text>
+            <Pressable onPress={load} style={styles.primaryBtn}>
+              <Text style={styles.primaryBtnText}>{t.tryAgain}</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
+        {data && selected ? (
+          <View style={styles.card}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.cardTitle}>{t.selectCountry}</Text>
+              <Pressable onPress={load} style={styles.ghostBtn} disabled={refreshing}>
+                <Text style={styles.ghostBtnText}>
+                  {refreshing ? t.refreshing : t.refresh}
+                </Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.pickerWrap}>
+              <Picker selectedValue={country} onValueChange={(v) => onSelectCountry(String(v))}>
+                {countries.map((c) => (
+                  <Picker.Item key={c} label={c} value={c} />
+                ))}
+              </Picker>
+            </View>
+
+            <View style={styles.grid}>
+              <View style={styles.tile}>
+                <Text style={styles.tileLabel}>{t.gasoline95}</Text>
+                <Text style={styles.tileValue}>{formatPrice(selected.gasoline95_eur)}</Text>
+              </View>
+
+              <View style={styles.tile}>
+                <Text style={styles.tileLabel}>{t.diesel}</Text>
+                <Text style={styles.tileValue}>{formatPrice(selected.diesel_eur)}</Text>
+              </View>
+
+              <View style={styles.tile}>
+                <Text style={styles.tileLabel}>{t.lpg}</Text>
+                <Text style={styles.tileValue}>{formatPrice(selected.lpg_eur)}</Text>
+              </View>
+            </View>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.metaLabel}>{t.source}</Text>
+            <View style={styles.rowBetween}>
+              <Text style={styles.metaText}>{data.source}</Text>
+              <Pressable onPress={() => Linking.openURL(data.source_url)} style={styles.linkBtn}>
+                <Text style={styles.linkBtnText}>{t.open}</Text>
+              </Pressable>
+            </View>
+
+            <Text style={styles.mutedSmall}>
+              {t.fetchedAt(new Date(data.fetched_at_utc).toLocaleString())}
             </Text>
           </View>
-
-          <Pressable onPress={toggleLang} style={styles.langPill}>
-            <Text style={styles.langText}>{lang === "en" ? t.langSQ : t.langEN}</Text>
-          </Pressable>
-        </View>
+        ) : null}
       </View>
 
-      {!data && !err ? (
-        <View style={styles.center}>
-          <ActivityIndicator />
-          <Text style={styles.muted}>{t.fetching}</Text>
-        </View>
-      ) : null}
-
-      {err ? (
-        <View style={[styles.card, styles.cardError]}>
-          <Text style={styles.errorTitle}>{t.couldntLoad}</Text>
-          <Text style={styles.errorText}>{err}</Text>
-          <Pressable onPress={load} style={styles.primaryBtn}>
-            <Text style={styles.primaryBtnText}>{t.tryAgain}</Text>
-          </Pressable>
-        </View>
-      ) : null}
-
-      {data && selected ? (
-        <View style={styles.card}>
-          <View style={styles.rowBetween}>
-            <Text style={styles.cardTitle}>{t.selectCountry}</Text>
-            <Pressable onPress={load} style={styles.ghostBtn} disabled={refreshing}>
-              <Text style={styles.ghostBtnText}>{refreshing ? t.refreshing : t.refresh}</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.pickerWrap}>
-            <Picker selectedValue={country} onValueChange={(v) => onSelectCountry(String(v))}>
-              {countries.map((c) => (
-                <Picker.Item key={c} label={c} value={c} />
-              ))}
-            </Picker>
-          </View>
-
-          <View style={styles.grid}>
-            <View style={styles.tile}>
-              <Text style={styles.tileLabel}>{t.gasoline95}</Text>
-              <Text style={styles.tileValue}>{formatPrice(selected.gasoline95_eur)}</Text>
-            </View>
-
-            <View style={styles.tile}>
-              <Text style={styles.tileLabel}>{t.diesel}</Text>
-              <Text style={styles.tileValue}>{formatPrice(selected.diesel_eur)}</Text>
-            </View>
-
-            <View style={styles.tile}>
-              <Text style={styles.tileLabel}>{t.lpg}</Text>
-              <Text style={styles.tileValue}>{formatPrice(selected.lpg_eur)}</Text>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <Text style={styles.metaLabel}>{t.source}</Text>
-          <View style={styles.rowBetween}>
-            <Text style={styles.metaText}>{data.source}</Text>
-            <Pressable onPress={() => Linking.openURL(data.source_url)} style={styles.linkBtn}>
-              <Text style={styles.linkBtnText}>{t.open}</Text>
-            </Pressable>
-          </View>
-
-          <Text style={styles.mutedSmall}>
-            {t.fetchedAt(new Date(data.fetched_at_utc).toLocaleString())}
-          </Text>
-        </View>
-      ) : null}
+      <View style={styles.adBar}>
+        <BannerAd unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
+      </View>
     </SafeAreaView>
   );
 }
@@ -232,9 +250,11 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    padding: 16,
-    paddingTop: Platform.OS === "android" ? 24 : 16,
     backgroundColor: "#F6F7FB",
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
   header: {
     marginBottom: 12,
@@ -249,11 +269,12 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "800",
     letterSpacing: 0.2,
+    color: "#0F172A",
   },
   sub: {
     marginTop: 4,
     fontSize: 14,
-    opacity: 0.7,
+    color: "#334155",
   },
   center: {
     marginTop: 28,
@@ -278,6 +299,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: "700",
+    color: "#0F172A",
   },
   pickerWrap: {
     marginTop: 10,
@@ -300,13 +322,14 @@ const styles = StyleSheet.create({
   },
   tileLabel: {
     fontSize: 13,
-    opacity: 0.7,
+    color: "#475569",
     fontWeight: "600",
   },
   tileValue: {
     marginTop: 6,
     fontSize: 18,
     fontWeight: "800",
+    color: "#0F172A",
   },
   divider: {
     height: 1,
@@ -316,20 +339,21 @@ const styles = StyleSheet.create({
   metaLabel: {
     fontSize: 12,
     fontWeight: "700",
-    opacity: 0.6,
+    color: "#64748B",
     marginBottom: 6,
   },
   metaText: {
     fontSize: 14,
     fontWeight: "600",
+    color: "#0F172A",
   },
   muted: {
-    opacity: 0.6,
+    color: "#64748B",
   },
   mutedSmall: {
     marginTop: 8,
     fontSize: 12,
-    opacity: 0.55,
+    color: "#64748B",
   },
   primaryBtn: {
     marginTop: 12,
@@ -351,7 +375,7 @@ const styles = StyleSheet.create({
   ghostBtnText: {
     fontSize: 13,
     fontWeight: "700",
-    opacity: 0.85,
+    color: "#0F172A",
   },
   linkBtn: {
     paddingVertical: 6,
@@ -362,6 +386,7 @@ const styles = StyleSheet.create({
   linkBtnText: {
     fontSize: 13,
     fontWeight: "800",
+    color: "#1D4ED8",
   },
   langPill: {
     paddingVertical: 8,
@@ -372,15 +397,24 @@ const styles = StyleSheet.create({
   langText: {
     fontSize: 13,
     fontWeight: "800",
-    opacity: 0.85,
+    color: "#0F172A",
   },
   errorTitle: {
     fontSize: 16,
     fontWeight: "800",
     marginBottom: 6,
+    color: "#991B1B",
   },
   errorText: {
-    opacity: 0.75,
+    color: "#334155",
     lineHeight: 18,
+  },
+  adBar: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F6F7FB",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.06)",
+    paddingBottom: Platform.OS === "android" ? 6 : 0,
   },
 });
