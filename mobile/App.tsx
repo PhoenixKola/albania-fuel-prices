@@ -90,7 +90,7 @@ export default function App() {
 
   const t = i18n[lang];
 
-  const url = "http://192.168.18.6:8081/latest.json";
+  const url = "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json";
 
   const selected = useMemo(() => {
     if (!data) return null;
