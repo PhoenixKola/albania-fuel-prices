@@ -235,6 +235,7 @@ button, select { font: inherit; }
 .metaVal {
   font-size: 13px;
   font-weight: 800;
+  text-align: right;
 }
 
 .hr {
@@ -301,4 +302,79 @@ button, select { font: inherit; }
   background: rgba(11, 18, 32, 0.92);
   border-top: 1px solid rgba(255,255,255,0.12);
   backdrop-filter: blur(10px);
+}
+
+/* Responsiveness */
+
+@media (max-width: 640px) {
+  .card {
+    background: rgba(15, 23, 48, 0.92);
+  }
+
+  body { padding-bottom: 110px; }
+
+  .container {
+    padding: 22px 14px 52px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .cardHeader { padding: 14px 14px 12px; }
+  .body { padding: 14px; }
+
+  .metaRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .metaVal {
+    width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+}
+
+@media (max-width: 420px) {
+  body { padding-bottom: 120px; }
+
+  .container {
+    padding: 18px 12px 48px;
+  }
+
+  .pill { padding: 8px 11px; }
+
+  .card { border-radius: 16px; }
+
+  .select {
+    padding: 11px 11px;
+    padding-right: 44px;
+    background-position: right 12px center;
+  }
+
+  .kpi {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .metaVal {
+    font-size: 12px;
+  }
+
+  .kpiValue { font-size: 20px; }
+
+  .adbar {
+    padding: 8px 10px;
+  }
 }

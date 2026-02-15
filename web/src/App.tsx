@@ -195,7 +195,7 @@ export default function App() {
 
                 <div className="metaRow">
                   <div className="metaKey">URL</div>
-                  <div className="metaVal" style={{ maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis", textAlign: "right" }}>
+                  <div className="metaVal" style={{ maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis" }}>
                     {data?.source_url ?? "—"}
                   </div>
                 </div>
