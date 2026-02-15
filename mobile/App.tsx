@@ -199,7 +199,7 @@ export default function App() {
             </View>
 
             <View style={styles.pickerWrap}>
-              <Picker selectedValue={country} onValueChange={(v) => onSelectCountry(String(v))}>
+              <Picker selectedValue={country} onValueChange={(v) => onSelectCountry(String(v))} style={styles.picker} dropdownIconColor="#475569">
                 {countries.map((c) => (
                   <Picker.Item key={c} label={c} value={c} />
                 ))}
@@ -308,6 +308,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.08)",
     backgroundColor: "#F3F5FF",
+  },
+  picker: {
+    color: "#0F172A",
   },
   grid: {
     marginTop: 14,
