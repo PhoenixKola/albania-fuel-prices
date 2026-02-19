@@ -21,7 +21,6 @@ The App fetches fuel price data from a **publicly available JSON source hosted o
 The App displays ads and uses third-party advertising SDKs (for example, Google Mobile Ads / AdMob).
 
 These SDKs may automatically collect certain device and usage information in order to serve and measure ads. This may include:
-- **Advertising ID (AAID)** (if available on your device)
 - IP address (used for network communication)
 - Approximate location inferred from IP (depending on the ad network’s settings)
 - Ad performance and interaction data (e.g., impressions, clicks)
