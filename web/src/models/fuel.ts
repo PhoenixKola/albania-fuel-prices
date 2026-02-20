@@ -15,4 +15,5 @@ export type LatestEurope = {
   countries: CountryPrices[];
 };
 
-export type Lang = "en" | "sq";
+export type FuelType = "gasoline95" | "diesel" | "lpg";
+export const FUEL_TYPES: FuelType[] = ["gasoline95", "diesel", "lpg"];
