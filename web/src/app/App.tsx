@@ -145,18 +145,7 @@ export default function App() {
                 onCopy={copyText}
                 onShare={shareText}
               />
-
-              <QuickCalcCard
-                t={t}
-                fuelType={fuelType}
-                setFuelType={setFuelType}
-                currency={currency}
-                setCurrency={setCurrency}
-                allPerEur={allPerEur}
-                setAllPerEur={setAllPerEur}
-                priceEur={priceForTools}
-              />
-
+              
               {country === "Albania" ? (
                 <CityEstimateCard
                   t={t}
@@ -169,6 +158,17 @@ export default function App() {
                   allPerEur={allPerEur}
                 />
               ) : null}
+
+              <QuickCalcCard
+                t={t}
+                fuelType={fuelType}
+                setFuelType={setFuelType}
+                currency={currency}
+                setCurrency={setCurrency}
+                allPerEur={allPerEur}
+                setAllPerEur={setAllPerEur}
+                priceEur={priceForTools}
+              />
             </div>
 
             <div className="sideCol">
