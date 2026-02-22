@@ -549,19 +549,20 @@ select {
 :root[data-theme="light"] .toast { background: rgba(255,255,255,0.78); }
 
 .adbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 9999;
+  position: static;
+  z-index: auto;
   display: flex;
   justify-content: center;
   padding: 10px 12px;
+  margin-top: 16px;
   background: rgba(8, 12, 18, 0.72);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(10px);
 }
-:root[data-theme="light"] .adbar { background: rgba(255, 255, 255, 0.78); }
+
+:root[data-theme="light"] .adbar {
+  background: rgba(255, 255, 255, 0.78);
+}
 
 .fab {
   position: fixed;

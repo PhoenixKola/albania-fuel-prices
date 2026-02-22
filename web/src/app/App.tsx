@@ -203,6 +203,7 @@ export default function App() {
               />
             </div>
           </div>
+          <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
         </div>
       </div>
 
@@ -211,8 +212,6 @@ export default function App() {
       <Modal open={sourceOpen} title={t.source} onClose={() => setSourceOpen(false)}>
         <SourceCard t={t} lang={lang} data={data} />
       </Modal>
-
-      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
     </>
   );
 }
