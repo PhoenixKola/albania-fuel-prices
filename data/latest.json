@@ -1,9 +1,9 @@
 {
   "region": "Europe",
-  "as_of": "2026-02-22",
+  "as_of": "2026-02-23",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-02-22T07:04:43.142Z",
+  "fetched_at_utc": "2026-02-23T07:19:48.843Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
@@ -170,9 +170,9 @@
     },
     {
       "country": "Switzerland",
-      "gasoline95_eur": 1.838,
-      "diesel_eur": 1.97,
-      "lpg_eur": 1.165
+      "gasoline95_eur": 1.855,
+      "diesel_eur": 1.979,
+      "lpg_eur": 1.17
     },
     {
       "country": "The Netherlands",
@@ -182,21 +182,21 @@
     },
     {
       "country": "Türkiye",
-      "gasoline95_eur": 1.078,
-      "diesel_eur": 1.122,
+      "gasoline95_eur": 1.11,
+      "diesel_eur": 1.125,
       "lpg_eur": 0.586
     },
     {
       "country": "Ukraine",
-      "gasoline95_eur": 1.24,
-      "diesel_eur": 1.244,
+      "gasoline95_eur": 1.248,
+      "diesel_eur": 1.256,
       "lpg_eur": 0.774
     },
     {
       "country": "United Kingdom",
-      "gasoline95_eur": 1.516,
-      "diesel_eur": 1.623,
-      "lpg_eur": 0.96
+      "gasoline95_eur": 1.518,
+      "diesel_eur": 1.631,
+      "lpg_eur": 1.043
     }
   ]
 }
