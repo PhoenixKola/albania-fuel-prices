@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, RefreshControl, ScrollView, StatusBar, Text, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Animated, Easing, Pressable, RefreshControl, ScrollView, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import mobileAds, { TestIds } from "react-native-google-mobile-ads";
+import { Ionicons } from "@expo/vector-icons";
 
 import { DATA_URL } from "../constants/urls";
 import {
@@ -33,6 +34,7 @@ import StationsCard from "../components/stations/StationsCard";
 import { useUserLocation } from "../hooks/useUserLocation";
 import { useNearbyStations } from "../hooks/useNearbyStations";
 import AdBar from "../components/ads/AdBar";
+import SegmentedControl from "../components/ui/SegmentedControl";
 
 import { makeHomeStyles } from "./HomeScreen.styles";
 
@@ -48,30 +50,58 @@ function parseStringArray(raw: string) {
   }
 }
 
+function AnimatedPressable({
+  onPress,
+  children,
+  style,
+  contentStyle,
+  scaleIn = 0.97
+}: {
+  onPress?: () => void;
+  children: React.ReactNode;
+  style?: any;
+  contentStyle?: any;
+  scaleIn?: number;
+}) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const pressIn = () => {
+    Animated.timing(scale, { toValue: scaleIn, duration: 90, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+  };
+
+  const pressOut = () => {
+    Animated.timing(scale, { toValue: 1, duration: 120, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+  };
+
+  return (
+    <Animated.View style={[{ transform: [{ scale }] }, style]}>
+      <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} style={contentStyle}>
+        {children}
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 export default function HomeScreen() {
   const { theme, themeName, toggleTheme } = useTheme();
   const s = useMemo(() => makeHomeStyles(theme), [theme]);
 
   const { value: lang, setValue: setLang } = useAsyncStorageState<Lang>(STORAGE_LANG_KEY, "en", {
-    deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
+    deserialize: (raw) => (raw === "sq" ? "sq" : "en")
   });
 
-  const { value: radiusM, setValue: setRadiusM } = useAsyncStorageState<number>(
-    STORAGE_STATIONS_RADIUS_KEY,
-    5000,
-    {
-      deserialize: (raw) => {
-        const n = Number(raw);
-        return n === 2000 || n === 5000 || n === 10000 ? n : 5000;
-      },
-      serialize: (v) => String(v),
-    }
-  );
+  const { value: radiusM, setValue: setRadiusM } = useAsyncStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
+    deserialize: (raw) => {
+      const n = Number(raw);
+      return n === 2000 || n === 5000 || n === 10000 ? n : 5000;
+    },
+    serialize: (v) => String(v)
+  });
 
   const { value: country, setValue: setCountry } = useAsyncStorageState<string>(STORAGE_COUNTRY_KEY, "Albania");
 
   const { value: fuelType, setValue: setFuelType } = useAsyncStorageState<FuelType>(STORAGE_FUELTYPE_KEY, "diesel", {
-    deserialize: (raw) => (raw === "gasoline95" || raw === "lpg" || raw === "diesel" ? raw : "diesel"),
+    deserialize: (raw) => (raw === "gasoline95" || raw === "lpg" || raw === "diesel" ? raw : "diesel")
   });
 
   const { value: city, setValue: setCity } = useAsyncStorageState<string>(STORAGE_CITY_KEY, "Tirana");
@@ -81,7 +111,7 @@ export default function HomeScreen() {
       const n = Number(raw);
       return Number.isFinite(n) ? n : 0;
     },
-    serialize: (v) => String(v),
+    serialize: (v) => String(v)
   });
 
   const { value: favorites, setValue: setFavorites } = useAsyncStorageState<string[]>(
@@ -108,7 +138,7 @@ export default function HomeScreen() {
   const t = i18n[lang];
 
   const { data, prevSelected, cacheSavedAtUtc, isFromCache, error, loading, refreshing, countries, selected, refresh } =
-  useFuelData({ url: DATA_URL, country, setCountry });
+    useFuelData({ url: DATA_URL, country, setCountry });
 
   const fx = useFxRates();
 
@@ -161,35 +191,78 @@ export default function HomeScreen() {
           subtitle={data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading}
           langPillLabel={lang === "en" ? t.langSQ : t.langEN}
           onToggleLang={toggleLang}
-          themePillLabel={themeName === "dark" ? "☀️" : "🌙"}
           onToggleTheme={toggleTheme}
         />
 
         {favorites.length ? (
           <View style={s.quickCard}>
-            <View style={s.quickHeader}>
-              <Text style={s.quickTitle}>{t.quickSwitch}</Text>
-              <Pressable onPress={() => setCountryModalOpen(true)} style={s.quickBtn}>
-                <Text style={s.quickBtnText}>{t.edit}</Text>
-              </Pressable>
+            <View style={s.cardHeader}>
+              <View style={s.cardHeaderLeft}>
+                <View style={s.headerIcon}>
+                  <Ionicons name="flash-outline" size={18} color={theme.colors.linkText} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.cardTitle}>{t.quickSwitch}</Text>
+                  <Text style={s.cardSub}>{t.tapToSwitch ?? ""}</Text>
+                </View>
+              </View>
+
+              <AnimatedPressable
+                onPress={() => setCountryModalOpen(true)}
+                contentStyle={s.headerBtn}
+                scaleIn={0.98}
+              >
+                <Ionicons name="create-outline" size={16} color={theme.colors.text} />
+                <Text style={s.headerBtnText}>{t.edit}</Text>
+              </AnimatedPressable>
             </View>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.quickRow}>
               {favorites.map((c) => {
                 const active = c === country;
                 return (
-                  <Pressable
+                  <AnimatedPressable
                     key={c}
                     onPress={() => setCountry(c)}
-                    style={[s.quickPill, active ? s.quickPillActive : null]}
+                    contentStyle={[s.quickPill, active ? s.quickPillActive : null]}
+                    scaleIn={0.97}
                   >
+                    <Ionicons
+                      name={active ? "checkmark-circle" : "star-outline"}
+                      size={16}
+                      color={active ? theme.colors.text : theme.colors.muted}
+                      style={{ marginRight: 8 }}
+                    />
                     <Text style={[s.quickPillText, active ? s.quickPillTextActive : null]}>{c}</Text>
-                  </Pressable>
+                  </AnimatedPressable>
                 );
               })}
             </ScrollView>
           </View>
-        ) : null}
+        ) : (
+          <View style={s.quickCard}>
+            <View style={s.cardHeader}>
+              <View style={s.cardHeaderLeft}>
+                <View style={s.headerIcon}>
+                  <Ionicons name="star-outline" size={18} color={theme.colors.linkText} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.cardTitle}>{t.quickSwitch}</Text>
+                  <Text style={s.cardSub}>{t.quickSwitchEmpty ?? ""}</Text>
+                </View>
+              </View>
+
+              <AnimatedPressable
+                onPress={() => setCountryModalOpen(true)}
+                contentStyle={s.headerBtnPrimary}
+                scaleIn={0.98}
+              >
+                <Ionicons name="add" size={18} color={theme.colors.primaryText} />
+                <Text style={s.headerBtnPrimaryText}>{t.edit}</Text>
+              </AnimatedPressable>
+            </View>
+          </View>
+        )}
 
         {error ? (
           <ErrorCard theme={theme} title={t.couldntLoad} message={error} cta={t.tryAgain} onPress={refresh} />
@@ -246,25 +319,15 @@ export default function HomeScreen() {
           />
         ) : null}
 
-        <View style={s.sectionToggle}>
-          <Pressable
-            onPress={() => setSection("rankings")}
-            style={[s.sectionPill, section === "rankings" ? s.sectionPillActive : null]}
-          >
-            <Text style={[s.sectionPillText, section === "rankings" ? s.sectionPillTextActive : null]}>
-              {t.rankingsTitle}
-            </Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => setSection("compare")}
-            style={[s.sectionPill, section === "compare" ? s.sectionPillActive : null]}
-          >
-            <Text style={[s.sectionPillText, section === "compare" ? s.sectionPillTextActive : null]}>
-              {t.compareTitle}
-            </Text>
-          </Pressable>
-        </View>
+        <SegmentedControl
+          theme={theme}
+          value={section}
+          onChange={setSection}
+          items={[
+            { value: "rankings", label: t.rankingsTitle, icon: "podium-outline" },
+            { value: "compare", label: t.compareTitle, icon: "git-compare-outline" }
+          ]}
+        />
 
         {section === "rankings" ? (
           <RankingCard

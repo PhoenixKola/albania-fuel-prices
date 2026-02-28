@@ -76,6 +76,8 @@ export const i18n = {
     stationsNearbyShowMore: "Show more",
     stationsNearbyShowAll: "Show all",
     stationsNearbyCollapse: "Collapse",
+    tapToSwitch: "Tap a country to switch instantly.",
+    quickSwitchEmpty: "Add favorites to switch countries in one tap.",
   },
   sq: {
     title: "Çmimet e Karburanteve në Europë",
@@ -152,5 +154,7 @@ export const i18n = {
     stationsNearbyShowMore: "Shfaq më shumë",
     stationsNearbyShowAll: "Shfaq të gjitha",
     stationsNearbyCollapse: "Mbyll",
+    tapToSwitch: "Prek një shtet për ta ndërruar menjëherë.",
+    quickSwitchEmpty: "Shto të preferuarat që t’i ndërroni shtetet me një prekje.",
   },
 } as const;

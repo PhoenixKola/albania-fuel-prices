@@ -1,10 +1,13 @@
 import React, { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 import type { Theme } from "../../theme/theme";
 import type { FuelType, LatestEurope } from "../../types/fuel";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
 import { getCurrencyForCountry, convertEur } from "../../utils/currency";
 import { formatMoney, hasRate } from "../../utils/money";
+import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeCompareStyles } from "./CompareCard.styles";
 
 type CurrencyMode = "eur" | "local";
@@ -51,11 +54,8 @@ export default function CompareCard(props: {
       const localOk = hasRate(currency, props.fxRates);
       const localText = localOk ? formatMoney(convertEur(eur, currency, props.fxRates), currency) : null;
 
-      const right =
-        props.currencyMode === "local" && localText ? localText : eurText;
-
-      const sub =
-        props.currencyMode === "local" && localText ? eurText : localText ? localText : null;
+      const right = props.currencyMode === "local" && localText ? localText : eurText;
+      const sub = props.currencyMode === "local" && localText ? eurText : localText ? localText : null;
 
       return { name, rank, right, sub };
     });
@@ -66,14 +66,25 @@ export default function CompareCard(props: {
   return (
     <View style={s.card}>
       <View style={s.headerRow}>
-        <View style={{ flex: 1 }}>
-          <Text style={s.title}>{props.t.compareTitle}</Text>
-          <Text style={s.subtitle}>{props.t.compareSubtitle(fuelName)}</Text>
+        <View style={s.headerLeft}>
+          <View style={s.headerIcon}>
+            <Ionicons name="git-compare-outline" size={18} color={props.theme.colors.linkText} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.title}>{props.t.compareTitle}</Text>
+            <Text style={s.subtitle}>{props.t.compareSubtitle(fuelName)}</Text>
+          </View>
         </View>
 
-        <Pressable onPress={props.onAddPress} style={[s.btn, !canAddMore ? s.btnDisabled : null]} disabled={!canAddMore}>
+        <AnimatedPressable
+          onPress={props.onAddPress}
+          disabled={!canAddMore}
+          contentStyle={[s.btn, !canAddMore ? s.btnDisabled : null]}
+          scaleIn={0.98}
+        >
+          <Ionicons name="add" size={18} color={props.theme.colors.text} />
           <Text style={s.btnText}>{props.t.addCountry}</Text>
-        </Pressable>
+        </AnimatedPressable>
       </View>
 
       {props.compareCountries.length < 2 ? <Text style={s.hint}>{props.t.compareHint}</Text> : null}
@@ -86,6 +97,7 @@ export default function CompareCard(props: {
               <View style={s.rankBubble}>
                 <Text style={s.rankText}>{r.rank ?? "—"}</Text>
               </View>
+
               <View style={{ flex: 1 }}>
                 <Text style={s.country}>{r.name}</Text>
                 {r.sub ? <Text style={s.sub}>{r.sub}</Text> : null}
@@ -94,9 +106,11 @@ export default function CompareCard(props: {
 
             <View style={s.right}>
               <Text style={s.price}>{r.right}</Text>
-              <Pressable onPress={() => props.onRemove(r.name)} style={s.removeBtn}>
+
+              <AnimatedPressable onPress={() => props.onRemove(r.name)} contentStyle={s.removeBtn} scaleIn={0.98}>
+                <Ionicons name="trash-outline" size={16} color={props.theme.colors.muted} />
                 <Text style={s.removeText}>{props.t.remove}</Text>
-              </Pressable>
+              </AnimatedPressable>
             </View>
           </View>
         ))}

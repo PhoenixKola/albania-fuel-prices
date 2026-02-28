@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 import type { Theme } from "../../theme/theme";
 import type { FuelType, LatestEurope } from "../../types/fuel";
-import { formatPriceEur } from "../../utils/format";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
 import SegmentedControl from "../ui/SegmentedControl";
+import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeRankingStyles } from "./RankingCard.styles";
 import { CurrencyMode, formatFuelPrice } from "../../utils/priceDisplay";
 
@@ -17,7 +19,7 @@ export default function RankingCard(props: {
   currentCountry: string;
   onOpenCountry: (c: string) => void;
   currencyMode: CurrencyMode;
-  fxRates: Record<string, number> | null
+  fxRates: Record<string, number> | null;
 }) {
   const s = useMemo(() => makeRankingStyles(props.theme), [props.theme]);
 
@@ -25,7 +27,7 @@ export default function RankingCard(props: {
     () => [
       { value: "diesel" as const, label: props.t.diesel },
       { value: "gasoline95" as const, label: props.t.gasoline95 },
-      { value: "lpg" as const, label: props.t.lpg },
+      { value: "lpg" as const, label: props.t.lpg }
     ],
     [props.t]
   );
@@ -49,32 +51,50 @@ export default function RankingCard(props: {
 
   return (
     <View style={s.card}>
-      <Text style={s.title}>{props.t.rankingsTitle}</Text>
-      <Text style={s.subtitle}>{props.t.rankingsSubtitle(fuelName)}</Text>
+      <View style={s.headerRow}>
+        <View style={s.headerLeft}>
+          <View style={s.headerIcon}>
+            <Ionicons name="podium-outline" size={18} color={props.theme.colors.linkText} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.title}>{props.t.rankingsTitle}</Text>
+            <Text style={s.subtitle}>{props.t.rankingsSubtitle(fuelName)}</Text>
+          </View>
+        </View>
+      </View>
 
       <SegmentedControl theme={props.theme} value={props.fuelType} items={fuelItems} onChange={props.setFuelType} />
 
-      {currentRank != null ? (
-        <Text style={s.note}>{props.t.yourRank(currentRank)}</Text>
-      ) : (
-        <Text style={s.note}>{props.t.rankUnavailable}</Text>
-      )}
+      <Text style={s.note}>
+        {currentRank != null ? props.t.yourRank(currentRank) : props.t.rankUnavailable}
+      </Text>
 
-      <View>
+      <View style={s.list}>
         {top.map((r, i) => {
           const active = r.country === props.currentCountry;
           return (
-            <Pressable
+            <AnimatedPressable
               key={r.country}
               onPress={() => props.onOpenCountry(r.country)}
-              style={[s.row, active ? s.rowActive : null, i === top.length - 1 ? { borderBottomWidth: 0 } : null]}
+              contentStyle={[s.row, active ? s.rowActive : null, i === top.length - 1 ? { borderBottomWidth: 0 } : null]}
+              scaleIn={0.99}
             >
               <View style={s.left}>
-                <Text style={s.rank}>{i + 1}</Text>
-                <Text style={s.country}>{r.country}</Text>
+                <View style={[s.rankBubble, active ? s.rankBubbleActive : null]}>
+                  <Text style={[s.rankText, active ? s.rankTextActive : null]}>{i + 1}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.country, active ? s.countryActive : null]}>{r.country}</Text>
+                </View>
               </View>
-              <Text style={s.price}>{formatFuelPrice(r.country, r.price, props.currencyMode, props.fxRates)}</Text>
-            </Pressable>
+
+              <View style={s.right}>
+                <Text style={[s.price, active ? s.priceActive : null]}>
+                  {formatFuelPrice(r.country, r.price, props.currencyMode, props.fxRates)}
+                </Text>
+                <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.35)" />
+              </View>
+            </AnimatedPressable>
           );
         })}
       </View>

@@ -5,143 +5,121 @@ export const makeFuelCardStyles = (theme: Theme) =>
   StyleSheet.create({
     card: {
       backgroundColor: theme.colors.card,
-      borderRadius: 16,
+      borderRadius: 18,
       padding: 16,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      gap: 12,
-    },
-    rowBetween: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 10,
-    },
-    title: {
-      fontSize: 16,
-      fontWeight: "800",
-      color: theme.colors.text,
-    },
-    countryName: {
-      fontSize: 18,
-      fontWeight: "900",
-      color: theme.colors.text,
-    },
-    btnGhost: {
-      paddingVertical: 7,
-      paddingHorizontal: 10,
-      borderRadius: 12,
-      backgroundColor: theme.colors.pillBg,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    btnGhostText: {
-      fontSize: 13,
-      fontWeight: "800",
-      color: theme.colors.text,
+      gap: 12
     },
 
-    currencyRow: {
+    headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
+    headerLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+    headerIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 16,
+      backgroundColor: theme.colors.linkBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    },
+    title: { fontSize: 16, fontWeight: "900", color: theme.colors.text },
+
+    badgeRow: { marginTop: 6, flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+    badge: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
-      gap: 10,
+      gap: 6,
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      borderRadius: 999,
+      backgroundColor: theme.colors.linkBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
     },
-    currencyLabel: {
-      color: theme.colors.muted,
-      fontWeight: "800",
-      fontSize: 12,
-    },
-    currencyPills: {
-      flexDirection: "row",
-      gap: 8,
-      alignItems: "center",
-    },
-    currencyPill: {
+    badgeText: { fontWeight: "900", color: theme.colors.linkText, fontSize: 12 },
+    loadingPill: {
       paddingVertical: 6,
       paddingHorizontal: 10,
       borderRadius: 999,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    currencyPillActive: {
-      backgroundColor: theme.colors.tile,
-    },
-    currencyPillDisabled: {
-      opacity: 0.5,
-    },
-    currencyPillText: {
-      fontSize: 12,
-      fontWeight: "900",
-      color: theme.colors.muted,
-    },
-    currencyPillTextActive: {
-      color: theme.colors.text,
-    },
-    currencyPillTextDisabled: {
-      color: theme.colors.muted,
+      borderColor: theme.colors.border
     },
 
-    grid: {
-      gap: 10,
-    },
-    tile: {
-      borderRadius: 14,
-      padding: 12,
-      backgroundColor: theme.colors.tile,
+    headerActions: { flexDirection: "row", alignItems: "center", gap: 10 },
+
+    iconBtn: {
+      width: 44,
+      height: 44,
+      borderRadius: 16,
+      backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
       borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
     },
-    tileLabel: {
-      fontSize: 13,
-      color: theme.colors.muted,
-      fontWeight: "700",
+    iconBtnDisabled: { opacity: 0.6 },
+
+    countryRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+    countryName: { fontSize: 18, fontWeight: "900", color: theme.colors.text },
+    subText: { marginTop: 6, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
+
+    ghostBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
     },
-    tileValue: {
-      marginTop: 6,
-      fontSize: 18,
-      fontWeight: "900",
-      color: theme.colors.text,
-    },
-    divider: {
-      height: 1,
-      backgroundColor: theme.colors.border,
-    },
-    metaLabel: {
-      fontSize: 12,
-      fontWeight: "900",
-      color: theme.colors.muted,
-      marginBottom: 6,
-    },
-    metaText: {
-      fontSize: 14,
-      fontWeight: "700",
-      color: theme.colors.text,
-      flex: 1,
-      paddingRight: 10,
-    },
-    linkBtn: {
-      paddingVertical: 7,
+    ghostBtnText: { fontSize: 12, fontWeight: "900", color: theme.colors.text },
+
+    label: { color: theme.colors.muted, fontWeight: "900", fontSize: 12 },
+
+    currencyRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
+    currencyPills: { flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" },
+
+    pill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingVertical: 8,
       paddingHorizontal: 10,
-      borderRadius: 12,
+      borderRadius: 999,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    pillActive: { backgroundColor: theme.colors.tile },
+    pillDisabled: { opacity: 0.5 },
+    pillText: { fontSize: 12, fontWeight: "900", color: theme.colors.muted },
+    pillTextActive: { color: theme.colors.text },
+    pillTextDisabled: { color: theme.colors.muted },
+
+    grid: { gap: 10 },
+
+    divider: { height: 1, backgroundColor: theme.colors.border },
+
+    sourceRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+    sourceText: { marginTop: 6, fontSize: 14, fontWeight: "800", color: theme.colors.text },
+
+    linkBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 16,
       backgroundColor: theme.colors.linkBg,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.colors.border
     },
-    linkBtnText: {
-      fontSize: 13,
-      fontWeight: "900",
-      color: theme.colors.linkText,
-    },
-    mutedSmall: {
-      fontSize: 12,
-      color: theme.colors.muted,
-    },
-    tileDelta: {
-      marginTop: 6,
-      fontSize: 12,
-      color: theme.colors.muted,
-      fontWeight: "800",
-    },
+    linkBtnText: { fontSize: 12, fontWeight: "900", color: theme.colors.linkText },
+
+    mutedSmall: { fontSize: 12, color: theme.colors.muted, fontWeight: "700" }
   });

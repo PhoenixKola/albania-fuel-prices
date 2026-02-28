@@ -8,24 +8,30 @@ export const makeSegmentedStyles = (theme: Theme) =>
       borderWidth: 1,
       borderColor: theme.colors.border,
       backgroundColor: theme.colors.card,
-      borderRadius: 14,
-      overflow: "hidden",
+      borderRadius: 16,
+      overflow: "hidden"
     },
+
     item: {
       flex: 1,
-      paddingVertical: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
       alignItems: "center",
       justifyContent: "center",
+      flexDirection: "row"
     },
+
     itemActive: {
-      backgroundColor: theme.colors.tile,
+      backgroundColor: theme.colors.tile
     },
+
     text: {
-      fontWeight: "800",
+      fontWeight: "900",
       color: theme.colors.muted,
-      fontSize: 13,
+      fontSize: 13
     },
+
     textActive: {
-      color: theme.colors.text,
-    },
+      color: theme.colors.text
+    }
   });

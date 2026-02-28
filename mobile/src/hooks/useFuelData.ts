@@ -13,8 +13,8 @@ function safeParseEnvelope(raw: string | null): CacheEnvelope | null {
   try {
     const j = JSON.parse(raw);
     if (!j || typeof j !== "object") return null;
-    if (typeof j.savedAtUtc !== "string") return null;
-    if (!j.data || typeof j.data !== "object") return null;
+    if (typeof (j as any).savedAtUtc !== "string") return null;
+    if (!(j as any).data || typeof (j as any).data !== "object") return null;
     return j as CacheEnvelope;
   } catch {
     return null;
@@ -31,6 +31,12 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
 
   const [data, setData] = useState<LatestEurope | null>(null);
   const [prevData, setPrevData] = useState<LatestEurope | null>(null);
+
+  // ✅ keep latest data in a ref so load() doesn't depend on state
+  const dataRef = useRef<LatestEurope | null>(null);
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
 
   const [cacheSavedAtUtc, setCacheSavedAtUtc] = useState<string | null>(null);
   const [isFromCache, setIsFromCache] = useState(false);
@@ -55,12 +61,9 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
 
   const persistCache = useCallback(async (next: LatestEurope, prev: LatestEurope | null) => {
     const now = new Date().toISOString();
-    const nextEnv: CacheEnvelope = { savedAtUtc: now, data: next };
-    await AsyncStorage.setItem(STORAGE_FUEL_CACHE_KEY, JSON.stringify(nextEnv));
-
+    await AsyncStorage.setItem(STORAGE_FUEL_CACHE_KEY, JSON.stringify({ savedAtUtc: now, data: next } as CacheEnvelope));
     if (prev) {
-      const prevEnv: CacheEnvelope = { savedAtUtc: now, data: prev };
-      await AsyncStorage.setItem(STORAGE_FUEL_PREV_KEY, JSON.stringify(prevEnv));
+      await AsyncStorage.setItem(STORAGE_FUEL_PREV_KEY, JSON.stringify({ savedAtUtc: now, data: prev } as CacheEnvelope));
     }
   }, []);
 
@@ -71,26 +74,19 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
       else setLoading(true);
 
       try {
-        const r = await fetch(url);
+        const r = await fetch(url, { cache: "no-store" });
         if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
         const json: LatestEurope = await r.json();
 
-        setPrevData((currentPrev) => {
-          const current = data ?? null;
-          const prevToStore = current;
-          if (current) persistCache(json, prevToStore).catch(() => {});
-          else persistCache(json, null).catch(() => {});
-          return currentPrev;
-        });
-
-        const prev = data;
-        if (prev) {
-          setPrevData(prev);
-        }
+        const prev = dataRef.current; // ✅ stable latest
+        if (prev) setPrevData(prev);
 
         setData(json);
         setCacheSavedAtUtc(new Date().toISOString());
         setIsFromCache(false);
+
+        // persist after state updates, but using prev from ref
+        persistCache(json, prev).catch(() => {});
 
         if (json.countries?.length) {
           const current = countryRef.current;
@@ -105,9 +101,10 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
         setRefreshing(false);
       }
     },
-    [url, setCountry, data, persistCache]
+    [url, setCountry, persistCache]
   );
 
+  // ✅ run once on mount (or when url changes), not every time data changes
   useEffect(() => {
     let cancelled = false;
 
@@ -120,7 +117,7 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
     return () => {
       cancelled = true;
     };
-  }, [load, loadCache]);
+  }, [loadCache, load]);
 
   const countries = useMemo(() => (data?.countries ?? []).map((c) => c.country), [data]);
 
@@ -145,6 +142,6 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
     refreshing,
     countries,
     selected,
-    refresh: () => load(true),
+    refresh: () => load(true)
   };
 }

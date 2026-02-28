@@ -17,7 +17,7 @@ type Props = {
   selected: CountryPrices | null;
   onSelectCountry: (next: string) => void;
 
-  currency: Currency;           // "eur" | "local"
+  currency: Currency;
   fxRates: FxRates | null;
 
   onCopy: (text: string) => void;

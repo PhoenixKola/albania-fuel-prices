@@ -5,30 +5,54 @@ export const makeErrorCardStyles = (theme: Theme) =>
   StyleSheet.create({
     card: {
       backgroundColor: theme.colors.card,
-      borderRadius: 16,
-      padding: 16,
+      borderRadius: 18,
+      padding: 14,
       borderWidth: 1,
       borderColor: theme.colors.border,
+      gap: 12
     },
+
+    head: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 12
+    },
+
+    icon: {
+      width: 40,
+      height: 40,
+      borderRadius: 16,
+      backgroundColor: theme.colors.linkBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    },
+
     title: {
-      fontSize: 16,
-      fontWeight: "800",
-      marginBottom: 6,
-      color: theme.colors.danger,
+      fontSize: 15,
+      fontWeight: "900",
+      color: theme.colors.danger
     },
+
     msg: {
+      marginTop: 6,
       color: theme.colors.subText,
       lineHeight: 18,
+      fontWeight: "700"
     },
+
     btn: {
-      marginTop: 12,
-      backgroundColor: theme.colors.primary,
-      paddingVertical: 10,
-      borderRadius: 12,
+      flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 12,
+      borderRadius: 16
     },
+
     btnText: {
       color: theme.colors.primaryText,
-      fontWeight: "800",
-    },
+      fontWeight: "900"
+    }
   });
