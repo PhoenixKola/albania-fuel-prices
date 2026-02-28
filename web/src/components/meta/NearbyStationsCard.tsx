@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { TDict } from "../../locales";
 import { useUserLocationWeb } from "../../hooks/useUserLocationWeb";
-import { useNearbyStationsWeb } from "../../hooks/useNearbyStationWeb";
+import { useNearbyStationsWeb } from "../../hooks/useNearbyStationsWeb";
 
 type Station = {
   id: string | number;
@@ -92,8 +92,8 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
         </div>
 
         {!loc.coords ? (
-          <button className="btn btn-primary" type="button" onClick={loc.request} disabled={loc.loading}>
-            {loc.loading ? t.stationsGettingLocation : t.stationsUseMyLocation}
+          <button className="btn btn-primary" type="button" onClick={loc.request} disabled={loc.loading || loc.checking}>
+            {loc.loading || loc.checking ? t.stationsGettingLocation : t.stationsUseMyLocation}
           </button>
         ) : (
           <div className="toolbarRow" style={{ marginTop: 10 }}>
