@@ -2,8 +2,9 @@ import type { LatestEurope, FuelType } from "../../models/fuel";
 import type { TDict } from "../../locales";
 import Chip from "../ui/Chip";
 import { getEurPrice, fuelLabel } from "../../utils/fuel";
-import { formatEurPerLiter, formatAllPerLiter } from "../../utils/format";
 import type { Currency } from "../../models/currency";
+import { formatFuelPrice } from "../../utils/priceDisplay";
+import type { FxRates } from "../../utils/currency";
 
 type Props = {
   t: TDict;
@@ -16,7 +17,7 @@ type Props = {
   onOpen: (country: string) => void;
   fuelType: FuelType;
   currency: Currency;
-  allPerEur: number;
+  fxRates: FxRates | null;
 };
 
 export default function WatchlistCard({
@@ -30,7 +31,7 @@ export default function WatchlistCard({
   onOpen,
   fuelType,
   currency,
-  allPerEur,
+  fxRates,
 }: Props) {
   const rows =
     data?.countries
@@ -69,9 +70,7 @@ export default function WatchlistCard({
               {rows.map((r) => (
                 <div key={r.country} className="tRow">
                   <div className="tLeft">{r.country}</div>
-                  <div className="tMid">
-                    {currency === "EUR" ? formatEurPerLiter(r.eur) : formatAllPerLiter(r.eur, allPerEur)}
-                  </div>
+                  <div className="tMid">{formatFuelPrice(r.country, r.eur, currency, fxRates)}</div>
                   <div className="tRight">
                     <button className="btn btn-ghost" type="button" onClick={() => onOpen(r.country)}>
                       {t.openCountry}

@@ -1,35 +1,39 @@
 import { StyleSheet } from "react-native";
 import type { Theme } from "../../theme/theme";
 
-export const makeCountryModalStyles = (theme: Theme) =>
+export const makeCompareStyles = (theme: Theme) =>
   StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: theme.colors.overlay,
-      justifyContent: "flex-end",
-    },
-    sheet: {
-      backgroundColor: theme.colors.bg,
-      borderTopLeftRadius: 18,
-      borderTopRightRadius: 18,
+    card: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 16,
       padding: 16,
-      borderTopWidth: 1,
+      borderWidth: 1,
       borderColor: theme.colors.border,
-      maxHeight: "85%",
+      gap: 12,
     },
     headerRow: {
       flexDirection: "row",
-      alignItems: "center",
+      alignItems: "flex-start",
       justifyContent: "space-between",
-      gap: 12,
-      marginBottom: 10,
+      gap: 10,
     },
     title: {
       fontSize: 16,
-      fontWeight: "800",
+      fontWeight: "900",
       color: theme.colors.text,
     },
-    closeBtn: {
+    subtitle: {
+      marginTop: 4,
+      color: theme.colors.muted,
+      fontWeight: "700",
+      fontSize: 12,
+    },
+    hint: {
+      color: theme.colors.muted,
+      fontWeight: "700",
+      fontSize: 12,
+    },
+    btn: {
       paddingVertical: 8,
       paddingHorizontal: 12,
       borderRadius: 12,
@@ -37,28 +41,20 @@ export const makeCountryModalStyles = (theme: Theme) =>
       borderWidth: 1,
       borderColor: theme.colors.border,
     },
-    closeText: {
-      fontSize: 13,
-      fontWeight: "800",
-      color: theme.colors.text,
+    btnDisabled: {
+      opacity: 0.5,
     },
-    input: {
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      borderRadius: 14,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
+    btnText: {
       color: theme.colors.text,
-      backgroundColor: theme.colors.card,
-      marginBottom: 10,
-      fontWeight: "600",
+      fontWeight: "900",
+      fontSize: 12,
     },
     list: {
       borderRadius: 14,
       overflow: "hidden",
       borderWidth: 1,
       borderColor: theme.colors.border,
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.tile,
     },
     row: {
       paddingVertical: 12,
@@ -68,47 +64,60 @@ export const makeCountryModalStyles = (theme: Theme) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: 10,
+      gap: 12,
     },
-    rowText: {
-      color: theme.colors.text,
-      fontWeight: "700",
-      flex: 1,
-    },
-    right: {
+    left: {
       flexDirection: "row",
       alignItems: "center",
       gap: 10,
+      flex: 1,
     },
-    starBtn: {
-      paddingVertical: 4,
-      paddingHorizontal: 6,
-      borderRadius: 10,
-      backgroundColor: theme.colors.pillBg,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    starText: {
-      fontSize: 14,
-      fontWeight: "900",
-    },
-    starOn: {
-      color: theme.colors.text,
-    },
-    starOff: {
-      color: theme.colors.muted,
-    },
-    badge: {
-      paddingVertical: 4,
-      paddingHorizontal: 10,
+    rankBubble: {
+      width: 28,
+      height: 28,
       borderRadius: 999,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
       borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center",
     },
-    badgeText: {
+    rankText: {
+      color: theme.colors.text,
+      fontWeight: "900",
+      fontSize: 12,
+    },
+    country: {
+      color: theme.colors.text,
+      fontWeight: "900",
+      fontSize: 14,
+    },
+    sub: {
+      marginTop: 2,
       color: theme.colors.muted,
-      fontWeight: "800",
+      fontWeight: "700",
+      fontSize: 12,
+    },
+    right: {
+      alignItems: "flex-end",
+      gap: 6,
+    },
+    price: {
+      color: theme.colors.text,
+      fontWeight: "900",
+      fontSize: 14,
+    },
+    removeBtn: {
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      borderRadius: 12,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    removeText: {
+      color: theme.colors.muted,
+      fontWeight: "900",
       fontSize: 12,
     },
   });

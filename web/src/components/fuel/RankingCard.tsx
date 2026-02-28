@@ -2,8 +2,9 @@ import type { LatestEurope, FuelType } from "../../models/fuel";
 import type { TDict } from "../../locales";
 import { FUEL_TYPES } from "../../models/fuel";
 import { getEurPrice, fuelLabel } from "../../utils/fuel";
-import { formatEurPerLiter, formatAllPerLiter } from "../../utils/format";
 import type { Currency } from "../../models/currency";
+import { formatFuelPrice } from "../../utils/priceDisplay";
+import type { FxRates } from "../../utils/currency";
 
 type Props = {
   t: TDict;
@@ -11,11 +12,11 @@ type Props = {
   fuelType: FuelType;
   setFuelType: (v: FuelType) => void;
   currency: Currency;
-  allPerEur: number;
   onOpen: (country: string) => void;
+  fxRates: FxRates | null;
 };
 
-export default function RankingCard({ t, data, fuelType, setFuelType, currency, allPerEur, onOpen }: Props) {
+export default function RankingCard({ t, data, fuelType, setFuelType, currency, fxRates, onOpen }: Props) {
   const list =
     data?.countries
       ?.map((c) => ({ country: c.country, eur: getEurPrice(c, fuelType) }))
@@ -25,7 +26,7 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
   const cheapest = asc.slice(0, 5);
   const expensive = asc.slice(-5).reverse();
 
-  const fmt = (v: number | null) => (currency === "EUR" ? formatEurPerLiter(v) : formatAllPerLiter(v, allPerEur));
+  const fmt = (countryName: string, v: number | null) => formatFuelPrice(countryName, v, currency, fxRates);
 
   return (
     <div className="card">
@@ -57,7 +58,7 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
             {cheapest.map((r) => (
               <button key={r.country} className="rankRow" type="button" onClick={() => onOpen(r.country)}>
                 <span className="rankName">{r.country}</span>
-                <span className="rankVal">{fmt(r.eur)}</span>
+                <span className="rankVal">{fmt(r.country, r.eur)}</span>
               </button>
             ))}
           </div>
@@ -67,7 +68,7 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
             {expensive.map((r) => (
               <button key={r.country} className="rankRow" type="button" onClick={() => onOpen(r.country)}>
                 <span className="rankName">{r.country}</span>
-                <span className="rankVal">{fmt(r.eur)}</span>
+                <span className="rankVal">{fmt(r.country, r.eur)}</span>
               </button>
             ))}
           </div>

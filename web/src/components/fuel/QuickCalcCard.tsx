@@ -37,7 +37,7 @@ export default function QuickCalcCard({
 
   const litersFromBudget = useMemo(() => {
     if (priceEur == null || priceEur <= 0) return null;
-    const bEur = currency === "EUR" ? budget : budget / allPerEur;
+    const bEur = currency === "eur" ? budget : budget / allPerEur;
     return bEur / priceEur;
   }, [priceEur, budget, currency, allPerEur]);
 
@@ -85,15 +85,15 @@ export default function QuickCalcCard({
           <div className="segRow">
             <button
               type="button"
-              className={`seg ${currency === "EUR" ? "segActive" : ""}`}
-              onClick={() => setCurrency("EUR")}
+              className={`seg ${currency === "eur" ? "segActive" : ""}`}
+              onClick={() => setCurrency("eur")}
             >
               EUR
             </button>
             <button
               type="button"
-              className={`seg ${currency === "ALL" ? "segActive" : ""}`}
-              onClick={() => setCurrency("ALL")}
+              className={`seg ${currency === "local" ? "segActive" : ""}`}
+              onClick={() => setCurrency("local")}
             >
               ALL
             </button>
@@ -137,7 +137,7 @@ export default function QuickCalcCard({
             <div className="resultRow">
               <div className="resultLabel">{t.cost}</div>
               <div className="resultValue">
-                {currency === "EUR" ? formatMoneyEUR(costEur) : formatMoneyALL(costAll)}
+                {currency === "eur" ? formatMoneyEUR(costEur) : formatMoneyALL(costAll)}
               </div>
             </div>
           </>
@@ -195,7 +195,7 @@ export default function QuickCalcCard({
             <div className="resultRow" style={{ marginTop: '12px' }}>
               <div className="resultLabel">{t.cost}</div>
               <div className="resultValue">
-                {currency === "EUR" ? formatMoneyEUR(tripCostEur) : formatMoneyALL(tripCostAll)}
+                {currency === "eur" ? formatMoneyEUR(tripCostEur) : formatMoneyALL(tripCostAll)}
               </div>
             </div>
           </>

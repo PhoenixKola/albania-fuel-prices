@@ -40,6 +40,49 @@ export const makeFuelCardStyles = (theme: Theme) =>
       fontWeight: "800",
       color: theme.colors.text,
     },
+
+    currencyRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    currencyLabel: {
+      color: theme.colors.muted,
+      fontWeight: "800",
+      fontSize: 12,
+    },
+    currencyPills: {
+      flexDirection: "row",
+      gap: 8,
+      alignItems: "center",
+    },
+    currencyPill: {
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      borderRadius: 999,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    currencyPillActive: {
+      backgroundColor: theme.colors.tile,
+    },
+    currencyPillDisabled: {
+      opacity: 0.5,
+    },
+    currencyPillText: {
+      fontSize: 12,
+      fontWeight: "900",
+      color: theme.colors.muted,
+    },
+    currencyPillTextActive: {
+      color: theme.colors.text,
+    },
+    currencyPillTextDisabled: {
+      color: theme.colors.muted,
+    },
+
     grid: {
       gap: 10,
     },
@@ -94,5 +137,11 @@ export const makeFuelCardStyles = (theme: Theme) =>
     mutedSmall: {
       fontSize: 12,
       color: theme.colors.muted,
+    },
+    tileDelta: {
+      marginTop: 6,
+      fontSize: 12,
+      color: theme.colors.muted,
+      fontWeight: "800",
     },
   });

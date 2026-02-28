@@ -1,1 +1,1 @@
-export type Currency = "EUR" | "ALL";
+export type Currency = "eur" | "local";

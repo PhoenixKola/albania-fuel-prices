@@ -9,19 +9,26 @@ export default function CountrySearchModal(props: {
   title: string;
   placeholder: string;
   closeLabel: string;
+  selectedLabel: string;
   countries: string[];
   value: string;
+  favorites?: string[];
+  onToggleFavorite?: (c: string) => void;
   onSelect: (c: string) => void;
   onClose: () => void;
 }) {
   const s = useMemo(() => makeCountryModalStyles(props.theme), [props.theme]);
   const [q, setQ] = useState("");
 
+  const favSet = useMemo(() => new Set(props.favorites ?? []), [props.favorites]);
+
   const items = useMemo(() => {
     const query = q.trim().toLowerCase();
-    if (!query) return props.countries;
-    return props.countries.filter((c) => c.toLowerCase().includes(query));
-  }, [q, props.countries]);
+    const base = !query ? props.countries : props.countries.filter((c) => c.toLowerCase().includes(query));
+    const fav = base.filter((c) => favSet.has(c));
+    const rest = base.filter((c) => !favSet.has(c));
+    return [...fav, ...rest];
+  }, [q, props.countries, favSet]);
 
   return (
     <Modal visible={props.open} transparent animationType="slide" onRequestClose={props.onClose}>
@@ -52,6 +59,7 @@ export default function CountrySearchModal(props: {
               renderItem={({ item, index }) => {
                 const active = item === props.value;
                 const isLast = index === items.length - 1;
+                const isFav = favSet.has(item);
 
                 return (
                   <Pressable
@@ -63,11 +71,20 @@ export default function CountrySearchModal(props: {
                     ]}
                   >
                     <Text style={s.rowText}>{item}</Text>
-                    {active ? (
-                      <View style={s.badge}>
-                        <Text style={s.badgeText}>Selected</Text>
-                      </View>
-                    ) : null}
+
+                    <View style={s.right}>
+                      {props.onToggleFavorite ? (
+                        <Pressable onPress={() => props.onToggleFavorite?.(item)} style={s.starBtn}>
+                          <Text style={[s.starText, isFav ? s.starOn : s.starOff]}>{isFav ? "★" : "☆"}</Text>
+                        </Pressable>
+                      ) : null}
+
+                      {active ? (
+                        <View style={s.badge}>
+                          <Text style={s.badgeText}>{props.selectedLabel}</Text>
+                        </View>
+                      ) : null}
+                    </View>
                   </Pressable>
                 );
               }}

@@ -1,23 +1,25 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
 import type { FuelType } from "../models/fuel";
 import { i18n } from "../locales";
 import {
   DATA_URL,
-  STORAGE_ALL_RATE_KEY,
+  // STORAGE_ALL_RATE_KEY,
   STORAGE_CITY_BIAS_KEY,
   STORAGE_CITY_KEY,
   STORAGE_COUNTRY_KEY,
   STORAGE_CURRENCY_KEY,
   STORAGE_FUELTYPE_KEY,
   STORAGE_LANG_KEY,
+  STORAGE_STATIONS_RADIUS_KEY,
 } from "../config/constants";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import { useFuelData } from "../hooks/useFuelData";
 import { useTheme } from "../hooks/useTheme";
 import { useWatchlist } from "../hooks/useWatchlist";
 import { useToast } from "../hooks/useToast";
+import { useFxRates } from "../hooks/useFxRates";
 
 import AdBar from "../components/ads/AdBar";
 import TopBar from "../components/layout/TopBar";
@@ -27,13 +29,14 @@ import Notice from "../components/feedback/Notice";
 import ToastHost from "../components/feedback/ToastHost";
 import WatchlistCard from "../components/fuel/WatchlistCard";
 import RankingCard from "../components/fuel/RankingCard";
-import QuickCalcCard from "../components/fuel/QuickCalcCard";
+// import QuickCalcCard from "../components/fuel/QuickCalcCard";
+// import { getEurPrice } from "../utils/fuel";
 import CityEstimateCard from "../components/fuel/CityEstimateCard";
+import NearbyStationsCard from "../components/meta/NearbyStationsCard";
 
 import Modal from "../components/ui/Modal";
 import SourceFab from "../components/meta/SourceFab";
 
-import { getEurPrice } from "../utils/fuel";
 import logo from "../assets/logo.png";
 
 export default function App() {
@@ -51,23 +54,31 @@ export default function App() {
     deserialize: (raw) => (raw === "gasoline95" || raw === "lpg" || raw === "diesel" ? raw : "diesel"),
   });
 
-  const [currency, setCurrency] = useLocalStorageState<Currency>(STORAGE_CURRENCY_KEY, "EUR", {
-    deserialize: (raw) => (raw === "ALL" ? "ALL" : "EUR"),
+  const [currency, setCurrency] = useLocalStorageState<Currency>(STORAGE_CURRENCY_KEY, "eur", {
+    deserialize: (raw) => (raw === "local" ? "local" : "eur"),
   });
 
-  const [allPerEur, setAllPerEur] = useLocalStorageState<number>(STORAGE_ALL_RATE_KEY, 100, {
-    deserialize: (raw) => {
-      const n = Number(raw);
-      return Number.isFinite(n) && n > 0 ? n : 100;
-    },
-    serialize: (v) => String(v),
-  });
+  // const [allPerEur, setAllPerEur] = useLocalStorageState<number>(STORAGE_ALL_RATE_KEY, 100, {
+  //   deserialize: (raw) => {
+  //     const n = Number(raw);
+  //     return Number.isFinite(n) && n > 0 ? n : 100;
+  //   },
+  //   serialize: (v) => String(v),
+  // });
 
   const [city, setCity] = useLocalStorageState<string>(STORAGE_CITY_KEY, "Tirana");
   const [cityBias, setCityBias] = useLocalStorageState<number>(STORAGE_CITY_BIAS_KEY, 0, {
     deserialize: (raw) => {
       const n = Number(raw);
       return Number.isFinite(n) ? n : 0;
+    },
+    serialize: (v) => String(v),
+  });
+
+  const [radiusM, setRadiusM] = useLocalStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
+    deserialize: (raw) => {
+      const n = Number(raw);
+      return n === 2000 || n === 5000 || n === 10000 ? n : 5000;
     },
     serialize: (v) => String(v),
   });
@@ -79,6 +90,8 @@ export default function App() {
     country,
     setCountry,
   });
+
+  const fx = useFxRates();
 
   const { watchlist, add, remove, has } = useWatchlist();
 
@@ -96,7 +109,7 @@ export default function App() {
   };
 
   const shareText = async (text: string) => {
-    const nav = navigator;
+    const nav = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
     if (nav.share) {
       try {
         await nav.share({ title: t.shareTextTitle, text });
@@ -108,7 +121,7 @@ export default function App() {
     await copyText(text);
   };
 
-  const priceForTools = useMemo(() => getEurPrice(selected, fuelType), [selected, fuelType]);
+  // const priceForTools = useMemo(() => getEurPrice(selected, fuelType), [selected, fuelType]);
 
   return (
     <>
@@ -128,6 +141,30 @@ export default function App() {
             onToggleTheme={toggleTheme}
           />
 
+          <div className="card">
+            <div className="body">
+              <div className="toolbarRow" style={{ marginBottom: 0 }}>
+                <div className="label">{t.currencyMode}</div>
+                <div className="segRow">
+                  <button
+                    type="button"
+                    className={`seg ${currency === "eur" ? "segActive" : ""}`}
+                    onClick={() => setCurrency("eur")}
+                  >
+                    {t.currencyEUR}
+                  </button>
+                  <button
+                    type="button"
+                    className={`seg ${currency === "local" ? "segActive" : ""}`}
+                    onClick={() => setCurrency("local")}
+                  >
+                    {t.currencyLocal}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {error ? <Notice t={t} message={error} onRetry={refresh} /> : null}
 
           <div className="grid">
@@ -141,34 +178,12 @@ export default function App() {
                 selected={selected}
                 onSelectCountry={setCountry}
                 currency={currency}
-                allPerEur={allPerEur}
+                fxRates={fx.rates}
                 onCopy={copyText}
                 onShare={shareText}
               />
-              
-              {country === "Albania" ? (
-                <CityEstimateCard
-                  t={t}
-                  base={selected}
-                  city={city}
-                  setCity={setCity}
-                  bias={cityBias}
-                  setBias={setCityBias}
-                  currency={currency}
-                  allPerEur={allPerEur}
-                />
-              ) : null}
 
-              <QuickCalcCard
-                t={t}
-                fuelType={fuelType}
-                setFuelType={setFuelType}
-                currency={currency}
-                setCurrency={setCurrency}
-                allPerEur={allPerEur}
-                setAllPerEur={setAllPerEur}
-                priceEur={priceForTools}
-              />
+              <NearbyStationsCard t={t} radiusM={radiusM} setRadiusM={setRadiusM} />
             </div>
 
             <div className="sideCol">
@@ -189,8 +204,21 @@ export default function App() {
                 onOpen={setCountry}
                 fuelType={fuelType}
                 currency={currency}
-                allPerEur={allPerEur}
+                fxRates={fx.rates}
               />
+
+              {country === "Albania" ? (
+                <CityEstimateCard
+                  t={t}
+                  base={selected}
+                  city={city}
+                  setCity={setCity}
+                  bias={cityBias}
+                  setBias={setCityBias}
+                  currency={currency}
+                  fxRates={fx.rates}
+                />
+              ) : null}
 
               <RankingCard
                 t={t}
@@ -198,11 +226,23 @@ export default function App() {
                 fuelType={fuelType}
                 setFuelType={setFuelType}
                 currency={currency}
-                allPerEur={allPerEur}
+                fxRates={fx.rates}
                 onOpen={setCountry}
               />
+
+              {/* <QuickCalcCard
+                t={t}
+                fuelType={fuelType}
+                setFuelType={setFuelType}
+                currency={currency}
+                setCurrency={setCurrency}
+                allPerEur={allPerEur}
+                setAllPerEur={setAllPerEur}
+                priceEur={priceForTools}
+              /> */}
             </div>
           </div>
+
           <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
         </div>
       </div>

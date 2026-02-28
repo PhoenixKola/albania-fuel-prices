@@ -7,6 +7,7 @@ import { formatBias, formatPriceEur } from "../../utils/format";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
 import SegmentedControl from "../ui/SegmentedControl";
 import { makeCityEstimateStyles } from "./CityEstimateCard.styles";
+import { CurrencyMode, formatFuelPrice } from "../../utils/priceDisplay";
 
 const CITY_PRESETS: { name: string; adj: number }[] = [
   { name: "Tirana", adj: 0 },
@@ -29,6 +30,8 @@ export default function CityEstimateCard(props: {
   setCity: (v: string | ((p: string) => string)) => void;
   bias: number;
   setBias: (v: number | ((p: number) => number)) => void;
+  currencyMode: CurrencyMode
+  fxRates: Record<string, number> | null
 }) {
   const s = useMemo(() => makeCityEstimateStyles(props.theme), [props.theme]);
 
@@ -95,7 +98,9 @@ export default function CityEstimateCard(props: {
         <Text style={s.label}>
           {props.t.estimate} ({fuelLabel(props.fuelType, props.t)})
         </Text>
-        <Text style={s.estimateValue}>{formatPriceEur(estimated)}</Text>
+        <Text style={s.estimateValue}>
+          {formatFuelPrice("Albania", estimated, props.currencyMode, props.fxRates)}
+        </Text>
         <Text style={s.note}>{props.t.approxNote}</Text>
       </View>
     </View>

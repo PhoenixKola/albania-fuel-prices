@@ -1,7 +1,9 @@
 import type { TDict } from "../../locales";
 import type { CountryPrices } from "../../models/fuel";
-import { clamp, formatAllPerLiter, formatEurPerLiter } from "../../utils/format";
+import { clamp  } from "../../utils/format";
 import type { Currency } from "../../models/currency";
+import { formatFuelPrice } from "../../utils/priceDisplay";
+import type { FxRates } from "../../utils/currency";
 
 const CITIES: { name: string; pct: number }[] = [
   { name: "Tirana", pct: 1.2 },
@@ -22,10 +24,19 @@ type Props = {
   bias: number;
   setBias: (v: number) => void;
   currency: Currency;
-  allPerEur: number;
+  fxRates: FxRates | null;
 };
 
-export default function CityEstimateCard({ t, base, city, setCity, bias, setBias, currency, allPerEur }: Props) {
+export default function CityEstimateCard({
+  t,
+  base,
+  city,
+  setCity,
+  bias,
+  setBias,
+  currency,
+  fxRates,
+}: Props) {
   if (!base) return null;
 
   const cityPct = CITIES.find((c) => c.name === city)?.pct ?? 0;
@@ -37,7 +48,7 @@ export default function CityEstimateCard({ t, base, city, setCity, bias, setBias
   const d = adj(base.diesel_eur);
   const l = adj(base.lpg_eur);
 
-  const fmt = (v: number | null) => (currency === "EUR" ? formatEurPerLiter(v) : formatAllPerLiter(v, allPerEur));
+  const fmt = (v: number | null) => formatFuelPrice("Albania", v, currency, fxRates);
 
   return (
     <div className="card">

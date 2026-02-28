@@ -60,6 +60,25 @@ export type TDict = {
   copied: string;
   share: string;
   shareTextTitle: string;
+  currencyMode: string;
+  currencyEUR: string;
+  currencyLocal: string;
+
+  stationsNearbyTitle: string;
+  stationsUseMyLocation: string;
+  stationsGettingLocation: string;
+  stationsRadius: string;
+  stations2km: string;
+  stations5km: string;
+  stations10km: string;
+  stationsFound: (n: number) => string;
+  stationsOpen: string;
+  stationsRefresh: string;
+  stationsNone: string;
+  stationsShowing: (shown: number, total: number) => string;
+  stationsShowMore: string;
+  stationsShowAll: string;
+  stationsCollapse: string;
 };
 
 export const i18n = {

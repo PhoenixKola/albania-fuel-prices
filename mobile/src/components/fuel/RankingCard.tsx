@@ -6,6 +6,7 @@ import { formatPriceEur } from "../../utils/format";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
 import SegmentedControl from "../ui/SegmentedControl";
 import { makeRankingStyles } from "./RankingCard.styles";
+import { CurrencyMode, formatFuelPrice } from "../../utils/priceDisplay";
 
 export default function RankingCard(props: {
   theme: Theme;
@@ -15,6 +16,8 @@ export default function RankingCard(props: {
   setFuelType: (v: FuelType | ((p: FuelType) => FuelType)) => void;
   currentCountry: string;
   onOpenCountry: (c: string) => void;
+  currencyMode: CurrencyMode;
+  fxRates: Record<string, number> | null
 }) {
   const s = useMemo(() => makeRankingStyles(props.theme), [props.theme]);
 
@@ -70,7 +73,7 @@ export default function RankingCard(props: {
                 <Text style={s.rank}>{i + 1}</Text>
                 <Text style={s.country}>{r.country}</Text>
               </View>
-              <Text style={s.price}>{formatPriceEur(r.price)}</Text>
+              <Text style={s.price}>{formatFuelPrice(r.country, r.price, props.currencyMode, props.fxRates)}</Text>
             </Pressable>
           );
         })}

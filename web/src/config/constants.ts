@@ -12,3 +12,5 @@ export const STORAGE_ALL_RATE_KEY = "allPerEur";
 export const STORAGE_CITY_KEY = "city";
 export const STORAGE_CITY_BIAS_KEY = "cityBias";
 export const STORAGE_LASTSEEN_KEY = "lastSeenPrices";
+export const STORAGE_FX_KEY = "fxRatesCache";
+export const STORAGE_STATIONS_RADIUS_KEY = "stationsRadiusM";
