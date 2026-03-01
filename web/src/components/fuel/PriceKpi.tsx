@@ -30,7 +30,7 @@ export default function PriceKpi({ label, value, secondary, delta, onCopy, copyL
           </button>
         </div>
       </div>
-      <div className="kpiValue">{value}</div>
+      <div className="kpiValuePrice">{value}</div>
       {secondary ? <div className="kpiSecondary">{secondary}</div> : null}
     </div>
   );

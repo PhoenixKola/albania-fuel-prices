@@ -1,25 +1,30 @@
 <!doctype html>
-<html lang="en">
+<html lang="sq">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Karburanti Sot</title>
+    <title>Karburanti Sot — Çmimet e karburantit në Shqipëri & Europë</title>
     <meta
       name="description"
-      content="Compare average fuel prices across Europe by country, track a watchlist, view rankings, and estimate trip fuel costs with quick tools. Updated from public sources."
+      content="Shiko dhe krahaso çmimet mesatare të karburantit në Shqipëri dhe Europë (Benzinë 95, Naftë, LPG). Renditje, watchlist dhe llogaritës udhëtimi."
     />
 
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <link rel="canonical" href="https://karburantisot.com/" />
 
+    <!-- (Recommended) Language targeting (prepare for /sq and /en routes) -->
+    <link rel="alternate" hreflang="sq" href="https://karburantisot.com/" />
+    <link rel="alternate" hreflang="en" href="https://karburantisot.com/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://karburantisot.com/" />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Karburanti Sot" />
-    <meta property="og:title" content="Karburanti Sot — Europe Fuel Prices" />
+    <meta property="og:title" content="Karburanti Sot — Çmimet e karburantit në Shqipëri & Europë" />
     <meta
       property="og:description"
-      content="Compare fuel prices by country, rankings, watchlist, and quick trip cost tools."
+      content="Krahaso çmimet e benzinës, naftës dhe LPG sipas shtetit. Renditje, watchlist dhe llogaritës udhëtimi."
     />
     <meta property="og:url" content="https://karburantisot.com/" />
     <meta property="og:image" content="https://karburantisot.com/og.png" />
@@ -28,10 +33,10 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Karburanti Sot — Europe Fuel Prices" />
+    <meta name="twitter:title" content="Karburanti Sot — Çmimet e karburantit në Shqipëri & Europë" />
     <meta
       name="twitter:description"
-      content="Compare fuel prices by country, rankings, watchlist, and quick trip cost tools."
+      content="Krahaso çmimet e benzinës, naftës dhe LPG sipas shtetit. Renditje, watchlist dhe llogaritës udhëtimi."
     />
     <meta name="twitter:image" content="https://karburantisot.com/og.png" />
 
@@ -44,15 +49,32 @@
     <!-- JSON-LD -->
     <script type="application/ld+json">
       {
-        "@context":"https://schema.org",
-        "@type":"WebApplication",
-        "name":"Karburanti Sot",
-        "url":"https://karburantisot.com/",
-        "description":"Compare average fuel prices across Europe by country, track a watchlist, view rankings, and estimate trip fuel costs.",
-        "applicationCategory":"FinanceApplication",
-        "operatingSystem":"Any",
-        "inLanguage":["en","sq"],
-        "offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "Karburanti Sot",
+            "url": "https://karburantisot.com/",
+            "inLanguage": ["sq", "en"]
+          },
+          {
+            "@type": "WebPage",
+            "name": "Karburanti Sot — Çmimet e karburantit në Shqipëri & Europë",
+            "url": "https://karburantisot.com/",
+            "inLanguage": "sq",
+            "description": "Shiko dhe krahaso çmimet mesatare të karburantit në Shqipëri dhe Europë (Benzinë 95, Naftë, LPG). Renditje, watchlist dhe llogaritës udhëtimi."
+          },
+          {
+            "@type": "WebApplication",
+            "name": "Karburanti Sot",
+            "url": "https://karburantisot.com/",
+            "description": "Shiko dhe krahaso çmimet mesatare të karburantit në Shqipëri dhe Europë (Benzinë 95, Naftë, LPG). Renditje, watchlist dhe llogaritës udhëtimi.",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Any",
+            "inLanguage": ["sq", "en"],
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+          }
+        ]
       }
     </script>
 
@@ -73,8 +95,11 @@
     </script>
 
     <!-- AdSense (keep) -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2653462201538649" crossorigin="anonymous"></script>
-
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2653462201538649"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <div id="root"></div>

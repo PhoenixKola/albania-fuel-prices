@@ -107,6 +107,12 @@ button, select, input { font: inherit; }
   backdrop-filter: blur(10px);
 }
 
+@media (max-width: 520px) {
+  .topbar {
+    flex-wrap: wrap;
+  }
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -315,8 +321,11 @@ select {
 
 .kpiLabel { font-size: 12px; color: var(--muted); font-weight: 900; letter-spacing: 0.2px; }
 .kpiValue { margin-top: 8px; font-size: 14px; font-weight: 950; letter-spacing: 0.2px; }
+.kpiValuePrice { margin-top: 8px; font-size: 22px; font-weight: 950; letter-spacing: 0.2px; }
 .kpiSecondary { margin-top: 6px; font-size: 12px; color: var(--muted-2); }
 .mutedHint { margin-top: 12px; font-size: 12px; color: var(--muted-2); line-height: 1.35; }
+
+@media (max-width: 520px) { .kpiValuePrice { margin-top: 2px; font-size: 18px; font-weight: 950; letter-spacing: 0.2px; } }
 
 .iconBtn {
   border: 1px solid var(--border);
