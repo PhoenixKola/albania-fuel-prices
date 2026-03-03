@@ -21,16 +21,17 @@ type CacheEnvelope = {
 };
 
 const CACHE_TTL_MS = 15 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 12 * 1000;
 
 function safeParse(raw: string | null): CacheEnvelope | null {
   if (!raw) return null;
   try {
     const j = JSON.parse(raw);
     if (!j || typeof j !== "object") return null;
-    if (typeof j.savedAtUtc !== "string") return null;
-    if (!j.center || typeof j.center.lat !== "number" || typeof j.center.lon !== "number") return null;
-    if (typeof j.radiusM !== "number") return null;
-    if (!Array.isArray(j.stations)) return null;
+    if (typeof (j as any).savedAtUtc !== "string") return null;
+    if (!(j as any).center || typeof (j as any).center.lat !== "number" || typeof (j as any).center.lon !== "number") return null;
+    if (typeof (j as any).radiusM !== "number") return null;
+    if (!Array.isArray((j as any).stations)) return null;
     return j as CacheEnvelope;
   } catch {
     return null;
@@ -49,6 +50,17 @@ out center tags;
 `;
 }
 
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const r = await fetch(url, { ...init, signal: controller.signal });
+    return r;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 export function useNearbyStations(opts: { center: { lat: number; lon: number } | null; radiusM?: number }) {
   const radiusM = opts.radiusM ?? 5000;
 
@@ -57,7 +69,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
   const [error, setError] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
 
-  const loadCache = useCallback(async () => {
+  const loadCacheStrict = useCallback(async () => {
     const raw = await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY);
     const env = safeParse(raw);
     if (!env) return null;
@@ -80,6 +92,25 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     return env;
   }, [opts.center, radiusM]);
 
+  const loadCacheAny = useCallback(async () => {
+    const raw = await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY);
+    const env = safeParse(raw);
+    if (!env) return null;
+
+    if (!opts.center) return null;
+
+    const nearSameCenter =
+      Math.abs(env.center.lat - opts.center.lat) < 0.01 &&
+      Math.abs(env.center.lon - opts.center.lon) < 0.01;
+
+    const sameRadius = env.radiusM === radiusM;
+    if (!nearSameCenter || !sameRadius) return null;
+
+    setStations(env.stations);
+    setFromCache(true);
+    return env;
+  }, [opts.center, radiusM]);
+
   const refresh = useCallback(async () => {
     if (!opts.center) return;
     setLoading(true);
@@ -89,11 +120,15 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
       const q = overpassQuery(opts.center.lat, opts.center.lon, radiusM);
       const body = `data=${encodeURIComponent(q)}`;
 
-      const r = await fetch(OVERPASS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body,
-      });
+      const r = await fetchWithTimeout(
+        OVERPASS_URL,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body
+        },
+        FETCH_TIMEOUT_MS
+      );
 
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
       const json = await r.json();
@@ -118,7 +153,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
             brand,
             lat,
             lon,
-            distanceKm: d,
+            distanceKm: d
           } as Station;
         })
         .filter(Boolean) as Station[];
@@ -132,27 +167,35 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
         savedAtUtc: new Date().toISOString(),
         center: opts.center,
         radiusM,
-        stations: parsed,
+        stations: parsed
       };
+
       await AsyncStorage.setItem(STORAGE_STATIONS_CACHE_KEY, JSON.stringify(env));
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      const msg = e instanceof Error ? e.message : String(e);
+
+      const usedCache = await loadCacheAny();
+      if (usedCache) {
+        setError("Stations server timeout. Showing cached results.");
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
-  }, [opts.center, radiusM]);
+  }, [opts.center, radiusM, loadCacheAny]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      await loadCache();
+      await loadCacheStrict();
       if (cancelled) return;
       if (opts.center) refresh();
     })();
     return () => {
       cancelled = true;
     };
-  }, [opts.center?.lat, opts.center?.lon, radiusM, loadCache, refresh]);
+  }, [opts.center?.lat, opts.center?.lon, radiusM, loadCacheStrict, refresh]);
 
   const top = useMemo(() => stations.slice(0, 100), [stations]);
   return { stations: top, totalCount: stations.length, loading, error, refresh, fromCache };

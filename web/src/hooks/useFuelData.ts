@@ -14,8 +14,10 @@ export function useFuelData({ url, country, setCountry }: Params) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const initialCountry = useRef(country);
-  const didInit = useRef(false);
+  const countryRef = useRef(country);
+  useEffect(() => {
+    countryRef.current = country;
+  }, [country]);
 
   const countries = useMemo(() => (data?.countries ?? []).map((c) => c.country), [data]);
 
@@ -25,16 +27,18 @@ export function useFuelData({ url, country, setCountry }: Params) {
   }, [data, country]);
 
   const load = useCallback(
-    async (mode: "init" | "refresh", countrySnapshot: string) => {
+    async (mode: "init" | "refresh") => {
       setError("");
       if (mode === "refresh") setRefreshing(true);
+      if (mode === "init") setLoading(true);
 
       try {
         const json = await fetchLatestEurope(url);
         setData(json);
 
         if (json.countries?.length) {
-          const exists = json.countries.some((c) => c.country === countrySnapshot);
+          const current = countryRef.current;
+          const exists = json.countries.some((c) => c.country === current);
           if (!exists) setCountry(json.countries[0].country);
         }
       } catch (e) {
@@ -49,14 +53,12 @@ export function useFuelData({ url, country, setCountry }: Params) {
   );
 
   useEffect(() => {
-    if (didInit.current) return;
-    didInit.current = true;
-    void load("init", initialCountry.current);
+    void load("init");
   }, [load]);
 
   const refresh = useCallback(() => {
-    void load("refresh", country);
-  }, [load, country]);
+    void load("refresh");
+  }, [load]);
 
   return { data, error, loading, refreshing, countries, selected, refresh };
 }

@@ -15,3 +15,5 @@ export const STORAGE_FUEL_PREV_KEY = "fuelDataPrev";
 
 export const STORAGE_STATIONS_CACHE_KEY = "stationsCache";
 export const STORAGE_STATIONS_RADIUS_KEY = "stationsRadiusM";
+
+export const STORAGE_REWARD_UNTIL_UTC = "rewardUnlockUntilUtc";

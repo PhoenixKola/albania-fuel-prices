@@ -35,6 +35,9 @@ import { useUserLocation } from "../hooks/useUserLocation";
 import { useNearbyStations } from "../hooks/useNearbyStations";
 import AdBar from "../components/ads/AdBar";
 import SegmentedControl from "../components/ui/SegmentedControl";
+import { useReturnInterstitial } from "../hooks/useReturnInterstitial";
+import RewardUnlockModal from "../components/ads/RewardUnlockModal";
+import { useRewardUnlock } from "../hooks/useRewardUnlock";
 
 import { makeHomeStyles } from "./HomeScreen.styles";
 
@@ -159,6 +162,18 @@ export default function HomeScreen() {
 
   const toggleLang = () => setLang((p) => (p === "en" ? "sq" : "en"));
   const adUnitId = __DEV__ ? TestIds.BANNER : "ca-app-pub-2653462201538649/5444199958";
+  const interstitialUnitId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-2653462201538649/5721527391";
+  const { markMapsOpened } = useReturnInterstitial({
+    unitId: interstitialUnitId,
+    cooldownMs: 2 * 60 * 1000,
+    maxPerSession: 3,
+    minBackgroundMs: 1200
+  });
+
+  const rewardedUnitId = __DEV__ ? TestIds.REWARDED : "ca-app-pub-2653462201538649/2269367545";
+  const reward = useRewardUnlock({ unitId: rewardedUnitId, durationMinutes: 30 });
+
+  const maxCompare = reward.unlocked ? 5 : 3;
 
   const toggleFavorite = (c: string) => {
     setFavorites((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c, ...prev]));
@@ -166,14 +181,38 @@ export default function HomeScreen() {
 
   const addCompare = (c: string) => {
     setCompareCountries((prev) => {
+      const limit = maxCompare;
       if (prev.includes(c)) return prev;
-      if (prev.length >= 3) return prev;
+      if (prev.length >= limit) return prev;
       return [...prev, c];
     });
   };
 
   const removeCompare = (c: string) => {
     setCompareCountries((prev) => prev.filter((x) => x !== c));
+  };
+
+  const [rewardModalOpen, setRewardModalOpen] = useState(false);
+  const pendingActionRef = useRef<null | (() => void)>(null);
+
+  const openRewardModal = (after?: () => void) => {
+    pendingActionRef.current = after ?? null;
+    setRewardModalOpen(true);
+  };
+
+  const onRewardContinue = () => {
+    setRewardModalOpen(false);
+    const act = pendingActionRef.current;
+    pendingActionRef.current = null;
+    act?.();
+  };
+
+  const onRewardWatch = async () => {
+    await reward.showRewardedAndUnlock();
+    setRewardModalOpen(false);
+    const act = pendingActionRef.current;
+    pendingActionRef.current = null;
+    act?.();
   };
 
   return (
@@ -301,6 +340,15 @@ export default function HomeScreen() {
           fromCache={nearby.fromCache}
           radiusM={radiusM}
           setRadiusM={setRadiusM}
+          onOpenExternalMap={markMapsOpened}
+          rewardUnlocked={reward.unlocked}
+          onShowAllPress={(proceed) => {
+            if (!reward.unlocked) {
+              openRewardModal(proceed);
+              return;
+            }
+            proceed();
+          }}
         />
 
         {country === "Albania" ? (
@@ -349,9 +397,17 @@ export default function HomeScreen() {
             fuelType={fuelType}
             compareCountries={compareCountries}
             onRemove={removeCompare}
-            onAddPress={() => setCompareModalOpen(true)}
+            onAddPress={() => {
+              if (compareCountries.length >= maxCompare && !reward.unlocked) {
+                openRewardModal(() => setCompareModalOpen(true));
+                return;
+              }
+              if (compareCountries.length >= maxCompare) return;
+              setCompareModalOpen(true);
+            }}
             currencyMode={currencyMode}
             fxRates={fx.rates}
+            maxCompare={maxCompare}
           />
         )}
 
@@ -391,8 +447,22 @@ export default function HomeScreen() {
           }}
         />
 
-        <AdBar theme={theme} unitId={adUnitId} />
       </ScrollView>
+
+      <RewardUnlockModal
+        theme={theme}
+        t={t}
+        open={rewardModalOpen}
+        minutes={30}
+        loadingAd={!reward.loaded}
+        onClose={() => setRewardModalOpen(false)}
+        onWatch={onRewardWatch}
+        onContinue={onRewardContinue}
+      />
+
+      <View>
+        <AdBar theme={theme} unitId={adUnitId} />
+      </View>
     </SafeAreaView>
   );
 }

@@ -32,12 +32,6 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
   const [data, setData] = useState<LatestEurope | null>(null);
   const [prevData, setPrevData] = useState<LatestEurope | null>(null);
 
-  // ✅ keep latest data in a ref so load() doesn't depend on state
-  const dataRef = useRef<LatestEurope | null>(null);
-  useEffect(() => {
-    dataRef.current = data;
-  }, [data]);
-
   const [cacheSavedAtUtc, setCacheSavedAtUtc] = useState<string | null>(null);
   const [isFromCache, setIsFromCache] = useState(false);
 
@@ -59,11 +53,16 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
     if (prevEnv?.data) setPrevData(prevEnv.data);
   }, []);
 
-  const persistCache = useCallback(async (next: LatestEurope, prev: LatestEurope | null) => {
-    const now = new Date().toISOString();
-    await AsyncStorage.setItem(STORAGE_FUEL_CACHE_KEY, JSON.stringify({ savedAtUtc: now, data: next } as CacheEnvelope));
+  const persistCache = useCallback(async (next: LatestEurope, prev: LatestEurope | null, nowIso: string) => {
+    await AsyncStorage.setItem(
+      STORAGE_FUEL_CACHE_KEY,
+      JSON.stringify({ savedAtUtc: nowIso, data: next } as CacheEnvelope)
+    );
     if (prev) {
-      await AsyncStorage.setItem(STORAGE_FUEL_PREV_KEY, JSON.stringify({ savedAtUtc: now, data: prev } as CacheEnvelope));
+      await AsyncStorage.setItem(
+        STORAGE_FUEL_PREV_KEY,
+        JSON.stringify({ savedAtUtc: nowIso, data: prev } as CacheEnvelope)
+      );
     }
   }, []);
 
@@ -74,19 +73,22 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
       else setLoading(true);
 
       try {
+        const prevRaw = await AsyncStorage.getItem(STORAGE_FUEL_CACHE_KEY);
+        const prevEnv = safeParseEnvelope(prevRaw);
+        const prev = prevEnv?.data ?? null;
+
         const r = await fetch(url, { cache: "no-store" });
         if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
         const json: LatestEurope = await r.json();
 
-        const prev = dataRef.current; // ✅ stable latest
         if (prev) setPrevData(prev);
 
         setData(json);
-        setCacheSavedAtUtc(new Date().toISOString());
+        const nowIso = new Date().toISOString();
+        setCacheSavedAtUtc(nowIso);
         setIsFromCache(false);
 
-        // persist after state updates, but using prev from ref
-        persistCache(json, prev).catch(() => {});
+        persistCache(json, prev, nowIso).catch(() => {});
 
         if (json.countries?.length) {
           const current = countryRef.current;
@@ -104,7 +106,6 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
     [url, setCountry, persistCache]
   );
 
-  // ✅ run once on mount (or when url changes), not every time data changes
   useEffect(() => {
     let cancelled = false;
 
@@ -128,7 +129,7 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
 
   const prevSelected = useMemo(() => {
     if (!prevData) return null;
-    return prevData.countries.find((c) => c.country === country) ?? null;
+    return prevData.countries.find((c) => c.country === country) ?? prevData.countries[0] ?? null;
   }, [prevData, country]);
 
   return {

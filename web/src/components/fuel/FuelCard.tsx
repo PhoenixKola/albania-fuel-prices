@@ -46,6 +46,14 @@ export default function FuelCard({
     return countries.filter((c) => c.toLowerCase().includes(s));
   }, [q, countries]);
 
+  const selectOptions = useMemo(() => {
+    const set = new Set(filtered);
+    if (country && !set.has(country) && countries.includes(country)) {
+      return [country, ...filtered];
+    }
+    return filtered;
+  }, [filtered, country, countries]);
+
   const g = selected?.gasoline95_eur ?? null;
   const d = selected?.diesel_eur ?? null;
   const l = selected?.lpg_eur ?? null;
@@ -92,7 +100,7 @@ export default function FuelCard({
               <div className="label">{t.selectCountry}</div>
               <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" />
               <select className="select" value={country} onChange={(e) => onSelectCountry(e.target.value)}>
-                {filtered.map((c) => (
+                {selectOptions.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>

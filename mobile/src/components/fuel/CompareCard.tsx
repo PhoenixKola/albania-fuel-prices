@@ -22,6 +22,8 @@ export default function CompareCard(props: {
   onAddPress: () => void;
   currencyMode: CurrencyMode;
   fxRates: Record<string, number> | null;
+
+  maxCompare: number;
 }) {
   const s = useMemo(() => makeCompareStyles(props.theme), [props.theme]);
 
@@ -61,7 +63,7 @@ export default function CompareCard(props: {
     });
   }, [props.data, props.compareCountries, props.fuelType, rankByCountry, props.currencyMode, props.fxRates]);
 
-  const canAddMore = props.compareCountries.length < 3;
+  const canAddMore = props.compareCountries.length < props.maxCompare;
 
   return (
     <View style={s.card}>
@@ -78,7 +80,6 @@ export default function CompareCard(props: {
 
         <AnimatedPressable
           onPress={props.onAddPress}
-          disabled={!canAddMore}
           contentStyle={[s.btn, !canAddMore ? s.btnDisabled : null]}
           scaleIn={0.98}
         >
@@ -88,7 +89,7 @@ export default function CompareCard(props: {
       </View>
 
       {props.compareCountries.length < 2 ? <Text style={s.hint}>{props.t.compareHint}</Text> : null}
-      {!canAddMore ? <Text style={s.hint}>{props.t.maxCompareReached}</Text> : null}
+      {!canAddMore ? <Text style={s.hint}>{props.t.maxCompareReachedN(props.maxCompare)}</Text> : null}
 
       <View style={s.list}>
         {rows.map((r, i) => (

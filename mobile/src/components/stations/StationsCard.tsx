@@ -25,17 +25,29 @@ export default function StationsCard(props: {
 
   radiusM: number;
   setRadiusM: (v: number | ((p: number) => number)) => void;
+
+  onOpenExternalMap?: () => void;
+
+  rewardUnlocked: boolean;
+  onShowAllPress: (proceed: () => void) => void;
 }) {
   const s = useMemo(() => makeStationsStyles(props.theme), [props.theme]);
 
-  const radiusItems = useMemo(
-    () => [
+  const radiusItems = useMemo(() => {
+    const base = [
       { v: 2000, label: props.t.radius2km, icon: "location-outline" as const },
       { v: 5000, label: props.t.radius5km, icon: "navigate-outline" as const },
       { v: 10000, label: props.t.radius10km, icon: "compass-outline" as const }
-    ],
-    [props.t]
-  );
+    ];
+
+    if (!props.rewardUnlocked) return base;
+
+    return [
+      ...base,
+      { v: 30000, label: props.t.radius30km, icon: "compass-outline" as const },
+      { v: 50000, label: props.t.radius50km, icon: "compass-outline" as const }
+    ];
+  }, [props.t, props.rewardUnlocked]);
 
   const [visible, setVisible] = useState(10);
 
@@ -99,7 +111,11 @@ export default function StationsCard(props: {
           </View>
 
           <AnimatedPressable onPress={props.onRequestLocation} disabled={props.locating} contentStyle={s.primaryBtn} scaleIn={0.98}>
-            {props.locating ? <ActivityIndicator color={props.theme.colors.primaryText} /> : <Ionicons name="locate-outline" size={18} color={props.theme.colors.primaryText} />}
+            {props.locating ? (
+              <ActivityIndicator color={props.theme.colors.primaryText} />
+            ) : (
+              <Ionicons name="locate-outline" size={18} color={props.theme.colors.primaryText} />
+            )}
             <Text style={s.primaryBtnText}>
               {props.locating ? props.t.stationsNearbyGettingLocation : props.t.stationsNearbyUseMyLocation}
             </Text>
@@ -130,7 +146,10 @@ export default function StationsCard(props: {
               scrollEnabled={false}
               renderItem={({ item, index }) => (
                 <AnimatedPressable
-                  onPress={() => openMaps(item.lat, item.lon, item.name)}
+                  onPress={() => {
+                    props.onOpenExternalMap?.();
+                    openMaps(item.lat, item.lon, item.name);
+                  }}
                   contentStyle={[s.row, index === shownStations.length - 1 ? { borderBottomWidth: 0 } : null]}
                   scaleIn={0.99}
                 >
@@ -174,7 +193,11 @@ export default function StationsCard(props: {
               ) : null}
 
               {canShowAll ? (
-                <AnimatedPressable onPress={() => setVisible(props.stations.length)} contentStyle={s.btn} scaleIn={0.98}>
+                <AnimatedPressable
+                  onPress={() => props.onShowAllPress(() => setVisible(props.stations.length))}
+                  contentStyle={s.btn}
+                  scaleIn={0.98}
+                >
                   <Ionicons name="list-outline" size={16} color={props.theme.colors.text} />
                   <Text style={s.btnText}>{props.t.stationsNearbyShowAll}</Text>
                 </AnimatedPressable>

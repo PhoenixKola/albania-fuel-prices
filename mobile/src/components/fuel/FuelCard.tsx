@@ -48,10 +48,10 @@ export default function FuelCard(props: {
 
   const fmtDelta = (currentEur: number | null | undefined, prevEur: number | null | undefined) => {
     if (currentEur == null || prevEur == null) return null;
+
     const diffEur = currentEur - prevEur;
     if (!Number.isFinite(diffEur) || Math.abs(diffEur) < 0.0001) return "—";
 
-    const arrow = diffEur > 0 ? "arrow-up" : "arrow-down";
     const sign = diffEur > 0 ? "+" : "-";
     const absEur = Math.abs(diffEur);
 
@@ -102,7 +102,11 @@ export default function FuelCard(props: {
             <Text style={s.title}>{props.t.selectCountry}</Text>
             <View style={s.badgeRow}>
               <View style={s.badge}>
-                <Ionicons name={props.isFromCache ? "cloud-offline-outline" : "pulse-outline"} size={14} color={props.theme.colors.linkText} />
+                <Ionicons
+                  name={props.isFromCache ? "cloud-offline-outline" : "pulse-outline"}
+                  size={14}
+                  color={props.theme.colors.linkText}
+                />
                 <Text style={s.badgeText}>{badgeText}</Text>
               </View>
               {props.loading ? (
@@ -119,7 +123,12 @@ export default function FuelCard(props: {
             <Ionicons name="share-outline" size={18} color={props.theme.colors.text} />
           </AnimatedPressable>
 
-          <AnimatedPressable onPress={props.onRefresh} disabled={props.refreshing} contentStyle={[s.iconBtn, props.refreshing ? s.iconBtnDisabled : null]} scaleIn={0.98}>
+          <AnimatedPressable
+            onPress={props.onRefresh}
+            disabled={props.refreshing}
+            contentStyle={[s.iconBtn, props.refreshing ? s.iconBtnDisabled : null]}
+            scaleIn={0.98}
+          >
             {props.refreshing ? <ActivityIndicator /> : <Ionicons name="refresh" size={18} color={props.theme.colors.text} />}
           </AnimatedPressable>
         </View>
@@ -128,7 +137,9 @@ export default function FuelCard(props: {
       <View style={s.countryRow}>
         <View style={{ flex: 1 }}>
           <Text style={s.countryName}>{props.country}</Text>
-          <Text style={s.subText}>{props.t.currency}: {mode === "eur" ? props.t.currencyEUR : props.t.currencyLocal}</Text>
+          <Text style={s.subText}>
+            {props.t.currency}: {mode === "eur" ? props.t.currencyEUR : props.t.currencyLocal}
+          </Text>
         </View>
 
         <AnimatedPressable onPress={props.onOpenCountrySearch} contentStyle={s.ghostBtn} scaleIn={0.98}>
@@ -150,19 +161,11 @@ export default function FuelCard(props: {
               if (canLocal) props.setCurrencyMode("local");
             }}
             disabled={!canLocal}
-            contentStyle={[
-              s.pill,
-              mode === "local" ? s.pillActive : null,
-              !canLocal ? s.pillDisabled : null
-            ]}
+            contentStyle={[s.pill, mode === "local" ? s.pillActive : null, !canLocal ? s.pillDisabled : null]}
             scaleIn={0.98}
           >
             <Ionicons name="cash-outline" size={14} color={mode === "local" ? props.theme.colors.text : props.theme.colors.muted} />
-            <Text style={[
-              s.pillText,
-              mode === "local" ? s.pillTextActive : null,
-              !canLocal ? s.pillTextDisabled : null
-            ]}>
+            <Text style={[s.pillText, mode === "local" ? s.pillTextActive : null, !canLocal ? s.pillTextDisabled : null]}>
               {props.t.currencyLocal}
             </Text>
           </AnimatedPressable>
@@ -176,7 +179,11 @@ export default function FuelCard(props: {
           icon="car-sport-outline"
           value={fmt(props.selected?.gasoline95_eur)}
           delta={fmtDelta(props.selected?.gasoline95_eur, props.prevSelected?.gasoline95_eur)}
-          deltaUp={(props.selected?.gasoline95_eur ?? 0) > (props.prevSelected?.gasoline95_eur ?? 0)}
+          deltaUp={
+            props.selected?.gasoline95_eur != null &&
+            props.prevSelected?.gasoline95_eur != null &&
+            props.selected.gasoline95_eur > props.prevSelected.gasoline95_eur
+          }
         />
 
         <PriceTile
@@ -185,7 +192,11 @@ export default function FuelCard(props: {
           icon="trail-sign-outline"
           value={fmt(props.selected?.diesel_eur)}
           delta={fmtDelta(props.selected?.diesel_eur, props.prevSelected?.diesel_eur)}
-          deltaUp={(props.selected?.diesel_eur ?? 0) > (props.prevSelected?.diesel_eur ?? 0)}
+          deltaUp={
+            props.selected?.diesel_eur != null &&
+            props.prevSelected?.diesel_eur != null &&
+            props.selected.diesel_eur > props.prevSelected.diesel_eur
+          }
         />
 
         <PriceTile
@@ -194,7 +205,11 @@ export default function FuelCard(props: {
           icon="flame-outline"
           value={fmt(props.selected?.lpg_eur)}
           delta={fmtDelta(props.selected?.lpg_eur, props.prevSelected?.lpg_eur)}
-          deltaUp={(props.selected?.lpg_eur ?? 0) > (props.prevSelected?.lpg_eur ?? 0)}
+          deltaUp={
+            props.selected?.lpg_eur != null &&
+            props.prevSelected?.lpg_eur != null &&
+            props.selected.lpg_eur > props.prevSelected.lpg_eur
+          }
         />
       </View>
 
@@ -203,15 +218,13 @@ export default function FuelCard(props: {
       <View style={s.sourceRow}>
         <View style={{ flex: 1 }}>
           <Text style={s.label}>{props.t.source}</Text>
-          <Text style={s.sourceText} numberOfLines={2}>{props.data?.source ?? "—"}</Text>
+          <Text style={s.sourceText} numberOfLines={2}>
+            {props.data?.source ?? "—"}
+          </Text>
         </View>
 
         {props.data?.source_url ? (
-          <AnimatedPressable
-            onPress={() => Linking.openURL(props.data!.source_url)}
-            contentStyle={s.linkBtn}
-            scaleIn={0.98}
-          >
+          <AnimatedPressable onPress={() => Linking.openURL(props.data!.source_url)} contentStyle={s.linkBtn} scaleIn={0.98}>
             <Ionicons name="open-outline" size={16} color={props.theme.colors.linkText} />
             <Text style={s.linkBtnText}>{props.t.open}</Text>
           </AnimatedPressable>
@@ -234,15 +247,19 @@ function PriceTile(props: {
   deltaUp: boolean;
 }) {
   const t = props.theme;
+  const showDelta = props.delta != null && props.delta !== "—";
+
   return (
-    <View style={{
-      borderRadius: 16,
-      padding: 12,
-      backgroundColor: t.colors.tile,
-      borderWidth: 1,
-      borderColor: t.colors.border,
-      gap: 8
-    }}>
+    <View
+      style={{
+        borderRadius: 16,
+        padding: 12,
+        backgroundColor: t.colors.tile,
+        borderWidth: 1,
+        borderColor: t.colors.border,
+        gap: 8
+      }}
+    >
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Ionicons name={props.icon} size={16} color={t.colors.muted} />
@@ -253,16 +270,16 @@ function PriceTile(props: {
 
       <Text style={{ fontSize: 18, fontWeight: "900", color: t.colors.text }}>{props.value}</Text>
 
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-        <Ionicons
-          name={props.delta == null || props.delta === "—" ? "remove" : props.deltaUp ? "arrow-up" : "arrow-down"}
-          size={14}
-          color={props.delta == null || props.delta === "—" ? t.colors.muted : props.deltaUp ? "#22c55e" : t.colors.danger}
-        />
-        <Text style={{ fontSize: 12, color: t.colors.muted, fontWeight: "800" }}>
-          {props.delta ?? ""}
-        </Text>
-      </View>
+      {showDelta ? (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <Ionicons
+            name={props.deltaUp ? "arrow-up" : "arrow-down"}
+            size={14}
+            color={props.deltaUp ? "#22c55e" : t.colors.danger}
+          />
+          <Text style={{ fontSize: 12, color: t.colors.muted, fontWeight: "800" }}>{props.delta}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
