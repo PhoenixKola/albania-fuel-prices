@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RewardedAd, RewardedAdEventType, AdEventType } from "react-native-google-mobile-ads";
+import { AdEventType, RewardedAd, RewardedAdEventType } from "react-native-google-mobile-ads";
 import { STORAGE_REWARD_UNTIL_UTC } from "../constants/storage";
 
 type Options = {
@@ -21,7 +21,6 @@ export function useRewardUnlock(opts: Options) {
   const [unlockUntilMs, setUnlockUntilMs] = useState<number>(0);
 
   const durationMs = opts.durationMinutes * 60 * 1000;
-
   const earningRef = useRef(false);
 
   const unlocked = unlockUntilMs > Date.now();
@@ -41,7 +40,7 @@ export function useRewardUnlock(opts: Options) {
   useEffect(() => {
     let cancelled = false;
 
-    const unsubLoaded = ad.addAdEventListener(AdEventType.LOADED, () => {
+    const unsubLoaded = ad.addAdEventListener(RewardedAdEventType.LOADED, () => {
       if (!cancelled) setLoaded(true);
     });
 
