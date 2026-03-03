@@ -19,6 +19,8 @@ export function useFuelData({ url, country, setCountry }: Params) {
     countryRef.current = country;
   }, [country]);
 
+  const didInitForUrl = useRef<string>("");
+
   const countries = useMemo(() => (data?.countries ?? []).map((c) => c.country), [data]);
 
   const selected: CountryPrices | null = useMemo(() => {
@@ -53,8 +55,10 @@ export function useFuelData({ url, country, setCountry }: Params) {
   );
 
   useEffect(() => {
+    if (didInitForUrl.current === url) return;
+    didInitForUrl.current = url;
     void load("init");
-  }, [load]);
+  }, [url]); 
 
   const refresh = useCallback(() => {
     void load("refresh");

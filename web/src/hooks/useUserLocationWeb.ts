@@ -1,10 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type Coords = { lat: number; lon: number };
+
+function almostSame(a: Coords | null, b: Coords, eps = 0.00001) {
+  if (!a) return false;
+  return Math.abs(a.lat - b.lat) < eps && Math.abs(a.lon - b.lon) < eps;
+}
 
 export function useUserLocationWeb() {
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [coords, setCoords] = useState<Coords | null>(null);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const inFlightRef = useRef(false);
+  const lastReqAtRef = useRef(0);
 
   const request = useCallback(() => {
     if (!navigator.geolocation) {
@@ -12,16 +22,28 @@ export function useUserLocationWeb() {
       return;
     }
 
+    const now = Date.now();
+    if (inFlightRef.current) return;
+    if (now - lastReqAtRef.current < 3000) return;
+
+    inFlightRef.current = true;
+    lastReqAtRef.current = now;
+
     setLoading(true);
     setError(null);
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        const next = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+
+        setCoords((prev) => (almostSame(prev, next) ? prev : next));
+
+        inFlightRef.current = false;
         setLoading(false);
       },
       (err) => {
         setError(err.message);
+        inFlightRef.current = false;
         setLoading(false);
       },
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 60_000 }
@@ -30,24 +52,25 @@ export function useUserLocationWeb() {
 
   useEffect(() => {
     let cancelled = false;
+    let perm: PermissionStatus | null = null;
 
     (async () => {
       try {
-        const nav = navigator as Navigator & { permissions?: PermissionStatus };
+        const nav = navigator as Navigator & { permissions?: { query?: (descriptor: PermissionDescriptor) => Promise<PermissionStatus> } };
         if (!nav.permissions?.query) return;
 
-        const p = await nav.permissions.query({ name: "geolocation" });
+        perm = await nav.permissions.query({ name: "geolocation" });
         if (cancelled) return;
 
-        // If user already granted, fetch coords automatically on page load
-        if (p.state === "granted") request();
+        if (perm.state === "granted" && !coords) request();
 
-        // If permission changes while tab open, react to it
-        p.onchange = () => {
-          if (p.state === "granted") request();
+        const onChange = () => {
+          if (perm && perm.state === "granted" && !coords) request();
         };
-      } catch {
-        // ignore (some browsers block permissions API)
+
+        if (perm) perm.onchange = onChange;
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
       } finally {
         if (!cancelled) setChecking(false);
       }
@@ -55,8 +78,9 @@ export function useUserLocationWeb() {
 
     return () => {
       cancelled = true;
+      if (perm) perm.onchange = null;
     };
-  }, [request]);
+  }, [request, coords]);
 
   return { coords, loading, checking, error, request };
 }
