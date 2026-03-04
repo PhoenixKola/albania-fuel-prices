@@ -9,7 +9,8 @@ export const makeSegmentedStyles = (theme: Theme) =>
       borderColor: theme.colors.border,
       backgroundColor: theme.colors.card,
       borderRadius: 16,
-      overflow: "hidden"
+      overflow: "hidden",
+      padding: 2
     },
 
     item: {
@@ -18,7 +19,8 @@ export const makeSegmentedStyles = (theme: Theme) =>
       paddingHorizontal: 12,
       alignItems: "center",
       justifyContent: "center",
-      flexDirection: "row"
+      flexDirection: "row",
+      borderRadius: 14
     },
 
     itemActive: {

@@ -119,11 +119,22 @@ export default function RewardUnlockModal(props: {
             </View>
             <Text style={s.text}>{props.t.unlockCompare}</Text>
           </View>
+
+          <View style={s.line}>
+            <View style={s.bullet}>
+              <Ionicons name="podium-outline" size={16} color={t.colors.linkText} />
+            </View>
+            <Text style={s.text}>{props.t.unlockRankings}</Text>
+          </View>
         </View>
 
         <View style={s.actions}>
           <AnimatedPressable onPress={props.onWatch} contentStyle={s.primaryBtn} scaleIn={0.98}>
-            {props.loadingAd ? <ActivityIndicator color={t.colors.primaryText} /> : <Ionicons name="play-circle-outline" size={18} color={t.colors.primaryText} />}
+            {props.loadingAd ? (
+              <ActivityIndicator color={t.colors.primaryText} />
+            ) : (
+              <Ionicons name="play-circle-outline" size={18} color={t.colors.primaryText} />
+            )}
             <Text style={s.primaryText}>{props.t.watchVideo}</Text>
           </AnimatedPressable>
 

@@ -29,6 +29,8 @@ export const i18n = {
 
     rankingsTitle: "Rankings",
     rankingsSubtitle: (fuel: string) => `Cheapest countries for ${fuel}`,
+    rankingsExpensiveTitle: "Most expensive",
+    rankingsExpensiveSubtitle: (fuel: string) => `Most expensive countries for ${fuel}`,
     yourRank: (n: number) => `Your country rank: #${n}`,
     rankUnavailable: "Rank unavailable (missing data).",
 
@@ -81,8 +83,9 @@ export const i18n = {
     unlockTitle: (m: number) => `Unlock bonus for ${m} min`,
     unlockStations: "Stations radius: unlock 30km + 50km",
     unlockCompare: "Compare: unlock up to 5 countries",
+    unlockRankings: "Rankings: show most expensive too",
     watchVideo: "Watch video",
-    continueWithout: "Continue without reward",
+    continueWithout: "No thanks",
     maxCompareReachedN: (n: number) => `You can compare up to ${n} countries.`,
     radius30km: "30 km",
     radius50km: "50 km",
@@ -115,6 +118,8 @@ export const i18n = {
 
     rankingsTitle: "Renditja",
     rankingsSubtitle: (fuel: string) => `Shtetet më të lira për ${fuel}`,
+    rankingsExpensiveTitle: "Më të shtrenjtët",
+    rankingsExpensiveSubtitle: (fuel: string) => `Shtetet më të shtrenjta për ${fuel}`,
     yourRank: (n: number) => `Renditja e shtetit: #${n}`,
     rankUnavailable: "Renditja s’është e mundur (mungojnë të dhënat).",
 
@@ -167,8 +172,9 @@ export const i18n = {
     unlockTitle: (m: number) => `Zhblloko bonus për ${m} min`,
     unlockStations: "Rrezja e pikave: zhblloko 30km + 50km",
     unlockCompare: "Krahasimi: zhblloko deri në 5 shtete",
+    unlockRankings: "Renditja: shfaq edhe më të shtrenjtat",
     watchVideo: "Shiko video",
-    continueWithout: "Vazhdo pa bonus",
+    continueWithout: "Jo faleminderit",
     maxCompareReachedN: (n: number) => `Mund të krahasosh deri në ${n} shtete.`,
     radius30km: "30 km",
     radius50km: "50 km",

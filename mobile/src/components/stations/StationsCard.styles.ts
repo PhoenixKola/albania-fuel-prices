@@ -41,9 +41,17 @@ export const makeStationsStyles = (theme: Theme) =>
       justifyContent: "center"
     },
 
-    radiusRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
-    radiusLabel: { color: theme.colors.muted, fontWeight: "900", fontSize: 12 },
-    radiusPills: { flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" },
+    radiusRow: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+    radiusLabel: { color: theme.colors.muted, fontWeight: "900", fontSize: 12, flexShrink: 0, paddingTop: 2 },
+    radiusPills: {
+      flexDirection: "row",
+      gap: 8,
+      alignItems: "center",
+      flexWrap: "wrap",
+      flex: 1,
+      flexShrink: 1,
+      justifyContent: "flex-end"
+    },
 
     radiusPill: {
       flexDirection: "row",
@@ -54,7 +62,8 @@ export const makeStationsStyles = (theme: Theme) =>
       borderRadius: 999,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
-      borderColor: theme.colors.border
+      borderColor: theme.colors.border,
+      flexShrink: 0
     },
     radiusPillActive: { backgroundColor: theme.colors.tile },
     radiusPillText: { fontSize: 12, fontWeight: "900", color: theme.colors.muted },

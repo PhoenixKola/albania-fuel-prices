@@ -99,21 +99,26 @@ export default function FuelCard(props: {
             <Ionicons name="speedometer-outline" size={18} color={props.theme.colors.linkText} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={s.title}>{props.t.selectCountry}</Text>
-            <View style={s.badgeRow}>
-              <View style={s.badge}>
-                <Ionicons
-                  name={props.isFromCache ? "cloud-offline-outline" : "pulse-outline"}
-                  size={14}
-                  color={props.theme.colors.linkText}
-                />
-                <Text style={s.badgeText}>{badgeText}</Text>
-              </View>
-              {props.loading ? (
-                <View style={s.loadingPill}>
-                  <ActivityIndicator />
+            <View style={s.titleRow}>
+              <Text style={s.title}>{props.t.selectCountry}</Text>
+              <View style={s.badgeRow}>
+                <View style={s.badge}>
+                  <Ionicons
+                    name={props.isFromCache ? "cloud-offline-outline" : "pulse-outline"}
+                    size={14}
+                    color={props.theme.colors.linkText}
+                  />
+                  <Text style={s.badgeText}>
+                    {props.isFromCache ? props.t.cachedWorksOffline ?? "Cached" : props.t.live ?? "Live"}
+                  </Text>
                 </View>
-              ) : null}
+
+                {props.loading ? (
+                  <View style={s.loadingPill}>
+                    <ActivityIndicator />
+                  </View>
+                ) : null}
+              </View>
             </View>
           </View>
         </View>

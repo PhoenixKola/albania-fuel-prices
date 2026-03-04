@@ -43,7 +43,6 @@ export default function TopBar(props: {
   subtitle: string;
   langPillLabel: string;
   onToggleLang: () => void;
-  // themePillLabel: string;
   onToggleTheme: () => void;
 }) {
   const { theme } = props;
@@ -60,20 +59,25 @@ export default function TopBar(props: {
           </View>
 
           <View style={s.titleWrap}>
-            <Text style={s.h1}>{props.title}</Text>
-            <Text style={s.sub}>{props.subtitle}</Text>
+            <Text style={s.h1}>
+              {props.title}
+            </Text>
+            <Text style={s.sub} numberOfLines={2}>
+              {props.subtitle}
+            </Text>
           </View>
         </View>
 
         <View style={s.actions}>
-          <AnimatedPressable onPress={props.onToggleTheme} contentStyle={s.pill} scaleIn={0.98}>
+          <AnimatedPressable onPress={props.onToggleTheme} contentStyle={s.iconBtn} scaleIn={0.98}>
             <Ionicons name={isDark ? "sunny-outline" : "moon-outline"} size={16} color={theme.colors.text} />
-            {/* <Text style={s.pillText}>{props.themePillLabel}</Text> */}
           </AnimatedPressable>
 
-          <AnimatedPressable onPress={props.onToggleLang} contentStyle={s.pill} scaleIn={0.98}>
+          <AnimatedPressable onPress={props.onToggleLang} contentStyle={s.langBtn} scaleIn={0.98}>
             <Ionicons name="globe-outline" size={16} color={theme.colors.text} />
-            <Text style={s.pillText}>{props.langPillLabel}</Text>
+            <Text style={s.langText} numberOfLines={1}>
+              {props.langPillLabel}
+            </Text>
           </AnimatedPressable>
         </View>
       </View>

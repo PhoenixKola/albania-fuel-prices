@@ -20,6 +20,8 @@ export default function RankingCard(props: {
   onOpenCountry: (c: string) => void;
   currencyMode: CurrencyMode;
   fxRates: Record<string, number> | null;
+
+  rewardUnlocked: boolean;
 }) {
   const s = useMemo(() => makeRankingStyles(props.theme), [props.theme]);
 
@@ -40,7 +42,12 @@ export default function RankingCard(props: {
       .sort((a, b) => (a.price! < b.price! ? -1 : 1));
   }, [props.data, props.fuelType]);
 
-  const top = useMemo(() => sorted.slice(0, 10), [sorted]);
+  const cheapest = useMemo(() => sorted.slice(0, 10), [sorted]);
+
+  const mostExpensive = useMemo(() => {
+    if (!sorted.length) return [];
+    return sorted.slice(Math.max(0, sorted.length - 10)).reverse();
+  }, [sorted]);
 
   const currentRank = useMemo(() => {
     const idx = sorted.findIndex((x) => x.country === props.currentCountry);
@@ -65,18 +72,16 @@ export default function RankingCard(props: {
 
       <SegmentedControl theme={props.theme} value={props.fuelType} items={fuelItems} onChange={props.setFuelType} />
 
-      <Text style={s.note}>
-        {currentRank != null ? props.t.yourRank(currentRank) : props.t.rankUnavailable}
-      </Text>
+      <Text style={s.note}>{currentRank != null ? props.t.yourRank(currentRank) : props.t.rankUnavailable}</Text>
 
       <View style={s.list}>
-        {top.map((r, i) => {
+        {cheapest.map((r, i) => {
           const active = r.country === props.currentCountry;
           return (
             <AnimatedPressable
               key={r.country}
               onPress={() => props.onOpenCountry(r.country)}
-              contentStyle={[s.row, active ? s.rowActive : null, i === top.length - 1 ? { borderBottomWidth: 0 } : null]}
+              contentStyle={[s.row, active ? s.rowActive : null, i === cheapest.length - 1 ? { borderBottomWidth: 0 } : null]}
               scaleIn={0.99}
             >
               <View style={s.left}>
@@ -98,6 +103,48 @@ export default function RankingCard(props: {
           );
         })}
       </View>
+
+      {props.rewardUnlocked ? (
+        <>
+          <View style={s.divider} />
+
+          <View style={s.sectionHeader}>
+            <Text style={s.sectionTitle}>{props.t.rankingsExpensiveTitle}</Text>
+            <Text style={s.sectionSubtitle}>{props.t.rankingsExpensiveSubtitle(fuelName)}</Text>
+          </View>
+
+          <View style={s.list}>
+            {mostExpensive.map((r, i) => {
+              const active = r.country === props.currentCountry;
+              const rank = sorted.length - i;
+              return (
+                <AnimatedPressable
+                  key={r.country}
+                  onPress={() => props.onOpenCountry(r.country)}
+                  contentStyle={[s.row, active ? s.rowActive : null, i === mostExpensive.length - 1 ? { borderBottomWidth: 0 } : null]}
+                  scaleIn={0.99}
+                >
+                  <View style={s.left}>
+                    <View style={[s.rankBubble, active ? s.rankBubbleActive : null]}>
+                      <Text style={[s.rankText, active ? s.rankTextActive : null]}>{rank}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[s.country, active ? s.countryActive : null]}>{r.country}</Text>
+                    </View>
+                  </View>
+
+                  <View style={s.right}>
+                    <Text style={[s.price, active ? s.priceActive : null]}>
+                      {formatFuelPrice(r.country, r.price, props.currencyMode, props.fxRates)}
+                    </Text>
+                    <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.35)" />
+                  </View>
+                </AnimatedPressable>
+              );
+            })}
+          </View>
+        </>
+      ) : null}
     </View>
   );
 }

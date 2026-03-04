@@ -26,7 +26,12 @@ export const makeFuelCardStyles = (theme: Theme) =>
     },
     title: { fontSize: 16, fontWeight: "900", color: theme.colors.text },
 
-    badgeRow: { marginTop: 6, flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+    badgeRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      flexWrap: "nowrap"
+    },
     badge: {
       flexDirection: "row",
       alignItems: "center",
@@ -121,5 +126,12 @@ export const makeFuelCardStyles = (theme: Theme) =>
     },
     linkBtnText: { fontSize: 12, fontWeight: "900", color: theme.colors.linkText },
 
-    mutedSmall: { fontSize: 12, color: theme.colors.muted, fontWeight: "700" }
+    mutedSmall: { fontSize: 12, color: theme.colors.muted, fontWeight: "700" },
+
+    titleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10
+    },
   });

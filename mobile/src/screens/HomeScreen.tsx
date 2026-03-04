@@ -27,7 +27,7 @@ import TopBar from "../components/layout/TopBar";
 import FuelCard from "../components/fuel/FuelCard";
 import RankingCard from "../components/fuel/RankingCard";
 import CompareCard from "../components/fuel/CompareCard";
-import CityEstimateCard from "../components/fuel/CityEstimateCard";
+// import CityEstimateCard from "../components/fuel/CityEstimateCard";
 import ErrorCard from "../components/feedback/ErrorCard";
 import CountrySearchModal from "../components/country/CountrySearchModal";
 import StationsCard from "../components/stations/StationsCard";
@@ -42,6 +42,7 @@ import { useRewardUnlock } from "../hooks/useRewardUnlock";
 import { makeHomeStyles } from "./HomeScreen.styles";
 
 type CurrencyMode = "eur" | "local";
+type HomeTab = "stations" | "compare" | "rankings";
 
 function parseStringArray(raw: string) {
   try {
@@ -147,7 +148,8 @@ export default function HomeScreen() {
 
   const [countryModalOpen, setCountryModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
-  const [section, setSection] = useState<"rankings" | "compare">("rankings");
+
+  const [tab, setTab] = useState<HomeTab>("stations");
 
   useEffect(() => {
     mobileAds().initialize();
@@ -161,8 +163,10 @@ export default function HomeScreen() {
   }, [data?.countries?.length, setFavorites, setCompareCountries]);
 
   const toggleLang = () => setLang((p) => (p === "en" ? "sq" : "en"));
+
   const adUnitId = __DEV__ ? TestIds.BANNER : "ca-app-pub-2653462201538649/5444199958";
   const interstitialUnitId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-2653462201538649/5721527391";
+
   const { markMapsOpened } = useReturnInterstitial({
     unitId: interstitialUnitId,
     cooldownMs: 2 * 60 * 1000,
@@ -181,9 +185,8 @@ export default function HomeScreen() {
 
   const addCompare = (c: string) => {
     setCompareCountries((prev) => {
-      const limit = maxCompare;
       if (prev.includes(c)) return prev;
-      if (prev.length >= limit) return prev;
+      if (prev.length >= maxCompare) return prev;
       return [...prev, c];
     });
   };
@@ -195,25 +198,61 @@ export default function HomeScreen() {
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
   const pendingActionRef = useRef<null | (() => void)>(null);
 
+  const STORAGE_REWARD_PROMPT_COOLDOWN_UNTIL_KEY = "reward_prompt_cooldown_until_utc_ms";
+
+  const { value: rewardPromptCooldownUntil, setValue: setRewardPromptCooldownUntil } = useAsyncStorageState<number>(
+    STORAGE_REWARD_PROMPT_COOLDOWN_UNTIL_KEY,
+    0,
+    {
+      deserialize: (raw) => {
+        const n = Number(raw);
+        return Number.isFinite(n) ? n : 0;
+      },
+      serialize: (v) => String(v)
+    }
+  );
+
+  const nowMs = Date.now();
+  const canAskReward = !reward.unlocked && nowMs >= rewardPromptCooldownUntil;
+
+  const suppressRewardPromptFor30Min = () => {
+    setRewardPromptCooldownUntil(Date.now() + 30 * 60 * 1000);
+  };
+
   const openRewardModal = (after?: () => void) => {
     pendingActionRef.current = after ?? null;
     setRewardModalOpen(true);
   };
 
-  const onRewardContinue = () => {
+  const closeRewardModal = (suppress: boolean) => {
+    if (suppress) suppressRewardPromptFor30Min();
     setRewardModalOpen(false);
-    const act = pendingActionRef.current;
     pendingActionRef.current = null;
+  };
+
+  const onRewardContinue = () => {
+    const act = pendingActionRef.current;
+    closeRewardModal(true);
     act?.();
   };
 
   const onRewardWatch = async () => {
     await reward.showRewardedAndUnlock();
-    setRewardModalOpen(false);
     const act = pendingActionRef.current;
-    pendingActionRef.current = null;
+    closeRewardModal(false);
     act?.();
   };
+
+  const refreshAll = () => {
+    nearby.refresh?.();
+    refresh();
+  };
+
+  const stationsLabel = ((t as any).stationsTab ?? (t as any).stationsTitle ?? "Stations") as string;
+  const compareLabel = ((t as any).compareTitle ?? "Compare") as string;
+  const rankingsLabel = ((t as any).rankingsTitle ?? "Ranking") as string;
+
+  const compareCountriesUI = compareCountries.length ? compareCountries : ["Albania", "Italy", "Greece"];
 
   return (
     <SafeAreaView style={s.screen} edges={["top", "left", "right", "bottom"]}>
@@ -222,7 +261,7 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={s.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refreshAll} />}
       >
         <TopBar
           theme={theme}
@@ -246,11 +285,7 @@ export default function HomeScreen() {
                 </View>
               </View>
 
-              <AnimatedPressable
-                onPress={() => setCountryModalOpen(true)}
-                contentStyle={s.headerBtn}
-                scaleIn={0.98}
-              >
+              <AnimatedPressable onPress={() => setCountryModalOpen(true)} contentStyle={s.headerBtn} scaleIn={0.98}>
                 <Ionicons name="create-outline" size={16} color={theme.colors.text} />
                 <Text style={s.headerBtnText}>{t.edit}</Text>
               </AnimatedPressable>
@@ -291,11 +326,7 @@ export default function HomeScreen() {
                 </View>
               </View>
 
-              <AnimatedPressable
-                onPress={() => setCountryModalOpen(true)}
-                contentStyle={s.headerBtnPrimary}
-                scaleIn={0.98}
-              >
+              <AnimatedPressable onPress={() => setCountryModalOpen(true)} contentStyle={s.headerBtnPrimary} scaleIn={0.98}>
                 <Ionicons name="add" size={18} color={theme.colors.primaryText} />
                 <Text style={s.headerBtnPrimaryText}>{t.edit}</Text>
               </AnimatedPressable>
@@ -304,7 +335,7 @@ export default function HomeScreen() {
         )}
 
         {error ? (
-          <ErrorCard theme={theme} title={t.couldntLoad} message={error} cta={t.tryAgain} onPress={refresh} />
+          <ErrorCard theme={theme} title={t.couldntLoad} message={error} cta={t.tryAgain} onPress={refreshAll} />
         ) : null}
 
         <FuelCard
@@ -322,35 +353,12 @@ export default function HomeScreen() {
           isFromCache={isFromCache}
           cacheSavedAtUtc={cacheSavedAtUtc}
           refreshing={refreshing}
-          onRefresh={refresh}
+          onRefresh={refreshAll}
           onOpenCountrySearch={() => setCountryModalOpen(true)}
         />
 
-        <StationsCard
-          theme={theme}
-          t={t}
-          permission={loc.permission}
-          locating={loc.loading}
-          onRequestLocation={loc.request}
-          stations={nearby.stations}
-          totalCount={nearby.totalCount}
-          loading={nearby.loading}
-          error={nearby.error}
-          onRefresh={nearby.refresh}
-          fromCache={nearby.fromCache}
-          radiusM={radiusM}
-          setRadiusM={setRadiusM}
-          onOpenExternalMap={markMapsOpened}
-          rewardUnlocked={reward.unlocked}
-          onShowAllPress={(proceed) => {
-            if (!reward.unlocked) {
-              openRewardModal(proceed);
-              return;
-            }
-            proceed();
-          }}
-        />
-
+        {/* City estimate disabled for now */}
+        {/*
         {country === "Albania" ? (
           <CityEstimateCard
             theme={theme}
@@ -366,18 +374,65 @@ export default function HomeScreen() {
             fxRates={fx.rates}
           />
         ) : null}
+        */}
 
         <SegmentedControl
           theme={theme}
-          value={section}
-          onChange={setSection}
+          value={tab}
+          onChange={(v) => setTab(v as HomeTab)}
           items={[
-            { value: "rankings", label: t.rankingsTitle, icon: "podium-outline" },
-            { value: "compare", label: t.compareTitle, icon: "git-compare-outline" }
+            { value: "stations", label: stationsLabel, icon: "navigate-outline" },
+            { value: "compare", label: compareLabel, icon: "git-compare-outline" },
+            { value: "rankings", label: rankingsLabel, icon: "podium-outline" }
           ]}
         />
 
-        {section === "rankings" ? (
+        {tab === "stations" ? (
+          <StationsCard
+            theme={theme}
+            t={t}
+            permission={loc.permission}
+            locating={loc.loading}
+            onRequestLocation={loc.request}
+            stations={nearby.stations}
+            totalCount={nearby.totalCount}
+            loading={nearby.loading}
+            error={nearby.error}
+            onRefresh={nearby.refresh}
+            fromCache={nearby.fromCache}
+            radiusM={radiusM}
+            setRadiusM={setRadiusM}
+            onOpenExternalMap={markMapsOpened}
+            rewardUnlocked={reward.unlocked}
+            onShowAllPress={(proceed) => {
+              proceed();
+            }}
+            onRadiusPress={() => {
+              if (!canAskReward) return;
+              openRewardModal();
+            }}
+          />
+        ) : null}
+
+        {tab === "compare" ? (
+          <CompareCard
+            theme={theme}
+            t={t}
+            data={data}
+            fuelType={fuelType}
+            compareCountries={compareCountriesUI}
+            onRemove={removeCompare}
+            onAddPress={() => {
+              if (compareCountries.length >= maxCompare) return;
+              setCompareModalOpen(true);
+            }}
+            currencyMode={currencyMode}
+            fxRates={fx.rates}
+            maxCompare={maxCompare}
+          />
+        ) : null}
+
+        {tab === "rankings" ? (
           <RankingCard
             theme={theme}
             t={t}
@@ -388,28 +443,9 @@ export default function HomeScreen() {
             onOpenCountry={(c) => setCountry(c)}
             currencyMode={currencyMode}
             fxRates={fx.rates}
+            rewardUnlocked={reward.unlocked}
           />
-        ) : (
-          <CompareCard
-            theme={theme}
-            t={t}
-            data={data}
-            fuelType={fuelType}
-            compareCountries={compareCountries}
-            onRemove={removeCompare}
-            onAddPress={() => {
-              if (compareCountries.length >= maxCompare && !reward.unlocked) {
-                openRewardModal(() => setCompareModalOpen(true));
-                return;
-              }
-              if (compareCountries.length >= maxCompare) return;
-              setCompareModalOpen(true);
-            }}
-            currencyMode={currencyMode}
-            fxRates={fx.rates}
-            maxCompare={maxCompare}
-          />
-        )}
+        ) : null}
 
         <CountrySearchModal
           theme={theme}
@@ -446,7 +482,6 @@ export default function HomeScreen() {
             setCompareModalOpen(false);
           }}
         />
-
       </ScrollView>
 
       <RewardUnlockModal
@@ -455,7 +490,7 @@ export default function HomeScreen() {
         open={rewardModalOpen}
         minutes={30}
         loadingAd={!reward.loaded}
-        onClose={() => setRewardModalOpen(false)}
+        onClose={() => closeRewardModal(true)}
         onWatch={onRewardWatch}
         onContinue={onRewardContinue}
       />

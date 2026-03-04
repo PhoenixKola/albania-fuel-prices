@@ -4,12 +4,13 @@ import type { Theme } from "../../theme/theme";
 export const makeTopBarStyles = (theme: Theme) =>
   StyleSheet.create({
     header: {
-      gap: 12
+      paddingTop: 6,
+      paddingBottom: 4
     },
 
     row: {
       flexDirection: "row",
-      alignItems: "center",
+      alignItems: "flex-start",
       justifyContent: "space-between",
       gap: 12
     },
@@ -17,60 +18,77 @@ export const makeTopBarStyles = (theme: Theme) =>
     brand: {
       flex: 1,
       flexDirection: "row",
-      alignItems: "center",
-      gap: 12
+      alignItems: "flex-start",
+      gap: 10,
+      minWidth: 0
     },
 
     brandIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 16,
+      width: 38,
+      height: 38,
+      borderRadius: 14,
       backgroundColor: theme.colors.linkBg,
       borderWidth: 1,
       borderColor: theme.colors.border,
       alignItems: "center",
-      justifyContent: "center"
+      justifyContent: "center",
+      marginTop: 2
     },
 
     titleWrap: {
-      flex: 1
+      flex: 1,
+      minWidth: 0
     },
 
     h1: {
-      fontSize: 24,
+      fontSize: 22,
       fontWeight: "900",
       letterSpacing: -0.2,
-      color: theme.colors.text
+      color: theme.colors.text,
+      lineHeight: 26
     },
 
     sub: {
-      marginTop: 6,
+      marginTop: 4,
       fontSize: 13,
       fontWeight: "800",
-      color: theme.colors.subText
+      color: theme.colors.subText,
+      lineHeight: 18
     },
 
     actions: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 10
+      gap: 8,
+      marginTop: 2,
+      flexShrink: 0
     },
 
-    pill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      paddingVertical: 10,
-      paddingHorizontal: 12,
-      borderRadius: 999,
+    iconBtn: {
+      width: 42,
+      height: 42,
+      borderRadius: 14,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      minWidth: 44,
+      alignItems: "center",
       justifyContent: "center"
     },
 
-    pillText: {
+    langBtn: {
+      height: 42,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 12,
+      borderRadius: 14,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      justifyContent: "center"
+    },
+
+    langText: {
       fontSize: 12,
       fontWeight: "900",
       color: theme.colors.text

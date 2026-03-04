@@ -30,6 +30,8 @@ export default function StationsCard(props: {
 
   rewardUnlocked: boolean;
   onShowAllPress: (proceed: () => void) => void;
+
+  onRadiusPress?: () => void;
 }) {
   const s = useMemo(() => makeStationsStyles(props.theme), [props.theme]);
 
@@ -91,7 +93,10 @@ export default function StationsCard(props: {
             return (
               <AnimatedPressable
                 key={it.v}
-                onPress={() => props.setRadiusM(it.v)}
+                onPress={() => {
+                  props.setRadiusM(it.v);
+                  props.onRadiusPress?.();
+                }}
                 contentStyle={[s.radiusPill, active ? s.radiusPillActive : null]}
                 scaleIn={0.98}
               >

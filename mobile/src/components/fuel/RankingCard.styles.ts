@@ -30,6 +30,16 @@ export const makeRankingStyles = (theme: Theme) =>
 
     note: { color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
 
+    divider: {
+      height: 1,
+      backgroundColor: theme.colors.border,
+      marginTop: 2
+    },
+
+    sectionHeader: { gap: 4 },
+    sectionTitle: { fontSize: 14, fontWeight: "900", color: theme.colors.text },
+    sectionSubtitle: { color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
+
     list: {
       borderRadius: 16,
       overflow: "hidden",
