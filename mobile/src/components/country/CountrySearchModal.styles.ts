@@ -13,6 +13,7 @@ export const makeCountryModalStyles = (theme: Theme) =>
       borderTopLeftRadius: 18,
       borderTopRightRadius: 18,
       padding: 16,
+      paddingBottom: 110,
       borderTopWidth: 1,
       borderColor: theme.colors.border,
       maxHeight: "85%",

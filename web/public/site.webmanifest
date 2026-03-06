@@ -1,6 +1,6 @@
 {
-  "name": "Karburanti Sot",
-  "short_name": "Karburanti",
+  "name": "Fuel Prices Today",
+  "short_name": "Fuel Prices",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0B1220",

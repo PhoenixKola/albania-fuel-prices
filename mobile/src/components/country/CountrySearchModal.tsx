@@ -56,6 +56,7 @@ export default function CountrySearchModal(props: {
               data={items}
               keyExtractor={(x) => x}
               keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: 14 }}
               renderItem={({ item, index }) => {
                 const active = item === props.value;
                 const isLast = index === items.length - 1;
@@ -67,7 +68,7 @@ export default function CountrySearchModal(props: {
                     style={[
                       s.row,
                       isLast ? { borderBottomWidth: 0 } : null,
-                      active ? { backgroundColor: props.theme.colors.tile } : null,
+                      active ? { backgroundColor: props.theme.colors.tile } : null
                     ]}
                   >
                     <Text style={s.rowText}>{item}</Text>

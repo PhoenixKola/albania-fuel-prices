@@ -14,6 +14,7 @@ export const makeCompareStyles = (theme: Theme) =>
 
     headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
     headerLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+
     headerIcon: {
       width: 40,
       height: 40,
@@ -27,7 +28,22 @@ export const makeCompareStyles = (theme: Theme) =>
 
     title: { fontSize: 16, fontWeight: "900", color: theme.colors.text },
     subtitle: { marginTop: 4, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
-    hint: { color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
+
+    headerActions: { alignItems: "flex-end", gap: 10 },
+
+    pills: { flexDirection: "row", gap: 8, justifyContent: "flex-end" },
+    pill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      borderRadius: 999,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    pillText: { color: theme.colors.muted, fontWeight: "900", fontSize: 12 },
 
     btn: {
       flexDirection: "row",
@@ -43,55 +59,102 @@ export const makeCompareStyles = (theme: Theme) =>
     btnDisabled: { opacity: 0.5 },
     btnText: { color: theme.colors.text, fontWeight: "900", fontSize: 12 },
 
-    list: {
+    notice: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
       borderRadius: 16,
-      overflow: "hidden",
+      backgroundColor: theme.colors.tile,
       borderWidth: 1,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.tile
+      borderColor: theme.colors.border
     },
+    noticeText: { color: theme.colors.muted, fontWeight: "800", fontSize: 12, flex: 1 },
 
-    row: {
+    rows: { gap: 10 },
+
+    rowCard: {
       paddingVertical: 12,
       paddingHorizontal: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      borderRadius: 16,
+      backgroundColor: theme.colors.tile,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       gap: 12
     },
 
-    left: { flexDirection: "row", alignItems: "center", gap: 10, flex: 1 },
+    rowBest: {
+      borderColor: theme.colors.linkText
+    },
+
+    rowLeft: { flexDirection: "row", alignItems: "center", gap: 10, flex: 1, minWidth: 0 },
 
     rankBubble: {
-      width: 30,
-      height: 30,
+      width: 38,
+      height: 38,
       borderRadius: 999,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
       borderColor: theme.colors.border,
       alignItems: "center",
-      justifyContent: "center"
+      justifyContent: "center",
+      gap: 2
     },
+
+    rank1: { backgroundColor: "rgba(245, 158, 11, 0.18)" },
+    rank2: { backgroundColor: "rgba(148, 163, 184, 0.18)" },
+    rank3: { backgroundColor: "rgba(34, 197, 94, 0.14)" },
+
     rankText: { color: theme.colors.text, fontWeight: "900", fontSize: 12 },
 
     country: { color: theme.colors.text, fontWeight: "900", fontSize: 14 },
-    sub: { marginTop: 2, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
 
-    right: { alignItems: "flex-end", gap: 8 },
-    price: { color: theme.colors.text, fontWeight: "900", fontSize: 14 },
+    subRow: { marginTop: 3, flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+    sub: { color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
 
-    removeBtn: {
+    diffPill: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
-      paddingVertical: 8,
-      paddingHorizontal: 10,
-      borderRadius: 14,
+      gap: 4,
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      borderRadius: 999,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
       borderColor: theme.colors.border
     },
-    removeText: { color: theme.colors.muted, fontWeight: "900", fontSize: 12 }
+    diffText: { color: theme.colors.muted, fontWeight: "900", fontSize: 11 },
+
+    rowRight: { flexDirection: "row", alignItems: "center", gap: 10 },
+
+    priceStack: { alignItems: "flex-end", gap: 6, minWidth: 88 },
+    price: { color: theme.colors.text, fontWeight: "900", fontSize: 14 },
+
+    bestPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      borderRadius: 999,
+      backgroundColor: theme.colors.linkBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    bestText: { color: theme.colors.text, fontWeight: "900", fontSize: 11 },
+
+    removeIconBtn: {
+      width: 38,
+      height: 38,
+      borderRadius: 14,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    }
   });

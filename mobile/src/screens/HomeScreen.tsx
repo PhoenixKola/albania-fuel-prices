@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, Pressable, RefreshControl, ScrollView, StatusBar, Text, View } from "react-native";
+import { Linking, RefreshControl, ScrollView, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import mobileAds, { TestIds } from "react-native-google-mobile-ads";
 import { Ionicons } from "@expo/vector-icons";
 
-import { DATA_URL } from "../constants/urls";
+import { DATA_URL, PLAY_STORE_URL } from "../constants/urls";
 import {
   STORAGE_CITY_BIAS_KEY,
   STORAGE_CITY_KEY,
@@ -27,7 +27,6 @@ import TopBar from "../components/layout/TopBar";
 import FuelCard from "../components/fuel/FuelCard";
 import RankingCard from "../components/fuel/RankingCard";
 import CompareCard from "../components/fuel/CompareCard";
-// import CityEstimateCard from "../components/fuel/CityEstimateCard";
 import ErrorCard from "../components/feedback/ErrorCard";
 import CountrySearchModal from "../components/country/CountrySearchModal";
 import StationsCard from "../components/stations/StationsCard";
@@ -38,8 +37,16 @@ import SegmentedControl from "../components/ui/SegmentedControl";
 import { useReturnInterstitial } from "../hooks/useReturnInterstitial";
 import RewardUnlockModal from "../components/ads/RewardUnlockModal";
 import { useRewardUnlock } from "../hooks/useRewardUnlock";
+import RateAppModal from "../components/feedback/RateAppModal";
+import { useRatePrompt } from "../hooks/useRatePrompt";
+
+import QuickSwitchCard from "../components/layout/QuickSwitchCard";
 
 import { makeHomeStyles } from "./HomeScreen.styles";
+
+import { getCurrencyForCountry } from "../utils/currency";
+import { hasRate } from "../utils/money";
+import FeedbackCurrencyBar from "../components/layout/FeedbackCurrencyBar";
 
 type CurrencyMode = "eur" | "local";
 type HomeTab = "stations" | "compare" | "rankings";
@@ -52,38 +59,6 @@ function parseStringArray(raw: string) {
   } catch {
     return [];
   }
-}
-
-function AnimatedPressable({
-  onPress,
-  children,
-  style,
-  contentStyle,
-  scaleIn = 0.97
-}: {
-  onPress?: () => void;
-  children: React.ReactNode;
-  style?: any;
-  contentStyle?: any;
-  scaleIn?: number;
-}) {
-  const scale = useRef(new Animated.Value(1)).current;
-
-  const pressIn = () => {
-    Animated.timing(scale, { toValue: scaleIn, duration: 90, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
-  };
-
-  const pressOut = () => {
-    Animated.timing(scale, { toValue: 1, duration: 120, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
-  };
-
-  return (
-    <Animated.View style={[{ transform: [{ scale }] }, style]}>
-      <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} style={contentStyle}>
-        {children}
-      </Pressable>
-    </Animated.View>
-  );
 }
 
 export default function HomeScreen() {
@@ -106,16 +81,6 @@ export default function HomeScreen() {
 
   const { value: fuelType, setValue: setFuelType } = useAsyncStorageState<FuelType>(STORAGE_FUELTYPE_KEY, "diesel", {
     deserialize: (raw) => (raw === "gasoline95" || raw === "lpg" || raw === "diesel" ? raw : "diesel")
-  });
-
-  const { value: city, setValue: setCity } = useAsyncStorageState<string>(STORAGE_CITY_KEY, "Tirana");
-
-  const { value: cityBias, setValue: setCityBias } = useAsyncStorageState<number>(STORAGE_CITY_BIAS_KEY, 0, {
-    deserialize: (raw) => {
-      const n = Number(raw);
-      return Number.isFinite(n) ? n : 0;
-    },
-    serialize: (v) => String(v)
   });
 
   const { value: favorites, setValue: setFavorites } = useAsyncStorageState<string[]>(
@@ -148,7 +113,6 @@ export default function HomeScreen() {
 
   const [countryModalOpen, setCountryModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
-
   const [tab, setTab] = useState<HomeTab>("stations");
 
   useEffect(() => {
@@ -254,6 +218,43 @@ export default function HomeScreen() {
 
   const compareCountriesUI = compareCountries.length ? compareCountries : ["Albania", "Italy", "Greece"];
 
+  const rate = useRatePrompt({ threshold: 4, cooldownDays: 7 });
+  const [rateOpen, setRateOpen] = useState(false);
+
+  useEffect(() => {
+    if (!rateOpen && rate.canShow) setRateOpen(true);
+  }, [rate.canShow, rateOpen]);
+
+  const setCountryTracked = (c: string) => {
+    setCountry(c);
+    rate.track("country_change");
+  };
+
+  const onOpenExternalMapTracked = () => {
+    markMapsOpened();
+    rate.track("open_map");
+  };
+
+  const openFeedback = async () => {
+    const subject = encodeURIComponent("Fuel app feedback");
+    const body = encodeURIComponent("Hi! I have feedback:\n\n");
+    const mailto = `mailto:fenixkola@gmail.com?subject=${subject}&body=${body}`;
+    const ok = await Linking.canOpenURL(mailto);
+    if (ok) await Linking.openURL(mailto);
+  };
+
+  const openStoreReview = async () => {
+    rate.markRated();
+    setRateOpen(false);
+    const url = PLAY_STORE_URL;
+    const ok = await Linking.canOpenURL(url);
+    if (ok) await Linking.openURL(url);
+  };
+
+  const currency = useMemo(() => getCurrencyForCountry(country), [country]);
+  const canLocal = useMemo(() => currency !== "EUR" && hasRate(currency, fx.rates), [currency, fx.rates]);
+  const effectiveCurrencyMode: CurrencyMode = currencyMode === "local" && canLocal ? "local" : "eur";
+
   return (
     <SafeAreaView style={s.screen} edges={["top", "left", "right", "bottom"]}>
       <StatusBar barStyle={themeName === "dark" ? "light-content" : "dark-content"} backgroundColor={theme.colors.bg} />
@@ -272,67 +273,26 @@ export default function HomeScreen() {
           onToggleTheme={toggleTheme}
         />
 
-        {favorites.length ? (
-          <View style={s.quickCard}>
-            <View style={s.cardHeader}>
-              <View style={s.cardHeaderLeft}>
-                <View style={s.headerIcon}>
-                  <Ionicons name="flash-outline" size={18} color={theme.colors.linkText} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.cardTitle}>{t.quickSwitch}</Text>
-                  <Text style={s.cardSub}>{t.tapToSwitch ?? ""}</Text>
-                </View>
-              </View>
+        <FeedbackCurrencyBar
+          theme={theme}
+          t={t}
+          onFeedbackPress={openFeedback}
+          currencyLocalCode={currency}
+          canLocal={canLocal}
+          currencyMode={effectiveCurrencyMode}
+          onSetCurrencyMode={(m) => setCurrencyMode(m)}
+          headerBtnStyle={s.headerBtn}
+          headerBtnTextStyle={s.headerBtnText}
+        />
 
-              <AnimatedPressable onPress={() => setCountryModalOpen(true)} contentStyle={s.headerBtn} scaleIn={0.98}>
-                <Ionicons name="create-outline" size={16} color={theme.colors.text} />
-                <Text style={s.headerBtnText}>{t.edit}</Text>
-              </AnimatedPressable>
-            </View>
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.quickRow}>
-              {favorites.map((c) => {
-                const active = c === country;
-                return (
-                  <AnimatedPressable
-                    key={c}
-                    onPress={() => setCountry(c)}
-                    contentStyle={[s.quickPill, active ? s.quickPillActive : null]}
-                    scaleIn={0.97}
-                  >
-                    <Ionicons
-                      name={active ? "checkmark-circle" : "star-outline"}
-                      size={16}
-                      color={active ? theme.colors.text : theme.colors.muted}
-                      style={{ marginRight: 8 }}
-                    />
-                    <Text style={[s.quickPillText, active ? s.quickPillTextActive : null]}>{c}</Text>
-                  </AnimatedPressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        ) : (
-          <View style={s.quickCard}>
-            <View style={s.cardHeader}>
-              <View style={s.cardHeaderLeft}>
-                <View style={s.headerIcon}>
-                  <Ionicons name="star-outline" size={18} color={theme.colors.linkText} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.cardTitle}>{t.quickSwitch}</Text>
-                  <Text style={s.cardSub}>{t.quickSwitchEmpty ?? ""}</Text>
-                </View>
-              </View>
-
-              <AnimatedPressable onPress={() => setCountryModalOpen(true)} contentStyle={s.headerBtnPrimary} scaleIn={0.98}>
-                <Ionicons name="add" size={18} color={theme.colors.primaryText} />
-                <Text style={s.headerBtnPrimaryText}>{t.edit}</Text>
-              </AnimatedPressable>
-            </View>
-          </View>
-        )}
+        <QuickSwitchCard
+          theme={theme}
+          t={t}
+          favorites={favorites}
+          currentCountry={country}
+          onEdit={() => setCountryModalOpen(true)}
+          onSelect={(c: any) => setCountryTracked(c)}
+        />
 
         {error ? (
           <ErrorCard theme={theme} title={t.couldntLoad} message={error} cta={t.tryAgain} onPress={refreshAll} />
@@ -347,7 +307,7 @@ export default function HomeScreen() {
           loading={loading}
           country={country}
           fuelType={fuelType}
-          currencyMode={currencyMode}
+          currencyMode={effectiveCurrencyMode}
           setCurrencyMode={setCurrencyMode}
           fxRates={fx.rates}
           isFromCache={isFromCache}
@@ -356,25 +316,6 @@ export default function HomeScreen() {
           onRefresh={refreshAll}
           onOpenCountrySearch={() => setCountryModalOpen(true)}
         />
-
-        {/* City estimate disabled for now */}
-        {/*
-        {country === "Albania" ? (
-          <CityEstimateCard
-            theme={theme}
-            t={t}
-            base={selected}
-            fuelType={fuelType}
-            setFuelType={setFuelType}
-            city={city}
-            setCity={setCity}
-            bias={cityBias}
-            setBias={setCityBias}
-            currencyMode={currencyMode}
-            fxRates={fx.rates}
-          />
-        ) : null}
-        */}
 
         <SegmentedControl
           theme={theme}
@@ -402,12 +343,13 @@ export default function HomeScreen() {
             fromCache={nearby.fromCache}
             radiusM={radiusM}
             setRadiusM={setRadiusM}
-            onOpenExternalMap={markMapsOpened}
+            onOpenExternalMap={onOpenExternalMapTracked}
             rewardUnlocked={reward.unlocked}
             onShowAllPress={(proceed) => {
               proceed();
             }}
             onRadiusPress={() => {
+              rate.track("stations_use");
               if (!canAskReward) return;
               openRewardModal();
             }}
@@ -426,7 +368,7 @@ export default function HomeScreen() {
               if (compareCountries.length >= maxCompare) return;
               setCompareModalOpen(true);
             }}
-            currencyMode={currencyMode}
+            currencyMode={effectiveCurrencyMode}
             fxRates={fx.rates}
             maxCompare={maxCompare}
           />
@@ -440,8 +382,8 @@ export default function HomeScreen() {
             fuelType={fuelType}
             setFuelType={setFuelType}
             currentCountry={country}
-            onOpenCountry={(c) => setCountry(c)}
-            currencyMode={currencyMode}
+            onOpenCountry={(c) => setCountryTracked(c)}
+            currencyMode={effectiveCurrencyMode}
             fxRates={fx.rates}
             rewardUnlocked={reward.unlocked}
           />
@@ -460,7 +402,7 @@ export default function HomeScreen() {
           onToggleFavorite={toggleFavorite}
           onClose={() => setCountryModalOpen(false)}
           onSelect={(c) => {
-            setCountry(c);
+            setCountryTracked(c);
             setCountryModalOpen(false);
           }}
         />
@@ -493,6 +435,21 @@ export default function HomeScreen() {
         onClose={() => closeRewardModal(true)}
         onWatch={onRewardWatch}
         onContinue={onRewardContinue}
+      />
+
+      <RateAppModal
+        theme={theme}
+        t={t}
+        open={rateOpen}
+        onClose={() => {
+          setRateOpen(false);
+          rate.snooze();
+        }}
+        onRate={openStoreReview}
+        onLater={() => {
+          setRateOpen(false);
+          rate.snooze();
+        }}
       />
 
       <View>

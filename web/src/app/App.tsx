@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
 import type { FuelType } from "../models/fuel";
@@ -6,8 +6,8 @@ import { i18n } from "../locales";
 import {
   DATA_URL,
   // STORAGE_ALL_RATE_KEY,
-  STORAGE_CITY_BIAS_KEY,
-  STORAGE_CITY_KEY,
+  // STORAGE_CITY_BIAS_KEY,
+  // STORAGE_CITY_KEY,
   STORAGE_COUNTRY_KEY,
   STORAGE_CURRENCY_KEY,
   STORAGE_FUELTYPE_KEY,
@@ -31,7 +31,7 @@ import WatchlistCard from "../components/fuel/WatchlistCard";
 import RankingCard from "../components/fuel/RankingCard";
 // import QuickCalcCard from "../components/fuel/QuickCalcCard";
 // import { getEurPrice } from "../utils/fuel";
-import CityEstimateCard from "../components/fuel/CityEstimateCard";
+// import CityEstimateCard from "../components/fuel/CityEstimateCard";
 import NearbyStationsCard from "../components/meta/NearbyStationsCard";
 
 import Modal from "../components/ui/Modal";
@@ -58,6 +58,10 @@ export default function App() {
     deserialize: (raw) => (raw === "local" ? "local" : "eur"),
   });
 
+  useEffect(() => {
+    document.documentElement.lang = lang === "sq" ? "sq" : "en";
+  }, [lang]);
+
   // const [allPerEur, setAllPerEur] = useLocalStorageState<number>(STORAGE_ALL_RATE_KEY, 100, {
   //   deserialize: (raw) => {
   //     const n = Number(raw);
@@ -66,14 +70,14 @@ export default function App() {
   //   serialize: (v) => String(v),
   // });
 
-  const [city, setCity] = useLocalStorageState<string>(STORAGE_CITY_KEY, "Tirana");
-  const [cityBias, setCityBias] = useLocalStorageState<number>(STORAGE_CITY_BIAS_KEY, 0, {
-    deserialize: (raw) => {
-      const n = Number(raw);
-      return Number.isFinite(n) ? n : 0;
-    },
-    serialize: (v) => String(v),
-  });
+  // const [city, setCity] = useLocalStorageState<string>(STORAGE_CITY_KEY, "Tirana");
+  // const [cityBias, setCityBias] = useLocalStorageState<number>(STORAGE_CITY_BIAS_KEY, 0, {
+  //   deserialize: (raw) => {
+  //     const n = Number(raw);
+  //     return Number.isFinite(n) ? n : 0;
+  //   },
+  //   serialize: (v) => String(v),
+  // });
 
   const [radiusM, setRadiusM] = useLocalStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
     deserialize: (raw) => {
@@ -207,7 +211,7 @@ export default function App() {
                 fxRates={fx.rates}
               />
 
-              {country === "Albania" ? (
+              {/* {country === "Albania" ? (
                 <CityEstimateCard
                   t={t}
                   base={selected}
@@ -218,7 +222,7 @@ export default function App() {
                   currency={currency}
                   fxRates={fx.rates}
                 />
-              ) : null}
+              ) : null} */}
 
               <RankingCard
                 t={t}

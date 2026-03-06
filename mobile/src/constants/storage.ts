@@ -17,3 +17,7 @@ export const STORAGE_STATIONS_CACHE_KEY = "stationsCache";
 export const STORAGE_STATIONS_RADIUS_KEY = "stationsRadiusM";
 
 export const STORAGE_REWARD_UNTIL_UTC = "rewardUnlockUntilUtc";
+
+export const STORAGE_RATE_EVENTS_KEY = "rate_prompt_events_v1";
+export const STORAGE_RATE_COOLDOWN_UNTIL_KEY = "rate_prompt_cooldown_until_utc_ms_v1";
+export const STORAGE_RATE_DONE_KEY = "rate_prompt_done_v1";
