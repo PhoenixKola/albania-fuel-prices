@@ -27,6 +27,7 @@ export const i18n = {
     langEN: "EN",
     langSQ: "AL",
 
+    stationsTitle: "Stations",
     rankingsTitle: "Rankings",
     rankingsSubtitle: (fuel: string) => `Cheapest countries for ${fuel}`,
     rankingsExpensiveTitle: "Most expensive",
@@ -123,6 +124,7 @@ export const i18n = {
     langEN: "EN",
     langSQ: "AL",
 
+    stationsTitle: "Pikat",
     rankingsTitle: "Renditja",
     rankingsSubtitle: (fuel: string) => `Shtetet më të lira për ${fuel}`,
     rankingsExpensiveTitle: "Më të shtrenjtët",

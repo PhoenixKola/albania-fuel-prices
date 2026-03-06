@@ -2,12 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Linking, RefreshControl, ScrollView, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import mobileAds, { TestIds } from "react-native-google-mobile-ads";
-import { Ionicons } from "@expo/vector-icons";
 
 import { DATA_URL, PLAY_STORE_URL } from "../constants/urls";
 import {
-  STORAGE_CITY_BIAS_KEY,
-  STORAGE_CITY_KEY,
   STORAGE_COMPARE_KEY,
   STORAGE_COUNTRY_KEY,
   STORAGE_CURRENCY_KEY,
@@ -212,7 +209,7 @@ export default function HomeScreen() {
     refresh();
   };
 
-  const stationsLabel = ((t as any).stationsTab ?? (t as any).stationsTitle ?? "Stations") as string;
+  const stationsLabel = ((t as any).stationsTitle ?? "Stations") as string;
   const compareLabel = ((t as any).compareTitle ?? "Compare") as string;
   const rankingsLabel = ((t as any).rankingsTitle ?? "Ranking") as string;
 
