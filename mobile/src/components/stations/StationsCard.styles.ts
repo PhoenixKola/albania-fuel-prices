@@ -29,7 +29,7 @@ export const makeStationsStyles = (theme: Theme) =>
     title: { fontSize: 16, fontWeight: "900", color: theme.colors.text },
     subtitle: { marginTop: 4, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
 
-    headerRight: { alignItems: "flex-end", gap: 10 },
+    headerRight: { alignItems: "flex-end", gap: 10, flexDirection: "row" },
     headerPills: { flexDirection: "row", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" },
 
     pill: {
@@ -44,6 +44,19 @@ export const makeStationsStyles = (theme: Theme) =>
       borderColor: theme.colors.border
     },
     pillText: { color: theme.colors.muted, fontWeight: "900", fontSize: 12, maxWidth: 120 },
+
+    pillBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      borderRadius: 999,
+      backgroundColor: theme.colors.tile,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    pillBtnText: { color: theme.colors.text, fontWeight: "900", fontSize: 12 },
 
     iconBtn: {
       width: 44,
@@ -83,12 +96,10 @@ export const makeStationsStyles = (theme: Theme) =>
     },
 
     radiusPillActive: { backgroundColor: theme.colors.tile },
-
     radiusPillLocked: { opacity: 0.6 },
 
     radiusPillText: { fontSize: 12, fontWeight: "900", color: theme.colors.muted },
     radiusPillTextActive: { color: theme.colors.text },
-    radiusPillTextLocked: { color: theme.colors.muted },
 
     notice: {
       borderRadius: 16,
@@ -184,6 +195,17 @@ export const makeStationsStyles = (theme: Theme) =>
 
     kmText: { color: theme.colors.muted, fontWeight: "900", fontSize: 12 },
 
+    starBtn: {
+      width: 38,
+      height: 38,
+      borderRadius: 14,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    },
+
     actionsRow: { flexDirection: "row", gap: 10, justifyContent: "flex-end", flexWrap: "wrap" },
 
     btn: {
@@ -197,5 +219,67 @@ export const makeStationsStyles = (theme: Theme) =>
       borderWidth: 1,
       borderColor: theme.colors.border
     },
-    btnText: { fontSize: 12, fontWeight: "900", color: theme.colors.text }
+    btnText: { fontSize: 12, fontWeight: "900", color: theme.colors.text },
+
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.55)",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16
+    },
+
+    modalCard: {
+      width: "100%",
+      maxWidth: 520,
+      borderRadius: 18,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      padding: 14,
+      gap: 12
+    },
+
+    modalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
+    modalTitle: { color: theme.colors.text, fontWeight: "900", fontSize: 16 },
+    modalCloseBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    },
+
+    modalOptions: { gap: 10 },
+
+    modalOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      backgroundColor: theme.colors.tile,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+
+    modalOptionText: { color: theme.colors.text, fontWeight: "900" },
+
+    rememberRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+
+    rememberText: { color: theme.colors.text, fontWeight: "900" }
   });

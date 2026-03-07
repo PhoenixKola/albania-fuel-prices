@@ -12,7 +12,7 @@ export const makeCompareStyles = (theme: Theme) =>
       gap: 12
     },
 
-    headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
+    headerRow: { flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
     headerLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
 
     headerIcon: {
@@ -44,6 +44,17 @@ export const makeCompareStyles = (theme: Theme) =>
       borderColor: theme.colors.border
     },
     pillText: { color: theme.colors.muted, fontWeight: "900", fontSize: 12 },
+
+    iconBtn: {
+      width: 44,
+      height: 44,
+      borderRadius: 16,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    },
 
     btn: {
       flexDirection: "row",
@@ -156,5 +167,126 @@ export const makeCompareStyles = (theme: Theme) =>
       borderColor: theme.colors.border,
       alignItems: "center",
       justifyContent: "center"
-    }
+    },
+
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.55)",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16
+    },
+
+    modalCard: {
+      width: "100%",
+      maxWidth: 520,
+      borderRadius: 18,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      padding: 14,
+      gap: 12
+    },
+
+    modalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
+    modalTitle: { color: theme.colors.text, fontWeight: "900", fontSize: 16 },
+    modalCloseBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    },
+
+    modalSection: { gap: 10 },
+
+    modalLabel: { color: theme.colors.muted, fontWeight: "900", fontSize: 12 },
+
+    modalRow: { flexDirection: "row", gap: 10, alignItems: "center" },
+
+    modalInput: {
+      flex: 1,
+      minHeight: 44,
+      borderRadius: 14,
+      backgroundColor: theme.colors.tile,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      paddingHorizontal: 12,
+      color: theme.colors.text,
+      fontWeight: "800"
+    },
+
+    modalPrimaryBtn: {
+      height: 44,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 12,
+      borderRadius: 14,
+      backgroundColor: theme.colors.primary,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      justifyContent: "center"
+    },
+
+    modalPrimaryText: { color: theme.colors.primaryText, fontWeight: "900" },
+
+    modalEmpty: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      backgroundColor: theme.colors.tile,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+
+    modalEmptyText: { color: theme.colors.muted, fontWeight: "800", fontSize: 12, flex: 1 },
+
+    setRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      backgroundColor: theme.colors.tile,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+
+    setName: { color: theme.colors.text, fontWeight: "900" },
+    setSub: { marginTop: 4, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
+
+    setBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      alignItems: "center",
+      justifyContent: "center"
+    },
+
+    modalFooter: { flexDirection: "row", justifyContent: "flex-end" },
+
+    modalGhostBtn: {
+      height: 44,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 12,
+      borderRadius: 14,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+
+    modalGhostText: { color: theme.colors.text, fontWeight: "900" }
   });

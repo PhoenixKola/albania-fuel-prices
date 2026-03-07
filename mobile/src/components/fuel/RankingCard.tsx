@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -9,6 +9,8 @@ import SegmentedControl from "../ui/SegmentedControl";
 import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeRankingStyles } from "./RankingCard.styles";
 import { CurrencyMode, formatFuelPrice } from "../../utils/priceDisplay";
+
+type Scope = "all" | "favorites";
 
 export default function RankingCard(props: {
   theme: Theme;
@@ -21,8 +23,11 @@ export default function RankingCard(props: {
   currencyMode: CurrencyMode;
   fxRates: Record<string, number> | null;
   rewardUnlocked: boolean;
+
+  favorites: string[];
 }) {
   const s = useMemo(() => makeRankingStyles(props.theme), [props.theme]);
+  const [scope, setScope] = useState<Scope>("all");
 
   const fuelItems = useMemo(
     () => [
@@ -33,13 +38,28 @@ export default function RankingCard(props: {
     [props.t]
   );
 
-  const sorted = useMemo(() => {
+  const scopeItems = useMemo(
+    () => [
+      { value: "all", label: props.t.allCountries ?? "All" },
+      { value: "favorites", label: props.t.favorites ?? "Favorites" }
+    ],
+    [props.t]
+  );
+
+  const baseSorted = useMemo(() => {
     if (!props.data) return [];
     return props.data.countries
       .map((c) => ({ country: c.country, price: getFuelPrice(c, props.fuelType) }))
       .filter((x) => x.price != null)
       .sort((a, b) => (a.price! < b.price! ? -1 : 1));
   }, [props.data, props.fuelType]);
+
+  const favoritesSet = useMemo(() => new Set(props.favorites ?? []), [props.favorites]);
+
+  const sorted = useMemo(() => {
+    if (scope === "all") return baseSorted;
+    return baseSorted.filter((x) => favoritesSet.has(x.country));
+  }, [baseSorted, favoritesSet, scope]);
 
   const cheapest = useMemo(() => sorted.slice(0, 10), [sorted]);
 
@@ -48,10 +68,27 @@ export default function RankingCard(props: {
     return sorted.slice(Math.max(0, sorted.length - 10)).reverse();
   }, [sorted]);
 
-  const currentRank = useMemo(() => {
+  const currentRankAll = useMemo(() => {
+    const idx = baseSorted.findIndex((x) => x.country === props.currentCountry);
+    return idx >= 0 ? idx + 1 : null;
+  }, [baseSorted, props.currentCountry]);
+
+  const currentRankInScope = useMemo(() => {
     const idx = sorted.findIndex((x) => x.country === props.currentCountry);
     return idx >= 0 ? idx + 1 : null;
   }, [sorted, props.currentCountry]);
+
+  const aroundYou = useMemo(() => {
+    if (!baseSorted.length) return [];
+    const idx = baseSorted.findIndex((x) => x.country === props.currentCountry);
+    if (idx < 0) return [];
+    const start = Math.max(0, idx - 2);
+    const end = Math.min(baseSorted.length, idx + 3);
+    return baseSorted.slice(start, end).map((x, i) => ({
+      ...x,
+      rank: start + i + 1
+    }));
+  }, [baseSorted, props.currentCountry]);
 
   const fuelName = fuelLabel(props.fuelType, props.t);
 
@@ -66,7 +103,7 @@ export default function RankingCard(props: {
     return props.t.currencyLocal ?? "Local";
   }, [props.currencyMode, props.t]);
 
-  const renderRow = (r: { country: string; price: number | null }, displayRank: number, isInTopList: boolean) => {
+  const renderRow = (r: { country: string; price: number | null }, displayRank: number, keyPrefix: string) => {
     const active = r.country === props.currentCountry;
 
     const medalIcon =
@@ -77,7 +114,7 @@ export default function RankingCard(props: {
 
     return (
       <AnimatedPressable
-        key={`${isInTopList ? "top" : "exp"}-${r.country}`}
+        key={`${keyPrefix}-${r.country}`}
         onPress={() => props.onOpenCountry(r.country)}
         contentStyle={[s.rowCard, active ? s.rowActive : null]}
         scaleIn={0.99}
@@ -120,6 +157,8 @@ export default function RankingCard(props: {
     );
   };
 
+  const favoritesDisabled = (props.favorites?.length ?? 0) < 2;
+
   return (
     <View style={s.card}>
       <View style={s.headerRow}>
@@ -138,11 +177,6 @@ export default function RankingCard(props: {
 
         <View style={s.headerPills}>
           <View style={s.pill}>
-            <Ionicons name="list-outline" size={14} color={props.theme.colors.muted} />
-            <Text style={s.pillText}>Top 10</Text>
-          </View>
-
-          <View style={s.pill}>
             <Ionicons name="flame-outline" size={14} color={props.theme.colors.muted} />
             <Text style={s.pillText} numberOfLines={1}>
               {fuelLabelShort}
@@ -150,9 +184,20 @@ export default function RankingCard(props: {
           </View>
 
           <View style={s.pill}>
-            <Ionicons name={props.currencyMode === "eur" ? "logo-euro" : "cash-outline"} size={14} color={props.theme.colors.muted} />
+            <Ionicons
+              name={props.currencyMode === "eur" ? "logo-euro" : "cash-outline"}
+              size={14}
+              color={props.theme.colors.muted}
+            />
             <Text style={s.pillText} numberOfLines={1}>
               {currencyModeLabel}
+            </Text>
+          </View>
+
+          <View style={s.pill}>
+            <Ionicons name={scope === "favorites" ? "star-outline" : "earth-outline"} size={14} color={props.theme.colors.muted} />
+            <Text style={s.pillText} numberOfLines={1}>
+              {scope === "favorites" ? (props.t.favorites ?? "Favorites") : (props.t.allCountries ?? "All")}
             </Text>
           </View>
         </View>
@@ -160,21 +205,67 @@ export default function RankingCard(props: {
 
       <SegmentedControl theme={props.theme} value={props.fuelType} items={fuelItems} onChange={props.setFuelType} />
 
+      <SegmentedControl
+        theme={props.theme}
+        value={scope}
+        items={scopeItems}
+        onChange={(v) => {
+          if (v === "favorites" && favoritesDisabled) return;
+          setScope(v as Scope);
+        }}
+      />
+
+      {favoritesDisabled ? (
+        <View style={s.infoBanner}>
+          <Ionicons name="information-circle-outline" size={18} color={props.theme.colors.muted} />
+          <Text style={s.infoText}>{props.t.addFavoritesToUseFavoritesRanking ?? "Add at least 2 favorites to use Favorites ranking."}</Text>
+        </View>
+      ) : null}
+
       <View style={s.infoBanner}>
         <Ionicons name="information-circle-outline" size={18} color={props.theme.colors.muted} />
         <Text style={s.infoText}>
-          {currentRank != null ? props.t.yourRank(currentRank) : props.t.rankUnavailable}
+          {scope === "all"
+            ? currentRankAll != null
+              ? props.t.yourRank(currentRankAll)
+              : props.t.rankUnavailable
+            : currentRankInScope != null
+              ? (props.t.yourRankInFavorites?.(currentRankInScope) ?? `Your favorites rank: #${currentRankInScope}`)
+              : (props.t.notInFavoritesRank ?? "Your country is not in your favorites list.")}
         </Text>
       </View>
 
       <View style={s.sectionHeaderRow}>
-        <Text style={s.sectionTitle}>{props.t.rankingsCheapTitle ?? props.t.rankingsTitle ?? "Cheapest"}</Text>
-        <Text style={s.sectionSub}>{props.t.rankingsCheapSubtitle?.(fuelName) ?? props.t.rankingsSubtitle?.(fuelName) ?? ""}</Text>
+        <Text style={s.sectionTitle}>
+          {scope === "favorites"
+            ? (props.t.rankingsFavoritesTitle ?? "Favorites ranking")
+            : (props.t.rankingsCheapTitle ?? "Cheapest")}
+        </Text>
+        <Text style={s.sectionSub}>
+          {scope === "favorites"
+            ? (props.t.rankingsFavoritesSubtitle?.(fuelName) ?? props.t.rankingsSubtitle?.(fuelName) ?? "")
+            : (props.t.rankingsCheapSubtitle?.(fuelName) ?? props.t.rankingsSubtitle?.(fuelName) ?? "")}
+        </Text>
       </View>
 
       <View style={s.rows}>
-        {cheapest.map((r, i) => renderRow(r, i + 1, true))}
+        {cheapest.map((r, i) => renderRow(r, i + 1, scope === "favorites" ? "fav" : "top"))}
       </View>
+
+      {scope === "all" && currentRankAll != null && currentRankAll > 10 && aroundYou.length ? (
+        <>
+          <View style={s.divider} />
+
+          <View style={s.sectionHeaderRow}>
+            <Text style={s.sectionTitle}>{props.t.rankingsAroundYouTitle ?? "Around you"}</Text>
+            <Text style={s.sectionSub}>{props.t.rankingsAroundYouSubtitle ?? "Your position with neighbors"}</Text>
+          </View>
+
+          <View style={s.rows}>
+            {aroundYou.map((r) => renderRow(r, r.rank, "around"))}
+          </View>
+        </>
+      ) : null}
 
       <View style={s.divider} />
 
@@ -201,7 +292,7 @@ export default function RankingCard(props: {
         <View style={s.rows}>
           {mostExpensive.map((r, i) => {
             const rank = sorted.length - i;
-            return renderRow(r, rank, false);
+            return renderRow(r, rank, "exp");
           })}
         </View>
       ) : (

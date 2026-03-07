@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Linking, RefreshControl, ScrollView, StatusBar, Text, View } from "react-native";
+import { Linking, RefreshControl, ScrollView, StatusBar, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import mobileAds, { TestIds } from "react-native-google-mobile-ads";
 
@@ -156,6 +156,10 @@ export default function HomeScreen() {
     setCompareCountries((prev) => prev.filter((x) => x !== c));
   };
 
+  const applyCompareSet = (countriesToApply: string[]) => {
+    setCompareCountries(countriesToApply);
+  };
+
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
   const pendingActionRef = useRef<null | (() => void)>(null);
 
@@ -213,7 +217,7 @@ export default function HomeScreen() {
   const compareLabel = ((t as any).compareTitle ?? "Compare") as string;
   const rankingsLabel = ((t as any).rankingsTitle ?? "Ranking") as string;
 
-  const compareCountriesUI = compareCountries.length ? compareCountries : ["Albania", "Italy", "Greece"];
+  const compareCountriesUI = compareCountries;
 
   const rate = useRatePrompt({ threshold: 4, cooldownDays: 7 });
   const [rateOpen, setRateOpen] = useState(false);
@@ -368,6 +372,7 @@ export default function HomeScreen() {
             currencyMode={effectiveCurrencyMode}
             fxRates={fx.rates}
             maxCompare={maxCompare}
+            onApplySet={applyCompareSet}
           />
         ) : null}
 
@@ -383,6 +388,7 @@ export default function HomeScreen() {
             currencyMode={effectiveCurrencyMode}
             fxRates={fx.rates}
             rewardUnlocked={reward.unlocked}
+            favorites={favorites}
           />
         ) : null}
 

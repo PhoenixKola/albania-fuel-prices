@@ -1,5 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Linking, Share, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { LatestEurope, CountryPrices, FuelType } from "../../types/fuel";
@@ -12,6 +13,29 @@ import { makeFuelCardStyles } from "./FuelCard.styles";
 import { PLAY_STORE_URL } from "../../constants/urls";
 
 type CurrencyMode = "eur" | "local";
+
+type StoredBaseline = {
+  savedAtUtc: string;
+  diesel_eur: number | null;
+  gasoline95_eur: number | null;
+  lpg_eur: number | null;
+};
+
+function safeParseBaseline(raw: string | null): StoredBaseline | null {
+  if (!raw) return null;
+  try {
+    const j = JSON.parse(raw);
+    if (!j || typeof j !== "object") return null;
+    return {
+      savedAtUtc: String(j.savedAtUtc ?? ""),
+      diesel_eur: typeof j.diesel_eur === "number" ? j.diesel_eur : null,
+      gasoline95_eur: typeof j.gasoline95_eur === "number" ? j.gasoline95_eur : null,
+      lpg_eur: typeof j.lpg_eur === "number" ? j.lpg_eur : null
+    };
+  } catch {
+    return null;
+  }
+}
 
 export default function FuelCard(props: {
   theme: Theme;
@@ -41,17 +65,57 @@ export default function FuelCard(props: {
   const canLocal = useMemo(() => hasRate(currency, props.fxRates), [currency, props.fxRates]);
   const mode: CurrencyMode = props.currencyMode === "local" && canLocal ? "local" : "eur";
 
+  const baselineKey = useMemo(() => `fuel_baseline_v1_${props.country}`, [props.country]);
+  const [baseline, setBaseline] = useState<StoredBaseline | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const raw = await AsyncStorage.getItem(baselineKey);
+      setBaseline(safeParseBaseline(raw));
+    })();
+  }, [baselineKey]);
+
+  useEffect(() => {
+    (async () => {
+      const cur = props.selected;
+      if (!cur) return;
+
+      const next: StoredBaseline = {
+        savedAtUtc: new Date().toISOString(),
+        diesel_eur: typeof cur.diesel_eur === "number" ? cur.diesel_eur : null,
+        gasoline95_eur: typeof cur.gasoline95_eur === "number" ? cur.gasoline95_eur : null,
+        lpg_eur: typeof cur.lpg_eur === "number" ? cur.lpg_eur : null
+      };
+
+      if (!baseline) {
+        setBaseline(next);
+        await AsyncStorage.setItem(baselineKey, JSON.stringify(next));
+        return;
+      }
+
+      const changed =
+        (next.diesel_eur != null && baseline.diesel_eur != null && Math.abs(next.diesel_eur - baseline.diesel_eur) > 0.0001) ||
+        (next.gasoline95_eur != null && baseline.gasoline95_eur != null && Math.abs(next.gasoline95_eur - baseline.gasoline95_eur) > 0.0001) ||
+        (next.lpg_eur != null && baseline.lpg_eur != null && Math.abs(next.lpg_eur - baseline.lpg_eur) > 0.0001);
+
+      if (changed) {
+        setBaseline(next);
+        await AsyncStorage.setItem(baselineKey, JSON.stringify(next));
+      }
+    })();
+  }, [props.selected, baseline, baselineKey]);
+
   const fmt = (eur: number | null | undefined) => {
     if (mode === "eur") return formatMoney(eur ?? null, "EUR");
     const local = convertEur(eur ?? null, currency, props.fxRates);
     return formatMoney(local, currency);
   };
 
-  const fmtDelta = (currentEur: number | null | undefined, prevEur: number | null | undefined) => {
-    if (currentEur == null || prevEur == null) return null;
+  const fmtDelta = (currentEur: number | null | undefined, baseEur: number | null | undefined) => {
+    if (currentEur == null || baseEur == null) return "—";
 
-    const diffEur = currentEur - prevEur;
-    if (!Number.isFinite(diffEur) || Math.abs(diffEur) < 0.0001) return "—";
+    const diffEur = currentEur - baseEur;
+    if (!Number.isFinite(diffEur) || Math.abs(diffEur) < 0.001) return "—";
 
     const sign = diffEur > 0 ? "+" : "-";
     const absEur = Math.abs(diffEur);
@@ -64,6 +128,10 @@ export default function FuelCard(props: {
     const absLocal = absEur * r;
     return `${sign}${formatMoney(absLocal, currency)}`;
   };
+
+  const baseDiesel = baseline?.diesel_eur ?? props.prevSelected?.diesel_eur ?? null;
+  const baseGas = baseline?.gasoline95_eur ?? props.prevSelected?.gasoline95_eur ?? null;
+  const baseLpg = baseline?.lpg_eur ?? props.prevSelected?.lpg_eur ?? null;
 
   const onShare = async () => {
     const fuelName = fuelLabel(props.fuelType, props.t);
@@ -177,12 +245,8 @@ export default function FuelCard(props: {
           label={props.t.gasoline95}
           icon="car-sport-outline"
           value={fmt(props.selected?.gasoline95_eur)}
-          delta={fmtDelta(props.selected?.gasoline95_eur, props.prevSelected?.gasoline95_eur)}
-          deltaUp={
-            props.selected?.gasoline95_eur != null &&
-            props.prevSelected?.gasoline95_eur != null &&
-            props.selected.gasoline95_eur > props.prevSelected.gasoline95_eur
-          }
+          delta={fmtDelta(props.selected?.gasoline95_eur, baseGas)}
+          deltaUp={props.selected?.gasoline95_eur != null && baseGas != null && props.selected.gasoline95_eur > baseGas}
         />
 
         <PriceTile
@@ -191,12 +255,8 @@ export default function FuelCard(props: {
           label={props.t.diesel}
           icon="trail-sign-outline"
           value={fmt(props.selected?.diesel_eur)}
-          delta={fmtDelta(props.selected?.diesel_eur, props.prevSelected?.diesel_eur)}
-          deltaUp={
-            props.selected?.diesel_eur != null &&
-            props.prevSelected?.diesel_eur != null &&
-            props.selected.diesel_eur > props.prevSelected.diesel_eur
-          }
+          delta={fmtDelta(props.selected?.diesel_eur, baseDiesel)}
+          deltaUp={props.selected?.diesel_eur != null && baseDiesel != null && props.selected.diesel_eur > baseDiesel}
         />
 
         <PriceTile
@@ -205,12 +265,8 @@ export default function FuelCard(props: {
           label={props.t.lpg}
           icon="flame-outline"
           value={fmt(props.selected?.lpg_eur)}
-          delta={fmtDelta(props.selected?.lpg_eur, props.prevSelected?.lpg_eur)}
-          deltaUp={
-            props.selected?.lpg_eur != null &&
-            props.prevSelected?.lpg_eur != null &&
-            props.selected.lpg_eur > props.prevSelected.lpg_eur
-          }
+          delta={fmtDelta(props.selected?.lpg_eur, baseLpg)}
+          deltaUp={props.selected?.lpg_eur != null && baseLpg != null && props.selected.lpg_eur > baseLpg}
         />
       </View>
 
@@ -248,14 +304,14 @@ function PriceTile(props: {
   label: string;
   icon: any;
   value: string;
-  delta: string | null;
+  delta: string;
   deltaUp: boolean;
   tone: "cool" | "neutral" | "warm";
 }) {
   const s = useMemo(() => makeFuelCardStyles(props.theme), [props.theme]);
 
-  const showDelta = props.delta != null && props.delta !== "—";
-  const deltaText = props.delta ?? "—";
+  const showDelta = props.delta !== "—";
+  const deltaText = props.delta;
   const sign = showDelta ? deltaText.trim().slice(0, 1) : "";
   const rest = showDelta ? deltaText.trim().slice(1) : "";
   const isMinus = showDelta && sign === "-";
@@ -276,27 +332,27 @@ function PriceTile(props: {
           </Text>
         </View>
 
-        {showDelta ? (
-          <View style={s.styles.deltaPill}>
-            <Ionicons
-              name={props.deltaUp ? "arrow-up" : "arrow-down"}
-              size={14}
-              color={props.deltaUp ? s.colors.up : props.theme.colors.danger}
-            />
+        <View style={s.styles.deltaPill}>
+          {showDelta ? (
+            <>
+              <Ionicons
+                name={props.deltaUp ? "arrow-up" : "arrow-down"}
+                size={14}
+                color={props.deltaUp ? s.colors.up : props.theme.colors.danger}
+              />
 
-            {isMinus ? (
-              <View style={[s.styles.minusBubble, { backgroundColor: tintBg, borderColor: tintBorder }]}>
-                <Text style={s.styles.minusText}>-</Text>
-              </View>
-            ) : null}
+              {isMinus ? (
+                <View style={[s.styles.minusBubble, { backgroundColor: tintBg, borderColor: tintBorder }]}>
+                  <Text style={s.styles.minusText}>-</Text>
+                </View>
+              ) : null}
 
-            <Text style={s.styles.deltaText}>{isMinus ? rest : deltaText}</Text>
-          </View>
-        ) : (
-          <View style={s.styles.deltaPill}>
+              <Text style={s.styles.deltaText}>{isMinus ? rest : deltaText}</Text>
+            </>
+          ) : (
             <Text style={s.styles.deltaText}>—</Text>
-          </View>
-        )}
+          )}
+        </View>
       </View>
 
       <Text style={s.styles.tileValue}>{props.value}</Text>

@@ -36,6 +36,7 @@ export const i18n = {
     rankUnavailable: "Rank unavailable (missing data).",
 
     compareTitle: "Compare",
+    compareEmpty: "Add countries to start comparing.",
     compareSubtitle: (fuel: string) => `Compare ${fuel} across 2–3 countries`,
     addCountry: "Add country",
     compareHint: "Pick 2–3 countries to compare.",
@@ -133,6 +134,7 @@ export const i18n = {
     rankUnavailable: "Renditja s’është e mundur (mungojnë të dhënat).",
 
     compareTitle: "Krahaso",
+    compareEmpty: "Shto shtete për të filluar krahasimin.",
     compareSubtitle: (fuel: string) => `Krahaso ${fuel} në 2–3 shtete`,
     addCountry: "Shto shtet",
     compareHint: "Zgjidh 2–3 shtete për krahasim.",

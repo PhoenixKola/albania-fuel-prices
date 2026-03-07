@@ -12,7 +12,7 @@ export const makeRankingStyles = (theme: Theme) =>
       gap: 12
     },
 
-    headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
+    headerRow: { flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
     headerLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
     headerIcon: {
       width: 40,
@@ -28,7 +28,7 @@ export const makeRankingStyles = (theme: Theme) =>
     title: { fontSize: 16, fontWeight: "900", color: theme.colors.text },
     subtitle: { marginTop: 4, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
 
-    headerPills: { alignItems: "flex-end", gap: 8 },
+    headerPills: { alignItems: "flex-end", gap: 8, flexDirection: "row" },
     pill: {
       flexDirection: "row",
       alignItems: "center",
