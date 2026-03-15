@@ -50,10 +50,10 @@ export default function WatchlistCard({
       <div className="watchlistTop">
         <div className="watchlistTopRow">
           <div className="watchlistTopText">
-            <div className="watchlistEyebrow">
+            {/* <div className="watchlistEyebrow">
               <span className="livePill">{t.watchlist}</span>
               <span className="ghostPill">{fuelLabel(t, fuelType)}</span>
-            </div>
+            </div> */}
 
             <div className="watchlistTitleWrap">
               <div className="watchlistTitle">{t.watchlist}</div>

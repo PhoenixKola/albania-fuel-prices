@@ -31,10 +31,10 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
   return (
     <div className="card rankingCard">
       <div className="rankingTop">
-        <div className="rankingEyebrow">
+        {/* <div className="rankingEyebrow">
           <span className="livePill">{t.rankings}</span>
           <span className="ghostPill">{fuelLabel(t, fuelType)}</span>
-        </div>
+        </div> */}
 
         <div className="rankingTitle">{t.rankings}</div>
         <div className="rankingSub">{t.fuelType}</div>

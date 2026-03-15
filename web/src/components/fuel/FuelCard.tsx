@@ -96,10 +96,10 @@ export default function FuelCard({
   return (
     <div className="card fuelHeroCard">
       <div className="fuelHeroTop">
-        <div className="fuelHeroEyebrow">
+        {/* <div className="fuelHeroEyebrow">
           <span className="livePill">{data?.source ?? t.source}</span>
           {data?.as_of ? <span className="ghostPill">{data.as_of}</span> : null}
-        </div>
+        </div> */}
 
         <div className="fuelHeroHeadline">
           <div className="fuelHeroText">

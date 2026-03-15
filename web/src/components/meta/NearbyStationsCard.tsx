@@ -58,10 +58,10 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
       <div className="nearbyTop">
         <div className="nearbyTopRow">
           <div className="nearbyTopText">
-            <div className="nearbyEyebrow">
+            {/* <div className="nearbyEyebrow">
               <span className="livePill">{t.stationsNearbyTitle}</span>
               {nearby.loading ? <span className="ghostPill">…</span> : null}
-            </div>
+            </div> */}
 
             <div className="nearbyTitleWrap">
               <div className="nearbyTitle">{t.stationsNearbyTitle}</div>
