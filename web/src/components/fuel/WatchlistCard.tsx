@@ -43,40 +43,100 @@ export default function WatchlistCard({
 
   rows.sort((a, b) => (a.eur ?? Infinity) - (b.eur ?? Infinity));
 
+  const isCurrentSaved = has.has(current);
+
   return (
-    <div className="card">
-      <div className="cardHeader cardHeaderRow">
-        <div>
-          <div className="cardTitle">{t.watchlist}</div>
-          <div className="cardSubtle">{fuelLabel(t, fuelType)}</div>
+    <div className="card watchlistCard">
+      <div className="watchlistTop">
+        <div className="watchlistTopRow">
+          <div className="watchlistTopText">
+            <div className="watchlistEyebrow">
+              <span className="livePill">{t.watchlist}</span>
+              <span className="ghostPill">{fuelLabel(t, fuelType)}</span>
+            </div>
+
+            <div className="watchlistTitleWrap">
+              <div className="watchlistTitle">{t.watchlist}</div>
+              <div className="watchlistSub">{current}</div>
+            </div>
+          </div>
+
+          <div className="watchlistTopAction">
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => onAdd(current)}
+              disabled={isCurrentSaved}
+            >
+              {t.addToWatchlist}
+            </button>
+          </div>
         </div>
-        <button className="btn btn-primary" type="button" onClick={() => onAdd(current)} disabled={has.has(current)}>
-          {t.addToWatchlist}
-        </button>
+
+        <div className="watchlistStats">
+          <div className="watchlistStat">
+            <div className="watchlistStatLabel">{t.watchlist}</div>
+            <div className="watchlistStatValue">{watchlist.length}</div>
+          </div>
+
+          <div className="watchlistStat">
+            <div className="watchlistStatLabel">{t.compare}</div>
+            <div className="watchlistStatValue">{rows.length}</div>
+          </div>
+
+          <div className="watchlistStat">
+            <div className="watchlistStatLabel">{fuelLabel(t, fuelType)}</div>
+            <div className="watchlistStatValue watchlistStatValueText">{current}</div>
+          </div>
+        </div>
       </div>
 
-      <div className="body">
-        <div className="chipRow">
-          {watchlist.length === 0 ? <div className="mutedBox">{t.emptyWatchlist}</div> : null}
-          {watchlist.map((c) => (
-            <Chip key={c} label={c} active={c === current} onClick={() => onOpen(c)} onRemove={() => onRemove(c)} />
-          ))}
+      <div className="body watchlistBody">
+        <div className="watchlistChipSection">
+          {watchlist.length === 0 ? (
+            <div className="mutedBox">{t.emptyWatchlist}</div>
+          ) : (
+            <div className="chipRow watchlistChipRow">
+              {watchlist.map((c) => (
+                <Chip key={c} label={c} active={c === current} onClick={() => onOpen(c)} onRemove={() => onRemove(c)} />
+              ))}
+            </div>
+          )}
         </div>
 
         {watchlist.length ? (
-          <div className="tableWrap">
+          <div className="tableWrap watchlistTableWrap">
             <div className="tableTitle">{t.compare}</div>
-            <div className="table">
-              {rows.map((r) => (
-                <div key={r.country} className="tRow">
-                  <div className="tLeft">{r.country}</div>
-                  <div className="tMid">{formatFuelPrice(r.country, r.eur, currency, fxRates)}</div>
-                  <div className="tRight">
-                    <button className="btn btn-ghost" type="button" onClick={() => onOpen(r.country)}>
-                      {t.openCountry}
-                    </button>
+
+            <div className="table watchlistTable">
+              {rows.map((r, index) => (
+                <button
+                  key={r.country}
+                  className="watchlistRow"
+                  type="button"
+                  onClick={() => onOpen(r.country)}
+                >
+                  <div className="watchlistRowLeft">
+                    <div className="watchlistRank">{index + 1}</div>
+
+                    <div className="watchlistRowText">
+                      <div className="watchlistRowName">{r.country}</div>
+                      <div className="watchlistRowMeta">
+                        {r.country === current ? (
+                          <span className="watchlistCurrentPill">{current}</span>
+                        ) : (
+                          <span className="watchlistMutedMeta">{fuelLabel(t, fuelType)}</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
+
+                  <div className="watchlistRowRight">
+                    <div className="watchlistPricePill">
+                      {formatFuelPrice(r.country, r.eur, currency, fxRates)}
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
           </div>

@@ -16,10 +16,8 @@ type Props = {
   country: string;
   selected: CountryPrices | null;
   onSelectCountry: (next: string) => void;
-
   currency: Currency;
   fxRates: FxRates | null;
-
   onCopy: (text: string) => void;
   onShare: (text: string) => void;
 };
@@ -54,6 +52,25 @@ export default function FuelCard({
     return filtered;
   }, [filtered, country, countries]);
 
+  const [shuffleSeed] = useState(() => Math.random());
+  const quickCountries = useMemo(() => {
+    const a = [...countries];
+    let s = shuffleSeed;
+    for (let i = a.length - 1; i > 0; i--) {
+      s = (s * 9301 + 49297) % 233280;
+      const j = Math.floor((s / 233280) * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a.slice(0, 8);
+  }, [countries, shuffleSeed]);
+
+  const chipCountries = useMemo(() => {
+    if (q.trim()) {
+      return filtered.filter((c) => c !== country).slice(0, 7);
+    }
+    return quickCountries.filter((c) => c !== country);
+  }, [q, filtered, quickCountries, country]);
+
   const g = selected?.gasoline95_eur ?? null;
   const d = selected?.diesel_eur ?? null;
   const l = selected?.lpg_eur ?? null;
@@ -73,39 +90,86 @@ export default function FuelCard({
     return lines.filter(Boolean).join("\n");
   }, [t, country, data?.as_of, data?.source, g, d, l, currency, fxRates]);
 
+  const resultCount = q.trim() ? filtered.length : countries.length;
+  const regionText = data?.region ? t.region(data.region) : "";
+
   return (
-    <div className="card">
-      <div className="cardHeader cardHeaderRow">
-        <div>
-          <div className="cardTitle">{t.selectCountry}</div>
-          <div className="cardSubtle">{data?.region ? t.region(data.region) : ""}</div>
+    <div className="card fuelHeroCard">
+      <div className="fuelHeroTop">
+        <div className="fuelHeroEyebrow">
+          <span className="livePill">{data?.source ?? t.source}</span>
+          {data?.as_of ? <span className="ghostPill">{data.as_of}</span> : null}
         </div>
 
-        <div className="headerActions">
-          <button className="btn btn-ghost" type="button" onClick={() => onCopy(shareText)}>
-            {t.copy}
-          </button>
-          <button className="btn btn-ghost" type="button" onClick={() => onShare(shareText)}>
-            {t.share}
-          </button>
+        <div className="fuelHeroHeadline">
+          <div className="fuelHeroText">
+            <div className="fuelHeroLabel">{t.selectCountry}</div>
+            <h2 className="fuelHeroTitle">{country}</h2>
+            {regionText ? <div className="fuelHeroSub">{regionText}</div> : null}
+          </div>
+
+          <div className="headerActions fuelHeroActions">
+            <button className="btn btn-ghost" type="button" onClick={() => onCopy(shareText)}>
+              {t.copy}
+            </button>
+            <button className="btn btn-ghost" type="button" onClick={() => onShare(shareText)}>
+              {t.share}
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="body">
+      <div className="body fuelHeroBody">
         {loading ? <LoadingRow t={t} /> : null}
 
         {data ? (
           <>
-            <div className="field">
-              <div className="label">{t.selectCountry}</div>
-              <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" />
-              <select className="select" value={country} onChange={(e) => onSelectCountry(e.target.value)}>
-                {selectOptions.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+            <div className="fuelControlGrid">
+              <div className="field">
+                <div className="label">{t.selectCountry}</div>
+                <div className="searchShell">
+                  <input
+                    className="input inputSearch"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder={t.selectCountry}
+                    autoComplete="off"
+                  />
+                  <span className="searchCount">{resultCount}</span>
+                </div>
+              </div>
+
+              <div className="field">
+                <div className="label">{t.selectCountry}</div>
+                <select className="select" value={country} onChange={(e) => onSelectCountry(e.target.value)}>
+                  {selectOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="quickCountryWrap">
+              <button
+                type="button"
+                className="countryChip countryChipActive"
+                onClick={() => onSelectCountry(country)}
+              >
+                {country}
+              </button>
+
+              {chipCountries.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  className="countryChip"
+                  onClick={() => onSelectCountry(c)}
+                >
+                  {c}
+                </button>
+              ))}
             </div>
 
             <div className="kpiGrid">

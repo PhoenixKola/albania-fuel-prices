@@ -54,56 +54,101 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
   };
 
   return (
-    <div className="card">
-      <div className="cardHeader cardHeaderRow">
-        <div>
-          <div className="cardTitle">{t.stationsNearbyTitle}</div>
-          {loc.coords ? <div className="cardSubtle">{t.stationsFound(nearby.totalCount)}</div> : null}
+    <div className="card nearbyCard">
+      <div className="nearbyTop">
+        <div className="nearbyTopRow">
+          <div className="nearbyTopText">
+            <div className="nearbyEyebrow">
+              <span className="livePill">{t.stationsNearbyTitle}</span>
+              {nearby.loading ? <span className="ghostPill">…</span> : null}
+            </div>
+
+            <div className="nearbyTitleWrap">
+              <div className="nearbyTitle">{t.stationsNearbyTitle}</div>
+              <div className="nearbySub">
+                {loc.coords ? t.stationsFound(nearby.totalCount) : t.stationsUseMyLocation}
+              </div>
+            </div>
+          </div>
+
+          <div className="headerActions nearbyHeaderActions">
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={onRefresh}
+              disabled={!loc.coords || nearby.loading}
+            >
+              {nearby.loading ? "…" : t.stationsRefresh}
+            </button>
+          </div>
         </div>
 
-        <div className="headerActions">
-          <button className="btn btn-ghost" type="button" onClick={onRefresh} disabled={!loc.coords || nearby.loading}>
-            {nearby.loading ? "…" : t.stationsRefresh}
-          </button>
+        <div className="nearbyStats">
+          <div className="nearbyStat">
+            <div className="nearbyStatLabel">{t.stationsRadius}</div>
+            <div className="nearbyStatValue">{radiusM / 1000} km</div>
+          </div>
+
+          <div className="nearbyStat">
+            <div className="nearbyStatLabel">{t.stationsNearbyTitle}</div>
+            <div className="nearbyStatValue">{nearby.totalCount}</div>
+          </div>
+
+          <div className="nearbyStat">
+            <div className="nearbyStatLabel">{t.stationsShowAll}</div>
+            <div className="nearbyStatValue">{shown.length}</div>
+          </div>
         </div>
       </div>
 
-      <div className="body">
-        <div className="toolbarRow">
-          <div className="label">{t.stationsRadius}</div>
+      <div className="body nearbyBody">
+        <div className="nearbySection">
+          <div className="toolbarRow nearbyToolbar">
+            <div className="label">{t.stationsRadius}</div>
 
-          <div className="segRow">
-            {radiusItems.map((it) => (
-              <button
-                key={it.v}
-                type="button"
-                className={`seg ${radiusM === it.v ? "segActive" : ""}`}
-                onClick={() => onChangeRadius(it.v)}
-                disabled={radiusDisabled}
-                aria-disabled={radiusDisabled}
-                title={nearby.loading ? "Loading…" : ""}
-              >
-                {it.label}
-              </button>
-            ))}
-
-            {nearby.loading ? <span className="badge">Loading…</span> : null}
+            <div className="segRow">
+              {radiusItems.map((it) => (
+                <button
+                  key={it.v}
+                  type="button"
+                  className={`seg ${radiusM === it.v ? "segActive" : ""}`}
+                  onClick={() => onChangeRadius(it.v)}
+                  disabled={radiusDisabled}
+                  aria-disabled={radiusDisabled}
+                  title={nearby.loading ? "Loading…" : ""}
+                >
+                  {it.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {!loc.coords ? (
-          <button className="btn btn-primary" type="button" onClick={loc.request} disabled={loc.loading || loc.checking}>
-            {loc.loading || loc.checking ? t.stationsGettingLocation : t.stationsUseMyLocation}
-          </button>
+          <div className="nearbyEmptyAction">
+            <button
+              className="btn btn-primary nearbyLocateBtn"
+              type="button"
+              onClick={loc.request}
+              disabled={loc.loading || loc.checking}
+            >
+              {loc.loading || loc.checking ? t.stationsGettingLocation : t.stationsUseMyLocation}
+            </button>
+          </div>
         ) : (
-          <div className="toolbarRow" style={{ marginTop: 10 }}>
+          <div className="nearbyControlBar">
             <div className="badge">{t.stationsShowing(shown.length, nearby.totalCount)}</div>
 
-            <div className="segRow">
+            <div className="segRow nearbyActionRow">
               {showActions ? (
                 <>
                   {canCollapse ? (
-                    <button className="btn btn-ghost" type="button" onClick={() => setVisible(10)} disabled={nearby.loading}>
+                    <button
+                      className="btn btn-ghost"
+                      type="button"
+                      onClick={() => setVisible(10)}
+                      disabled={nearby.loading}
+                    >
                       {t.stationsCollapse}
                     </button>
                   ) : null}
@@ -139,25 +184,33 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
         {nearby.error ? <div className="alert">{nearby.error}</div> : null}
 
         {loc.coords ? (
-          <div className="tableWrap">
-            <div className="table">
-              {nearby.stations.length === 0 && !nearby.loading ? <div className="mutedBox">{t.stationsNone}</div> : null}
+          <div className="tableWrap nearbyTableWrap">
+            <div className="table nearbyTable">
+              {nearby.stations.length === 0 && !nearby.loading ? (
+                <div className="mutedBox">{t.stationsNone}</div>
+              ) : null}
 
-              {shown.map((s: Station) => (
-                <div key={s.id} className="tRow">
-                  <div className="tLeft">{s.name}</div>
-                  <div className="tMid">{s.distanceKm.toFixed(2)} km</div>
-                  <div className="tRight">
-                    <a
-                      className="btn btn-ghost"
-                      href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {t.stationsOpen}
-                    </a>
+              {shown.map((s: Station, index) => (
+                <a
+                  key={s.id}
+                  className="nearbyRow"
+                  href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div className="nearbyRowLeft">
+                    <div className="nearbyRowIndex">{index + 1}</div>
+
+                    <div className="nearbyRowText">
+                      <div className="nearbyRowName">{s.name}</div>
+                      <div className="nearbyRowMeta">{s.distanceKm.toFixed(2)} km</div>
+                    </div>
                   </div>
-                </div>
+
+                  <div className="nearbyRowRight">
+                    <div className="nearbyDistancePill">{s.distanceKm.toFixed(2)} km</div>
+                  </div>
+                </a>
               ))}
             </div>
           </div>

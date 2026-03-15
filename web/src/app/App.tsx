@@ -5,9 +5,6 @@ import type { FuelType } from "../models/fuel";
 import { i18n } from "../locales";
 import {
   DATA_URL,
-  // STORAGE_ALL_RATE_KEY,
-  // STORAGE_CITY_BIAS_KEY,
-  // STORAGE_CITY_KEY,
   STORAGE_COUNTRY_KEY,
   STORAGE_CURRENCY_KEY,
   STORAGE_FUELTYPE_KEY,
@@ -29,11 +26,7 @@ import Notice from "../components/feedback/Notice";
 import ToastHost from "../components/feedback/ToastHost";
 import WatchlistCard from "../components/fuel/WatchlistCard";
 import RankingCard from "../components/fuel/RankingCard";
-// import QuickCalcCard from "../components/fuel/QuickCalcCard";
-// import { getEurPrice } from "../utils/fuel";
-// import CityEstimateCard from "../components/fuel/CityEstimateCard";
 import NearbyStationsCard from "../components/meta/NearbyStationsCard";
-
 import Modal from "../components/ui/Modal";
 import SourceFab from "../components/meta/SourceFab";
 
@@ -62,23 +55,6 @@ export default function App() {
     document.documentElement.lang = lang === "sq" ? "sq" : "en";
   }, [lang]);
 
-  // const [allPerEur, setAllPerEur] = useLocalStorageState<number>(STORAGE_ALL_RATE_KEY, 100, {
-  //   deserialize: (raw) => {
-  //     const n = Number(raw);
-  //     return Number.isFinite(n) && n > 0 ? n : 100;
-  //   },
-  //   serialize: (v) => String(v),
-  // });
-
-  // const [city, setCity] = useLocalStorageState<string>(STORAGE_CITY_KEY, "Tirana");
-  // const [cityBias, setCityBias] = useLocalStorageState<number>(STORAGE_CITY_BIAS_KEY, 0, {
-  //   deserialize: (raw) => {
-  //     const n = Number(raw);
-  //     return Number.isFinite(n) ? n : 0;
-  //   },
-  //   serialize: (v) => String(v),
-  // });
-
   const [radiusM, setRadiusM] = useLocalStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
     deserialize: (raw) => {
       const n = Number(raw);
@@ -96,7 +72,6 @@ export default function App() {
   });
 
   const fx = useFxRates();
-
   const { watchlist, add, remove, has } = useWatchlist();
 
   const subtitle = data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading;
@@ -125,8 +100,6 @@ export default function App() {
     await copyText(text);
   };
 
-  // const priceForTools = useMemo(() => getEurPrice(selected, fuelType), [selected, fuelType]);
-
   return (
     <>
       <ToastHost message={toast} />
@@ -145,11 +118,17 @@ export default function App() {
             onToggleTheme={toggleTheme}
           />
 
-          <div className="card">
-            <div className="body">
-              <div className="toolbarRow" style={{ marginBottom: 0 }}>
-                <div className="label">{t.currencyMode}</div>
-                <div className="segRow">
+          <div className="card pageIntroCard">
+            <div className="body pageIntroBody">
+              <div className="pageIntroContent">
+                <div className="pageIntroText">
+                  <div className="cardTitle">{t.currencyMode}</div>
+                  <div className="cardSubtle">
+                    {country}
+                  </div>
+                </div>
+
+                <div className="segRow pageIntroSeg">
                   <button
                     type="button"
                     className={`seg ${currency === "eur" ? "segActive" : ""}`}
@@ -211,19 +190,6 @@ export default function App() {
                 fxRates={fx.rates}
               />
 
-              {/* {country === "Albania" ? (
-                <CityEstimateCard
-                  t={t}
-                  base={selected}
-                  city={city}
-                  setCity={setCity}
-                  bias={cityBias}
-                  setBias={setCityBias}
-                  currency={currency}
-                  fxRates={fx.rates}
-                />
-              ) : null} */}
-
               <RankingCard
                 t={t}
                 data={data}
@@ -233,17 +199,6 @@ export default function App() {
                 fxRates={fx.rates}
                 onOpen={setCountry}
               />
-
-              {/* <QuickCalcCard
-                t={t}
-                fuelType={fuelType}
-                setFuelType={setFuelType}
-                currency={currency}
-                setCurrency={setCurrency}
-                allPerEur={allPerEur}
-                setAllPerEur={setAllPerEur}
-                priceEur={priceForTools}
-              /> */}
             </div>
           </div>
 
