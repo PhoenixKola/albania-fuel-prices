@@ -35,6 +35,7 @@ export default function FuelCard({
   onCopy,
   onShare,
 }: Props) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [q, setQ] = useState("");
   const deltas = usePriceMemory(country, selected);
 
@@ -61,7 +62,7 @@ export default function FuelCard({
       const j = Math.floor((s / 233280) * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
-    return a.slice(0, 8);
+    return a.slice(0, 6);
   }, [countries, shuffleSeed]);
 
   const chipCountries = useMemo(() => {
@@ -90,8 +91,10 @@ export default function FuelCard({
     return lines.filter(Boolean).join("\n");
   }, [t, country, data?.as_of, data?.source, g, d, l, currency, fxRates]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const resultCount = q.trim() ? filtered.length : countries.length;
   const regionText = data?.region ? t.region(data.region) : "";
+  
 
   return (
     <div className="card fuelHeroCard">
@@ -125,7 +128,7 @@ export default function FuelCard({
         {data ? (
           <>
             <div className="fuelControlGrid">
-              <div className="field">
+              {/* <div className="field">
                 <div className="label">{t.selectCountry}</div>
                 <div className="searchShell">
                   <input
@@ -137,7 +140,7 @@ export default function FuelCard({
                   />
                   <span className="searchCount">{resultCount}</span>
                 </div>
-              </div>
+              </div> */}
 
               <div className="field">
                 <div className="label">{t.selectCountry}</div>

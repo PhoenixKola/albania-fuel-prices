@@ -436,12 +436,12 @@ input {
   z-index: 1;
 }
 
-.fuelControlGrid {
+/* .fuelControlGrid {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
   gap: 12px;
   align-items: end;
-}
+} */
 
 @media (max-width: 800px) {
   .fuelControlGrid {
