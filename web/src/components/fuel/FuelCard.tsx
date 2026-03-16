@@ -35,7 +35,6 @@ export default function FuelCard({
   onCopy,
   onShare,
 }: Props) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [q, setQ] = useState("");
   const deltas = usePriceMemory(country, selected);
 
@@ -91,10 +90,11 @@ export default function FuelCard({
     return lines.filter(Boolean).join("\n");
   }, [t, country, data?.as_of, data?.source, g, d, l, currency, fxRates]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const resultCount = q.trim() ? filtered.length : countries.length;
   const regionText = data?.region ? t.region(data.region) : "";
-  
+
+  void setQ;
+  void resultCount;
 
   return (
     <div className="card fuelHeroCard">
