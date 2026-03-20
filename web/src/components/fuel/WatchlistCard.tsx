@@ -5,6 +5,7 @@ import { getEurPrice, fuelLabel } from "../../utils/fuel";
 import type { Currency } from "../../models/currency";
 import { formatFuelPrice } from "../../utils/priceDisplay";
 import type { FxRates } from "../../utils/currency";
+import { getIso2ForCountry, getFlagImgUrl } from "../../utils/countryFlag";
 
 type Props = {
   t: TDict;
@@ -97,9 +98,19 @@ export default function WatchlistCard({
             <div className="mutedBox">{t.emptyWatchlist}</div>
           ) : (
             <div className="chipRow watchlistChipRow">
-              {watchlist.map((c) => (
-                <Chip key={c} label={c} active={c === current} onClick={() => onOpen(c)} onRemove={() => onRemove(c)} />
-              ))}
+              {watchlist.map((c) => {
+                const iso2 = getIso2ForCountry(c);
+                return (
+                  <Chip
+                    key={c}
+                    label={c}
+                    icon={iso2 ? <img src={getFlagImgUrl(iso2)} alt={c} className="countryFlagImg" /> : undefined}
+                    active={c === current}
+                    onClick={() => onOpen(c)}
+                    onRemove={() => onRemove(c)}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
@@ -120,7 +131,10 @@ export default function WatchlistCard({
                     <div className="watchlistRank">{index + 1}</div>
 
                     <div className="watchlistRowText">
-                      <div className="watchlistRowName">{r.country}</div>
+                      <div className="watchlistRowName">
+                        {(() => { const iso2 = getIso2ForCountry(r.country); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}</> : null; })()}
+                        {r.country}
+                      </div>
                       <div className="watchlistRowMeta">
                         {r.country === current ? (
                           <span className="watchlistCurrentPill">{current}</span>

@@ -73,6 +73,9 @@ export type TDict = {
   stations10km: string;
   stationsFound: (n: number) => string;
   stationsOpen: string;
+  stationsOpenNow: string;
+  stationsClosed: string;
+  stationsHoursUnknown: string;
   stationsRefresh: string;
   stationsNone: string;
   stationsShowing: (shown: number, total: number) => string;

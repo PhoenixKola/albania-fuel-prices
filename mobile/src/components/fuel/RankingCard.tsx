@@ -9,6 +9,7 @@ import SegmentedControl from "../ui/SegmentedControl";
 import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeRankingStyles } from "./RankingCard.styles";
 import { CurrencyMode, formatFuelPrice } from "../../utils/priceDisplay";
+import { getFlagForCountry } from "../../utils/countryFlag";
 
 type Scope = "all" | "favorites";
 
@@ -135,7 +136,7 @@ export default function RankingCard(props: {
 
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text style={[s.country, active ? s.countryActive : null]} numberOfLines={1}>
-              {r.country}
+              {getFlagForCountry(r.country) ? `${getFlagForCountry(r.country)} ${r.country}` : r.country}
             </Text>
 
             {active ? (

@@ -130,17 +130,6 @@ export default function StationsCard(props: {
     return [...base, ...premium];
   }, [props.t, props.rewardUnlocked]);
 
-  const radiusLabel = useMemo(() => {
-    if (props.radiusM === 2000) return props.t.radius2km;
-    if (props.radiusM === 5000) return props.t.radius5km;
-    if (props.radiusM === 10000) return props.t.radius10km;
-    if (props.radiusM === 30000) return props.t.radius30km;
-    if (props.radiusM === 50000) return props.t.radius50km;
-    return `${Math.round(props.radiusM / 1000)} km`;
-  }, [props.radiusM, props.t]);
-
-  const liveLabel = props.fromCache ? (props.t.cachedWorksOffline ?? "Cached") : (props.t.live ?? "Live");
-
   const toggleFav = async (id: string) => {
     const next = favSet.has(id) ? favoriteIds.filter((x) => x !== id) : [id, ...favoriteIds];
     setFavoriteIds(next);
@@ -201,18 +190,6 @@ export default function StationsCard(props: {
 
         <View style={s.headerRight}>
           <View style={s.headerPills}>
-            {/* <View style={s.pill}>
-              <Ionicons name={props.fromCache ? "cloud-offline-outline" : "pulse-outline"} size={14} color={props.theme.colors.muted} />
-              <Text style={s.pillText}>{liveLabel}</Text>
-            </View> */}
-
-            {/* <View style={s.pill}>
-              <Ionicons name="resize-outline" size={14} color={props.theme.colors.muted} />
-              <Text style={s.pillText} numberOfLines={1}>
-                {radiusLabel}
-              </Text>
-            </View> */}
-
             {canResetProvider ? (
               <AnimatedPressable onPress={resetProvider} contentStyle={s.pillBtn} scaleIn={0.98}>
                 <Ionicons name="map-outline" size={14} color={props.theme.colors.text} />
@@ -312,11 +289,34 @@ export default function StationsCard(props: {
                         <Text style={s.rowTitle} numberOfLines={1}>
                           {item.name}
                         </Text>
+
                         {item.brand ? (
                           <Text style={s.rowSub} numberOfLines={1}>
                             {item.brand}
                           </Text>
                         ) : null}
+
+                        {item.isOpen24Hours ? (
+                          <View style={s.open24Badge}>
+                            <Ionicons name="time-outline" size={12} color={props.theme.colors.text} />
+                            <Text style={s.open24BadgeText}>24h</Text>
+                          </View>
+                        ) : item.isOpenNow === true ? (
+                          <View style={s.open24Badge}>
+                            <Ionicons name="time-outline" size={12} color={props.theme.colors.text} />
+                            <Text style={s.open24BadgeText}>{props.t.stationsNearbyOpenNow}</Text>
+                          </View>
+                        ) : item.isOpenNow === false ? (
+                          <View style={s.open24Badge}>
+                            <Ionicons name="time-outline" size={12} color={props.theme.colors.text} />
+                            <Text style={s.open24BadgeText}>{props.t.stationsNearbyClosed}</Text>
+                          </View>
+                        ) : (
+                          <View style={s.open24Badge}>
+                            <Ionicons name="time-outline" size={12} color={props.theme.colors.text} />
+                            <Text style={s.open24BadgeText}>{props.t.stationsNearbyHoursUnknown}</Text>
+                          </View>
+                        )}
                       </View>
                     </View>
 

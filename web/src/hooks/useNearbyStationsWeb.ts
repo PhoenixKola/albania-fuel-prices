@@ -1,16 +1,40 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import opening_hours from "opening_hours";
 import { haversineKm } from "../utils/geo";
 
 export type Station = {
   id: string;
   name: string;
+  brand?: string;
   lat: number;
   lon: number;
   distanceKm: number;
+  openingHours?: string;
+  isOpen24Hours?: boolean;
+  isOpenNow?: boolean | null;
 };
 
 const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
 const FETCH_TIMEOUT_MS = 12 * 1000;
+
+function is24Hours(openingHours?: string) {
+  if (!openingHours) return false;
+
+  const normalized = openingHours.trim().toLowerCase();
+
+  return normalized === "24/7" || normalized === "00:00-24:00" || normalized.includes("24/7");
+}
+
+function getOpenNow(openingHours?: string): boolean | null {
+  if (!openingHours) return null;
+
+  try {
+    const oh = new opening_hours(openingHours, null);
+    return oh.getState();
+  } catch {
+    return null;
+  }
+}
 
 function overpassQuery(lat: number, lon: number, radiusM: number) {
   return `
@@ -63,7 +87,6 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
   const refresh = useCallback(async () => {
     if (!key) return;
-
     if (inFlightRef.current) return;
 
     const now = Date.now();
@@ -99,10 +122,27 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
           if (plat == null || plon == null) return null;
 
           const tags = el.tags ?? {};
-          const name = typeof tags.name === "string" ? tags.name : "Fuel station";
+          const name =
+            typeof tags.name === "string"
+              ? tags.name
+              : typeof tags.brand === "string"
+                ? tags.brand
+                : "Fuel station";
+          const brand = typeof tags.brand === "string" ? tags.brand : undefined;
+          const openingHours = typeof tags.opening_hours === "string" ? tags.opening_hours : undefined;
           const d = haversineKm({ lat: slat, lon: slon }, { lat: plat, lon: plon });
 
-          return { id: `${el.type}:${el.id}`, name, lat: plat, lon: plon, distanceKm: d } as Station;
+          return {
+            id: `${el.type}:${el.id}`,
+            name,
+            brand,
+            lat: plat,
+            lon: plon,
+            distanceKm: d,
+            openingHours,
+            isOpen24Hours: is24Hours(openingHours),
+            isOpenNow: getOpenNow(openingHours)
+          } as Station;
         })
         .filter(Boolean) as Station[];
 

@@ -10,6 +10,7 @@ import { getCurrencyForCountry, convertEur } from "../../utils/currency";
 import { formatMoney, hasRate } from "../../utils/money";
 import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeCompareStyles } from "./CompareCard.styles";
+import { getFlagForCountry } from "../../utils/countryFlag";
 
 type CurrencyMode = "eur" | "local";
 
@@ -262,7 +263,7 @@ export default function CompareCard(props: {
 
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={s.country} numberOfLines={1}>
-                    {r.name}
+                    {getFlagForCountry(r.name) ? `${getFlagForCountry(r.name)} ${r.name}` : r.name}
                   </Text>
 
                   <View style={s.subRow}>

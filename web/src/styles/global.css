@@ -611,6 +611,18 @@ select {
   box-shadow: 0 10px 24px rgba(59, 130, 246, 0.12);
 }
 
+.countryFlagImg {
+  display: inline-block;
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  margin-right: 4px;
+}
+
 .kpiGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1517,20 +1529,28 @@ select {
 
 .nearbyRowText {
   min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .nearbyRowName {
   font-size: 14px;
   font-weight: 900;
   line-height: 1.2;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nearbyRowMeta {
-  margin-top: 6px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .nearbyRowRight {
@@ -2112,4 +2132,30 @@ select {
   .rankingRowRight {
     justify-content: flex-start;
   }
+}
+
+.nearbyHoursBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  width: fit-content;
+}
+
+:root[data-theme="light"] .nearbyHoursBadge {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+}
+
+.nearbyHoursBadgeClosed {
+  opacity: 0.8;
+}
+
+:root[data-theme="light"] .nearbyHoursBadgeClosed {
+  background: rgba(0, 0, 0, 0.04);
+  opacity: 0.7;
 }

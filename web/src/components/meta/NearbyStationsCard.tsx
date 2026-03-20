@@ -6,9 +6,13 @@ import { useNearbyStationsWeb } from "../../hooks/useNearbyStationsWeb";
 type Station = {
   id: string | number;
   name: string;
+  brand?: string;
   distanceKm: number;
   lat: number;
   lon: number;
+  openingHours?: string;
+  isOpen24Hours?: boolean;
+  isOpenNow?: boolean | null;
 };
 
 type Props = {
@@ -25,7 +29,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
     () => [
       { v: 2000, label: t.stations2km },
       { v: 5000, label: t.stations5km },
-      { v: 10000, label: t.stations10km },
+      { v: 10000, label: t.stations10km }
     ],
     [t]
   );
@@ -58,11 +62,6 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
       <div className="nearbyTop">
         <div className="nearbyTopRow">
           <div className="nearbyTopText">
-            {/* <div className="nearbyEyebrow">
-              <span className="livePill">{t.stationsNearbyTitle}</span>
-              {nearby.loading ? <span className="ghostPill">…</span> : null}
-            </div> */}
-
             <div className="nearbyTitleWrap">
               <div className="nearbyTitle">{t.stationsNearbyTitle}</div>
               <div className="nearbySub">
@@ -203,7 +202,21 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
 
                     <div className="nearbyRowText">
                       <div className="nearbyRowName">{s.name}</div>
-                      <div className="nearbyRowMeta">{s.distanceKm.toFixed(2)} km</div>
+
+                      <div className="nearbyRowMeta">
+                        {s.brand ? `${s.brand} • ` : ""}
+                        {s.distanceKm.toFixed(2)} km
+                      </div>
+
+                      {s.isOpen24Hours ? (
+                        <div className="nearbyHoursBadge">24h</div>
+                      ) : s.isOpenNow === true ? (
+                        <div className="nearbyHoursBadge">{t.stationsOpenNow}</div>
+                      ) : s.isOpenNow === false ? (
+                        <div className="nearbyHoursBadge nearbyHoursBadgeClosed">{t.stationsClosed}</div>
+                      ) : (
+                        <div className="nearbyHoursBadge">{t.stationsHoursUnknown}</div>
+                      )}
                     </div>
                   </div>
 

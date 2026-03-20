@@ -7,6 +7,7 @@ import { formatFuelPrice } from "../../utils/priceDisplay";
 import LoadingRow from "../feedback/LeadingRow";
 import PriceKpi from "./PriceKpi";
 import { usePriceMemory } from "../../hooks/usePriceMemory";
+import { getIso2ForCountry, getFlagImgUrl } from "../../utils/countryFlag";
 
 type Props = {
   t: TDict;
@@ -37,6 +38,8 @@ export default function FuelCard({
 }: Props) {
   const [q, setQ] = useState("");
   const deltas = usePriceMemory(country, selected);
+
+  const currentIso2 = useMemo(() => getIso2ForCountry(country), [country]);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -107,7 +110,9 @@ export default function FuelCard({
         <div className="fuelHeroHeadline">
           <div className="fuelHeroText">
             <div className="fuelHeroLabel">{t.selectCountry}</div>
-            <h2 className="fuelHeroTitle">{country}</h2>
+            <h2 className="fuelHeroTitle">
+              {currentIso2 ? <><img src={getFlagImgUrl(currentIso2)} alt={country} className="countryFlagImg" />{" "}</> : null}{country}
+            </h2>
             {regionText ? <div className="fuelHeroSub">{regionText}</div> : null}
           </div>
 
@@ -160,7 +165,7 @@ export default function FuelCard({
                 className="countryChip countryChipActive"
                 onClick={() => onSelectCountry(country)}
               >
-                {country}
+                {currentIso2 ? <><img src={getFlagImgUrl(currentIso2)} alt={country} className="countryFlagImg" />{" "}</> : null}{country}
               </button>
 
               {chipCountries.map((c) => (
@@ -170,7 +175,7 @@ export default function FuelCard({
                   className="countryChip"
                   onClick={() => onSelectCountry(c)}
                 >
-                  {c}
+                  {(() => { const iso2 = getIso2ForCountry(c); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={c} className="countryFlagImg" />{" "}</> : null; })()}{c}
                 </button>
               ))}
             </div>

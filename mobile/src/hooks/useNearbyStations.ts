@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import opening_hours from "opening_hours";
 import { OVERPASS_URL } from "../constants/urls";
 import { STORAGE_STATIONS_CACHE_KEY } from "../constants/storage";
 import { haversineKm } from "../utils/geo";
@@ -11,6 +12,9 @@ export type Station = {
   lat: number;
   lon: number;
   distanceKm: number;
+  openingHours?: string;
+  isOpen24Hours?: boolean;
+  isOpenNow?: boolean | null;
 };
 
 type CacheEnvelope = {
@@ -33,6 +37,25 @@ function safeParse(raw: string | null): CacheEnvelope | null {
     if (typeof (j as any).radiusM !== "number") return null;
     if (!Array.isArray((j as any).stations)) return null;
     return j as CacheEnvelope;
+  } catch {
+    return null;
+  }
+}
+
+function is24Hours(openingHours?: string) {
+  if (!openingHours) return false;
+
+  const normalized = openingHours.trim().toLowerCase();
+
+  return normalized === "24/7" || normalized === "00:00-24:00" || normalized.includes("24/7");
+}
+
+function getOpenNow(openingHours?: string): boolean | null {
+  if (!openingHours) return null;
+
+  try {
+    const oh = new opening_hours(openingHours, null);
+    return oh.getState();
   } catch {
     return null;
   }
@@ -144,6 +167,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
           const tags = el.tags ?? {};
           const name = typeof tags.name === "string" ? tags.name : typeof tags.brand === "string" ? tags.brand : "Fuel station";
           const brand = typeof tags.brand === "string" ? tags.brand : undefined;
+          const openingHours = typeof tags.opening_hours === "string" ? tags.opening_hours : undefined;
 
           const d = haversineKm({ lat: opts.center!.lat, lon: opts.center!.lon }, { lat, lon });
 
@@ -153,7 +177,10 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
             brand,
             lat,
             lon,
-            distanceKm: d
+            distanceKm: d,
+            openingHours,
+            isOpen24Hours: is24Hours(openingHours),
+            isOpenNow: getOpenNow(openingHours)
           } as Station;
         })
         .filter(Boolean) as Station[];

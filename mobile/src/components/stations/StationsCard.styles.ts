@@ -281,5 +281,19 @@ export const makeStationsStyles = (theme: Theme) =>
       borderColor: theme.colors.border
     },
 
-    rememberText: { color: theme.colors.text, fontWeight: "900" }
+    rememberText: { color: theme.colors.text, fontWeight: "900" },
+
+    open24Badge: {
+      marginTop: 6,
+      alignSelf: "flex-start",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 999
+    },
+    open24BadgeText: {
+      fontSize: 12,
+    },
   });

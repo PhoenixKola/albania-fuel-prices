@@ -5,6 +5,7 @@ import { getEurPrice, fuelLabel } from "../../utils/fuel";
 import type { Currency } from "../../models/currency";
 import { formatFuelPrice } from "../../utils/priceDisplay";
 import type { FxRates } from "../../utils/currency";
+import { getIso2ForCountry, getFlagImgUrl } from "../../utils/countryFlag";
 
 type Props = {
   t: TDict;
@@ -55,12 +56,18 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
         <div className="rankingSummaryRow">
           <div className="rankingSummaryItem">
             <span className="rankingSummaryLabel">{t.cheapest}</span>
-            <span className="rankingSummaryValue">{cheapest[0]?.country ?? "—"}</span>
+            <span className="rankingSummaryValue">
+              {(() => { const iso2 = cheapest[0] ? getIso2ForCountry(cheapest[0].country) : null; return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={cheapest[0]!.country} className="countryFlagImg" />{" "}</> : null; })()}
+              {cheapest[0]?.country ?? "—"}
+            </span>
           </div>
 
           <div className="rankingSummaryItem">
             <span className="rankingSummaryLabel">{t.mostExpensive}</span>
-            <span className="rankingSummaryValue">{expensive[0]?.country ?? "—"}</span>
+            <span className="rankingSummaryValue">
+              {(() => { const iso2 = expensive[0] ? getIso2ForCountry(expensive[0].country) : null; return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={expensive[0]!.country} className="countryFlagImg" />{" "}</> : null; })()}
+              {expensive[0]?.country ?? "—"}
+            </span>
           </div>
         </div>
       </div>
@@ -85,7 +92,10 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
                     <div className="rankingBadge">{index + 1}</div>
 
                     <div className="rankingRowText">
-                      <div className="rankingName">{r.country}</div>
+                      <div className="rankingName">
+                        {(() => { const iso2 = getIso2ForCountry(r.country); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}</> : null; })()}
+                        {r.country}
+                      </div>
                       <div className="rankingMeta">{fuelLabel(t, fuelType)}</div>
                     </div>
                   </div>
@@ -116,7 +126,10 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
                     <div className="rankingBadge">{index + 1}</div>
 
                     <div className="rankingRowText">
-                      <div className="rankingName">{r.country}</div>
+                      <div className="rankingName">
+                        {(() => { const iso2 = getIso2ForCountry(r.country); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}</> : null; })()}
+                        {r.country}
+                      </div>
                       <div className="rankingMeta">{fuelLabel(t, fuelType)}</div>
                     </div>
                   </div>

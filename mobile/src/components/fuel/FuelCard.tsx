@@ -11,6 +11,7 @@ import { formatMoney, hasRate } from "../../utils/money";
 import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeFuelCardStyles } from "./FuelCard.styles";
 import { PLAY_STORE_URL } from "../../constants/urls";
+import { getFlagForCountry } from "../../utils/countryFlag";
 
 type CurrencyMode = "eur" | "local";
 
@@ -67,6 +68,8 @@ export default function FuelCard(props: {
 
   const baselineKey = useMemo(() => `fuel_baseline_v1_${props.country}`, [props.country]);
   const [baseline, setBaseline] = useState<StoredBaseline | null>(null);
+
+  const flag = useMemo(() => getFlagForCountry(props.country), [props.country]);
 
   useEffect(() => {
     (async () => {
@@ -217,7 +220,11 @@ export default function FuelCard(props: {
       <View style={s.styles.countryRow}>
         <View style={s.styles.flex1}>
           <View style={s.styles.countryTitleRow}>
-            <Text style={s.styles.countryName}>{props.country}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              {flag ? <Text style={{ fontSize: 20 }}>{flag}</Text> : null}
+              <Text style={s.styles.countryName}>{props.country}</Text>
+            </View>
+
             <View style={s.styles.modeChip}>
               <Ionicons name={mode === "eur" ? "logo-euro" : "cash-outline"} size={14} color={props.theme.colors.text} />
               <Text style={s.styles.modeChipText} numberOfLines={1}>
