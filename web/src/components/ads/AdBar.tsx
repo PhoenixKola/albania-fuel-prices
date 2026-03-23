@@ -1,22 +1,31 @@
 import { useEffect } from "react";
+import type { Lang } from "../../models/i18n";
 
 type Props = {
   adClient: string;
   adSlot: string;
+  enabled?: boolean;
+  lang?: Lang;
 };
 
-export default function AdBar({ adClient, adSlot }: Props) {
+export default function AdBar({ adClient, adSlot, enabled = true, lang = "en" }: Props) {
+  const shouldRender = enabled && lang === "en";
+
   useEffect(() => {
+    if (!shouldRender) return;
+
     try {
       // @ts-expect-error - AdSense injects this global
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
-      // ignore
+      //
     }
-  }, []);
+  }, [shouldRender]);
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="adbar">
+    <div className="adbar" aria-label="Advertisement">
       <ins
         className="adsbygoogle"
         style={{ display: "block", width: "100%" }}

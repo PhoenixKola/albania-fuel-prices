@@ -40,11 +40,11 @@ export default function TopBar({
   t,
   logoSrc,
   subtitle,
-  lang,
+  // lang,
   theme,
   refreshing,
   onRefresh,
-  onToggleLang,
+  // onToggleLang,
   onToggleTheme,
 }: Props) {
   return (
@@ -66,9 +66,16 @@ export default function TopBar({
           {theme === "dark" ? <SunIcon /> : <MoonIcon />}
         </button>
 
-        <button className="btn btn-ghost" onClick={onToggleLang}>
-          {lang === "en" ? t.langSQ : t.langEN}
+        {/*
+        <button
+          className="btn btn-ghost"
+          onClick={onToggleLang}
+          aria-label={lang === "en" ? "Switch to Albanian" : "Switch to English"}
+          title={lang === "en" ? "Switch to Albanian" : "Switch to English"}
+        >
+          {lang === "en" ? "SQ" : "EN"}
         </button>
+        */}
       </div>
     </div>
   );

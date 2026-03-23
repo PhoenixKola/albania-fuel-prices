@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
 import type { FuelType } from "../models/fuel";
@@ -27,18 +27,21 @@ import ToastHost from "../components/feedback/ToastHost";
 import WatchlistCard from "../components/fuel/WatchlistCard";
 import RankingCard from "../components/fuel/RankingCard";
 import NearbyStationsCard from "../components/meta/NearbyStationsCard";
-import Modal from "../components/ui/Modal";
-import SourceFab from "../components/meta/SourceFab";
+
+import HeroIntro from "../components/content/HeroIntro";
+import EditorialSummary from "../components/content/EditorialSummary";
+import MethodologySection from "../components/content/MethodologySection";
+import FaqSection from "../components/content/FaqSection";
 
 import logo from "../assets/logo.png";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const { toast, show } = useToast();
-  const [sourceOpen, setSourceOpen] = useState(false);
 
   const [lang, setLang] = useLocalStorageState<Lang>(STORAGE_LANG_KEY, "en", {
-    deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
+    // deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
+    deserialize: () => "en",
   });
 
   const [country, setCountry] = useLocalStorageState<string>(STORAGE_COUNTRY_KEY, "Albania");
@@ -100,6 +103,16 @@ export default function App() {
     await copyText(text);
   };
 
+  const canShowAds = lang === "en" && !loading && !error && !!data && data.countries.length > 0;
+
+  const editorialItems =
+    data?.countries?.map((c) => ({
+      country: c.country,
+      petrol: typeof c.gasoline95_eur === "number" ? c.gasoline95_eur : null,
+      diesel: typeof c.diesel_eur === "number" ? c.diesel_eur : null,
+      currency: "EUR",
+    })) ?? [];
+
   return (
     <>
       <ToastHost message={toast} />
@@ -118,14 +131,16 @@ export default function App() {
             onToggleTheme={toggleTheme}
           />
 
+          <HeroIntro t={t} lang={lang} updatedAt={data?.fetched_at_utc ?? null} />
+
+          <EditorialSummary t={t} items={editorialItems} />
+
           <div className="card pageIntroCard">
             <div className="body pageIntroBody">
               <div className="pageIntroContent">
                 <div className="pageIntroText">
                   <div className="cardTitle">{t.currencyMode}</div>
-                  <div className="cardSubtle">
-                    {country}
-                  </div>
+                  <div className="cardSubtle">{country}</div>
                 </div>
 
                 <div className="segRow pageIntroSeg">
@@ -202,15 +217,25 @@ export default function App() {
             </div>
           </div>
 
-          <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
+          <MethodologySection
+            t={t}
+            fuelSourceLabel={data?.source ?? t.methodologyFuelSourceDefault}
+            fxSourceLabel={t.methodologyFxSourceDefault}
+            updateFrequency={t.methodologyUpdateFrequencyDefault}
+          />
+
+          <SourceCard t={t} data={data} />
+
+          <FaqSection t={t} />
+
+          <AdBar
+            adClient="ca-pub-2653462201538649"
+            adSlot="5789581249"
+            enabled={canShowAds}
+            lang={lang}
+          />
         </div>
       </div>
-
-      <SourceFab label={t.source} onClick={() => setSourceOpen(true)} />
-
-      <Modal open={sourceOpen} title={t.source} onClose={() => setSourceOpen(false)}>
-        <SourceCard t={t} lang={lang} data={data} />
-      </Modal>
     </>
   );
 }

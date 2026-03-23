@@ -51,11 +51,6 @@ export default function WatchlistCard({
       <div className="watchlistTop">
         <div className="watchlistTopRow">
           <div className="watchlistTopText">
-            {/* <div className="watchlistEyebrow">
-              <span className="livePill">{t.watchlist}</span>
-              <span className="ghostPill">{fuelLabel(t, fuelType)}</span>
-            </div> */}
-
             <div className="watchlistTitleWrap">
               <div className="watchlistTitle">{t.watchlist}</div>
               <div className="watchlistSub">{current}</div>
@@ -73,6 +68,10 @@ export default function WatchlistCard({
             </button>
           </div>
         </div>
+
+        <p className="tinyNote" style={{ marginTop: 10, lineHeight: 1.7 }}>
+          {t.watchlistGuidance}
+        </p>
 
         <div className="watchlistStats">
           <div className="watchlistStat">
@@ -132,7 +131,14 @@ export default function WatchlistCard({
 
                     <div className="watchlistRowText">
                       <div className="watchlistRowName">
-                        {(() => { const iso2 = getIso2ForCountry(r.country); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}</> : null; })()}
+                        {(() => {
+                          const iso2 = getIso2ForCountry(r.country);
+                          return iso2 ? (
+                            <>
+                              <img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}
+                            </>
+                          ) : null;
+                        })()}
                         {r.country}
                       </div>
                       <div className="watchlistRowMeta">

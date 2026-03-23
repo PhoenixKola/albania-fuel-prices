@@ -82,6 +82,56 @@ export type TDict = {
   stationsShowMore: string;
   stationsShowAll: string;
   stationsCollapse: string;
+
+  heroTitle: string;
+  heroSubtitle: string;
+  heroLiveFallback: string;
+  heroUpdatedAt: (s: string) => string;
+
+  editorialTitle: string;
+  editorialEmpty: string;
+  editorialLead: string;
+  editorialCheapestPetrol: string;
+  editorialMostExpensivePetrol: string;
+  editorialPetrolSpread: string;
+  editorialCheapestDiesel: string;
+  editorialMostExpensiveDiesel: string;
+  editorialDieselSpread: string;
+  notAvailable: string;
+
+  methodologyTitle: string;
+  methodologyParagraph1: string;
+  methodologyParagraph2: string;
+  methodologyParagraph3: string;
+  methodologyFuelSource: string;
+  methodologyFxSource: string;
+  methodologyUpdatePattern: string;
+  methodologyFuelSourceDefault: string;
+  methodologyFxSourceDefault: string;
+  methodologyUpdateFrequencyDefault: string;
+
+  faqTitle: string;
+  faqQ1: string;
+  faqA1: string;
+  faqQ2: string;
+  faqA2: string;
+  faqQ3: string;
+  faqA3: string;
+  faqQ4: string;
+  faqA4: string;
+  faqQ5: string;
+  faqA5: string;
+  faqQ6: string;
+  faqA6: string;
+
+  watchlistGuidance: string;
+  nearbyGuidance: string;
+
+  sourceUpdatedLabel: string;
+  sourceCardSubtitle: string;
+  sourceCardInterpretationNote: string;
+  sourceCardMethodologyNote: string;
+  sourceUrlLabel: string;
 };
 
 export const i18n = {

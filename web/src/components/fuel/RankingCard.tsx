@@ -32,13 +32,14 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
   return (
     <div className="card rankingCard">
       <div className="rankingTop">
-        {/* <div className="rankingEyebrow">
-          <span className="livePill">{t.rankings}</span>
-          <span className="ghostPill">{fuelLabel(t, fuelType)}</span>
-        </div> */}
-
         <div className="rankingTitle">{t.rankings}</div>
         <div className="rankingSub">{t.fuelType}</div>
+
+        <p className="tinyNote" style={{ marginTop: 10, lineHeight: 1.7 }}>
+          These rankings help compare broader price levels across countries. They are useful for spotting relative fuel
+          cost differences, but they should still be treated as public market guidance rather than an exact price for
+          every local station.
+        </p>
 
         <div className="segRow rankingSegRow">
           {FUEL_TYPES.map((ft) => (
@@ -57,7 +58,14 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
           <div className="rankingSummaryItem">
             <span className="rankingSummaryLabel">{t.cheapest}</span>
             <span className="rankingSummaryValue">
-              {(() => { const iso2 = cheapest[0] ? getIso2ForCountry(cheapest[0].country) : null; return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={cheapest[0]!.country} className="countryFlagImg" />{" "}</> : null; })()}
+              {(() => {
+                const iso2 = cheapest[0] ? getIso2ForCountry(cheapest[0].country) : null;
+                return iso2 ? (
+                  <>
+                    <img src={getFlagImgUrl(iso2)} alt={cheapest[0]!.country} className="countryFlagImg" />{" "}
+                  </>
+                ) : null;
+              })()}
               {cheapest[0]?.country ?? "—"}
             </span>
           </div>
@@ -65,7 +73,14 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
           <div className="rankingSummaryItem">
             <span className="rankingSummaryLabel">{t.mostExpensive}</span>
             <span className="rankingSummaryValue">
-              {(() => { const iso2 = expensive[0] ? getIso2ForCountry(expensive[0].country) : null; return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={expensive[0]!.country} className="countryFlagImg" />{" "}</> : null; })()}
+              {(() => {
+                const iso2 = expensive[0] ? getIso2ForCountry(expensive[0].country) : null;
+                return iso2 ? (
+                  <>
+                    <img src={getFlagImgUrl(iso2)} alt={expensive[0]!.country} className="countryFlagImg" />{" "}
+                  </>
+                ) : null;
+              })()}
               {expensive[0]?.country ?? "—"}
             </span>
           </div>
@@ -93,7 +108,14 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
 
                     <div className="rankingRowText">
                       <div className="rankingName">
-                        {(() => { const iso2 = getIso2ForCountry(r.country); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}</> : null; })()}
+                        {(() => {
+                          const iso2 = getIso2ForCountry(r.country);
+                          return iso2 ? (
+                            <>
+                              <img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}
+                            </>
+                          ) : null;
+                        })()}
                         {r.country}
                       </div>
                       <div className="rankingMeta">{fuelLabel(t, fuelType)}</div>
@@ -127,7 +149,14 @@ export default function RankingCard({ t, data, fuelType, setFuelType, currency, 
 
                     <div className="rankingRowText">
                       <div className="rankingName">
-                        {(() => { const iso2 = getIso2ForCountry(r.country); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}</> : null; })()}
+                        {(() => {
+                          const iso2 = getIso2ForCountry(r.country);
+                          return iso2 ? (
+                            <>
+                              <img src={getFlagImgUrl(iso2)} alt={r.country} className="countryFlagImg" />{" "}
+                            </>
+                          ) : null;
+                        })()}
                         {r.country}
                       </div>
                       <div className="rankingMeta">{fuelLabel(t, fuelType)}</div>

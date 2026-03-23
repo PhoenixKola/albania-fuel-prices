@@ -82,6 +82,10 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
           </div>
         </div>
 
+        <p className="tinyNote" style={{ marginTop: 10, lineHeight: 1.7 }}>
+          {t.nearbyGuidance}
+        </p>
+
         <div className="nearbyStats">
           <div className="nearbyStat">
             <div className="nearbyStatLabel">{t.stationsRadius}</div>
@@ -114,7 +118,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                   onClick={() => onChangeRadius(it.v)}
                   disabled={radiusDisabled}
                   aria-disabled={radiusDisabled}
-                  title={nearby.loading ? "Loading…" : ""}
+                  title={nearby.loading ? t.refreshing : ""}
                 >
                   {it.label}
                 </button>
@@ -203,10 +207,10 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                     <div className="nearbyRowText">
                       <div className="nearbyRowName">{s.name}</div>
 
-                      <div className="nearbyRowMeta">
+                      {/* <div className="nearbyRowMeta">
                         {s.brand ? `${s.brand} • ` : ""}
                         {s.distanceKm.toFixed(2)} km
-                      </div>
+                      </div> */}
 
                       {s.isOpen24Hours ? (
                         <div className="nearbyHoursBadge">24h</div>
