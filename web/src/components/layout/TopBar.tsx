@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import type { Lang } from "../../models/i18n";
 import type { Theme } from "../../models/theme";
 import type { TDict } from "../../locales";
@@ -40,22 +41,22 @@ export default function TopBar({
   t,
   logoSrc,
   subtitle,
-  lang,
+  // lang,
   theme,
   refreshing,
   onRefresh,
-  onToggleLang,
+  // onToggleLang,
   onToggleTheme,
 }: Props) {
   return (
     <div className="topbar">
-      <div className="brand">
+      <Link to="/" className="brand">
         <img className="logoImg" src={logoSrc} alt="" aria-hidden="true" />
         <div className="hgroup">
-          <h1 className="h1">{t.title}</h1>
+          <span className="h1">{t.title}</span>
           <p className="sub">{subtitle}</p>
         </div>
-      </div>
+      </Link>
 
       <div className="actions">
         <button className="btn btn-primary" onClick={onRefresh} disabled={refreshing}>
@@ -66,14 +67,14 @@ export default function TopBar({
           {theme === "dark" ? <SunIcon /> : <MoonIcon />}
         </button>
 
-        <button
+        {/* <button
           className="btn btn-ghost"
           onClick={onToggleLang}
           aria-label={lang === "en" ? "Switch to Albanian" : "Switch to English"}
           title={lang === "en" ? "Switch to Albanian" : "Switch to English"}
         >
           {lang === "en" ? "SQ" : "EN"}
-        </button>
+        </button> */}
       </div>
     </div>
   );

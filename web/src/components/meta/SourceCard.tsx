@@ -28,9 +28,11 @@ export default function SourceCard({ t, data }: Props) {
           <div className="cardSubtle">{t.sourceCardSubtitle}</div>
         </div>
 
-        <a className="btn btn-ghost" href={data?.source_url ?? "#"} target="_blank" rel="noreferrer">
-          {t.open}
-        </a>
+        {data?.source_url ? (
+          <a className="btn btn-ghost" href={data.source_url} target="_blank" rel="noreferrer">
+            {t.open}
+          </a>
+        ) : null}
       </div>
 
       <div className="body">

@@ -132,6 +132,109 @@ export type TDict = {
   sourceCardInterpretationNote: string;
   sourceCardMethodologyNote: string;
   sourceUrlLabel: string;
+
+  // Navigation & Footer
+  navHome: string;
+  navAbout: string;
+  navContact: string;
+  navPrivacy: string;
+  navTerms: string;
+  footerTagline: string;
+  footerCopyright: (year: number) => string;
+
+  // About page
+  aboutTitle: string;
+  aboutIntro: string;
+  aboutMissionTitle: string;
+  aboutMissionP1: string;
+  aboutMissionP2: string;
+  aboutDataTitle: string;
+  aboutDataP1: string;
+  aboutDataP2: string;
+  aboutDataP3: string;
+  aboutEditorialTitle: string;
+  aboutEditorialP1: string;
+  aboutEditorialP2: string;
+  aboutWhoTitle: string;
+  aboutWhoP1: string;
+  aboutWhoP2: string;
+
+  // Contact page
+  contactTitle: string;
+  contactIntro: string;
+  contactEmailTitle: string;
+  contactEmailValue: string;
+  contactEmailNote: string;
+  contactTopicsTitle: string;
+  contactTopic1: string;
+  contactTopic2: string;
+  contactTopic3: string;
+  contactTopic4: string;
+  contactTopic5: string;
+  contactResponseTitle: string;
+  contactResponseP1: string;
+  contactResponseP2: string;
+
+  // Privacy page
+  privacyTitle: string;
+  privacyUpdated: string;
+  privacyIntro: string;
+  privacyCollectTitle: string;
+  privacyCollectP1: string;
+  privacyLocalTitle: string;
+  privacyLocalP1: string;
+  privacyFetchTitle: string;
+  privacyFetchP1: string;
+  privacyAdsTitle: string;
+  privacyAdsP1: string;
+  privacyAdItem1: string;
+  privacyAdItem2: string;
+  privacyAdItem3: string;
+  privacyAdItem4: string;
+  privacyAdsP2: string;
+  privacyAnalyticsTitle: string;
+  privacyAnalyticsP1: string;
+  privacySharingTitle: string;
+  privacySharingP1: string;
+  privacySecurityTitle: string;
+  privacySecurityP1: string;
+  privacyChildrenTitle: string;
+  privacyChildrenP1: string;
+  privacyChangesTitle: string;
+  privacyChangesP1: string;
+  privacyContactTitle: string;
+  privacyContactP1: string;
+
+  // Terms page
+  termsTitle: string;
+  termsUpdated: string;
+  termsIntro: string;
+  termsServiceTitle: string;
+  termsServiceP1: string;
+  termsAccuracyTitle: string;
+  termsAccuracyP1: string;
+  termsAccuracyP2: string;
+  termsAccuracyP3: string;
+  termsUseTitle: string;
+  termsUseP1: string;
+  termsIpTitle: string;
+  termsIpP1: string;
+  termsLinksTitle: string;
+  termsLinksP1: string;
+  termsAdsTitle: string;
+  termsAdsP1: string;
+  termsLiabilityTitle: string;
+  termsLiabilityP1: string;
+  termsChangesTitle: string;
+  termsChangesP1: string;
+  termsContactTitle: string;
+  termsContactP1: string;
+
+  // 404 page
+  notFoundTitle: string;
+  notFoundSubtitle: string;
+  notFoundMessage: string;
+  notFoundButtonHome: string;
 };
 
 export const i18n = {
