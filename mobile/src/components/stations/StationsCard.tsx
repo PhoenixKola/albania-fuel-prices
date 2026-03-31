@@ -174,7 +174,7 @@ export default function StationsCard(props: {
 
   return (
     <View style={s.card}>
-      <View style={s.headerRow}>
+      {/* <View style={s.headerRow}>
         <View style={s.headerLeft}>
           <View style={s.headerIcon}>
             <Ionicons name="navigate-outline" size={18} color={props.theme.colors.linkText} />
@@ -202,7 +202,7 @@ export default function StationsCard(props: {
             {props.loading ? <ActivityIndicator /> : <Ionicons name="refresh" size={18} color={props.theme.colors.text} />}
           </AnimatedPressable>
         </View>
-      </View>
+      </View> */}
 
       <View style={s.radiusRow}>
         <Text style={s.radiusLabel}>{props.t.radius}</Text>

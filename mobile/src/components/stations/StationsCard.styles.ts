@@ -295,5 +295,6 @@ export const makeStationsStyles = (theme: Theme) =>
     },
     open24BadgeText: {
       fontSize: 12,
+      color: theme.colors.muted,
     },
   });

@@ -40,8 +40,8 @@ export default function App() {
   const { toast, show } = useToast();
 
   const [lang, setLang] = useLocalStorageState<Lang>(STORAGE_LANG_KEY, "en", {
-    // deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
-    deserialize: () => "en",
+    deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
+    // deserialize: () => "en",
   });
 
   const [country, setCountry] = useLocalStorageState<string>(STORAGE_COUNTRY_KEY, "Albania");

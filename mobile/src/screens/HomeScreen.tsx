@@ -269,19 +269,12 @@ export default function HomeScreen() {
           theme={theme}
           title={t.title}
           subtitle={data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading}
-          langPillLabel={lang === "en" ? t.langSQ : t.langEN}
-          onToggleLang={toggleLang}
-          onToggleTheme={toggleTheme}
         />
 
         <FeedbackCurrencyBar
           theme={theme}
           t={t}
           onFeedbackPress={openFeedback}
-          currencyLocalCode={currency}
-          canLocal={canLocal}
-          currencyMode={effectiveCurrencyMode}
-          onSetCurrencyMode={(m) => setCurrencyMode(m)}
           headerBtnStyle={s.headerBtn}
           headerBtnTextStyle={s.headerBtnText}
         />

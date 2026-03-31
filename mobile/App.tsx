@@ -1,5 +1,10 @@
-import HomeScreen from "./src/screens/HomeScreen";
+import { AppProvider } from "./src/context/AppContext";
+import TabNavigator from "./src/navigation/TabNavigator";
 
 export default function App() {
-  return <HomeScreen />;
+  return (
+    <AppProvider>
+      <TabNavigator />
+    </AppProvider>
+  );
 }

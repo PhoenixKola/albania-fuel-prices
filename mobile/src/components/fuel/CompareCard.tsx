@@ -174,7 +174,7 @@ export default function CompareCard(props: {
   return (
     <View style={s.card}>
       <View style={s.headerRow}>
-        <View style={s.headerLeft}>
+        {/* <View style={s.headerLeft}>
           <View style={s.headerIcon}>
             <Ionicons name="git-compare-outline" size={18} color={props.theme.colors.linkText} />
           </View>
@@ -185,7 +185,7 @@ export default function CompareCard(props: {
               {props.t.compareSubtitle(fuelName)}
             </Text>
           </View>
-        </View>
+        </View> */}
 
         <View style={s.headerActions}>
           <View style={s.pills}>

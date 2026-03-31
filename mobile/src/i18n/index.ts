@@ -1,6 +1,125 @@
 export type Lang = "en" | "sq";
 
-export const i18n = {
+export type TDict = {
+  title: string;
+  subtitleAsOf: (d: string) => string;
+  subtitleLoading: string;
+  fetching: string;
+  couldntLoad: string;
+  tryAgain: string;
+  refresh: string;
+  refreshing: string;
+  selectCountry: string;
+  changeCountry: string;
+  searchPlaceholder: string;
+  close: string;
+  selected: string;
+
+  gasoline95: string;
+  diesel: string;
+  lpg: string;
+
+  source: string;
+  open: string;
+  fetchedAt: (s: string) => string;
+
+  langEN: string;
+  langSQ: string;
+
+  stationsTitle: string;
+  rankingsTitle: string;
+  rankingsSubtitle: (fuel: string) => string;
+  rankingsExpensiveTitle: string;
+  rankingsExpensiveSubtitle: (fuel: string) => string;
+  yourRank: (n: number) => string;
+  rankUnavailable: string;
+
+  compareTitle: string;
+  compareEmpty: string;
+  compareSubtitle: (fuel: string) => string;
+  addCountry: string;
+  compareHint: string;
+  maxCompareReached: string;
+  remove: string;
+
+  favoritesTitle: string;
+  quickSwitch: string;
+  edit: string;
+
+  currency: string;
+  currencyEUR: string;
+  currencyLocal: string;
+
+  share: string;
+
+  cityEstimateTitle: string;
+  city: string;
+  bias: string;
+  biasHint: string;
+  estimate: string;
+  approxNote: string;
+  reset: string;
+  lastUpdated: string;
+  showingCached: string;
+
+  stationsNearbyTitle: string;
+  stationsNearbyNeedLocation: string;
+  stationsNearbyUseMyLocation: string;
+  stationsNearbyGettingLocation: string;
+  stationsNearbyRefresh: string;
+  stationsNearbyCached: string;
+  stationsNearbyNone: string;
+  stationsNearbyOpen: string;
+  stationsNearbyOpenNow: string;
+  stationsNearbyClosed: string;
+  stationsNearbyHoursUnknown: string;
+  radius: string;
+  radius2km: string;
+  radius5km: string;
+  radius10km: string;
+  stationsNearbyFound: (n: number) => string;
+  stationsNearbyShowing: (shown: number, total: number) => string;
+  stationsNearbyShowMore: string;
+  stationsNearbyShowAll: string;
+  stationsNearbyCollapse: string;
+  tapToSwitch: string;
+  quickSwitchEmpty: string;
+  unlockTitle: (m: number) => string;
+  unlockStations: string;
+  unlockCompare: string;
+  unlockRankings: string;
+  watchVideo: string;
+  continueWithout: string;
+  maxCompareReachedN: (n: number) => string;
+  radius30km: string;
+  radius50km: string;
+  rateTitle: string;
+  rateBody: string;
+  rateNow: string;
+  rateLater: string;
+  feedback: string;
+  unlockMoreRankingsTitle: string;
+  unlockMoreRankingsSubtitle: string;
+
+  homeTitle: string;
+  settingsTitle: string;
+  settingsSubtitle: string;
+  appearance: string;
+  darkMode: string;
+  darkModeOn: string;
+  darkModeOff: string;
+  language: string;
+  dataSource: string;
+  rateApp: string;
+  rateAppSubtitle: string;
+  feedbackSubtitle: string;
+  feedbackSupport: string;
+  version: string;
+  allCountries: string;
+  favorites: string;
+};
+
+export const i18n: Record<Lang, TDict> = {
   en: {
     title: "Europe Fuel Prices",
     subtitleAsOf: (d: string) => `As of ${d}`,
@@ -101,6 +220,23 @@ export const i18n = {
     feedback: "Feedback",
     unlockMoreRankingsTitle: "Unlock more rankings",
     unlockMoreRankingsSubtitle: "Watch a rewarded ad to unlock more.",
+
+    homeTitle: "Home",
+    settingsTitle: "Settings",
+    settingsSubtitle: "Customize your experience",
+    appearance: "Appearance",
+    darkMode: "Dark Mode",
+    darkModeOn: "On",
+    darkModeOff: "Off",
+    language: "Language",
+    dataSource: "Data & Sources",
+    rateApp: "Rate App",
+    rateAppSubtitle: "Rate us on Google Play",
+    feedbackSubtitle: "Send us your thoughts",
+    feedbackSupport: "Feedback & Support",
+    version: "Version",
+    allCountries: "All",
+    favorites: "Favorites",
   },
   sq: {
     title: "Çmimet e Karburanteve në Europë",
@@ -202,5 +338,22 @@ export const i18n = {
     feedback: "Sugjerim",
     unlockMoreRankingsTitle: "Zhblloko më shumë renditje",
     unlockMoreRankingsSubtitle: "Shiko një reklamë për të zhbllokuar më shumë renditje.",
+
+    homeTitle: "Kryefaqja",
+    settingsTitle: "Cilësimet",
+    settingsSubtitle: "Personalizo eksperiencën",
+    appearance: "Pamja",
+    darkMode: "Modaliteti i errët",
+    darkModeOn: "Aktiv",
+    darkModeOff: "Joaktiv",
+    language: "Gjuha",
+    dataSource: "Të dhënat & Burimet",
+    rateApp: "Vlerëso aplikacionin",
+    rateAppSubtitle: "Vlerëso në Google Play",
+    feedbackSubtitle: "Na dërgo mendimet e tua",
+    feedbackSupport: "Sugjerime & Mbështetje",
+    version: "Versioni",
+    allCountries: "Të gjitha",
+    favorites: "Të preferuarat",
   },
-} as const;
+};
