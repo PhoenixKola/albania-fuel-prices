@@ -5,7 +5,7 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useApp } from "../../context/AppContext";
-// import AdBar from "../ads/AdBar"; // Uncomment for production
+import AdBar from "../ads/AdBar";
 import { makeBottomTabBarStyles } from "./BottomTabBar.styles";
 
 const TAB_ICONS: Record<string, { active: any; inactive: any }> = {
@@ -29,10 +29,7 @@ export default function BottomTabBar({ state, descriptors, navigation }: BottomT
 
   return (
     <View style={s.container}>
-      {/* Ad placeholder - uncomment <AdBar theme={theme} unitId={adUnitId} /> for production ads */}
-      <View style={{ height: 50, backgroundColor: theme.colors.card, borderBottomWidth: 1, borderBottomColor: theme.colors.border, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: theme.colors.muted, fontSize: 11, fontWeight: '600' }}>📱 Ad Space (Local Dev)</Text>
-      </View>
+      <AdBar theme={theme} unitId={adUnitId} />
       <View style={[s.tabRow, { paddingBottom: Math.max(insets.bottom, 6) }]}>
         {state.routes.map((route, index) => {
           const focused = state.index === index;
