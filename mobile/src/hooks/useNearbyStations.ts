@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import opening_hours from "opening_hours";
 import { OVERPASS_URL } from "../constants/urls";
@@ -73,39 +73,36 @@ out center tags;
 `;
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const r = await fetch(url, { ...init, signal: controller.signal });
-    return r;
-  } finally {
-    clearTimeout(t);
-  }
-}
-
 export function useNearbyStations(opts: { center: { lat: number; lon: number } | null; radiusM?: number }) {
   const radiusM = opts.radiusM ?? 5000;
+  // Extract primitives so callbacks don't re-create when the center object reference changes
+  const centerLat = opts.center?.lat ?? null;
+  const centerLon = opts.center?.lon ?? null;
 
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
 
-  const loadCacheStrict = useCallback(async () => {
+  // Tracks the AbortController of the current in-flight request
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Merged cache loader: strict=true enforces the TTL, strict=false returns any matching cached data
+  const loadCache = useCallback(async (strict: boolean) => {
     const raw = await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY);
     const env = safeParse(raw);
     if (!env) return null;
 
-    const age = Date.now() - new Date(env.savedAtUtc).getTime();
-    if (age > CACHE_TTL_MS) return null;
+    if (strict) {
+      const age = Date.now() - new Date(env.savedAtUtc).getTime();
+      if (age > CACHE_TTL_MS) return null;
+    }
 
-    if (!opts.center) return null;
+    if (centerLat === null || centerLon === null) return null;
 
     const nearSameCenter =
-      Math.abs(env.center.lat - opts.center.lat) < 0.01 &&
-      Math.abs(env.center.lon - opts.center.lon) < 0.01;
-
+      Math.abs(env.center.lat - centerLat) < 0.01 &&
+      Math.abs(env.center.lon - centerLon) < 0.01;
     const sameRadius = env.radiusM === radiusM;
 
     if (!nearSameCenter || !sameRadius) return null;
@@ -113,45 +110,29 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     setStations(env.stations);
     setFromCache(true);
     return env;
-  }, [opts.center, radiusM]);
-
-  const loadCacheAny = useCallback(async () => {
-    const raw = await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY);
-    const env = safeParse(raw);
-    if (!env) return null;
-
-    if (!opts.center) return null;
-
-    const nearSameCenter =
-      Math.abs(env.center.lat - opts.center.lat) < 0.01 &&
-      Math.abs(env.center.lon - opts.center.lon) < 0.01;
-
-    const sameRadius = env.radiusM === radiusM;
-    if (!nearSameCenter || !sameRadius) return null;
-
-    setStations(env.stations);
-    setFromCache(true);
-    return env;
-  }, [opts.center, radiusM]);
+  }, [centerLat, centerLon, radiusM]);
 
   const refresh = useCallback(async () => {
-    if (!opts.center) return;
+    if (centerLat === null || centerLon === null) return;
+
+    // Cancel any previous in-flight request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
 
-    try {
-      const q = overpassQuery(opts.center.lat, opts.center.lon, radiusM);
-      const body = `data=${encodeURIComponent(q)}`;
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-      const r = await fetchWithTimeout(
-        OVERPASS_URL,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body
-        },
-        FETCH_TIMEOUT_MS
-      );
+    try {
+      const q = overpassQuery(centerLat, centerLon, radiusM);
+      const r = await fetch(OVERPASS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `data=${encodeURIComponent(q)}`,
+        signal: controller.signal
+      });
 
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
       const json = await r.json();
@@ -169,15 +150,13 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
           const brand = typeof tags.brand === "string" ? tags.brand : undefined;
           const openingHours = typeof tags.opening_hours === "string" ? tags.opening_hours : undefined;
 
-          const d = haversineKm({ lat: opts.center!.lat, lon: opts.center!.lon }, { lat, lon });
-
           return {
             id: `${el.type}:${String(el.id)}`,
             name,
             brand,
             lat,
             lon,
-            distanceKm: d,
+            distanceKm: haversineKm({ lat: centerLat, lon: centerLon }, { lat, lon }),
             openingHours,
             isOpen24Hours: is24Hours(openingHours),
             isOpenNow: getOpenNow(openingHours)
@@ -192,37 +171,43 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
 
       const env: CacheEnvelope = {
         savedAtUtc: new Date().toISOString(),
-        center: opts.center,
+        center: { lat: centerLat, lon: centerLon },
         radiusM,
         stations: parsed
       };
-
       await AsyncStorage.setItem(STORAGE_STATIONS_CACHE_KEY, JSON.stringify(env));
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
+      // Silently drop if this request was superseded by a newer refresh() call
+      if (abortRef.current !== controller) return;
 
-      const usedCache = await loadCacheAny();
+      const msg = e instanceof Error ? e.message : String(e);
+      const usedCache = await loadCache(false);
       if (usedCache) {
         setError("Stations server timeout. Showing cached results.");
       } else {
         setError(msg);
       }
     } finally {
-      setLoading(false);
+      clearTimeout(timeoutId);
+      // Only clear loading for the request that is still current
+      if (abortRef.current === controller) {
+        setLoading(false);
+      }
     }
-  }, [opts.center, radiusM, loadCacheAny]);
+  }, [centerLat, centerLon, radiusM, loadCache]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      await loadCacheStrict();
+      await loadCache(true);
       if (cancelled) return;
-      if (opts.center) refresh();
+      if (centerLat !== null && centerLon !== null) refresh();
     })();
     return () => {
       cancelled = true;
+      abortRef.current?.abort();
     };
-  }, [opts.center?.lat, opts.center?.lon, radiusM, loadCacheStrict, refresh]);
+  }, [centerLat, centerLon, radiusM, loadCache, refresh]);
 
   const top = useMemo(() => stations.slice(0, 100), [stations]);
   return { stations: top, totalCount: stations.length, loading, error, refresh, fromCache };

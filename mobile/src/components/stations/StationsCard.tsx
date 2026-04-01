@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Linking, Modal, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Linking, Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -8,10 +8,7 @@ import type { Station } from "../../hooks/useNearbyStations";
 import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeStationsStyles } from "./StationsCard.styles";
 
-type MapProvider = "system" | "google" | "apple" | "waze";
-
 const STORAGE_STATION_FAVORITES_KEY = "stations_favorites_v1";
-const STORAGE_MAP_PROVIDER_KEY = "maps_provider_v1";
 
 function safeParseStringArray(raw: string | null) {
   if (!raw) return [];
@@ -24,28 +21,13 @@ function safeParseStringArray(raw: string | null) {
   }
 }
 
-async function openPreferredMap(provider: MapProvider, lat: number, lon: number, label: string) {
+async function openInMaps(lat: number, lon: number, label: string) {
   const q = encodeURIComponent(label);
   const ll = `${lat},${lon}`;
-
-  const candidates: string[] =
-    provider === "google"
-      ? [`google.navigation:q=${ll}(${q})`, `https://www.google.com/maps/dir/?api=1&destination=${ll}&destination_place_id=&travelmode=driving`]
-      : provider === "apple"
-        ? [`http://maps.apple.com/?daddr=${ll}&q=${q}`]
-        : provider === "waze"
-          ? [`waze://?ll=${ll}&navigate=yes`, `https://waze.com/ul?ll=${ll}&navigate=yes`]
-          : [`https://www.google.com/maps/search/?api=1&query=${ll}(${q})`];
-
-  for (const url of candidates) {
-    try {
-      const ok = await Linking.canOpenURL(url);
-      if (ok) {
-        await Linking.openURL(url);
-        return;
-      }
-    } catch {}
-  }
+  const url = `https://www.google.com/maps/search/?api=1&query=${ll}(${q})`;
+  try {
+    await Linking.openURL(url);
+  } catch {}
 }
 
 export default function StationsCard(props: {
@@ -82,16 +64,11 @@ export default function StationsCard(props: {
   }, [props.radiusM, props.totalCount]);
 
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
-  const [mapProvider, setMapProvider] = useState<MapProvider>("system");
 
   useEffect(() => {
     (async () => {
       const favRaw = await AsyncStorage.getItem(STORAGE_STATION_FAVORITES_KEY);
       setFavoriteIds(safeParseStringArray(favRaw));
-
-      const mpRaw = await AsyncStorage.getItem(STORAGE_MAP_PROVIDER_KEY);
-      const mp = (mpRaw as MapProvider) || "system";
-      setMapProvider(mp === "google" || mp === "apple" || mp === "waze" || mp === "system" ? mp : "system");
     })();
   }, []);
 
@@ -136,40 +113,9 @@ export default function StationsCard(props: {
     await AsyncStorage.setItem(STORAGE_STATION_FAVORITES_KEY, JSON.stringify(next));
   };
 
-  const [mapModalOpen, setMapModalOpen] = useState(false);
-  const [rememberProvider, setRememberProvider] = useState(true);
-  const [pendingStation, setPendingStation] = useState<Station | null>(null);
-
   const openStation = async (st: Station) => {
     props.onOpenExternalMap?.();
-
-    if (mapProvider !== "system") {
-      await openPreferredMap(mapProvider, st.lat, st.lon, st.name);
-      return;
-    }
-
-    setPendingStation(st);
-    setMapModalOpen(true);
-  };
-
-  const chooseProvider = async (p: MapProvider) => {
-    const st = pendingStation;
-    setMapModalOpen(false);
-    setPendingStation(null);
-
-    if (rememberProvider) {
-      setMapProvider(p);
-      await AsyncStorage.setItem(STORAGE_MAP_PROVIDER_KEY, p);
-    }
-
-    if (st) await openPreferredMap(p, st.lat, st.lon, st.name);
-  };
-
-  const canResetProvider = mapProvider !== "system";
-
-  const resetProvider = async () => {
-    setMapProvider("system");
-    await AsyncStorage.setItem(STORAGE_MAP_PROVIDER_KEY, "system");
+    await openInMaps(st.lat, st.lon, st.name);
   };
 
   return (
@@ -369,48 +315,6 @@ export default function StationsCard(props: {
         </>
       ) : null}
 
-      <Modal visible={mapModalOpen} transparent animationType="fade" onRequestClose={() => setMapModalOpen(false)}>
-        <View style={s.modalBackdrop}>
-          <View style={s.modalCard}>
-            <View style={s.modalHeader}>
-              <Text style={s.modalTitle}>{props.t.chooseMapsApp ?? "Open with"}</Text>
-              <AnimatedPressable onPress={() => setMapModalOpen(false)} contentStyle={s.modalCloseBtn} scaleIn={0.98}>
-                <Ionicons name="close" size={18} color={props.theme.colors.text} />
-              </AnimatedPressable>
-            </View>
-
-            <View style={s.modalOptions}>
-              <AnimatedPressable onPress={() => chooseProvider("google")} contentStyle={s.modalOption} scaleIn={0.98}>
-                <Ionicons name="logo-google" size={18} color={props.theme.colors.text} />
-                <Text style={s.modalOptionText}>Google Maps</Text>
-              </AnimatedPressable>
-
-              <AnimatedPressable onPress={() => chooseProvider("apple")} contentStyle={s.modalOption} scaleIn={0.98}>
-                <Ionicons name="map-outline" size={18} color={props.theme.colors.text} />
-                <Text style={s.modalOptionText}>Apple Maps</Text>
-              </AnimatedPressable>
-
-              <AnimatedPressable onPress={() => chooseProvider("waze")} contentStyle={s.modalOption} scaleIn={0.98}>
-                <Ionicons name="navigate-outline" size={18} color={props.theme.colors.text} />
-                <Text style={s.modalOptionText}>Waze</Text>
-              </AnimatedPressable>
-            </View>
-
-            <AnimatedPressable
-              onPress={() => setRememberProvider((p) => !p)}
-              contentStyle={s.rememberRow}
-              scaleIn={0.98}
-            >
-              <Ionicons
-                name={rememberProvider ? "checkbox-outline" : "square-outline"}
-                size={18}
-                color={props.theme.colors.text}
-              />
-              <Text style={s.rememberText}>{props.t.rememberChoice ?? "Remember my choice"}</Text>
-            </AnimatedPressable>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
