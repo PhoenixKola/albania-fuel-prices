@@ -136,6 +136,8 @@ export const sq = {
     "Përdor listën e të preferuarave për të mbajtur një grup të vogël krahasimi me vendet që të interesojnë më shumë. Është e dobishme për krahasime të shpejta, por vlerat duhen parë si orientim i përgjithshëm i çmimit.",
   nearbyGuidance:
     "Pikat afër janë opsionale dhe shërbejnë si shtresë praktike lokale mbi krahasimin sipas vendeve. Disponueshmëria e pikave dhe të dhënat e orareve mund të jenë të paplota ose të ndryshme nga ajo që shfaqet në pompë.",
+  rankingsGuidance:
+    "Renditjet tregojnë nivelet relative të çmimeve të karburantit mes vendeve për llojin e zgjedhur të karburantit. Janë të dobishme për të dalluar shpejt ndryshimet e tregut, por çmimet lokale të pikave mund të ndryshojnë.",
 
   sourceUpdatedLabel: "Përditësuar",
   sourceCardSubtitle: "Informacion mbi burimin dhe si duhen interpretuar këto shifra të karburantit.",
@@ -147,6 +149,9 @@ export const sq = {
 
   // Navigation & Footer
   navHome: "Kryefaqja",
+  navStations: "Pikat",
+  navCompare: "Krahaso",
+  navRankings: "Renditje",
   navAbout: "Rreth nesh",
   navContact: "Kontakt",
   navPrivacy: "Politika e Privatësisë",

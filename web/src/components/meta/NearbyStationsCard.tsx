@@ -77,7 +77,14 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
               onClick={onRefresh}
               disabled={!loc.coords || nearby.loading}
             >
-              {nearby.loading ? "…" : t.stationsRefresh}
+              {nearby.loading ? (
+                <>
+                  <span className="spinner spinnerSm" aria-hidden="true" />
+                  {t.refreshing}
+                </>
+              ) : (
+                t.stationsRefresh
+              )}
             </button>
           </div>
         </div>
@@ -140,7 +147,16 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
           </div>
         ) : (
           <div className="nearbyControlBar">
-            <div className="badge">{t.stationsShowing(shown.length, nearby.totalCount)}</div>
+            <div className="badge">
+              {nearby.loading ? (
+                <span className="inlineLoading">
+                  <span className="spinner spinnerSm" aria-hidden="true" />
+                  {t.refreshing}
+                </span>
+              ) : (
+                t.stationsShowing(shown.length, nearby.totalCount)
+              )}
+            </div>
 
             <div className="segRow nearbyActionRow">
               {showActions ? (
@@ -189,6 +205,13 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
         {loc.coords ? (
           <div className="tableWrap nearbyTableWrap">
             <div className="table nearbyTable">
+              {nearby.loading && shown.length === 0 ? (
+                <div className="mutedBox nearbyLoadingBox">
+                  <span className="spinner" aria-hidden="true" />
+                  <span>{t.refreshing}</span>
+                </div>
+              ) : null}
+
               {nearby.stations.length === 0 && !nearby.loading ? (
                 <div className="mutedBox">{t.stationsNone}</div>
               ) : null}

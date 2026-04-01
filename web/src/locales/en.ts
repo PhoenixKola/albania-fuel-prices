@@ -136,6 +136,8 @@ export const en = {
     "Use the watchlist to keep a small comparison set of countries you care about most. This is helpful for quick side-by-side checks, but the values should still be read as general price guidance rather than a station-by-station guarantee.",
   nearbyGuidance:
     "Nearby stations are optional and meant as a local convenience layer on top of the country comparison. Station availability and opening-hour data may be incomplete or vary from what is shown at the pump.",
+  rankingsGuidance:
+    "Rankings show relative fuel price levels across countries for the selected fuel type. They are useful for spotting market differences quickly, but local station prices can still vary.",
 
   sourceUpdatedLabel: "Updated",
   sourceCardSubtitle: "Source information and how these fuel figures should be interpreted.",
@@ -147,6 +149,9 @@ export const en = {
 
   // Navigation & Footer
   navHome: "Home",
+  navStations: "Stations",
+  navCompare: "Compare",
+  navRankings: "Rankings",
   navAbout: "About",
   navContact: "Contact",
   navPrivacy: "Privacy Policy",

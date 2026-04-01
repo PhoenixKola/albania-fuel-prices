@@ -126,6 +126,7 @@ export type TDict = {
 
   watchlistGuidance: string;
   nearbyGuidance: string;
+  rankingsGuidance: string;
 
   sourceUpdatedLabel: string;
   sourceCardSubtitle: string;
@@ -135,6 +136,9 @@ export type TDict = {
 
   // Navigation & Footer
   navHome: string;
+  navStations: string;
+  navCompare: string;
+  navRankings: string;
   navAbout: string;
   navContact: string;
   navPrivacy: string;

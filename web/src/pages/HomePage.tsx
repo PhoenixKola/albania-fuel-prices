@@ -1,29 +1,15 @@
-import { useEffect } from "react";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
-import type { FuelType } from "../models/fuel";
+import type { CountryPrices, LatestEurope } from "../models/fuel";
 import type { TDict } from "../locales";
-import { useLocalStorageState } from "../hooks/useLocalStorageState";
-import { useFuelData } from "../hooks/useFuelData";
-import { useWatchlist } from "../hooks/useWatchlist";
-import { useToast } from "../hooks/useToast";
-import { useFxRates } from "../hooks/useFxRates";
-import {
-  DATA_URL,
-  STORAGE_COUNTRY_KEY,
-  STORAGE_CURRENCY_KEY,
-  STORAGE_FUELTYPE_KEY,
-  STORAGE_STATIONS_RADIUS_KEY,
-} from "../config/constants";
+import type { FxRates } from "../utils/currency";
 
 import AdBar from "../components/ads/AdBar";
 import FuelCard from "../components/fuel/FuelCard";
+import CurrencyModeCard from "../components/fuel/CurrencyModeCard";
 import SourceCard from "../components/meta/SourceCard";
 import Notice from "../components/feedback/Notice";
 import ToastHost from "../components/feedback/ToastHost";
-import WatchlistCard from "../components/fuel/WatchlistCard";
-import RankingCard from "../components/fuel/RankingCard";
-import NearbyStationsCard from "../components/meta/NearbyStationsCard";
 
 import HeroIntro from "../components/content/HeroIntro";
 import EditorialSummary from "../components/content/EditorialSummary";
@@ -33,42 +19,38 @@ import FaqSection from "../components/content/FaqSection";
 type Props = {
   t: TDict;
   lang: Lang;
-  setSubtitle: (s: string) => void;
+  data: LatestEurope | null;
+  error: string;
+  loading: boolean;
+  countries: string[];
+  country: string;
+  selected: CountryPrices | null;
+  setCountry: (c: string) => void;
+  currency: Currency;
+  setCurrency: (c: Currency) => void;
+  fxRates: FxRates | null;
+  toast: string | null;
+  show: (msg: string) => void;
+  refresh: () => void;
 };
 
-export default function HomePage({ t, lang, setSubtitle }: Props) {
-  const [country, setCountry] = useLocalStorageState<string>(STORAGE_COUNTRY_KEY, "Albania");
-
-  const [fuelType, setFuelType] = useLocalStorageState<FuelType>(STORAGE_FUELTYPE_KEY, "diesel", {
-    deserialize: (raw) => (raw === "gasoline95" || raw === "lpg" || raw === "diesel" ? raw : "diesel"),
-  });
-
-  const [currency, setCurrency] = useLocalStorageState<Currency>(STORAGE_CURRENCY_KEY, "eur", {
-    deserialize: (raw) => (raw === "local" ? "local" : "eur"),
-  });
-
-  const [radiusM, setRadiusM] = useLocalStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
-    deserialize: (raw) => {
-      const n = Number(raw);
-      return n === 2000 || n === 5000 || n === 10000 ? n : 5000;
-    },
-    serialize: (v) => String(v),
-  });
-
-  const { data, error, loading, countries, selected, refresh } = useFuelData({
-    url: DATA_URL,
-    country,
-    setCountry,
-  });
-
-  const fx = useFxRates();
-  const { watchlist, add, remove, has } = useWatchlist();
-  const { toast, show } = useToast();
-
-  useEffect(() => {
-    setSubtitle(data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading);
-  }, [data, t, setSubtitle]);
-
+export default function HomePage({
+  t,
+  lang,
+  data,
+  error,
+  loading,
+  countries,
+  country,
+  selected,
+  setCountry,
+  currency,
+  setCurrency,
+  fxRates,
+  toast,
+  show,
+  refresh,
+}: Props) {
   const copyText = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -109,87 +91,23 @@ export default function HomePage({ t, lang, setSubtitle }: Props) {
 
       <EditorialSummary t={t} items={editorialItems} />
 
-      <div className="card pageIntroCard">
-        <div className="body pageIntroBody">
-          <div className="pageIntroContent">
-            <div className="pageIntroText">
-              <div className="cardTitle">{t.currencyMode}</div>
-              <div className="cardSubtle">{country}</div>
-            </div>
-
-            <div className="segRow pageIntroSeg">
-              <button
-                type="button"
-                className={`seg ${currency === "eur" ? "segActive" : ""}`}
-                onClick={() => setCurrency("eur")}
-              >
-                {t.currencyEUR}
-              </button>
-              <button
-                type="button"
-                className={`seg ${currency === "local" ? "segActive" : ""}`}
-                onClick={() => setCurrency("local")}
-              >
-                {t.currencyLocal}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CurrencyModeCard t={t} country={country} currency={currency} setCurrency={setCurrency} />
 
       {error ? <Notice t={t} message={error} onRetry={refresh} /> : null}
 
-      <div className="grid">
-        <div className="mainCol">
-          <FuelCard
-            t={t}
-            data={data}
-            loading={loading}
-            countries={countries}
-            country={country}
-            selected={selected}
-            onSelectCountry={setCountry}
-            currency={currency}
-            fxRates={fx.rates}
-            onCopy={copyText}
-            onShare={shareText}
-          />
-
-          <NearbyStationsCard t={t} radiusM={radiusM} setRadiusM={setRadiusM} />
-        </div>
-
-        <div className="sideCol">
-          <WatchlistCard
-            t={t}
-            data={data}
-            watchlist={watchlist}
-            has={has}
-            current={country}
-            onAdd={(c) => {
-              add(c);
-              show(`${t.addToWatchlist}: ${c}`);
-            }}
-            onRemove={(c) => {
-              remove(c);
-              show(`${t.remove}: ${c}`);
-            }}
-            onOpen={setCountry}
-            fuelType={fuelType}
-            currency={currency}
-            fxRates={fx.rates}
-          />
-
-          <RankingCard
-            t={t}
-            data={data}
-            fuelType={fuelType}
-            setFuelType={setFuelType}
-            currency={currency}
-            fxRates={fx.rates}
-            onOpen={setCountry}
-          />
-        </div>
-      </div>
+      <FuelCard
+        t={t}
+        data={data}
+        loading={loading}
+        countries={countries}
+        country={country}
+        selected={selected}
+        onSelectCountry={setCountry}
+        currency={currency}
+        fxRates={fxRates}
+        onCopy={copyText}
+        onShare={shareText}
+      />
 
       <MethodologySection
         t={t}

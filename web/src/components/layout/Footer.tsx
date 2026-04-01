@@ -19,6 +19,9 @@ export default function Footer({ t }: Props) {
 
           <nav className="footerNav" aria-label="Footer navigation">
             <Link to="/" className="footerLink">{t.navHome}</Link>
+            {/* <Link to="/stations" className="footerLink">{t.navStations}</Link>
+            <Link to="/compare" className="footerLink">{t.navCompare}</Link>
+            <Link to="/rankings" className="footerLink">{t.navRankings}</Link> */}
             <Link to="/about" className="footerLink">{t.navAbout}</Link>
             <Link to="/contact" className="footerLink">{t.navContact}</Link>
             <Link to="/privacy" className="footerLink">{t.navPrivacy}</Link>
