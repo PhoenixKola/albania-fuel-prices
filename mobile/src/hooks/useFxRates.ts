@@ -6,7 +6,7 @@ type FxCache = {
   fetchedAtUtc: string;
   date: string;
   base: "EUR";
-  rates: Record<string, number>; // UPPERCASE keys: ALL, USD, GBP...
+  rates: Record<string, number>;
 };
 
 const FX_URL = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json";

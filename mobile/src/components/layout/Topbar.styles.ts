@@ -56,6 +56,26 @@ export const makeTopBarStyles = (theme: Theme) =>
       lineHeight: 18
     },
 
+    rewardStatus: {
+      marginTop: 2,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      height: 32,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      flexShrink: 0
+    },
+
+    rewardStatusText: {
+      color: theme.colors.text,
+      fontWeight: "900",
+      fontSize: 11
+    },
+
     actions: {
       flexDirection: "row",
       alignItems: "center",

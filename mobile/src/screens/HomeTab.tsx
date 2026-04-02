@@ -28,12 +28,17 @@ export default function HomeTab() {
           theme={ctx.theme}
           title={ctx.t.title}
           subtitle={ctx.data ? ctx.t.subtitleAsOf(ctx.data.as_of) : ctx.t.subtitleLoading}
+          t={ctx.t}
+          rewardEnabled={ctx.reward.unlocked}
         />
 
         <FeedbackCurrencyBar
           theme={ctx.theme}
           t={ctx.t}
           onFeedbackPress={ctx.openFeedback}
+          onUnlockPress={() => ctx.openRewardModal()}
+          unlockDisabled={!ctx.canAskReward || ctx.reward.unlocked}
+          rewardUnlocked={ctx.reward.unlocked}
           headerBtnStyle={s.headerBtn}
           headerBtnTextStyle={s.headerBtnText}
         />

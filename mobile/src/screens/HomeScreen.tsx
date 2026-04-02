@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Linking, RefreshControl, ScrollView, StatusBar, View } from "react-native";
+import { Alert, Linking, RefreshControl, ScrollView, StatusBar, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import mobileAds, { TestIds } from "react-native-google-mobile-ads";
 
@@ -236,20 +236,38 @@ export default function HomeScreen() {
     rate.track("open_map");
   };
 
+  const tryOpenUrl = async (url: string) => {
+    try {
+      await Linking.openURL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const openFeedback = async () => {
     const subject = encodeURIComponent("Fuel app feedback");
     const body = encodeURIComponent("Hi! I have feedback:\n\n");
-    const mailto = `mailto:fenixkola@gmail.com?subject=${subject}&body=${body}`;
-    const ok = await Linking.canOpenURL(mailto);
-    if (ok) await Linking.openURL(mailto);
+    const to = "fenixkola@gmail.com";
+    const mailto = `mailto:${to}?subject=${subject}&body=${body}`;
+    const opened = await tryOpenUrl(mailto);
+    if (opened) return;
+
+    const gmailCompose = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${subject}&body=${body}`;
+    const openedGmail = await tryOpenUrl(gmailCompose);
+    if (!openedGmail) {
+      Alert.alert("No email app found", "Please send feedback manually to fenixkola@gmail.com.");
+    }
   };
 
   const openStoreReview = async () => {
     rate.markRated();
     setRateOpen(false);
     const url = PLAY_STORE_URL;
-    const ok = await Linking.canOpenURL(url);
-    if (ok) await Linking.openURL(url);
+    const opened = await tryOpenUrl(url);
+    if (!opened) {
+      Alert.alert("Could not open store", "Please open Google Play and search for Karburanti Sot.");
+    }
   };
 
   const currency = useMemo(() => getCurrencyForCountry(country), [country]);
@@ -269,12 +287,17 @@ export default function HomeScreen() {
           theme={theme}
           title={t.title}
           subtitle={data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading}
+          t={t}
+          rewardEnabled={reward.unlocked}
         />
 
         <FeedbackCurrencyBar
           theme={theme}
           t={t}
           onFeedbackPress={openFeedback}
+          onUnlockPress={() => openRewardModal()}
+          unlockDisabled={!canAskReward || reward.unlocked}
+          rewardUnlocked={reward.unlocked}
           headerBtnStyle={s.headerBtn}
           headerBtnTextStyle={s.headerBtnText}
         />

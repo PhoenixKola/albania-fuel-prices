@@ -21,10 +21,9 @@ function safeParseStringArray(raw: string | null) {
   }
 }
 
-async function openInMaps(lat: number, lon: number, label: string) {
-  const q = encodeURIComponent(label);
+async function openInMaps(lat: number, lon: number) {
   const ll = `${lat},${lon}`;
-  const url = `https://www.google.com/maps/search/?api=1&query=${ll}(${q})`;
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ll)}`;
   try {
     await Linking.openURL(url);
   } catch {}
@@ -115,7 +114,7 @@ export default function StationsCard(props: {
 
   const openStation = async (st: Station) => {
     props.onOpenExternalMap?.();
-    await openInMaps(st.lat, st.lon, st.name);
+    await openInMaps(st.lat, st.lon);
   };
 
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar, View } from "react-native";
+import { StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -8,6 +8,7 @@ import { useApp } from "../context/AppContext";
 import BottomTabBar from "../components/layout/BottomTabBar";
 import RewardUnlockModal from "../components/ads/RewardUnlockModal";
 import RateAppModal from "../components/feedback/RateAppModal";
+import GlobalToast from "../components/ui/GlobalToast";
 
 import HomeTab from "../screens/HomeTab";
 import StationsTab from "../screens/StationsTab";
@@ -63,6 +64,8 @@ export default function TabNavigator() {
           ctx.rate.snooze();
         }}
       />
+
+      <GlobalToast theme={ctx.theme} message={ctx.toastMessage} />
     </SafeAreaView>
   );
 }

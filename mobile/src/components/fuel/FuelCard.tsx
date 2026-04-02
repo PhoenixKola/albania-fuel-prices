@@ -114,11 +114,11 @@ export default function FuelCard(props: {
     return formatMoney(local, currency);
   };
 
-  const fmtDelta = (currentEur: number | null | undefined, baseEur: number | null | undefined) => {
-    if (currentEur == null || baseEur == null) return "—";
+  const fmtDelta = (currentEur: number | null | undefined, prevEur: number | null | undefined) => {
+    if (currentEur == null || prevEur == null) return "—";
 
-    const diffEur = currentEur - baseEur;
-    if (!Number.isFinite(diffEur) || Math.abs(diffEur) < 0.001) return "—";
+    const diffEur = currentEur - prevEur;
+    if (!Number.isFinite(diffEur) || Math.abs(diffEur) < 0.0001) return "—";
 
     const sign = diffEur > 0 ? "+" : "-";
     const absEur = Math.abs(diffEur);
@@ -132,9 +132,13 @@ export default function FuelCard(props: {
     return `${sign}${formatMoney(absLocal, currency)}`;
   };
 
-  const baseDiesel = baseline?.diesel_eur ?? props.prevSelected?.diesel_eur ?? null;
-  const baseGas = baseline?.gasoline95_eur ?? props.prevSelected?.gasoline95_eur ?? null;
-  const baseLpg = baseline?.lpg_eur ?? props.prevSelected?.lpg_eur ?? null;
+  // const baseDiesel = baseline?.diesel_eur ?? props.prevSelected?.diesel_eur ?? null;
+  // const baseGas = baseline?.gasoline95_eur ?? props.prevSelected?.gasoline95_eur ?? null;
+  // const baseLpg = baseline?.lpg_eur ?? props.prevSelected?.lpg_eur ?? null;
+
+  const baseDiesel = props.prevSelected?.diesel_eur ?? null;
+  const baseGas = props.prevSelected?.gasoline95_eur ?? null;
+  const baseLpg = props.prevSelected?.lpg_eur ?? null;
 
   const onShare = async () => {
     const fuelName = fuelLabel(props.fuelType, props.t);

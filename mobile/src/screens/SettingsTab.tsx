@@ -49,7 +49,7 @@ export default function SettingsTab() {
                 scaleIn={0.97}
               >
                 <Ionicons name="sunny-outline" size={14} color={!isDark ? ctx.theme.colors.primaryText : ctx.theme.colors.text} />
-                <Text style={[s.pillText, !isDark ? s.pillTextActive : null]}>Light</Text>
+                <Text style={[s.pillText, !isDark ? s.pillTextActive : null]}>{ctx.t.themeLight}</Text>
               </AnimatedPressable>
               <AnimatedPressable
                 onPress={() => isDark || ctx.toggleTheme()}
@@ -57,7 +57,7 @@ export default function SettingsTab() {
                 scaleIn={0.97}
               >
                 <Ionicons name="moon-outline" size={14} color={isDark ? ctx.theme.colors.primaryText : ctx.theme.colors.text} />
-                <Text style={[s.pillText, isDark ? s.pillTextActive : null]}>Dark</Text>
+                <Text style={[s.pillText, isDark ? s.pillTextActive : null]}>{ctx.t.themeDark}</Text>
               </AnimatedPressable>
             </View>
           </View>
@@ -85,7 +85,7 @@ export default function SettingsTab() {
                 contentStyle={[s.pill, ctx.lang === "sq" ? s.pillActive : null]}
                 scaleIn={0.97}
               >
-                <Text style={[s.pillText, ctx.lang === "sq" ? s.pillTextActive : null]}>SQ</Text>
+                <Text style={[s.pillText, ctx.lang === "sq" ? s.pillTextActive : null]}>AL</Text>
               </AnimatedPressable>
             </View>
           </View>
@@ -218,10 +218,10 @@ export default function SettingsTab() {
         </View>
 
         {/* Footer */}
-        <View style={s.footer}>
+        {/* <View style={s.footer}>
           <Text style={s.footerText}>Europe Fuel Prices</Text>
           <Text style={s.footerVersion}>{(ctx.t as any).version ?? "Version"} 1.0.0</Text>
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );

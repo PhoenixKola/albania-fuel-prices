@@ -98,6 +98,9 @@ export type TDict = {
   rateNow: string;
   rateLater: string;
   feedback: string;
+  unlockRewards: string;
+  unlockLater: string;
+  rewardsEnabled: string;
   unlockMoreRankingsTitle: string;
   unlockMoreRankingsSubtitle: string;
 
@@ -105,15 +108,28 @@ export type TDict = {
   settingsTitle: string;
   settingsSubtitle: string;
   appearance: string;
+  themeLight: string;
+  themeDark: string;
   darkMode: string;
   darkModeOn: string;
   darkModeOff: string;
   language: string;
+  extraFeaturesOn: string;
   dataSource: string;
   rateApp: string;
   rateAppSubtitle: string;
   feedbackSubtitle: string;
   feedbackSupport: string;
+  toastThemeLight: string;
+  toastThemeDark: string;
+  toastLanguageChanged: string;
+  toastCurrencyEUR: string;
+  toastCurrencyLocal: string;
+  toastRefreshing: string;
+  toastOpeningFeedback: string;
+  toastOpeningStore: string;
+  toastRewardsUnlocked: string;
+  toastRewardsLater: string;
   version: string;
   allCountries: string;
   favorites: string;
@@ -218,6 +234,9 @@ export const i18n: Record<Lang, TDict> = {
     rateNow: "Rate now",
     rateLater: "Not now",
     feedback: "Feedback",
+    unlockRewards: "Unlock rewards",
+    unlockLater: "Unlock later",
+    rewardsEnabled: "Rewards enabled",
     unlockMoreRankingsTitle: "Unlock more rankings",
     unlockMoreRankingsSubtitle: "Watch a rewarded ad to unlock more.",
 
@@ -225,15 +244,28 @@ export const i18n: Record<Lang, TDict> = {
     settingsTitle: "Settings",
     settingsSubtitle: "Customize your experience",
     appearance: "Appearance",
+    themeLight: "Light",
+    themeDark: "Dark",
     darkMode: "Dark Mode",
     darkModeOn: "On",
     darkModeOff: "Off",
     language: "Language",
+    extraFeaturesOn: "Extra ON",
     dataSource: "Data & Sources",
     rateApp: "Rate App",
     rateAppSubtitle: "Rate us on Google Play",
     feedbackSubtitle: "Send us your thoughts",
     feedbackSupport: "Feedback & Support",
+    toastThemeLight: "Switched to light theme",
+    toastThemeDark: "Switched to dark theme",
+    toastLanguageChanged: "Language updated",
+    toastCurrencyEUR: "Currency set to EUR",
+    toastCurrencyLocal: "Currency set to local",
+    toastRefreshing: "Refreshing data...",
+    toastOpeningFeedback: "Opening feedback",
+    toastOpeningStore: "Opening store",
+    toastRewardsUnlocked: "Extra features unlocked",
+    toastRewardsLater: "Maybe later",
     version: "Version",
     allCountries: "All",
     favorites: "Favorites",
@@ -336,6 +368,9 @@ export const i18n: Record<Lang, TDict> = {
     rateNow: "Vlerëso tani",
     rateLater: "Jo tani",
     feedback: "Sugjerim",
+    unlockRewards: "Zhblloko shpërblimet",
+    unlockLater: "Më vonë",
+    rewardsEnabled: "Shpërblimet aktive",
     unlockMoreRankingsTitle: "Zhblloko më shumë renditje",
     unlockMoreRankingsSubtitle: "Shiko një reklamë për të zhbllokuar më shumë renditje.",
 
@@ -343,15 +378,28 @@ export const i18n: Record<Lang, TDict> = {
     settingsTitle: "Cilësimet",
     settingsSubtitle: "Personalizo eksperiencën",
     appearance: "Pamja",
+    themeLight: "E çelët",
+    themeDark: "E errët",
     darkMode: "Modaliteti i errët",
     darkModeOn: "Aktiv",
     darkModeOff: "Joaktiv",
     language: "Gjuha",
+    extraFeaturesOn: "Extra ON",
     dataSource: "Të dhënat & Burimet",
     rateApp: "Vlerëso aplikacionin",
     rateAppSubtitle: "Vlerëso në Google Play",
     feedbackSubtitle: "Na dërgo mendimet e tua",
     feedbackSupport: "Sugjerime & Mbështetje",
+    toastThemeLight: "Kalove në temën e çelët",
+    toastThemeDark: "Kalove në temën e errët",
+    toastLanguageChanged: "Gjuha u përditësua",
+    toastCurrencyEUR: "Monedha u vendos në EUR",
+    toastCurrencyLocal: "Monedha u vendos në vendase",
+    toastRefreshing: "Po rifreskohen të dhënat...",
+    toastOpeningFeedback: "Po hapet feedback",
+    toastOpeningStore: "Po hapet dyqani",
+    toastRewardsUnlocked: "Veçoritë extra u zhbllokuan",
+    toastRewardsLater: "Ndoshta më vonë",
     version: "Versioni",
     allCountries: "Të gjitha",
     favorites: "Të preferuarat",

@@ -162,8 +162,8 @@ export default function RankingCard(props: {
 
   return (
     <View style={s.card}>
-      <View style={s.headerRow}>
-        {/* <View style={s.headerLeft}>
+      {/* <View style={s.headerRow}>
+        <View style={s.headerLeft}>
           <View style={s.headerIcon}>
             <Ionicons name="podium-outline" size={18} color={props.theme.colors.linkText} />
           </View>
@@ -174,7 +174,7 @@ export default function RankingCard(props: {
               {props.t.rankingsSubtitle(fuelName)}
             </Text>
           </View>
-        </View> */}
+        </View>
 
         <View style={s.headerPills}>
           <View style={s.pill}>
@@ -202,7 +202,7 @@ export default function RankingCard(props: {
             </Text>
           </View>
         </View>
-      </View>
+      </View> */}
 
       <SegmentedControl theme={props.theme} value={props.fuelType} items={fuelItems} onChange={props.setFuelType} />
 

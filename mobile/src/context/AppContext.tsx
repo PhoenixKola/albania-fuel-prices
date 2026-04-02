@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Linking } from "react-native";
+import { Alert, Linking } from "react-native";
 import mobileAds, { TestIds } from "react-native-google-mobile-ads";
 import { useReturnInterstitial } from "../hooks/useReturnInterstitial";
 import { useRewardUnlock } from "../hooks/useRewardUnlock";
@@ -114,6 +114,8 @@ type AppContextType = {
   setRateOpen: (v: boolean) => void;
   openStoreReview: () => Promise<void>;
   openFeedback: () => Promise<void>;
+  showToast: (message: string, durationMs?: number) => void;
+  toastMessage: string | null;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -199,7 +201,50 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCompareCountries((p) => p.filter((x) => exists.has(x)));
   }, [data?.countries?.length, setFavorites, setCompareCountries]);
 
-  const toggleLang = () => setLang((p) => (p === "en" ? "sq" : "en"));
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = useCallback((message: string, durationMs = 1800) => {
+    setToastMessage(message);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToastMessage(null);
+      toastTimerRef.current = null;
+    }, durationMs);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  const toggleThemeTracked = useCallback(() => {
+    const next = themeName === "light" ? "dark" : "light";
+    toggleTheme();
+    showToast(next === "dark" ? t.toastThemeDark : t.toastThemeLight);
+  }, [themeName, toggleTheme, showToast, t]);
+
+  const setLangTracked = useCallback<AppContextType["setLang"]>(
+    (next) => {
+      const nextLang = typeof next === "function" ? next(lang) : next;
+      setLang(next);
+      if (nextLang !== lang) showToast(t.toastLanguageChanged);
+    },
+    [lang, setLang, showToast, t]
+  );
+
+  const setCurrencyModeTracked = useCallback<AppContextType["setCurrencyMode"]>(
+    (next) => {
+      const nextMode = typeof next === "function" ? next(currencyMode) : next;
+      setCurrencyMode(next);
+      if (nextMode === currencyMode) return;
+      showToast(nextMode === "eur" ? t.toastCurrencyEUR : t.toastCurrencyLocal);
+    },
+    [currencyMode, setCurrencyMode, showToast, t]
+  );
+
+  const toggleLang = useCallback(() => setLangTracked((p) => (p === "en" ? "sq" : "en")), [setLangTracked]);
 
   const toggleFavorite = (c: string) => {
     setFavorites((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c, ...prev]));
@@ -263,20 +308,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const onRewardContinue = useCallback(() => {
     const act = pendingActionRef.current;
     closeRewardModal(true);
+    showToast(t.toastRewardsLater);
     act?.();
-  }, [closeRewardModal]);
+  }, [closeRewardModal, showToast, t]);
 
   const onRewardWatch = useCallback(async () => {
     await reward.showRewardedAndUnlock();
     const act = pendingActionRef.current;
     closeRewardModal(false);
+    showToast(t.toastRewardsUnlocked);
     act?.();
-  }, [reward, closeRewardModal]);
+  }, [reward, closeRewardModal, showToast, t]);
 
   const refreshAll = useCallback(() => {
+    showToast(t.toastRefreshing);
     nearby.refresh?.();
     refresh();
-  }, [nearby.refresh, refresh]);
+  }, [nearby.refresh, refresh, showToast, t]);
 
   const [rateOpen, setRateOpen] = useState(false);
 
@@ -297,21 +345,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     rate.track("open_map");
   }, [markMapsOpened, rate]);
 
-  const openFeedback = useCallback(async () => {
-    const subject = encodeURIComponent("Fuel app feedback");
-    const body = encodeURIComponent("Hi! I have feedback:\n\n");
-    const mailto = `mailto:fenixkola@gmail.com?subject=${subject}&body=${body}`;
-    const ok = await Linking.canOpenURL(mailto);
-    if (ok) await Linking.openURL(mailto);
+  const tryOpenUrl = useCallback(async (url: string) => {
+    try {
+      await Linking.openURL(url);
+      return true;
+    } catch {
+      return false;
+    }
   }, []);
 
+  const openFeedback = useCallback(async () => {
+    showToast(t.toastOpeningFeedback);
+    const subject = encodeURIComponent("Fuel app feedback");
+    const body = encodeURIComponent("Hi! I have feedback:\n\n");
+    const to = "fenixkola@gmail.com";
+    const mailto = `mailto:${to}?subject=${subject}&body=${body}`;
+    const opened = await tryOpenUrl(mailto);
+    if (opened) return;
+
+    const gmailCompose = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${subject}&body=${body}`;
+    const openedGmail = await tryOpenUrl(gmailCompose);
+    if (!openedGmail) {
+      Alert.alert("No email app found", "Please send feedback manually to fenixkola@gmail.com.");
+    }
+  }, [showToast, t, tryOpenUrl]);
+
   const openStoreReview = useCallback(async () => {
+    showToast(t.toastOpeningStore);
     rate.markRated();
     setRateOpen(false);
     const url = PLAY_STORE_URL;
-    const ok = await Linking.canOpenURL(url);
-    if (ok) await Linking.openURL(url);
-  }, [rate]);
+    const opened = await tryOpenUrl(url);
+    if (!opened) {
+      Alert.alert("Could not open store", "Please open Google Play and search for Karburanti Sot.");
+    }
+  }, [rate, showToast, t, tryOpenUrl]);
 
   const currency = useMemo(() => getCurrencyForCountry(country), [country]);
   const canLocal = useMemo(() => currency !== "EUR" && hasRate(currency, fx.rates), [currency, fx.rates]);
@@ -321,9 +389,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     () => ({
       theme,
       themeName,
-      toggleTheme,
+      toggleTheme: toggleThemeTracked,
       lang,
-      setLang,
+      setLang: setLangTracked,
       toggleLang,
       t,
       country,
@@ -339,7 +407,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       applyCompareSet,
       maxCompare,
       currencyMode,
-      setCurrencyMode,
+      setCurrencyMode: setCurrencyModeTracked,
       effectiveCurrencyMode,
       currency,
       canLocal,
@@ -372,13 +440,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setRateOpen,
       openStoreReview,
       openFeedback,
+      showToast,
+      toastMessage,
     }),
     [
       theme,
       themeName,
-      toggleTheme,
+      toggleThemeTracked,
       lang,
-      setLang,
+      setLangTracked,
       toggleLang,
       t,
       country,
@@ -390,7 +460,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       compareCountries,
       maxCompare,
       currencyMode,
-      setCurrencyMode,
+      setCurrencyModeTracked,
       effectiveCurrencyMode,
       currency,
       canLocal,
@@ -423,6 +493,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setRateOpen,
       openStoreReview,
       openFeedback,
+      showToast,
+      toastMessage,
       toggleFavorite,
     ]
   );
