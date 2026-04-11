@@ -30,6 +30,10 @@ import AboutPage from "../pages/AboutPage";
 import ContactPage from "../pages/ContactPage";
 import PrivacyPage from "../pages/PrivacyPage";
 import TermsPage from "../pages/TermsPage";
+import MethodologyPage from "../pages/MethodologyPage";
+import HowFuelPricesWorkPage from "../pages/HowFuelPricesWorkPage";
+import EuropeFuelComparisonPage from "../pages/EuropeFuelComparisonPage";
+import RoadTripFuelGuidePage from "../pages/RoadTripFuelGuidePage";
 import NotFoundPage from "../pages/NotFoundPage";
 
 import logo from "../assets/logo.png";
@@ -182,6 +186,10 @@ export default function App() {
           <Route path="/contact" element={<ContactPage t={t} />} />
           <Route path="/privacy" element={<PrivacyPage t={t} />} />
           <Route path="/terms" element={<TermsPage t={t} />} />
+          <Route path="/methodology" element={<MethodologyPage t={t} />} />
+          <Route path="/how-fuel-prices-work" element={<HowFuelPricesWorkPage t={t} />} />
+          <Route path="/europe-fuel-comparison" element={<EuropeFuelComparisonPage t={t} />} />
+          <Route path="/road-trip-fuel-guide" element={<RoadTripFuelGuidePage t={t} />} />
           <Route path="*" element={<NotFoundPage t={t} />} />
         </Routes>
 

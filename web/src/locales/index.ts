@@ -239,6 +239,138 @@ export type TDict = {
   notFoundSubtitle: string;
   notFoundMessage: string;
   notFoundButtonHome: string;
+
+  // Guide navigation
+  navMethodology: string;
+  navHowPricesWork: string;
+  navEuropeComparison: string;
+  navRoadTripGuide: string;
+  footerGuidesHeading: string;
+
+  // Stations page editorial
+  stationsEditorialTitle: string;
+  stationsEditorialP1: string;
+  stationsEditorialP2: string;
+  stationsEditorialP3: string;
+  stationsEditorialTipTitle: string;
+  stationsEditorialTip: string;
+
+  // Compare page editorial
+  compareEditorialTitle: string;
+  compareEditorialP1: string;
+  compareEditorialP2: string;
+  compareEditorialP3: string;
+  compareEditorialTipTitle: string;
+  compareEditorialTip: string;
+
+  // Rankings page editorial
+  rankingsEditorialTitle: string;
+  rankingsEditorialP1: string;
+  rankingsEditorialP2: string;
+  rankingsEditorialP3: string;
+  rankingsEditorialP4: string;
+
+  // Methodology page
+  methodologyPageTitle: string;
+  methodologyPageIntro: string;
+  methodologySourcesTitle: string;
+  methodologySourcesP1: string;
+  methodologySourcesP2: string;
+  methodologyProcessTitle: string;
+  methodologyProcessP1: string;
+  methodologyProcessP2: string;
+  methodologyFxTitle: string;
+  methodologyFxP1: string;
+  methodologyFxP2: string;
+  methodologyAccuracyTitle: string;
+  methodologyAccuracyP1: string;
+  methodologyAccuracyP2: string;
+  methodologyUpdateTitle: string;
+  methodologyUpdateP1: string;
+  methodologyEditorialTitle: string;
+  methodologyEditorialP1: string;
+  methodologyEditorialP2: string;
+  methodologyOpenTitle: string;
+  methodologyOpenP1: string;
+
+  // How Fuel Prices Work page
+  howPricesTitle: string;
+  howPricesIntro: string;
+  howPricesCrudeTitle: string;
+  howPricesCrudeP1: string;
+  howPricesCrudeP2: string;
+  howPricesRefiningTitle: string;
+  howPricesRefiningP1: string;
+  howPricesRefiningP2: string;
+  howPricesDistributionTitle: string;
+  howPricesDistributionP1: string;
+  howPricesDistributionP2: string;
+  howPricesTaxTitle: string;
+  howPricesTaxP1: string;
+  howPricesTaxP2: string;
+  howPricesTaxP3: string;
+  howPricesRetailTitle: string;
+  howPricesRetailP1: string;
+  howPricesRetailP2: string;
+  howPricesSeasonalTitle: string;
+  howPricesSeasonalP1: string;
+  howPricesSeasonalP2: string;
+  howPricesSummaryTitle: string;
+  howPricesSummaryP1: string;
+
+  // Europe Fuel Comparison page
+  europeCompTitle: string;
+  europeCompIntro: string;
+  europeCompWhyTitle: string;
+  europeCompWhyP1: string;
+  europeCompWhyP2: string;
+  europeCompRegionsTitle: string;
+  europeCompRegionsP1: string;
+  europeCompRegionsP2: string;
+  europeCompRegionsP3: string;
+  europeCompRegionsP4: string;
+  europeCompDieselVsPetrolTitle: string;
+  europeCompDieselVsPetrolP1: string;
+  europeCompDieselVsPetrolP2: string;
+  europeCompLpgTitle: string;
+  europeCompLpgP1: string;
+  europeCompBorderTitle: string;
+  europeCompBorderP1: string;
+  europeCompBorderP2: string;
+  europeCompExchangeTitle: string;
+  europeCompExchangeP1: string;
+  europeCompSummaryTitle: string;
+  europeCompSummaryP1: string;
+
+  // Road Trip Fuel Guide page
+  roadTripTitle: string;
+  roadTripIntro: string;
+  roadTripCalcTitle: string;
+  roadTripCalcP1: string;
+  roadTripCalcP2: string;
+  roadTripConsumptionTitle: string;
+  roadTripConsumptionP1: string;
+  roadTripConsumptionP2: string;
+  roadTripConsumptionP3: string;
+  roadTripCrossBorderTitle: string;
+  roadTripCrossBorderP1: string;
+  roadTripCrossBorderP2: string;
+  roadTripCrossBorderP3: string;
+  roadTripPaymentTitle: string;
+  roadTripPaymentP1: string;
+  roadTripPaymentP2: string;
+  roadTripSavingsTitle: string;
+  roadTripSavingsP1: string;
+  roadTripSavingsP2: string;
+  roadTripSavingsP3: string;
+  roadTripSavingsP4: string;
+  roadTripSavingsP5: string;
+  roadTripExampleTitle: string;
+  roadTripExampleP1: string;
+  roadTripExampleP2: string;
+  roadTripExampleP3: string;
+  roadTripSummaryTitle: string;
+  roadTripSummaryP1: string;
 };
 
 export const i18n = {

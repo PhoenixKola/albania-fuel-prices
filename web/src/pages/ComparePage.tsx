@@ -50,6 +50,19 @@ export default function ComparePage({
         currency={currency}
         fxRates={fxRates}
       />
+
+      <article className="contentPage">
+        <section className="contentSection">
+          <h2 className="contentHeading">{t.compareEditorialTitle}</h2>
+          <p className="contentBody">{t.compareEditorialP1}</p>
+          <p className="contentBody">{t.compareEditorialP2}</p>
+          <p className="contentBody">{t.compareEditorialP3}</p>
+        </section>
+        <section className="contentSection">
+          <h3 className="contentHeading">{t.compareEditorialTipTitle}</h3>
+          <p className="contentBody">{t.compareEditorialTip}</p>
+        </section>
+      </article>
     </>
   );
 }

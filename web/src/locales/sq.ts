@@ -285,6 +285,212 @@ export const sq = {
   termsContactP1:
     "Nëse keni pyetje rreth këtyre Kushteve të Përdorimit, na kontaktoni në fenixkola@gmail.com.",
 
+  // Guide navigation
+  navMethodology: "Metodologjia",
+  navHowPricesWork: "Si Funksionojnë Çmimet",
+  navEuropeComparison: "Krahasimi Europian",
+  navRoadTripGuide: "Guida e Udhëtimit",
+  footerGuidesHeading: "Guida",
+
+  // Stations page editorial
+  stationsEditorialTitle: "Pse çmimet e pikave afër ndryshojnë nga mesataret kombëtare",
+  stationsEditorialP1:
+    "Mesataret kombëtare të çmimeve janë të dobishme si referencë tregu, por çmimi që paguani në pompë varet nga faktorë lokal. Pikat e pavarura mund të çmojnë më agresivisht se zinxhirët e markuar, vendet në qendër të qytetit shpesh kanë çmime më të larta dhe pikat e autostradave janë zakonisht më të shtrenjtat.",
+  stationsEditorialP2:
+    "Regjimi tatimor mund të ndryshojë edhe në nivel nën-kombëtar në disa vende. Taksat rajonale, taksat mjedisore lokale ose edhe koha e dorëzimit të fundit me shumicë mund të krijojnë hendekë mes mesatares kombëtare dhe numrit në ekranin e pompës.",
+  stationsEditorialP3:
+    "Përdorimi i mjetit të pikave afër së bashku me të dhënat e vendit në faqen kryesore ju jep një pamje makro dhe mikro. Pamja makro tregon ku qëndron karburanti në një vend; pamja mikro tregon çfarë po ngarkon pompa më e afërt.",
+  stationsEditorialTipTitle: "Këshillë praktike",
+  stationsEditorialTip:
+    "Nëse jeni duke ngjitur afër një kufiri kombëtar, kontrolloni mesataret dhe pikat afër në të dyja anët. Në Ballkan veçanërisht, një devijim 10-minutësh mund të kursejë 10–20 centë për litër.",
+
+  // Compare page editorial
+  compareEditorialTitle: "Si të përdorni krahasimet mes vendeve në mënyrë efektive",
+  compareEditorialP1:
+    "Krahasimi i çmimeve mes vendeve nuk ka të bëjë vetëm me gjetjen e numrit më të ulët. Kurset e këmbimit, fuqia blerëse lokale, strukturat tatimore dhe even oraret e raportimit ndikojnë kuptimësinë e krahasimit.",
+  compareEditorialP2:
+    "Veçoria e listës së të preferuarave është dizajnuar për drejtuesit që kalojnë rregullisht kufij ose planifikojnë udhëtime në disa vende. Duke mbajtur një grup të vogël vendesh, mund të vini re shpejt kur hendekët e çmimeve zgjerohen ose ngushtohen.",
+  compareEditorialP3:
+    "Kur lexoni krahasimin, kushtojini vëmendje llojit të karburantit të zgjedhur. Nafta dhe benzina nuk levizin gjithmonë në të njëjtin drejtim. Disa vende e taksojnë naftën më lehtë, ndërsa të tjerë kanë barazuar ose përmbysur atë model.",
+  compareEditorialTipTitle: "Këshillë ndërkufitare",
+  compareEditorialTip:
+    "Nëse po planifikoni një udhëtim mes disa vendeve, mbushni rezervuarin ku çmimet janë më të ulëta dhe mbani vetëm sa mjafton karburant në vendet e shtrenjta.",
+
+  // Rankings page editorial
+  rankingsEditorialTitle: "Kuptimi i renditjeve të çmimeve të karburantit në Europë",
+  rankingsEditorialP1:
+    "Çmimet e karburantit në Europë mbulojnë një gamë të gjerë. Në krye gjeni vende me taksa të larta — zakonisht Skandinavia dhe Europa Perëndimore — ndërsa në fund gjeni vende me taksa më të ulëta ose subvencione.",
+  rankingsEditorialP2:
+    "Taksa është faktori më i madh. Në shumë vende të BE, më shumë se gjysma e çmimit final përbehet nga akciza dhe TVSH.",
+  rankingsEditorialP3:
+    "Subvencionet dhe kontrollet e çmimeve funksionojnë në drejtim të kundërt. Disa vende kufizojnë çmimet me pakicë. Këto ndërhyrje janë shpesh të përkohshme.",
+  rankingsEditorialP4:
+    "Tabela e renditjes është më e dobishme kur e krahasoni me kohën. Një vend që leviz nga mesi në krye mund të jetë duke futur taksa të reja, ndërsa një vend që bie mund të jetë duke u përgjigjur me subvencione të përkohshme.",
+
+  // Methodology page
+  methodologyPageTitle: "Metodologjia: Si Mbledh dhe Paraqet Karburanti Sot të Dhënat e Çmimeve",
+  methodologyPageIntro:
+    "Transparenca rreth mbledhjes, përpunimit dhe shfaqjes së të dhënave është thelbësore. Kjo faqe shpjegon çdo hap të tubacionit të të dhënave.",
+  methodologySourcesTitle: "Burimet e të dhënave",
+  methodologySourcesP1:
+    "Karburanti Sot merr të dhëna çmimesh nga burime publike të mirëmbajtura nga agjenci qeveritare të energjisë, zyra statistikash dhe organizma industriale.",
+  methodologySourcesP2:
+    "Burimet specifike mund të ndryshojnë me kohën ndërsa agjencitë përditësojnë formatet. Qëllimi është gjithmonë burimi më autoritar dhe i shpejtë.",
+  methodologyProcessTitle: "Përpunimi i të dhënave",
+  methodologyProcessP1:
+    "Të dhënat normalizohen: çmimet shprehen për litër dhe EUR përdoret si referencë. Vlerat në monedhë lokale ruhen gjithashtu.",
+  methodologyProcessP2:
+    "Nuk aplikohen rregullime manuale. Numrat e shfaqur janë vlerat e raportuara nga burimi, të konvertuara nëse nevojitet.",
+  methodologyFxTitle: "Konvertimet valutore",
+  methodologyFxP1:
+    "Kurset e këmbimit merren nga një API publik FX. Këto janë kurse indikative të mesit të tregut, jo kurse blerje/shitjeje bankare.",
+  methodologyFxP2:
+    "Kurset rifreskohen rregullisht, por një vonesë e vogël mes kursit të shfaqur dhe atij real është normale.",
+  methodologyAccuracyTitle: "Saktësia dhe kufizimet",
+  methodologyAccuracyP1:
+    "Çmimet në nivel vendi përfaqësojnë mesatare ose vlera referuese zyrtare. Nuk pasqyrojnë çmimin e saktë të çdo pike.",
+  methodologyAccuracyP2:
+    "Veçoria e pikave afër përdor burime të ndryshme të dhënash dhe mund të tregojë çmime më aktuale por më pak konsistente.",
+  methodologyUpdateTitle: "Frekuenca e përditësimit",
+  methodologyUpdateP1:
+    "Të dhënat rifreskohen automatikisht bazuar në orarin e publikimit të burimeve. Data e përditësimit tregon saktësisht kur u morën të dhënat.",
+  methodologyEditorialTitle: "Shtresa editoriale",
+  methodologyEditorialP1:
+    "Përtej të dhënave, faqja shton kontekst editorial. Përmbledhja ditore thekson vendet dhe diferencat. Guidat shpjegojnë tematika më të gjera.",
+  methodologyEditorialP2:
+    "Përmbajtja editoriale shkruhet nga njerëz dhe përditësohet kur ndryshojnë kushtet e tregut.",
+  methodologyOpenTitle: "Qasja e hapur",
+  methodologyOpenP1:
+    "Të dhënat vijnë nga burime publike dhe nuk kufizohen pas një muri pagesash. Metodologjia synon transparencë.",
+
+  // How Fuel Prices Work page
+  howPricesTitle: "Si Funksionojnë Çmimet e Karburantit: Nga Nafta Bruto te Pompa",
+  howPricesIntro:
+    "Çmimet e karburantit ndjekin një zinxhir që nis me nxjerrjen e naftës bruto, kalon përmes rafinimit dhe shpërndarjes, dhe përfundon në pompë me taksa dhe marzhe.",
+  howPricesCrudeTitle: "Nafta bruto: pika e nisjes",
+  howPricesCrudeP1:
+    "Çmimet globale të naftës bruto vendosin bazën. Nafta tregtohet si Brent (referenca europiane) dhe WTI (referenca amerikane).",
+  howPricesCrudeP2:
+    "Çmimet ndikhohen nga ngjarje gjeopolitike, vendime OPEC+, modelet e kërkesës, levizjet e monedhave dhe nivelet e inventarit.",
+  howPricesRefiningTitle: "Rafinimi: kthimi i naftës bruto në benzinë dhe naftë",
+  howPricesRefiningP1:
+    "Nafta bruto përpunohet në rafineri në produkte: benzinë, naftë, kerozinë, LPG etj. Marzhi i rafinimit luhatet sipas kapacitetit dhe kërkesës sezonale.",
+  howPricesRefiningP2:
+    "Europa importon produkte të rafinuara si edhe naftë bruto, kështu që kapaciteti rafinues global mund të ndikojë çmimet europiane.",
+  howPricesDistributionTitle: "Shpërndarja dhe shumica",
+  howPricesDistributionP1:
+    "Karburanti i rafinuar transportohet nga rafineri në depot rajonale dhe pastaj në pika përmes tubacioneve, kamionëve ose hekurudhave.",
+  howPricesDistributionP2:
+    "Çmimet me shumicë pasqyrojnë çmimin e produktit të rafinuar plus kostot e shpërndarjes plus një marzh të vogël.",
+  howPricesTaxTitle: "Taksat: variabli më i madh mes vendeve",
+  howPricesTaxP1:
+    "Në shumicën e vendeve europiane, taksat përbëjnë 40–60% të çmimit final. Dy komponentët kryesor janë akciza dhe TVSH.",
+  howPricesTaxP2:
+    "Kjo është arsyeja kryesore pse i njëjti karburant mund të kushtojë €1.30/L në një vend dhe €1.90/L në një tjetër.",
+  howPricesTaxP3:
+    "Disa vende aplikojnë edhe taksa të veçanta: taksa karboni, kontribute për rezerva strategjike, ose mbingarkesa mirëmbajtjeje rrugore.",
+  howPricesRetailTitle: "Marzhet e shitjes me pakicë",
+  howPricesRetailP1:
+    "Marzhi i shitjes me pakicë zakonisht është i vogël — disa centë për litër — por ndryshon sipas konkurrencës, vendndodhjes dhe markës.",
+  howPricesRetailP2:
+    "Kjo shpjegon pse mjeti i pikave afër mund të tregojë çmime të ndryshme nga mesatarja e vendit.",
+  howPricesSeasonalTitle: "Modelet sezonale dhe të kërkesës",
+  howPricesSeasonalP1:
+    "Kërkesa për benzinë rritet në verë (sezoni i udhëtimit). Kërkesa për naftë tenton të rritet në dimër në vendet ku nafta përdoret edhe për ngrohje.",
+  howPricesSeasonalP2:
+    "Fundjavet e pushimeve dhe ngjarjet e mëdha të udhëtimit mund të krijojnë rritje afatshkurtra të kërkesës.",
+  howPricesSummaryTitle: "Duke i bashkuar të gjitha",
+  howPricesSummaryP1:
+    "Çmimi i pompës është afërsisht: kosto naftë bruto + marzh rafinimi + kosto shpërndarja + akcizë + TVSH + marzh i shitjes me pakicë.",
+
+  // Europe Fuel Comparison page
+  europeCompTitle: "Çmimet e Karburantit në Europë: Guidë Krahasimi Vend për Vend",
+  europeCompIntro:
+    "Europa ka një nga variacionet më të gjera të çmimeve të karburantit. Kjo guidë shpjegon pse ekzistojnë dallimet dhe si t'i përdorni praktikisht.",
+  europeCompWhyTitle: "Pse çmimet ndryshojnë kaq shumë",
+  europeCompWhyP1:
+    "Kosto bazë e karburantit është në përgjithësi e ngjashme sepse të gjithë mbështeten të tregjet globale. Dallimet vijnë nga taksat, kostot lokale të shpërndarjes dhe ndërhyrjet qeveritare.",
+  europeCompWhyP2:
+    "BE vendos norma minimale akcize, por çdo shtet anëtar zgjedh normën e vet sipër asaj baze. Vendet jashtë BE në Ballkan kanë edhe më shumë feksibilitet.",
+  europeCompRegionsTitle: "Modelet rajonale",
+  europeCompRegionsP1:
+    "Vendet skandinave dhe të Europës Veriperëndimore (Hollandë, Finlandë, Danimarkë, Suedi, Norvegji) kanë çmimet më të larta.",
+  europeCompRegionsP2:
+    "Vendet e Europës Jugore (Spanjë, Portugali, Greqi) bien në mesin e rangut.",
+  europeCompRegionsP3:
+    "Vendet e Europës Qendrore dhe Lindore (Poloni, Hungari, Çeki, Rumani, Bullgari) kanë çmime më të ulëta.",
+  europeCompRegionsP4:
+    "Vendet e Ballkanit (Shqipëri, Kosovë, Maqedoni e Veriut, Serbi, Bosnjë, Mal i Zi) kanë shpesh çmimet më të ulëta, por me variacion mes tyre.",
+  europeCompDieselVsPetrolTitle: "Nafta kundrejt benzinës",
+  europeCompDieselVsPetrolP1:
+    "Historikisht, shumë vende europiane e taksonin naftën më lehtë. Kjo prirje ka filluar të përmbyset për arsye mjedisore.",
+  europeCompDieselVsPetrolP2:
+    "Si rezultat, në disa vende nafta tani është më e shtrenjtë se benzina. Faqja e renditjeve ju lejon të shihni saktësisht ku qëndron çdo lloj karburanti.",
+  europeCompLpgTitle: "LPG: alternativa e harruar",
+  europeCompLpgP1:
+    "Autogazi (LPG) është dukshëm më i lirë në vendet që e promovojnë, si Polonia, Turqia dhe Italia. Por disponueshmëria ndryshon shumë mes vendeve.",
+  europeCompBorderTitle: "Efektet kufitare dhe strategjitë e mbushjeve",
+  europeCompBorderP1:
+    "Dallimet e çmimeve në kufij krijojnë mundësi praktike. Drejtuesit shpesh kalojnë kufirin për karburant më të lirë.",
+  europeCompBorderP2:
+    "Mjeti i krahasimit në këtë faqe është dizajnuar për t'i bërë strategjitë kufitare të dukshme.",
+  europeCompExchangeTitle: "Efektet e kursit të këmbimit për udhëtarët",
+  europeCompExchangeP1:
+    "Nëse udhëtoni nga zona euro në një vend jo-euro, kursi i këmbimit shton një shtresë tjetër. Faqja tregon çmime në EUR dhe monedhë lokale.",
+  europeCompSummaryTitle: "Si ta përdorni këtë informacion",
+  europeCompSummaryP1:
+    "Për udhëtarët ditore, krahasimi i vendeve dhe renditjet ju tregojnë ku të mbushni me çmim të ulët. Për të interesuarit në politikë energjie, të dhënat zbulojnë si zgjedhjet qeveritare ndikojnë drejtpërdrejt çfarë paguajnë drejtuesit.",
+
+  // Road Trip Fuel Guide page
+  roadTripTitle: "Guida e Kostos së Karburantit për Udhëtime: Si të Vlerësoni dhe Ulni Shpenzimet",
+  roadTripIntro:
+    "Po planifikoni një udhëtim me makinë? Karburanti është zakonisht një nga kostot variabël më të mëdha, dhe ia vlen ta vlerësoni paraprakisht.",
+  roadTripCalcTitle: "Si funksionon kalkulatori i udhëtimit",
+  roadTripCalcP1:
+    "Kosto e vlerësuar: (distanca ÷ 100) × konsumi × çmimi për litër = kosto e vlerësuar.",
+  roadTripCalcP2:
+    "Mjeti i udhëtimit aplikon këtë formulë me çmimin e shfaqur. Për rrugë mes disa vendeve, vlerësoni çdo segment veç e veç.",
+  roadTripConsumptionTitle: "Kuptimi i konsumit të karburantit",
+  roadTripConsumptionP1:
+    "Konsumi i makinës — në L/100km — është variabli më i rëndësishëm personal. Shifrat e prodhuesit janë optimiste. Konsumi real është 10–30% më i lartë.",
+  roadTripConsumptionP2:
+    "Faktorët që rrisin konsumin: shpejtësi e lartë, ndalesa të shpeshta, kondicioner, terreno kodrore, ngarkesë e rëndë, goma me presion të ulët.",
+  roadTripConsumptionP3:
+    "Për vlerësim realist, shtoni 15–20% figure së prodhuesit. Një makinë me 6.0 L/100km do të mesatarizojë 7.0–7.5 L/100km.",
+  roadTripCrossBorderTitle: "Strategjia e mbushjeve ndërkufitare",
+  roadTripCrossBorderP1:
+    "Mbushni në vendin me çmimin më të ulët dhe mbani sa më pak karburant në vendet e shtrenjta.",
+  roadTripCrossBorderP2:
+    "P.sh. nëse udhëtoni nga Gjermania përmes Austrisë në Slloveni dhe Itali, mbushni para se të hyni në Itali ku çmimet janë zakonisht më të larta.",
+  roadTripCrossBorderP3:
+    "Kini parasysh se disa vende kanë kufizime ligjore për sa karburant mund të transportoni në enë portative.",
+  roadTripPaymentTitle: "Këshilla pagese dhe valute",
+  roadTripPaymentP1:
+    "Shumica e pikave në Europë pranojnë karta kryesore. Disa pika rurale në Ballkan mund të jenë vetëm me para të gatshme.",
+  roadTripPaymentP2:
+    "Kur paguani me kartë në vend jo-euro, zgjidhni të paguani në monedhën lokale. Kursi i bankës suaj është pothuajse gjithmonë më i mirë.",
+  roadTripSavingsTitle: "Këshilla praktike për ulje kostosh",
+  roadTripSavingsP1:
+    "Ngisni me shpejtësi të moderuar. Ulja nga 130 km/h në 110 km/h mund të ulë konsumin 15–20%.",
+  roadTripSavingsP2:
+    "Mbani shpejtësi të qëndrueshme. Përdorni kruiz kontrollin kur mundeni.",
+  roadTripSavingsP3:
+    "Kontrolloni presionin e gomave para udhëtimit.",
+  roadTripSavingsP4:
+    "Hiqni peshën dhe rezistencën e panevojshme: kutivbagazhi në çati, mbajtëse biçikletash.",
+  roadTripSavingsP5:
+    "Planifikoni ndalesat e mbushjeve duke përdorur të dhënat e renditjeve dhe krahasimit.",
+  roadTripExampleTitle: "Shembull: vlerësimi i udhëtimit në Ballkan",
+  roadTripExampleP1:
+    "Supozoni se udhëtoni nga Tirana, Shqipëri në Selanik, Greqi — rreth 300 km. Makina konsunon 7.5 L/100km.",
+  roadTripExampleP2:
+    "Karburanti i nevojshëm: (300 ÷ 100) × 7.5 = 22.5 litëv. Me çmim nafte rreth €1.45/L, kosto vlerësohet rreth €32.60. Diferenca me Greqinë tregon pse njohja e çmimeve ndërkufitare ka rëndësi.",
+  roadTripExampleP3:
+    "Për udhëtime më të gjata, këto diferenca akumulohen. Një udhëtim 2,000 km përmes 5 vendeve mund të ketë diferenca €30–50.",
+  roadTripSummaryTitle: "Përmbledhje",
+  roadTripSummaryP1:
+    "Vlerësimi i kostos së karburantit nuk është i komplikuar, por ndërgjegjësimi për dallimet ndërkufitare mund të kursejë para kuptimplota.",
+
   // 404 page
   notFoundTitle: "Faqja nuk u gjet",
   notFoundSubtitle: "404 — Kjo faqe nuk ekziston",

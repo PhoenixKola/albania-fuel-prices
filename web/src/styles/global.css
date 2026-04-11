@@ -2562,6 +2562,13 @@ select {
   gap: 8px 16px;
 }
 
+.footerNavHeading {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  width: 100%;
+}
+
 .footerLink {
   color: var(--muted);
   font-size: 13px;

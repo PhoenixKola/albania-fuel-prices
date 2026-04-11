@@ -285,6 +285,240 @@ export const en = {
   termsContactP1:
     "If you have questions about these Terms of Use, please contact us at fenixkola@gmail.com.",
 
+  // Guide navigation
+  navMethodology: "Methodology",
+  navHowPricesWork: "How Fuel Prices Work",
+  navEuropeComparison: "Europe Fuel Comparison",
+  navRoadTripGuide: "Road Trip Fuel Guide",
+  footerGuidesHeading: "Guides",
+
+  // ── Stations page editorial ──
+  stationsEditorialTitle: "Why nearby station prices differ from national averages",
+  stationsEditorialP1:
+    "National average fuel prices are useful as a market-level reference, but the price you actually pay at a pump depends on local factors. Independent stations may price more aggressively than branded chains, city-centre locations often charge a premium because of higher property costs, and motorway stations are frequently the most expensive because of captive demand.",
+  stationsEditorialP2:
+    "Tax regimes can also vary at a sub-national level in some countries. Regional surcharges, local environmental levies, or even the timing of a station's last wholesale delivery can all create gaps between the reported national average and the number on the pump display. Seasonal demand shifts — higher diesel consumption in winter for heating in certain Balkan countries, or increased petrol usage during summer travel season — add further variation.",
+  stationsEditorialP3:
+    "Using the nearby stations tool alongside the country-level data on the home page gives you both a macro view and a micro view. The macro view tells you roughly where fuel sits in a given country; the micro view tells you what the nearest pump is actually charging. Combining both is the most practical approach for day-to-day fueling decisions.",
+  stationsEditorialTipTitle: "Practical tip",
+  stationsEditorialTip:
+    "If you are driving near a national border, check both the country average and nearby stations on each side. In the Balkans especially, a 10-minute detour across a border can sometimes save 10–20 cents per liter on a fill-up, which adds up over a full tank.",
+
+  // ── Compare page editorial ──
+  compareEditorialTitle: "How to use country comparisons effectively",
+  compareEditorialP1:
+    "Comparing fuel prices across countries is not just about finding the cheapest number in a table. Exchange rates, local purchasing power, tax structures, and even data reporting schedules all affect how meaningful a direct comparison is. A country with a nominally lower price in EUR may still feel expensive to its residents if local wages are also lower.",
+  compareEditorialP2:
+    "The watchlist feature is designed for drivers and travelers who regularly cross borders or plan road trips that span multiple countries. By keeping a small set of countries in your comparison list, you can quickly spot when price gaps widen or narrow — which is useful for choosing where to refuel along a cross-border route.",
+  compareEditorialP3:
+    "When reading the comparison, pay attention to the fuel type selected. Diesel and petrol prices do not always move in the same direction. Some countries tax diesel more lightly than petrol to support commercial transport, while others have equalized or even reversed that pattern. LPG availability and pricing is even more varied, with some countries actively subsidizing autogas and others offering very few stations.",
+  compareEditorialTipTitle: "Cross-border tip",
+  compareEditorialTip:
+    "If you are planning a multi-country drive through the Balkans or Central Europe, refueling strategy matters. Fill up in countries where prices are consistently lower and carry only enough fuel in expensive countries to reach the next cheap refueling point. The comparison tool makes this strategy visible at a glance.",
+
+  // ── Rankings page editorial ──
+  rankingsEditorialTitle: "Understanding fuel price rankings across Europe",
+  rankingsEditorialP1:
+    "European fuel prices span a wide range. At the top of the ranking you will typically find countries with high excise duties and VAT — often in Scandinavia and Western Europe — while at the bottom you will find countries with lower taxes, state subsidies, or domestic refining capacity that keeps costs down.",
+  rankingsEditorialP2:
+    "Tax is the single biggest factor in cross-country price differences. In many EU countries, more than half of the pump price is made up of excise duty and VAT. When you see a country like the Netherlands or Finland near the top of the diesel ranking, it is rarely because crude oil costs more there — it is because the government takes a larger share of every liter sold.",
+  rankingsEditorialP3:
+    "Subsidies and price controls work in the opposite direction. Some countries cap retail fuel prices or provide direct subsidies to keep costs politically manageable. These interventions can shift a country's ranking significantly, but they also tend to be temporary — which means rankings can change quickly when a subsidy is removed or a cap is adjusted.",
+  rankingsEditorialP4:
+    "The ranking table is most useful when you compare it over time. A country that moves from the middle of the table to the top may be introducing new carbon taxes, while a country that drops may be responding to domestic pressure with short-term subsidies. Reading the direction of movement, not just the current position, gives you a deeper understanding of the fuel market.",
+
+  // ── Methodology page (standalone) ──
+  methodologyPageTitle: "Methodology: How Karburanti Sot Collects and Presents Fuel Price Data",
+  methodologyPageIntro:
+    "Transparency about how data is collected, processed, and displayed is essential for any site that helps people make real-world decisions based on numbers. This page explains every step of the data pipeline behind Karburanti Sot, from the original public sources through to the final figures shown on screen.",
+
+  methodologySourcesTitle: "Data sources",
+  methodologySourcesP1:
+    "Karburanti Sot pulls fuel price data from publicly available sources maintained by government energy agencies, national statistics offices, and recognized industry bodies across Europe. These sources publish data at different intervals — some weekly, some bi-weekly, and some monthly — depending on the reporting requirements in each country.",
+  methodologySourcesP2:
+    "The specific sources used can change over time as agencies update their reporting formats or APIs. When a source changes, the site's data pipeline is updated to match. The goal is always to use the most authoritative and timely public source available for each country.",
+
+  methodologyProcessTitle: "Data processing",
+  methodologyProcessP1:
+    "Raw data from different countries arrives in different formats, units, and currencies. The processing pipeline normalizes everything into a consistent format: fuel prices are expressed per liter, and a common reference currency (EUR) is used for cross-country comparisons. Local-currency values are also preserved and displayed when the user selects the local-currency mode.",
+  methodologyProcessP2:
+    "No manual adjustments, estimates, or editorial rounding are applied to the underlying price values. The numbers shown are the values reported by the upstream source, converted if necessary using the current exchange rate.",
+
+  methodologyFxTitle: "Exchange rate conversions",
+  methodologyFxP1:
+    "When comparing fuel prices across countries with different currencies, the site fetches exchange rates from a public FX API. These rates are mid-market indicative rates, not bank buy/sell rates. This means that the EUR-equivalent prices shown for countries like Albania (ALL), Serbia (RSD), or North Macedonia (MKD) are close approximations, not guaranteed conversion values.",
+  methodologyFxP2:
+    "Exchange rates are refreshed regularly, but because FX markets move continuously, a small lag between the displayed rate and the real-time market rate is normal. This is acceptable for the site's purpose — showing relativefuel cost comparisons — but should not be used for financial transactions.",
+
+  methodologyAccuracyTitle: "Accuracy and limitations",
+  methodologyAccuracyP1:
+    "Country-level fuel prices represent national averages or officially reported reference values. They do not reflect the exact pump price at any specific station. Several factors can cause the price at a station near you to differ from the national figure: local competition, brand markups, time-of-day pricing, promotions, and how recently the station received a wholesale delivery.",
+  methodologyAccuracyP2:
+    "The \"Nearby Stations\" feature uses a different data source (map/location APIs) and may show prices that are more current for a specific location but less consistent in format than the country-level data. Both views are useful for different purposes: country data for broad comparisons, station data for immediate local decisions.",
+
+  methodologyUpdateTitle: "Update frequency",
+  methodologyUpdateP1:
+    "Data is refreshed automatically based on a schedule aligned with how often upstream sources publish. For countries that publish weekly, the site will typically show new data within hours of a publication. For countries with more infrequent reporting, the data may remain static for longer periods. The \"last updated\" timestamp on every page tells you exactly when the most recent data was fetched.",
+
+  methodologyEditorialTitle: "Editorial layer",
+  methodologyEditorialP1:
+    "Beyond raw data, the site adds editorial context. The daily summary on the home page highlights cheapest and most expensive countries, the price spread, and practical observations. The FAQ section answers common questions. Guide pages explain broader topics like how fuel prices are formed, how to compare countries fairly, and how to plan a road trip with fuel costs in mind.",
+  methodologyEditorialP2:
+    "The editorial content is written by humans and updated when market conditions or the site's data coverage changes. It is intended to help non-expert users interpret the data, not to provide financial or investment advice.",
+
+  methodologyOpenTitle: "Open approach",
+  methodologyOpenP1:
+    "The underlying fuel price data comes from public sources and the site does not gate it behind a paywall or registration. The methodology described on this page is intended to be transparent so users can judge for themselves how much weight to give the figures. If you have questions about a specific data source or want to suggest improvements, the contact page is open.",
+
+  // ── How Fuel Prices Work page ──
+  howPricesTitle: "How Fuel Prices Work: From Crude Oil to the Pump",
+  howPricesIntro:
+    "Fuel prices are not arbitrary. They follow a chain that starts with crude oil extraction, passes through refining and distribution, and ends at the pump with taxes and margins added on top. Understanding this chain helps you interpret the price differences you see between countries, fuel types, and time periods on this site.",
+
+  howPricesCrudeTitle: "Crude oil: The starting point",
+  howPricesCrudeP1:
+    "Global crude oil prices set the floor for all refined fuel products. Crude is traded on international commodity markets — primarily as Brent (the European benchmark) and WTI (the US benchmark). When crude prices rise, pump prices tend to follow with a lag of one to three weeks, depending on how much refined product is already in the supply chain.",
+  howPricesCrudeP2:
+    "Crude oil prices are influenced by geopolitical events, OPEC+ production decisions, global demand patterns (seasonal driving, industrial activity), currency movements (oil is priced in USD), and inventory levels. A single event — such as a production cut or a pipeline disruption — can move prices across every country covered on this site.",
+
+  howPricesRefiningTitle: "Refining: Turning crude into petrol and diesel",
+  howPricesRefiningP1:
+    "Crude oil is processed in refineries into different products: petrol (gasoline), diesel, kerosene, LPG, heating oil, and others. The refining margin — the difference between the cost of crude and the wholesale price of refined products — fluctuates based on refinery capacity, maintenance schedules, and seasonal demand. Diesel and petrol are refined in different proportions, which is why their prices do not always move in lockstep.",
+  howPricesRefiningP2:
+    "Europe imports refined products as well as crude oil, which means that refining capacity in the Middle East, the US Gulf, and Asia can also affect European pump prices. When global refining capacity is tight, the refining margin widens and pump prices rise even if crude prices stay flat.",
+
+  howPricesDistributionTitle: "Distribution and wholesale",
+  howPricesDistributionP1:
+    "Refined fuel is transported from refineries to regional storage depots and then to individual stations via pipelines, tanker trucks, or rail. Distribution costs vary by geography: landlocked countries or regions far from major refining centers face higher transport costs, which adds to the retail price.",
+  howPricesDistributionP2:
+    "Wholesale prices — the cost a station pays to stock fuel — reflect the refined product price plus distribution costs plus a small wholesale margin. Stations buy at wholesale and add their own retail margin on top.",
+
+  howPricesTaxTitle: "Taxes: The biggest variable between countries",
+  howPricesTaxP1:
+    "In most European countries, taxes make up 40–60% of the final pump price. The two main components are excise duty (a fixed amount per liter, set by national law) and VAT (a percentage of the final price including excise). The EU sets minimum excise rates, but member states are free to go higher — and many do.",
+  howPricesTaxP2:
+    "This is the primary reason why the same fuel can cost €1.30/L in one country and €1.90/L in another. The difference is not mainly in crude oil or refining — it is in the tax wedge. Countries that prioritize revenue from fuel taxes (like the Netherlands, Finland, or Italy) sit near the top of the rankings, while countries with lower tax burdens (like Bulgaria, Poland, or several Balkan states) sit near the bottom.",
+  howPricesTaxP3:
+    "Some countries also apply special levies: carbon taxes, strategic reserve contributions, or road maintenance surcharges. These are less visible to consumers but still affect the pump price.",
+
+  howPricesRetailTitle: "Retail margins and station-level pricing",
+  howPricesRetailP1:
+    "The retail margin is what the station owner keeps after paying for wholesale fuel, distribution, and taxes. It is typically small — a few cents per liter — but varies by competition, location, and brand. Motorway stations, which have less competition, charge higher margins. Urban stations in competitive areas may operate on very thin margins to attract volume.",
+  howPricesRetailP2:
+    "This is why the nearby stations tool on this site can show prices that differ from the country average. The country average smooths out all the local variation; the station price reflects the specific competitive and cost dynamics of that location.",
+
+  howPricesSeasonalTitle: "Seasonal and demand patterns",
+  howPricesSeasonalP1:
+    "Fuel prices tend to follow seasonal patterns. Petrol demand rises in summer (driving season), which can push petrol prices up. Diesel demand tends to rise in winter in countries where diesel is also used for heating. These seasonal swings are layered on top of the global crude price movements.",
+  howPricesSeasonalP2:
+    "Holiday weekends, back-to-school periods, and major travel events can also create short-term demand spikes. If you are planning a road trip during a high-demand period, expect slightly higher prices at stations along popular routes.",
+
+  howPricesSummaryTitle: "Putting it all together",
+  howPricesSummaryP1:
+    "The pump price you see is roughly: crude oil cost + refining margin + distribution costs + excise duty + VAT + retail margin. When you compare countries on this site, most of the difference comes from the tax component. When you compare stations within a country, most of the difference comes from the retail margin and local competitive dynamics.",
+
+  // ── Europe Fuel Comparison page ──
+  europeCompTitle: "Fuel Prices Across Europe: A Country-by-Country Comparison Guide",
+  europeCompIntro:
+    "Europe has some of the widest fuel price variation of any continent. A liter of diesel can cost nearly twice as much in Scandinavia as it does in parts of the Balkans. This guide explains why those differences exist, which countries are typically cheapest and most expensive, and how to use this information practically.",
+
+  europeCompWhyTitle: "Why fuel prices vary so much across Europe",
+  europeCompWhyP1:
+    "The base cost of fuel — crude oil and refining — is broadly similar for all European countries because they draw on the same global commodity market. The differences come almost entirely from three factors: taxes (the dominant factor), local distribution costs, and government interventions like subsidies or price caps.",
+  europeCompWhyP2:
+    "The EU sets minimum excise duty rates for petrol and diesel, but each member state chooses its own rate above that floor. Non-EU countries in the Balkans and Eastern Europe have even more flexibility and often set lower rates. This tax disparity is the main driver of the price ranking you see on this site.",
+
+  europeCompRegionsTitle: "Regional patterns",
+  europeCompRegionsP1:
+    "Scandinavian and Northwestern European countries (Netherlands, Finland, Denmark, Sweden, Norway) typically have the highest pump prices due to aggressive fuel taxation and environmental levies. The Nordic countries use high fuel taxes as part of a broader climate policy to discourage fossil fuel consumption.",
+  europeCompRegionsP2:
+    "Southern European countries (Spain, Portugal, Greece) tend to fall in the mid-range, with moderate excise rates and VAT.",
+  europeCompRegionsP3:
+    "Central and Eastern European countries (Poland, Hungary, Czech Republic, Romania, Bulgaria) generally have lower fuel prices due to lower excise rates and sometimes lower distribution costs.",
+  europeCompRegionsP4:
+    "Balkan countries (Albania, Kosovo, North Macedonia, Serbia, Bosnia, Montenegro) often have some of the lowest prices in Europe, though with more variation between them. Some, like Kosovo, have particularly low prices due to minimal taxation, while others are moderately taxed.",
+
+  europeCompDieselVsPetrolTitle: "Diesel vs. petrol: Not always what you expect",
+  europeCompDieselVsPetrolP1:
+    "Historically, many European countries taxed diesel more lightly than petrol to support the transport and agriculture sectors. This gave diesel a consistent price advantage at the pump. However, that trend has been slowly reversing. Environmental concerns about diesel particulates and NO₂ emissions have led some countries to equalize or even reverse the tax differential.",
+  europeCompDieselVsPetrolP2:
+    "As a result, in some countries diesel is now more expensive than petrol at the pump — something that surprises many drivers. The ranking page on this site lets you switch between petrol, diesel, and LPG to see exactly where each fuel type stands in the European pricing hierarchy.",
+
+  europeCompLpgTitle: "LPG: The overlooked alternative",
+  europeCompLpgP1:
+    "Autogas (LPG) is significantly cheaper than petrol or diesel in countries that promote it, such as Poland, Turkey, and Italy. However, LPG availability varies enormously. Some countries have dense LPG station networks, while others have almost none. If your vehicle runs on LPG, checking the rankings by fuel type is especially useful before a cross-border trip.",
+
+  europeCompBorderTitle: "Border effects and refueling strategies",
+  europeCompBorderP1:
+    "Price differences at national borders create practical opportunities for drivers. In border regions, it is common to see drivers crossing to the cheaper side for cheaper fuel. Classic examples include Luxembourg (cheap fuel surrounded by more expensive neighbors), Slovenia vs. Italy, and Kosovo vs. neighboring countries.",
+  europeCompBorderP2:
+    "The compare tool on this site is designed to make border strategies visible. By keeping your home country and its neighbors in the watchlist, you can see at a glance whether a cross-border refueling run is worthwhile on any given day.",
+
+  europeCompExchangeTitle: "Exchange rate effects for travelers",
+  europeCompExchangeP1:
+    "If you are traveling from a Eurozone country to a non-Euro country (or vice versa), exchange rates add another layer. A country might look cheap in EUR terms, but the actual cost you pay depends on the exchange rate your bank or card issuer applies. The site shows both EUR and local-currency prices when available, which helps you plan for the actual cash or card cost.",
+
+  europeCompSummaryTitle: "How to use this information",
+  europeCompSummaryP1:
+    "For daily commuters, the most relevant data is your own country's price and the nearby station view. For road-trip planners, the country comparison and rankings tell you where to fill up cheaply and where to avoid refueling if possible. For anyone interested in energy policy, the data reveals how government choices translate directly into what drivers pay.",
+
+  // ── Road Trip Fuel Guide page ──
+  roadTripTitle: "Road Trip Fuel Cost Guide: How to Estimate and Reduce Your Fuel Expenses",
+  roadTripIntro:
+    "Planning a road trip across one or more countries? Fuel is usually one of the biggest variable costs of a drive, and it pays to estimate it in advance. This guide explains how to calculate fuel costs for any trip, how to factor in cross-border price differences, and practical tips for keeping your fuel bill as low as possible.",
+
+  roadTripCalcTitle: "How the trip calculator works",
+  roadTripCalcP1:
+    "The estimated fuel cost for a trip is calculated using three inputs: the distance you plan to drive (in kilometers), your vehicle's fuel consumption (in liters per 100 km), and the fuel price per liter. The formula is simple: (distance ÷ 100) × consumption × price per liter = estimated fuel cost.",
+  roadTripCalcP2:
+    "The trip tool on the home page applies this formula using the displayed fuel price for your selected country and fuel type. If your route crosses multiple countries, you can estimate each segment separately by changing the country selection.",
+
+  roadTripConsumptionTitle: "Understanding fuel consumption",
+  roadTripConsumptionP1:
+    "Your vehicle's fuel consumption — expressed in liters per 100 km (L/100km) in Europe — is the most important personal variable. Manufacturer-stated consumption figures are measured under standardized test conditions and are almost always optimistic. Real-world consumption is typically 10–30% higher, depending on driving conditions.",
+  roadTripConsumptionP2:
+    "Factors that increase real-world consumption include: driving at higher speeds (especially above 120 km/h), frequent acceleration and braking in city traffic, running air conditioning, driving in hilly or mountainous terrain, carrying heavy loads or a roof box, and driving with underinflated tires.",
+  roadTripConsumptionP3:
+    "For a realistic estimate, use your vehicle's trip computer average if available. If not, add 15–20% to the manufacturer's combined figure. A car rated at 6.0 L/100km will likely average 7.0–7.5 L/100km on a mixed highway-and-city trip.",
+
+  roadTripCrossBorderTitle: "Cross-border refueling strategy",
+  roadTripCrossBorderP1:
+    "On a multi-country drive, the cheapest approach is to fill your tank in the country with the lowest fuel price and carry as little fuel as possible through expensive countries. The country comparison and ranking tools on this site make this strategy easy to plan.",
+  roadTripCrossBorderP2:
+    "For example, if you are driving from Germany through Austria to Slovenia and then into Italy, you might notice that fuel is cheapest in Austria or Slovenia. The optimal strategy would be to fill up before entering Italy, where prices are typically higher due to higher excise duties.",
+  roadTripCrossBorderP3:
+    "Keep in mind that some countries have legal limits on how much fuel you can carry in portable containers across borders. Stick to filling your vehicle's built-in tank and avoid carrying jerry cans across EU borders unless you have checked the regulations.",
+
+  roadTripPaymentTitle: "Payment and currency tips",
+  roadTripPaymentP1:
+    "In Eurozone countries, paying at the pump is straightforward. In non-Euro countries (Albania, Serbia, North Macedonia, Bosnia, etc.), you will need local currency or a card that handles foreign transactions well. Most fuel stations in Europe accept major credit and debit cards, but some smaller rural stations in the Balkans may be cash-only.",
+  roadTripPaymentP2:
+    "If paying by card in a non-Euro country, choose to pay in the local currency rather than accepting the station's dynamic currency conversion. Your bank's exchange rate is almost always better than the rate offered at the pump.",
+
+  roadTripSavingsTitle: "Practical tips to reduce fuel costs",
+  roadTripSavingsP1:
+    "Drive at moderate speeds. Fuel consumption increases roughly exponentially with speed. Dropping from 130 km/h to 110 km/h can reduce consumption by 15–20%.",
+  roadTripSavingsP2:
+    "Maintain steady speed. Use cruise control on highways when possible. Avoid unnecessary acceleration and hard braking.",
+  roadTripSavingsP3:
+    "Check tire pressure before the trip. Underinflated tires increase rolling resistance and fuel consumption. Check your vehicle's recommended pressure (usually on a sticker inside the driver's door frame).",
+  roadTripSavingsP4:
+    "Remove unnecessary weight and drag. Roof boxes, bike racks, and heavy items in the trunk all increase consumption. Remove them if not needed for the trip.",
+  roadTripSavingsP5:
+    "Plan refueling stops. Use the rankings and country comparison data on this site to identify the cheapest refueling points along your route. Even a few cents per liter add up over a full tank.",
+
+  roadTripExampleTitle: "Example: Estimating a Balkans road trip",
+  roadTripExampleP1:
+    "Suppose you are driving from Tirana, Albania to Thessaloniki, Greece — roughly 300 km. Your car consumes 7.5 L/100km in real-world conditions. Based on the current Albanian diesel price shown on this site:",
+  roadTripExampleP2:
+    "Fuel needed: (300 ÷ 100) × 7.5 = 22.5 liters. At a diesel price of approximately €1.45/L (Albania), the estimated fuel cost is about €32.60. If the Greek leg averages €1.60/L, the cost for the same distance in Greece would be about €36.00. This €3.40 difference on a 300 km segment shows why cross-border price awareness matters.",
+  roadTripExampleP3:
+    "For a longer multi-country road trip, these differences compound. A 2,000 km drive through five countries could see fuel cost differences of €30–50 depending on where you choose to fill up.",
+
+  roadTripSummaryTitle: "Summary",
+  roadTripSummaryP1:
+    "Fuel cost estimation is not complicated, but being aware of consumption realities, cross-border price differences, and refueling strategy can save meaningful money on any road trip. Use the tools on this site — country comparison, rankings, trip calculator, and nearby stations — to plan your refueling stops before you leave.",
+
   // 404 page
   notFoundTitle: "Page not found",
   notFoundSubtitle: "404 — This page doesn't exist",

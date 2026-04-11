@@ -38,6 +38,16 @@ export default function RankingsPage({
         fxRates={fxRates}
         onOpen={onOpen}
       />
+
+      <article className="contentPage">
+        <section className="contentSection">
+          <h2 className="contentHeading">{t.rankingsEditorialTitle}</h2>
+          <p className="contentBody">{t.rankingsEditorialP1}</p>
+          <p className="contentBody">{t.rankingsEditorialP2}</p>
+          <p className="contentBody">{t.rankingsEditorialP3}</p>
+          <p className="contentBody">{t.rankingsEditorialP4}</p>
+        </section>
+      </article>
     </>
   );
 }
