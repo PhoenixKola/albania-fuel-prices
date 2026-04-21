@@ -61,18 +61,6 @@ function getOpenNow(openingHours?: string): boolean | null {
   }
 }
 
-function overpassQuery(lat: number, lon: number, radiusM: number) {
-  return `
-[out:json][timeout:25];
-(
-  node["amenity"="fuel"](around:${radiusM},${lat},${lon});
-  way["amenity"="fuel"](around:${radiusM},${lat},${lon});
-  relation["amenity"="fuel"](around:${radiusM},${lat},${lon});
-);
-out center tags;
-`;
-}
-
 export function useNearbyStations(opts: { center: { lat: number; lon: number } | null; radiusM?: number }) {
   const radiusM = opts.radiusM ?? 5000;
   // Extract primitives so callbacks don't re-create when the center object reference changes
@@ -126,11 +114,9 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
     try {
-      const q = overpassQuery(centerLat, centerLon, radiusM);
-      const r = await fetch(OVERPASS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `data=${encodeURIComponent(q)}`,
+      const url = `${OVERPASS_URL}?lat=${encodeURIComponent(centerLat)}&lon=${encodeURIComponent(centerLon)}&radiusM=${encodeURIComponent(radiusM)}`;
+      const r = await fetch(url, {
+        method: "GET",
         signal: controller.signal
       });
 

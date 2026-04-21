@@ -14,7 +14,7 @@ export type Station = {
   isOpenNow?: boolean | null;
 };
 
-const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const OVERPASS_URL = "https://fuel-proxy.fenixkola.workers.dev";
 const FETCH_TIMEOUT_MS = 12 * 1000;
 
 function is24Hours(openingHours?: string) {
@@ -34,17 +34,6 @@ function getOpenNow(openingHours?: string): boolean | null {
   } catch {
     return null;
   }
-}
-
-function overpassQuery(lat: number, lon: number, radiusM: number) {
-  return `
-[out:json][timeout:25];
-(
-  node["amenity"="fuel"](around:${radiusM},${lat},${lon});
-  way["amenity"="fuel"](around:${radiusM},${lat},${lon});
-  relation["amenity"="fuel"](around:${radiusM},${lat},${lon});
-);
-out center tags;`;
 }
 
 type OverpassElement = {
@@ -102,12 +91,11 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
     try {
       const [slat, slon] = key.split(",").slice(0, 2).map(Number);
-      const q = overpassQuery(slat, slon, radiusM);
-      const body = `data=${encodeURIComponent(q)}`;
+      const url = `${OVERPASS_URL}?lat=${encodeURIComponent(slat)}&lon=${encodeURIComponent(slon)}&radiusM=${encodeURIComponent(radiusM)}`;
 
       const r = await fetchWithTimeout(
-        OVERPASS_URL,
-        { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body },
+        url,
+        { method: "GET" },
         FETCH_TIMEOUT_MS
       );
 
