@@ -31,6 +31,9 @@ export default function Footer({ t }: Props) {
             <Link to="/how-fuel-prices-work" className="footerLink">{t.navHowPricesWork}</Link>
             <Link to="/europe-fuel-comparison" className="footerLink">{t.navEuropeComparison}</Link>
             <Link to="/road-trip-fuel-guide" className="footerLink">{t.navRoadTripGuide}</Link>
+            <Link to="/compare" className="footerLink">{t.navCompare}</Link>
+            <Link to="/rankings" className="footerLink">{t.navRankings}</Link>
+            <Link to="/stations" className="footerLink">{t.navStations}</Link>
           </nav>
         </div>
 

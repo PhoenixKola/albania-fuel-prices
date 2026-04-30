@@ -1,6 +1,7 @@
 {
   "name": "Fuel Prices Today",
   "short_name": "Fuel Prices",
+  "description": "Compare Albania and Europe fuel prices, estimate road trip costs, and read transparent methodology notes.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0B1220",

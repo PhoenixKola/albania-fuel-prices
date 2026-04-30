@@ -154,6 +154,7 @@ export const sq = {
   navRankings: "Renditje",
   navAbout: "Rreth nesh",
   navContact: "Kontakt",
+  navGuides: "Guida",
   navPrivacy: "Politika e Privatësisë",
   navTerms: "Kushtet e Përdorimit",
   footerTagline: "Të dhëna të pavarura për çmimet e karburantit për drejtuesit dhe udhëtarët në Europë.",
@@ -162,7 +163,7 @@ export const sq = {
   // About page
   aboutTitle: "Rreth Karburanti Sot",
   aboutIntro:
-    "Karburanti Sot është një shërbim i pavarur informacioni për çmimet e karburantit që mbledh, krahason dhe shpjegon të dhënat publike të çmimeve të karburantit në Shqipëri dhe rajonin më të gjerë europian. Projekti u nis për t'u dhënë drejtuesve, udhëtarëve dhe atyre që udhëtojnë ndërkufitarisht një mënyrë të thjeshtë për të krahasuar kostot e karburantit pa pasur nevojë të vizitojnë dhjetëra burime të ndryshme qeveritare apo industriale.",
+    "Karburanti Sot është një shërbim i pavarur informacioni për çmimet e karburantit që mbledh, krahason dhe shpjegon të dhënat publike të çmimeve të karburantit në Shqipëri dhe rajonin më të gjerë europian. Projekti u nis për t'u dhënë drejtuesve, udhëtarëve dhe atyre që udhëtojnë ndërkufitarisht një mënyrë të thjeshtë për të krahasuar kostot e karburantit pa pasur nevojë të vizitojnë shumë burime të veçanta të palëve të treta dhe industrisë.",
   aboutMissionTitle: "Misioni ynë",
   aboutMissionP1:
     "Çmimet e karburantit ndryshojnë ndjeshëm nga një vend në tjetrin në Europë, ndonjëherë me më shumë se 50 përqind për të njëjtin lloj karburanti. Këto diferenca kanë rëndësi: ndikojnë buxhetet familjare, planet e udhëtimit, kostot logjistike dhe vendimet e udhëtimit ndërkufitar.",
@@ -170,7 +171,7 @@ export const sq = {
     "Karburanti Sot i sjell së bashku këto informacione të shpërndara në një vend. Qëllimi nuk është thjesht të listojë numra, por të shtojë kontekst: cili vend është më i liri tani, sa i madh është hendeku i çmimeve, si duken efektet e kursit të këmbimit për udhëtarët që paguajnë në monedha të ndryshme dhe si krahasohen pikat afër me mesataren kombëtare.",
   aboutDataTitle: "Nga vijnë të dhënat",
   aboutDataP1:
-    "Çmimet e shfaqura në këtë faqe vijnë nga burime të dhënash publike duke përfshirë agjenci qeveritare të energjisë, zyra statistikash zyrtare dhe dataset-e të njohura industriale. Faqja i merr të dhënat në mënyrë programatike dhe i konverton në një format konsistent.",
+    "Të dhënat e çmimeve të karburantit mblidhen nga burime publike të palëve të treta dhe mund të plotësohen me referenca zyrtare ose statistikore kur janë të disponueshme. Faqja i merr të dhënat në mënyrë programatike dhe i konverton në një format konsistent.",
   aboutDataP2:
     "Konvertimet e kursit të këmbimit përdorin një burim publik të dhënash FX në mënyrë që krahasimet mes vendeve me monedha të ndryshme të mbeten praktike. Të gjitha konvertimet janë të etiketuara qartë.",
   aboutDataP3:
@@ -228,7 +229,7 @@ export const sq = {
   privacyAdItem3: "Të dhëna të performancës së reklamave dhe ndërveprimit (shfaqje, klikime)",
   privacyAdItem4: "Cookie-t ose identifikuesit e reklamave celulare, sipas cilësimeve të pajisjes dhe shfletuesit tuaj",
   privacyAdsP2:
-    "Ne nuk marrim identifikuesin tuaj personal të reklamave drejtpërdrejt. Mund të rivendosni ose kufizoni personalizimin e reklamave përmes cilësimeve të privatësisë së shfletuesit ose pajisjes tuaj.",
+    "Reklamat mund të përdorin cookie dhe identifikues të ngjashëm për reklama të personalizuara ose jo të personalizuara, në varësi të pëlqimit tuaj dhe kërkesave ligjore lokale. Për përdoruesit në EEA, MB dhe Zvicër, sinjalet e pëlqimit menaxhohen përmes një CMP të certifikuar ose Google Privacy & messaging flow (detajet e ofruesit dhe lidhjet mund të shtohen nga pronari i faqes). Mund të rivendosni ose kufizoni personalizimin e reklamave përmes cilësimeve të privatësisë së shfletuesit ose pajisjes tuaj.",
   privacyAnalyticsTitle: "Analitika",
   privacyAnalyticsP1:
     "Shërbimi nuk përdor një produkt analitike të veçantë për të ndjekur përdoruesit individualë. Çdo e dhënë përdorimi e mbledhur kufizohet në atë që SDK-të e reklamave mbledhin për qëllime matjeje.",
@@ -255,12 +256,12 @@ export const sq = {
     "Duke aksesuar dhe përdorur Karburanti Sot (\"Shërbimin\"), pranoni të jeni i lidhur me këto Kushte Përdorimi. Nëse nuk pajtoheni me ndonjë pjesë të këtyre kushteve, ju lutemi mos e përdorni Shërbimin.",
   termsServiceTitle: "Përshkrimi i Shërbimit",
   termsServiceP1:
-    "Karburanti Sot është një shërbim falas dhe publik i krahasimit të çmimeve të karburantit. Mbledh të dhëna publike nga burime qeveritare dhe industriale në Europë, i konverton në format konsistent dhe i paraqet me kontekst editorial.",
+    "Karburanti Sot është një shërbim falas dhe publik i krahasimit të çmimeve të karburantit. Mbledh të dhëna publike nga burime të palëve të treta dhe industriale në Europë, i konverton në format konsistent dhe i paraqet me kontekst editorial.",
   termsAccuracyTitle: "Saktësia e të dhënave dhe kufizimet",
   termsAccuracyP1:
     "Çmimet e karburantit të shfaqura janë nga dataset-e publike. Ndërsa bëjmë përpjekje të arsyeshme për saktësi dhe përditësim, nuk mund të garantojmë që çdo çmim përputhet me çmimin e saktë të pompës në çdo pikë.",
   termsAccuracyP2:
-    "Shifrat në nivel vendi përfaqësojnë mesatare kombëtare ose vlera zyrtare të raportuara, jo çmime individuale pike. Taksat lokale, promocionet dhe vonesat e raportimit mund të krijojnë diferenca.",
+    "Shifrat në nivel vendi përfaqësojnë vlera orientuese nga dataset-et e disponueshme, jo çmime individuale pike. Taksat lokale, promocionet dhe vonesat e raportimit mund të krijojnë diferenca.",
   termsAccuracyP3:
     "Konvertimet e kursit të këmbimit bazohen në të dhëna publike FX dhe duhen trajtuar si vlerësime. Shërbimi nuk është një mjet këshillimi financiar.",
   termsUseTitle: "Përdorimi i pranueshëm",
@@ -333,9 +334,9 @@ export const sq = {
     "Transparenca rreth mbledhjes, përpunimit dhe shfaqjes së të dhënave është thelbësore. Kjo faqe shpjegon çdo hap të tubacionit të të dhënave.",
   methodologySourcesTitle: "Burimet e të dhënave",
   methodologySourcesP1:
-    "Karburanti Sot merr të dhëna çmimesh nga burime publike të mirëmbajtura nga agjenci qeveritare të energjisë, zyra statistikash dhe organizma industriale.",
+    "Karburanti Sot merr të dhëna çmimesh nga burime publike të palëve të treta dhe mund të plotësojë mbulimin me referenca zyrtare ose statistikore kur janë të disponueshme.",
   methodologySourcesP2:
-    "Burimet specifike mund të ndryshojnë me kohën ndërsa agjencitë përditësojnë formatet. Qëllimi është gjithmonë burimi më autoritar dhe i shpejtë.",
+    "Burimet specifike mund të ndryshojnë me kohën ndërsa ofruesit përditësojnë formatet. Qëllimi është të ruhet një feed transparent, i përditësuar dhe i krahasueshëm.",
   methodologyProcessTitle: "Përpunimi i të dhënave",
   methodologyProcessP1:
     "Të dhënat normalizohen: çmimet shprehen për litër dhe EUR përdoret si referencë. Vlerat në monedhë lokale ruhen gjithashtu.",
@@ -348,7 +349,7 @@ export const sq = {
     "Kurset rifreskohen rregullisht, por një vonesë e vogël mes kursit të shfaqur dhe atij real është normale.",
   methodologyAccuracyTitle: "Saktësia dhe kufizimet",
   methodologyAccuracyP1:
-    "Çmimet në nivel vendi përfaqësojnë mesatare ose vlera referuese zyrtare. Nuk pasqyrojnë çmimin e saktë të çdo pike.",
+    "Çmimet në nivel vendi përfaqësojnë vlera orientuese nga dataset-et e disponueshme. Nuk pasqyrojnë çmimin e saktë të çdo pike.",
   methodologyAccuracyP2:
     "Veçoria e pikave afër përdor burime të ndryshme të dhënash dhe mund të tregojë çmime më aktuale por më pak konsistente.",
   methodologyUpdateTitle: "Frekuenca e përditësimit",

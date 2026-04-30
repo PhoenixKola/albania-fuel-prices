@@ -34,7 +34,7 @@ export default function ComparePage({
   return (
     <>
       <div className="pageHeader">
-        <h2 className="pageHeaderTitle">{t.navCompare}</h2>
+        <h1 className="pageHeaderTitle">{t.navCompare}</h1>
         <p className="pageHeaderSub">{t.watchlistGuidance}</p>
       </div>
       <WatchlistCard

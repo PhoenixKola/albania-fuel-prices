@@ -58,14 +58,15 @@ export default function Navbar({
   t,
   logoSrc,
   subtitle,
-//   lang,
+  lang,
   theme,
   refreshing,
   onRefresh,
-//   onToggleLang,
+  onToggleLang,
   onToggleTheme,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [guidesOpen, setGuidesOpen] = useState(false);
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
   const [lastPath, setLastPath] = useState(location.pathname);
@@ -74,6 +75,7 @@ export default function Navbar({
   if (lastPath !== location.pathname) {
     setLastPath(location.pathname);
     if (menuOpen) setMenuOpen(false);
+    if (guidesOpen) setGuidesOpen(false);
   }
 
   // Close menu on outside click
@@ -100,10 +102,17 @@ export default function Navbar({
 
   const navLinks = [
     { to: "/", label: t.navHome },
-    { to: "/stations", label: t.navStations },
-    { to: "/compare", label: t.navCompare },
-    { to: "/rankings", label: t.navRankings },
+    { to: "/about", label: t.navAbout },
+    { to: "/contact", label: t.navContact },
   ];
+
+  const guideLinks = [
+    { to: "/europe-fuel-comparison", label: t.navEuropeComparison },
+    { to: "/road-trip-fuel-guide", label: t.navRoadTripGuide },
+    { to: "/methodology", label: t.navMethodology },
+  ];
+
+  const mobileLinks = [...navLinks, ...guideLinks];
 
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
@@ -130,6 +139,33 @@ export default function Navbar({
               {link.label}
             </Link>
           ))}
+
+          <div className="navMenuWrap">
+            <button
+              className={`navMenuBtn ${guideLinks.some((link) => isActive(link.to)) ? "navLinkActive" : ""}`}
+              onClick={() => setGuidesOpen((prev) => !prev)}
+              aria-haspopup="menu"
+              aria-expanded={guidesOpen}
+            >
+              {t.navGuides}
+            </button>
+
+            {guidesOpen ? (
+              <div className="navMenu" role="menu" aria-label="Guides menu">
+                {guideLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    role="menuitem"
+                    className={`navMenuLink ${isActive(link.to) ? "navMenuLinkActive" : ""}`}
+                    onClick={() => setGuidesOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+          </div>
         </div>
 
         {/* Desktop actions */}
@@ -172,7 +208,7 @@ export default function Navbar({
       {menuOpen && (
         <div className="mobileMenu">
           <div className="mobileMenuLinks">
-            {navLinks.map((link) => (
+            {mobileLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -208,7 +244,7 @@ export default function Navbar({
               <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
             </button>
 
-            {/* <button
+            <button
               className="btn btn-ghost mobileMenuBtn"
               onClick={() => {
                 onToggleLang();
@@ -216,7 +252,7 @@ export default function Navbar({
               }}
             >
               {lang === "en" ? t.langSQ : t.langEN}
-            </button> */}
+            </button>
           </div>
         </div>
       )}

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 
 type Props = { t: TDict };
@@ -67,6 +68,26 @@ export default function PrivacyPage({ t }: Props) {
       <section className="contentSection">
         <h2 className="contentHeading">{t.privacyContactTitle}</h2>
         <p className="contentBody">{t.privacyContactP1}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Fuel data transparency note</h2>
+        <p className="contentBody">
+          Fuel prices shown on this website are informational and may change after publication. They are intended for comparison and planning, not as a guaranteed quote for a specific station transaction.
+        </p>
+        <p className="contentBody">
+          See <Link to="/methodology" className="inlineLink">Methodology</Link> for data handling details and <Link to="/contact" className="inlineLink">Contact</Link> if you need corrections.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Consent management and ad choices</h2>
+        <p className="contentBody">
+          This site can integrate a Google-certified Consent Management Platform (CMP) or Google Privacy &amp; messaging flow for ad consent handling. Where required by law (including EEA, UK, and Switzerland), users should be able to choose consent options for personalized and non-personalized ads.
+        </p>
+        <p className="contentBody">
+          Site owner placeholders: CMP provider name: [ADD_CMP_PROVIDER], CMP privacy link: [ADD_CMP_PRIVACY_URL], CMP cookie list link: [ADD_CMP_COOKIE_URL].
+        </p>
       </section>
     </article>
   );

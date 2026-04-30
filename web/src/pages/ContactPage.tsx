@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 
 type Props = { t: TDict };
@@ -36,6 +37,16 @@ export default function ContactPage({ t }: Props) {
         <h2 className="contentHeading">{t.contactResponseTitle}</h2>
         <p className="contentBody">{t.contactResponseP1}</p>
         <p className="contentBody">{t.contactResponseP2}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Before you contact us</h2>
+        <p className="contentBody">
+          For methodology and data limitations, please read <Link to="/methodology" className="inlineLink">Methodology</Link>. For legal and data-use policy details, see <Link to="/privacy" className="inlineLink">Privacy Policy</Link> and <Link to="/terms" className="inlineLink">Terms of Use</Link>.
+        </p>
+        <p className="contentBody">
+          If you are reporting a fuel-price discrepancy, include the country, fuel type, observed value, and source link so we can review quickly.
+        </p>
       </section>
     </article>
   );

@@ -141,6 +141,7 @@ export type TDict = {
   navRankings: string;
   navAbout: string;
   navContact: string;
+  navGuides: string;
   navPrivacy: string;
   navTerms: string;
   footerTagline: string;

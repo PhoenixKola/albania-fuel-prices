@@ -67,6 +67,26 @@ export default function RoadTripFuelGuidePage({ t }: Props) {
           <Link to="/methodology" className="inlineLink">{t.navMethodology}</Link>
         </p>
       </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Route examples from Albania</h2>
+        <ul className="contentList">
+          <li>Tirana to Shkoder: useful for short domestic budgeting and diesel-vs-petrol sensitivity checks.</li>
+          <li>Tirana to Pristina: cross-border route where Kosovo price differences can materially change total cost.</li>
+          <li>Tirana to Ohrid: mountainous route where consumption assumptions matter more than city commuting.</li>
+          <li>Tirana to Podgorica: regional corridor where Montenegro price context can shift fueling strategy.</li>
+        </ul>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Petrol, diesel, and LPG planning differences</h2>
+        <p className="contentBody">
+          Petrol vehicles are often simpler for broad station coverage, while diesel can improve long-distance efficiency depending on vehicle type and driving profile. LPG can be cheaper per liter where available, but station coverage and tank setup constraints should be checked in advance.
+        </p>
+        <p className="contentBody">
+          For country-specific price context, open <Link to="/fuel-prices/albania" className="inlineLink">Albania fuel prices</Link> and compare with neighboring routes in <Link to="/europe-fuel-comparison" className="inlineLink">Europe comparison</Link>.
+        </p>
+      </section>
     </article>
   );
 }

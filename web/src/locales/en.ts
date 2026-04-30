@@ -154,6 +154,7 @@ export const en = {
   navRankings: "Rankings",
   navAbout: "About",
   navContact: "Contact",
+  navGuides: "Guides",
   navPrivacy: "Privacy Policy",
   navTerms: "Terms of Use",
   footerTagline: "Independent fuel price data for drivers and travelers across Europe.",
@@ -162,15 +163,15 @@ export const en = {
   // About page
   aboutTitle: "About Karburanti Sot",
   aboutIntro:
-    "Karburanti Sot is an independent fuel price information service that collects, compares, and explains public fuel pricing data across Albania and the wider European region. The project was started to give drivers, commuters, and cross-border travelers a straightforward way to compare fuel costs without needing to visit dozens of separate government or industry sources.",
+    "Karburanti Sot is an independent fuel price information service that collects, compares, and explains public fuel pricing data across Albania and the wider European region. The project was started to give drivers, commuters, and cross-border travelers a straightforward way to compare fuel costs without needing to visit many separate third-party and industry sources.",
   aboutMissionTitle: "Our mission",
   aboutMissionP1:
-    "Fuel prices vary significantly from country to country in Europe, sometimes by more than 50 percent for the same fuel type. Those differences matter: they affect household budgets, road-trip plans, logistics costs, and cross-border commuting decisions. Unfortunately, official price data is scattered across national energy agencies, statistics offices, and industry associations — each with its own format, update schedule, and reporting method.",
+    "Fuel prices vary significantly from country to country in Europe, sometimes by more than 50 percent for the same fuel type. Those differences matter: they affect household budgets, road-trip plans, logistics costs, and cross-border commuting decisions. Unfortunately, publicly available price data is fragmented across multiple third-party feeds, statistics references, and industry sources — each with its own format, update schedule, and reporting method.",
   aboutMissionP2:
     "Karburanti Sot brings that fragmented information together in one place. The goal is not simply to list numbers, but to add context: which country is cheapest right now, how large the price gap is, what exchange-rate effects look like for travelers paying in different currencies, and how nearby stations compare to the national average.",
   aboutDataTitle: "Where the data comes from",
   aboutDataP1:
-    "The prices shown on this site come from publicly available data sources including government energy agencies, official statistics bureaus, and recognized industry datasets. The site fetches data programmatically and converts it into a consistent format so that values can be compared side by side across countries.",
+    "Fuel price data is collected from publicly available third-party fuel price sources and may be supplemented with official or statistical references where available. The site fetches data programmatically and converts it into a consistent format so that values can be compared side by side across countries.",
   aboutDataP2:
     "Exchange-rate conversions use a public FX data source so that comparisons between countries with different currencies remain practical. All conversions are clearly labeled, and users are reminded that converted values are estimates rather than guaranteed pump prices.",
   aboutDataP3:
@@ -228,7 +229,7 @@ export const en = {
   privacyAdItem3: "Ad performance and interaction data (impressions, clicks)",
   privacyAdItem4: "Cookies or mobile advertising identifiers, subject to your device and browser settings",
   privacyAdsP2:
-    "We do not receive your personal advertising identifier directly. You can reset or limit ad personalization through your browser or device privacy settings.",
+    "Advertising may use cookies and similar identifiers for personalized or non-personalized ads, depending on your consent status and local legal requirements. For users in the EEA, UK, and Switzerland, consent signals are managed through a certified CMP or Google Privacy & messaging flow (provider details and links can be added by the site owner). You can reset or limit ad personalization through your browser or device privacy settings.",
   privacyAnalyticsTitle: "Analytics",
   privacyAnalyticsP1:
     "The Service does not use a separate analytics product to track individual users. Any usage data collected is limited to what the advertising SDKs gather for ad measurement purposes.",
@@ -255,12 +256,12 @@ export const en = {
     "By accessing and using Karburanti Sot (\"the Service\"), you agree to be bound by these Terms of Use. If you do not agree with any part of these terms, please do not use the Service.",
   termsServiceTitle: "Description of the Service",
   termsServiceP1:
-    "Karburanti Sot is a free, publicly accessible fuel price comparison service. It collects public fuel price data from government and industry sources across Europe, converts that data into a consistent format, and presents it with editorial context to help drivers and travelers make informed decisions.",
+    "Karburanti Sot is a free, publicly accessible fuel price comparison service. It collects public fuel price data from third-party and industry sources across Europe, converts that data into a consistent format, and presents it with editorial context to help drivers and travelers make informed decisions.",
   termsAccuracyTitle: "Data accuracy and limitations",
   termsAccuracyP1:
     "The fuel prices displayed on this site are sourced from publicly available datasets. While we make reasonable efforts to ensure accuracy and timeliness, we cannot guarantee that every price shown matches the exact pump price at any specific fuel station at any given time.",
   termsAccuracyP2:
-    "Country-level figures represent national averages or official reported values, not individual station prices. Local taxes, promotions, brand-specific pricing, and reporting delays can all cause differences between displayed values and actual station prices.",
+    "Country-level figures represent broad reference values from available datasets, not individual station prices. Local taxes, promotions, brand-specific pricing, and reporting delays can all cause differences between displayed values and actual station prices.",
   termsAccuracyP3:
     "Exchange-rate conversions are based on public FX data and should be treated as estimates. The Service is not a financial advisory tool and should not be relied upon for currency trading or investment decisions.",
   termsUseTitle: "Acceptable use",
@@ -334,9 +335,9 @@ export const en = {
 
   methodologySourcesTitle: "Data sources",
   methodologySourcesP1:
-    "Karburanti Sot pulls fuel price data from publicly available sources maintained by government energy agencies, national statistics offices, and recognized industry bodies across Europe. These sources publish data at different intervals — some weekly, some bi-weekly, and some monthly — depending on the reporting requirements in each country.",
+    "Karburanti Sot pulls fuel price data from publicly available third-party fuel price sources and may supplement coverage with official or statistical references where available. These sources publish data at different intervals — some weekly, some bi-weekly, and some monthly — depending on each publisher's reporting schedule.",
   methodologySourcesP2:
-    "The specific sources used can change over time as agencies update their reporting formats or APIs. When a source changes, the site's data pipeline is updated to match. The goal is always to use the most authoritative and timely public source available for each country.",
+    "The specific sources used can change over time as providers update their reporting formats or APIs. When a source changes, the site's data pipeline is updated to match. The goal is to keep a transparent, timely, and comparable public feed for each covered country.",
 
   methodologyProcessTitle: "Data processing",
   methodologyProcessP1:
@@ -352,7 +353,7 @@ export const en = {
 
   methodologyAccuracyTitle: "Accuracy and limitations",
   methodologyAccuracyP1:
-    "Country-level fuel prices represent national averages or officially reported reference values. They do not reflect the exact pump price at any specific station. Several factors can cause the price at a station near you to differ from the national figure: local competition, brand markups, time-of-day pricing, promotions, and how recently the station received a wholesale delivery.",
+    "Country-level fuel prices represent broad reference values from available datasets. They do not reflect the exact pump price at any specific station. Several factors can cause the price at a station near you to differ from the displayed figure: local competition, brand markups, time-of-day pricing, promotions, and how recently the station received a wholesale delivery.",
   methodologyAccuracyP2:
     "The \"Nearby Stations\" feature uses a different data source (map/location APIs) and may show prices that are more current for a specific location but less consistent in format than the country-level data. Both views are useful for different purposes: country data for broad comparisons, station data for immediate local decisions.",
 

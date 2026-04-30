@@ -60,6 +60,23 @@ export default function HowFuelPricesWorkPage({ t }: Props) {
           <Link to="/road-trip-fuel-guide" className="inlineLink">{t.navRoadTripGuide}</Link>
         </p>
       </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Albania and Balkan fuel price examples</h2>
+        <p className="contentBody">
+          In the Balkans, the same crude-oil trend can still produce different final pump prices. Albania, Kosovo, Montenegro, North Macedonia, and Greece may move in similar directions but with different speed because tax structure, logistics routes, and import dependence are not identical.
+        </p>
+        <p className="contentBody">
+          This is why country-to-country comparison is more useful than reading a single headline about oil prices. For practical route planning, compare markets directly in the <Link to="/europe-fuel-comparison" className="inlineLink">Europe comparison guide</Link> and in dedicated country pages like <Link to="/fuel-prices/albania" className="inlineLink">Albania</Link> and <Link to="/fuel-prices/greece" className="inlineLink">Greece</Link>.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">What this means for drivers</h2>
+        <p className="contentBody">
+          Treat fuel prices as decision support, not guaranteed station invoices. If you are planning a trip from Tirana to Pristina, Ohrid, or Podgorica, use country-level values to estimate the budget first, then confirm local prices before departure.
+        </p>
+      </section>
     </article>
   );
 }

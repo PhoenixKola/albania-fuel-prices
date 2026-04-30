@@ -26,7 +26,7 @@ export default function RankingsPage({
   return (
     <>
       <div className="pageHeader">
-        <h2 className="pageHeaderTitle">{t.navRankings}</h2>
+        <h1 className="pageHeaderTitle">{t.navRankings}</h1>
         <p className="pageHeaderSub">{t.rankingsGuidance}</p>
       </div>
       <RankingCard

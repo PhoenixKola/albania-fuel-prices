@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 
 type Props = { t: TDict };
@@ -57,6 +58,16 @@ export default function TermsPage({ t }: Props) {
       <section className="contentSection">
         <h2 className="contentHeading">{t.termsContactTitle}</h2>
         <p className="contentBody">{t.termsContactP1}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Informational use and local verification</h2>
+        <p className="contentBody">
+          Fuel prices and comparisons on this website are provided for informational planning only. They do not constitute a binding commercial offer and may differ from station-level prices at the time of purchase.
+        </p>
+        <p className="contentBody">
+          Users are responsible for verifying local prices and official notices before acting on route or purchasing decisions. For transparency details, review <Link to="/methodology" className="inlineLink">Methodology</Link>.
+        </p>
       </section>
     </article>
   );

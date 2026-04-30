@@ -11,7 +11,7 @@ export default function StationsPage({ t, radiusM, setRadiusM }: Props) {
   return (
     <>
       <div className="pageHeader">
-        <h2 className="pageHeaderTitle">{t.navStations}</h2>
+        <h1 className="pageHeaderTitle">{t.navStations}</h1>
         <p className="pageHeaderSub">{t.nearbyGuidance}</p>
       </div>
       <NearbyStationsCard t={t} radiusM={radiusM} setRadiusM={setRadiusM} />

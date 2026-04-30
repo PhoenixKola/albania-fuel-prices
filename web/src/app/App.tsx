@@ -1,7 +1,8 @@
-import { useEffect, useCallback, useMemo } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { Routes, Route, useLocation, useParams } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import type { FuelType } from "../models/fuel";
+import type { LatestEurope } from "../models/fuel";
 import type { Currency } from "../models/currency";
 import { i18n } from "../locales";
 import {
@@ -23,20 +24,41 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 
 import HomePage from "../pages/HomePage";
-import StationsPage from "../pages/StationsPage";
-import ComparePage from "../pages/ComparePage";
-import RankingsPage from "../pages/RankingsPage";
-import AboutPage from "../pages/AboutPage";
-import ContactPage from "../pages/ContactPage";
-import PrivacyPage from "../pages/PrivacyPage";
-import TermsPage from "../pages/TermsPage";
-import MethodologyPage from "../pages/MethodologyPage";
-import HowFuelPricesWorkPage from "../pages/HowFuelPricesWorkPage";
-import EuropeFuelComparisonPage from "../pages/EuropeFuelComparisonPage";
-import RoadTripFuelGuidePage from "../pages/RoadTripFuelGuidePage";
-import NotFoundPage from "../pages/NotFoundPage";
+const StationsPage = lazy(() => import("../pages/StationsPage"));
+const ComparePage = lazy(() => import("../pages/ComparePage"));
+const RankingsPage = lazy(() => import("../pages/RankingsPage"));
+const AboutPage = lazy(() => import("../pages/AboutPage"));
+const ContactPage = lazy(() => import("../pages/ContactPage"));
+const PrivacyPage = lazy(() => import("../pages/PrivacyPage"));
+const TermsPage = lazy(() => import("../pages/TermsPage"));
+const MethodologyPage = lazy(() => import("../pages/MethodologyPage"));
+const HowFuelPricesWorkPage = lazy(() => import("../pages/HowFuelPricesWorkPage"));
+const EuropeFuelComparisonPage = lazy(() => import("../pages/EuropeFuelComparisonPage"));
+const RoadTripFuelGuidePage = lazy(() => import("../pages/RoadTripFuelGuidePage"));
+const CountryFuelPricesPage = lazy(() => import("../pages/CountryFuelPricesPage"));
+const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
+import RouteSeo from "./RouteSeo";
 
 import logo from "../assets/logo.png";
+
+type CountryFuelRouteProps = {
+  data: LatestEurope | null;
+  loading: boolean;
+  setCountry: (country: string) => void;
+};
+
+function CountryFuelRoute({ data, loading, setCountry }: CountryFuelRouteProps) {
+  const { countrySlug } = useParams<{ countrySlug: string }>();
+
+  return (
+    <CountryFuelPricesPage
+      slug={countrySlug ?? ""}
+      data={data}
+      loading={loading}
+      setCountry={setCountry}
+    />
+  );
+}
 
 export default function App() {
   const { pathname } = useLocation();
@@ -52,8 +74,7 @@ export default function App() {
   }, [pathname]);
 
   const [lang, setLang] = useLocalStorageState<Lang>(STORAGE_LANG_KEY, "en", {
-    // deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
-    deserialize: () => "en",
+    deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
   });
 
   useEffect(() => {
@@ -117,6 +138,9 @@ export default function App() {
           onToggleTheme={toggleTheme}
         />
 
+        <RouteSeo data={data} loading={loading} />
+
+        <Suspense fallback={<section className="contentSection"><p className="contentBody">Loading page...</p></section>}>
         <Routes>
           <Route
             path="/"
@@ -190,8 +214,13 @@ export default function App() {
           <Route path="/how-fuel-prices-work" element={<HowFuelPricesWorkPage t={t} />} />
           <Route path="/europe-fuel-comparison" element={<EuropeFuelComparisonPage t={t} />} />
           <Route path="/road-trip-fuel-guide" element={<RoadTripFuelGuidePage t={t} />} />
+          <Route
+            path="/fuel-prices/:countrySlug"
+            element={<CountryFuelRoute data={data} loading={loading} setCountry={setCountry} />}
+          />
           <Route path="*" element={<NotFoundPage t={t} />} />
         </Routes>
+        </Suspense>
 
         <Footer t={t} />
       </div>

@@ -39,6 +39,23 @@ export default function AboutPage({ t }: Props) {
           <Link to="/contact" className="inlineLink">{t.navContact}</Link>
         </p>
       </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Who this website is for</h2>
+        <p className="contentBody">
+          Fuel Today is built for everyday drivers, commuters, logistics operators, and travelers who need a practical fuel-price comparison reference for Albania and Europe. It is especially useful when planning regional routes where fuel costs can change significantly across borders.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">What value this tool provides</h2>
+        <p className="contentBody">
+          The value is not just a number table. The site combines fuel data, route-oriented guides, and methodology notes so users can make better-informed decisions with clear limitations and transparent sourcing.
+        </p>
+        <p className="contentBody">
+          For data policy details, see <Link to="/privacy" className="inlineLink">Privacy</Link> and <Link to="/terms" className="inlineLink">Terms</Link>.
+        </p>
+      </section>
     </article>
   );
 }

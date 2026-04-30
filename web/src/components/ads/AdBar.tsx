@@ -11,15 +11,29 @@ type Props = {
 export default function AdBar({ adClient, adSlot, enabled = true, lang = "en" }: Props) {
   const shouldRender = enabled && lang === "en";
 
-  useEffect(() => {
-    if (!shouldRender) return;
-
+  const requestAd = () => {
     try {
       // @ts-expect-error - AdSense injects this global
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
-      //
+      // Ignore until AdSense is available.
     }
+  };
+
+  useEffect(() => {
+    if (!shouldRender) return;
+
+    requestAd();
+
+    const onConsentAdsReady = () => {
+      requestAd();
+    };
+
+    window.addEventListener("fueltoday:adsense-ready", onConsentAdsReady);
+
+    return () => {
+      window.removeEventListener("fueltoday:adsense-ready", onConsentAdsReady);
+    };
   }, [shouldRender]);
 
   if (!shouldRender) return null;

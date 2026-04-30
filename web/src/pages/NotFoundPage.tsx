@@ -13,6 +13,9 @@ export default function NotFoundPage({ t }: Props) {
         <h1 className="contentPageTitle">{t.notFoundTitle}</h1>
         <p className="notFoundSub">{t.notFoundSubtitle}</p>
         <p className="contentBody notFoundBody">{t.notFoundMessage}</p>
+        <p className="contentBody notFoundBody">
+          Try <Link to="/methodology" className="inlineLink">Methodology</Link>, <Link to="/europe-fuel-comparison" className="inlineLink">Europe comparison</Link>, or <Link to="/contact" className="inlineLink">Contact</Link>.
+        </p>
         <Link to="/" className="btn btn-primary notFoundBtn">
           {t.notFoundButtonHome}
         </Link>

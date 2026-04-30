@@ -58,7 +58,7 @@ export function useFuelData({ url, country, setCountry }: Params) {
     if (didInitForUrl.current === url) return;
     didInitForUrl.current = url;
     void load("init");
-  }, [url]); 
+  }, [url, load]); 
 
   const refresh = useCallback(() => {
     void load("refresh");

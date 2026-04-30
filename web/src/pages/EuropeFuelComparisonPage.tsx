@@ -59,6 +59,26 @@ export default function EuropeFuelComparisonPage({ t }: Props) {
           <Link to="/road-trip-fuel-guide" className="inlineLink">{t.navRoadTripGuide}</Link>
         </p>
       </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">How Albania compares with key countries</h2>
+        <p className="contentBody">
+          This website is built around Albania as the practical baseline, then expands outward to nearby and major European markets. The most useful comparison set for many users is Kosovo, Montenegro, North Macedonia, Greece, Italy, and Croatia.
+        </p>
+        <p className="contentBody">
+          For broader context, Portugal, Switzerland, and the United Kingdom help show how far prices can diverge across Europe due to taxation, currency, and distribution structure differences.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Practical interpretation instead of raw ranking</h2>
+        <p className="contentBody">
+          A lower country average does not automatically mean your full trip will be cheaper. Border detours, tolls, city traffic, and payment-currency effects can offset part of the fuel advantage.
+        </p>
+        <p className="contentBody">
+          Use country pages for context: <Link to="/fuel-prices/albania" className="inlineLink">Albania</Link>, <Link to="/fuel-prices/kosovo" className="inlineLink">Kosovo</Link>, <Link to="/fuel-prices/montenegro" className="inlineLink">Montenegro</Link>, <Link to="/fuel-prices/north-macedonia" className="inlineLink">North Macedonia</Link>, <Link to="/fuel-prices/greece" className="inlineLink">Greece</Link>, <Link to="/fuel-prices/italy" className="inlineLink">Italy</Link>, <Link to="/fuel-prices/croatia" className="inlineLink">Croatia</Link>, <Link to="/fuel-prices/portugal" className="inlineLink">Portugal</Link>, <Link to="/fuel-prices/switzerland" className="inlineLink">Switzerland</Link>, and <Link to="/fuel-prices/united-kingdom" className="inlineLink">United Kingdom</Link>.
+        </p>
+      </section>
     </article>
   );
 }

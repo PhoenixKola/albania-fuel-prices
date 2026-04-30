@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
 import type { CountryPrices, LatestEurope } from "../models/fuel";
@@ -14,7 +15,8 @@ import ToastHost from "../components/feedback/ToastHost";
 import HeroIntro from "../components/content/HeroIntro";
 import EditorialSummary from "../components/content/EditorialSummary";
 import MethodologySection from "../components/content/MethodologySection";
-import FaqSection from "../components/content/FaqSection";
+
+const HomeEditorialDeepDive = lazy(() => import("../components/content/HomeEditorialDeepDive"));
 
 type Props = {
   t: TDict;
@@ -118,7 +120,9 @@ export default function HomePage({
 
       <SourceCard t={t} data={data} />
 
-      <FaqSection t={t} />
+      <Suspense fallback={<section className="contentSection"><p className="contentBody">Loading guide content...</p></section>}>
+        <HomeEditorialDeepDive data={data} />
+      </Suspense>
 
       <AdBar
         adClient="ca-pub-2653462201538649"

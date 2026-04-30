@@ -164,11 +164,45 @@
       })();
     </script>
 
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2653462201538649"
-      crossorigin="anonymous"
-    ></script>
+    <script>
+      window.__FUELTODAY_CONSENT_HOOKS__ = {
+        cmpProviderName: "[ADD_CMP_PROVIDER]",
+        cmpPolicyUrl: "[ADD_CMP_PRIVACY_URL]",
+        cmpCookieListUrl: "[ADD_CMP_COOKIE_URL]",
+        regionsRequiringConsent: ["EEA", "UK", "CH"],
+      };
+
+      window.__FUELTODAY_LOAD_ADSENSE__ = function () {
+        if (window.__FUELTODAY_ADSENSE_LOADED__) return;
+        var script = document.createElement("script");
+        script.async = true;
+        script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2653462201538649";
+        script.crossOrigin = "anonymous";
+        document.head.appendChild(script);
+        window.__FUELTODAY_ADSENSE_LOADED__ = true;
+      };
+
+      // CMPs can call this callback once consent is resolved.
+      window.__FUELTODAY_ON_CONSENT_READY__ = function () {
+        window.__FUELTODAY_LOAD_ADSENSE__();
+        window.dispatchEvent(new Event("fueltoday:adsense-ready"));
+      };
+
+      // Optional: set window.__FUELTODAY_LOAD_ADSENSE_IMMEDIATELY__ = true before this script.
+      if (window.__FUELTODAY_LOAD_ADSENSE_IMMEDIATELY__ === true) {
+        window.__FUELTODAY_LOAD_ADSENSE__();
+      }
+
+      // Optional: set window.__FUELTODAY_CMP_SCRIPT_URL__ to inject your certified CMP script.
+      var cmpUrl = window.__FUELTODAY_CMP_SCRIPT_URL__ || "";
+      if (typeof cmpUrl === "string" && cmpUrl.length > 0) {
+        var cmpScript = document.createElement("script");
+        cmpScript.src = cmpUrl;
+        cmpScript.async = true;
+        cmpScript.defer = true;
+        document.head.appendChild(cmpScript);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

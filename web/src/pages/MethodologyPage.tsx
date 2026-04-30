@@ -54,6 +54,26 @@ export default function MethodologyPage({ t }: Props) {
           <Link to="/contact" className="inlineLink">{t.navContact}</Link>
         </p>
       </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Data source and update summary</h2>
+        <p className="contentBody">
+          This website publishes informational country-level fuel prices sourced from public datasets and normalized for comparison use. Update timing depends on upstream publication schedules, so not every country changes at the same frequency.
+        </p>
+        <p className="contentBody">
+          The timestamp shown in the tool indicates when the dataset was refreshed. It should be interpreted as data availability timing, not as a guarantee of real-time pump updates.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Fuel types and limitations</h2>
+        <p className="contentBody">
+          Petrol (95), diesel, and LPG are shown only when each value exists in the source. Missing fields are not guessed or interpolated. Local station offers, promotions, and micro-regional pricing are outside country-level scope.
+        </p>
+        <p className="contentBody">
+          Before making travel or purchasing decisions, users should verify prices with local stations or official channels. For practical examples, see <Link to="/road-trip-fuel-guide" className="inlineLink">Road trip fuel guide</Link>.
+        </p>
+      </section>
     </article>
   );
 }
