@@ -70,6 +70,7 @@ export default function Navbar({
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
   const [lastPath, setLastPath] = useState(location.pathname);
+  console.log(lang, onToggleLang);
 
   // Close menu on route change
   if (lastPath !== location.pathname) {
@@ -244,7 +245,7 @@ export default function Navbar({
               <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
             </button>
 
-            <button
+            {/* <button
               className="btn btn-ghost mobileMenuBtn"
               onClick={() => {
                 onToggleLang();
@@ -252,7 +253,7 @@ export default function Navbar({
               }}
             >
               {lang === "en" ? t.langSQ : t.langEN}
-            </button>
+            </button> */}
           </div>
         </div>
       )}
