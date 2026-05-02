@@ -1,9 +1,9 @@
 {
   "region": "Europe",
-  "as_of": "2026-05-01",
+  "as_of": "2026-05-02",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-05-01T08:24:13.231Z",
+  "fetched_at_utc": "2026-05-02T07:57:54.766Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
