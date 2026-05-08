@@ -1,9 +1,9 @@
 {
   "region": "Europe",
-  "as_of": "2026-05-07",
+  "as_of": "2026-05-08",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-05-07T08:46:52.945Z",
+  "fetched_at_utc": "2026-05-08T07:55:52.896Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
@@ -39,19 +39,19 @@
     {
       "country": "Bulgaria",
       "gasoline95_eur": 1.467,
-      "diesel_eur": 1.755,
+      "diesel_eur": 1.756,
       "lpg_eur": 0.801
     },
     {
       "country": "Croatia",
       "gasoline95_eur": 1.681,
-      "diesel_eur": 1.873,
+      "diesel_eur": 1.874,
       "lpg_eur": 1.015
     },
     {
       "country": "Czechia",
       "gasoline95_eur": 1.67,
-      "diesel_eur": 1.693,
+      "diesel_eur": 1.694,
       "lpg_eur": 0.961
     },
     {
@@ -68,21 +68,21 @@
     },
     {
       "country": "Germany",
-      "gasoline95_eur": 1.997,
-      "diesel_eur": 2.065,
+      "gasoline95_eur": 1.998,
+      "diesel_eur": 2.066,
       "lpg_eur": 1.174
     },
     {
       "country": "Greece",
       "gasoline95_eur": 2.068,
-      "diesel_eur": 1.868,
+      "diesel_eur": 1.869,
       "lpg_eur": 1.26
     },
     {
       "country": "Hungary",
       "gasoline95_eur": 1.634,
       "diesel_eur": 1.689,
-      "lpg_eur": 1.011
+      "lpg_eur": 1.012
     },
     {
       "country": "Italy",
@@ -106,7 +106,7 @@
       "country": "Luxembourg",
       "gasoline95_eur": 1.834,
       "diesel_eur": 1.921,
-      "lpg_eur": 0.797
+      "lpg_eur": 0.798
     },
     {
       "country": "Moldova",
@@ -118,12 +118,12 @@
       "country": "Poland",
       "gasoline95_eur": 1.431,
       "diesel_eur": 1.608,
-      "lpg_eur": 0.887
+      "lpg_eur": 0.888
     },
     {
       "country": "Portugal",
       "gasoline95_eur": 1.976,
-      "diesel_eur": 2.014,
+      "diesel_eur": 2.015,
       "lpg_eur": 0.998
     },
     {
@@ -134,9 +134,9 @@
     },
     {
       "country": "Russia",
-      "gasoline95_eur": 0.763,
+      "gasoline95_eur": 0.764,
       "diesel_eur": 0.865,
-      "lpg_eur": 0.346
+      "lpg_eur": 0.347
     },
     {
       "country": "San Marino",
@@ -152,7 +152,7 @@
     },
     {
       "country": "Slovakia",
-      "gasoline95_eur": 1.676,
+      "gasoline95_eur": 1.677,
       "diesel_eur": 1.775,
       "lpg_eur": 0.895
     },
@@ -164,7 +164,7 @@
     },
     {
       "country": "Spain",
-      "gasoline95_eur": 1.535,
+      "gasoline95_eur": 1.536,
       "diesel_eur": 1.729,
       "lpg_eur": 1.021
     },
