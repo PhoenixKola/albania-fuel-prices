@@ -2,10 +2,17 @@
   "expo": {
     "name": "Karburanti Sot",
     "slug": "karburanti-sot",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/de19f756-719b-4414-81ba-94ff5d53dd08",
+      "checkAutomatically": "ON_LOAD"
+    },
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
@@ -19,7 +26,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.phoenixkola.karburantisot",
-      "versionCode": 10,
+      "versionCode": 14,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0b1220"
