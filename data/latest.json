@@ -1,9 +1,9 @@
 {
   "region": "Europe",
-  "as_of": "2026-05-11",
+  "as_of": "2026-05-12",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-05-11T09:58:20.793Z",
+  "fetched_at_utc": "2026-05-12T08:52:04.100Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
@@ -44,7 +44,7 @@
     },
     {
       "country": "Croatia",
-      "gasoline95_eur": 1.682,
+      "gasoline95_eur": 1.681,
       "diesel_eur": 1.874,
       "lpg_eur": 1.015
     },
@@ -56,7 +56,7 @@
     },
     {
       "country": "Estonia",
-      "gasoline95_eur": 1.846,
+      "gasoline95_eur": 1.845,
       "diesel_eur": 1.913,
       "lpg_eur": 0.969
     },
@@ -86,7 +86,7 @@
     },
     {
       "country": "Italy",
-      "gasoline95_eur": 1.908,
+      "gasoline95_eur": 1.907,
       "diesel_eur": 2.039,
       "lpg_eur": 0.802
     },
@@ -94,7 +94,7 @@
       "country": "Latvia",
       "gasoline95_eur": 1.771,
       "diesel_eur": 1.934,
-      "lpg_eur": 1.049
+      "lpg_eur": 1.048
     },
     {
       "country": "Lithuania",
@@ -140,7 +140,7 @@
     },
     {
       "country": "San Marino",
-      "gasoline95_eur": 1.535,
+      "gasoline95_eur": 1.534,
       "diesel_eur": 1.805,
       "lpg_eur": 0.794
     },
