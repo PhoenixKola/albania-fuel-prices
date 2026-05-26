@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-adsense-account" content="ca-pub-2653462201538649" />
 
     <title>Fuel Prices Today</title>
     <meta
@@ -42,93 +43,6 @@
     <link rel="icon" href="/favicon.ico" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "WebSite",
-            "name": "Fuel Prices Today",
-            "url": "https://karburantisot.com/",
-            "inLanguage": "en"
-          },
-          {
-            "@type": "WebPage",
-            "name": "Fuel Prices Today | Compare Fuel Prices in Albania and Europe",
-            "url": "https://karburantisot.com/",
-            "inLanguage": "en",
-            "description": "Compare public fuel prices across Albania and Europe, view country rankings, check nearby stations, and understand current petrol and diesel price differences."
-          },
-          {
-            "@type": "WebPage",
-            "name": "About Karburanti Sot",
-            "url": "https://karburantisot.com/about",
-            "inLanguage": "en",
-            "description": "Learn about the mission, data sources, and editorial approach behind Karburanti Sot, an independent fuel price comparison service for Europe."
-          },
-          {
-            "@type": "ContactPage",
-            "name": "Contact Us",
-            "url": "https://karburantisot.com/contact",
-            "inLanguage": "en",
-            "description": "Get in touch with the team behind Karburanti Sot for data corrections, feedback, or partnership inquiries."
-          },
-          {
-            "@type": "WebPage",
-            "name": "Privacy Policy",
-            "url": "https://karburantisot.com/privacy",
-            "inLanguage": "en",
-            "description": "Privacy Policy for Karburanti Sot — how we handle information when you use our fuel price comparison website and mobile apps."
-          },
-          {
-            "@type": "WebPage",
-            "name": "Terms of Use",
-            "url": "https://karburantisot.com/terms",
-            "inLanguage": "en",
-            "description": "Terms of Use for Karburanti Sot — data accuracy disclaimers, acceptable use, and limitation of liability."
-          },
-          {
-            "@type": "Article",
-            "name": "Methodology: How Karburanti Sot Collects and Presents Fuel Price Data",
-            "url": "https://karburantisot.com/methodology",
-            "inLanguage": "en",
-            "description": "Transparent explanation of the data pipeline behind Karburanti Sot: sources, processing, exchange-rate conversions, accuracy, and editorial approach."
-          },
-          {
-            "@type": "Article",
-            "name": "How Fuel Prices Work: From Crude Oil to the Pump",
-            "url": "https://karburantisot.com/how-fuel-prices-work",
-            "inLanguage": "en",
-            "description": "Understand the fuel price chain from crude oil extraction through refining, distribution, taxes, and retail margins to the pump price you pay."
-          },
-          {
-            "@type": "Article",
-            "name": "Fuel Prices Across Europe: A Country-by-Country Comparison Guide",
-            "url": "https://karburantisot.com/europe-fuel-comparison",
-            "inLanguage": "en",
-            "description": "Why fuel prices vary across Europe, regional patterns, diesel vs petrol differences, border effects, and practical advice for cross-border refueling."
-          },
-          {
-            "@type": "Article",
-            "name": "Road Trip Fuel Cost Guide: How to Estimate and Reduce Your Fuel Expenses",
-            "url": "https://karburantisot.com/road-trip-fuel-guide",
-            "inLanguage": "en",
-            "description": "Calculate fuel costs for road trips, understand real-world consumption, plan cross-border refueling, and learn practical tips to reduce fuel expenses."
-          },
-          {
-            "@type": "WebApplication",
-            "name": "Fuel Prices Today",
-            "url": "https://karburantisot.com/",
-            "description": "A public fuel price comparison website for Albania and Europe with country rankings, nearby station lookup, and practical price context.",
-            "applicationCategory": "TravelApplication",
-            "operatingSystem": "Any",
-            "inLanguage": "en",
-            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
-          }
-        ]
-      }
-    </script>
-
     <script>
       (function () {
         try {
@@ -165,13 +79,6 @@
     </script>
 
     <script>
-      window.__FUELTODAY_CONSENT_HOOKS__ = {
-        cmpProviderName: "[ADD_CMP_PROVIDER]",
-        cmpPolicyUrl: "[ADD_CMP_PRIVACY_URL]",
-        cmpCookieListUrl: "[ADD_CMP_COOKIE_URL]",
-        regionsRequiringConsent: ["EEA", "UK", "CH"],
-      };
-
       window.__FUELTODAY_LOAD_ADSENSE__ = function () {
         if (window.__FUELTODAY_ADSENSE_LOADED__) return;
         var script = document.createElement("script");
@@ -181,27 +88,6 @@
         document.head.appendChild(script);
         window.__FUELTODAY_ADSENSE_LOADED__ = true;
       };
-
-      // CMPs can call this callback once consent is resolved.
-      window.__FUELTODAY_ON_CONSENT_READY__ = function () {
-        window.__FUELTODAY_LOAD_ADSENSE__();
-        window.dispatchEvent(new Event("fueltoday:adsense-ready"));
-      };
-
-      // Optional: set window.__FUELTODAY_LOAD_ADSENSE_IMMEDIATELY__ = true before this script.
-      if (window.__FUELTODAY_LOAD_ADSENSE_IMMEDIATELY__ === true) {
-        window.__FUELTODAY_LOAD_ADSENSE__();
-      }
-
-      // Optional: set window.__FUELTODAY_CMP_SCRIPT_URL__ to inject your certified CMP script.
-      var cmpUrl = window.__FUELTODAY_CMP_SCRIPT_URL__ || "";
-      if (typeof cmpUrl === "string" && cmpUrl.length > 0) {
-        var cmpScript = document.createElement("script");
-        cmpScript.src = cmpUrl;
-        cmpScript.async = true;
-        cmpScript.defer = true;
-        document.head.appendChild(cmpScript);
-      }
     </script>
   </head>
   <body>

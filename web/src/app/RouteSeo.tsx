@@ -2,17 +2,12 @@ import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import type { LatestEurope } from "../models/fuel";
 import Seo from "../components/meta/Seo";
-import { getCountryPageBySlug } from "../config/countryPages";
+import { getCountryEditorial } from "../config/countryContent";
 
 type Props = {
   data: LatestEurope | null;
   loading: boolean;
 };
-
-function hasUsableCountryFuelData(row: LatestEurope["countries"][number] | undefined) {
-  if (!row) return false;
-  return [row.gasoline95_eur, row.diesel_eur, row.lpg_eur].some((value) => typeof value === "number");
-}
 
 export default function RouteSeo({ data, loading }: Props) {
   const { pathname } = useLocation();
@@ -128,18 +123,13 @@ export default function RouteSeo({ data, loading }: Props) {
 
     if (pathname.startsWith("/fuel-prices/")) {
       const slug = pathname.replace("/fuel-prices/", "");
-      const countryPage = getCountryPageBySlug(slug);
-      const countryRow = data?.countries.find((c) => c.country === countryPage?.dataCountryName);
-      const hasData = hasUsableCountryFuelData(countryRow);
+      const editorial = getCountryEditorial(slug);
 
-      if (countryPage) {
+      if (editorial) {
         return {
-          title: `${countryPage.label} Fuel Prices | Fuel Today`,
-          description: hasData
-            ? `Latest ${countryPage.label} fuel prices for petrol, diesel, and LPG where available, with Albania comparison context and methodology links.`
-            : `${countryPage.label} fuel price context page with Albania comparison guidance and transparent notes about current data availability.`,
+          title: editorial.metaTitle,
+          description: editorial.metaDescription,
           path: pathname,
-          noindex: !loading && !hasData,
         };
       }
     }

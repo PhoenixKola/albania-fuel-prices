@@ -1,7 +1,9 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/)(?!ads\\.txt)(?!robots\\.txt)(?!sitemap\\.xml)(?!site\\.webmanifest)(?!favicon\\.ico)(?!og\\.png).*)",
       "destination": "/index.html"
     }
   ]

@@ -39,7 +39,7 @@ const CountryFuelPricesPage = lazy(() => import("../pages/CountryFuelPricesPage"
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
 import RouteSeo from "./RouteSeo";
 
-import logo from "../assets/logo.png";
+import logo from "../assets/Logo.png";
 
 type CountryFuelRouteProps = {
   data: LatestEurope | null;

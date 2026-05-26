@@ -83,10 +83,21 @@ export default function PrivacyPage({ t }: Props) {
       <section className="contentSection">
         <h2 className="contentHeading">Consent management and ad choices</h2>
         <p className="contentBody">
-          This site can integrate a Google-certified Consent Management Platform (CMP) or Google Privacy &amp; messaging flow for ad consent handling. Where required by law (including EEA, UK, and Switzerland), users should be able to choose consent options for personalized and non-personalized ads.
+          This site may use Google AdSense on the web version to serve advertisements. Google and its advertising partners may use cookies or device identifiers to serve personalized or non-personalized ads depending on your region and consent status.
         </p>
         <p className="contentBody">
-          Site owner placeholders: CMP provider name: [ADD_CMP_PROVIDER], CMP privacy link: [ADD_CMP_PRIVACY_URL], CMP cookie list link: [ADD_CMP_COOKIE_URL].
+          For users in regions that require consent (including the European Economic Area, United Kingdom, and Switzerland), consent controls will be presented once a Google-certified Consent Management Platform is enabled through the AdSense interface.
+        </p>
+        <p className="contentBody">
+          You can learn more about how Google uses data when you use partner sites and apps at{" "}
+          <a
+            href="https://policies.google.com/technologies/partner-sites"
+            className="inlineLink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Google&apos;s partner sites privacy page
+          </a>.
         </p>
       </section>
     </article>

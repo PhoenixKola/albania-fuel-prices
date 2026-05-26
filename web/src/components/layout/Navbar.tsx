@@ -58,11 +58,9 @@ export default function Navbar({
   t,
   logoSrc,
   subtitle,
-  lang,
   theme,
   refreshing,
   onRefresh,
-  onToggleLang,
   onToggleTheme,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,7 +68,6 @@ export default function Navbar({
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
   const [lastPath, setLastPath] = useState(location.pathname);
-  console.log(lang, onToggleLang);
 
   // Close menu on route change
   if (lastPath !== location.pathname) {
@@ -103,14 +100,18 @@ export default function Navbar({
 
   const navLinks = [
     { to: "/", label: t.navHome },
+    { to: "/compare", label: t.navCompare },
+    { to: "/rankings", label: t.navRankings },
+    { to: "/stations", label: t.navStations },
     { to: "/about", label: t.navAbout },
     { to: "/contact", label: t.navContact },
   ];
 
   const guideLinks = [
+    { to: "/methodology", label: t.navMethodology },
+    { to: "/how-fuel-prices-work", label: t.navHowPricesWork },
     { to: "/europe-fuel-comparison", label: t.navEuropeComparison },
     { to: "/road-trip-fuel-guide", label: t.navRoadTripGuide },
-    { to: "/methodology", label: t.navMethodology },
   ];
 
   const mobileLinks = [...navLinks, ...guideLinks];

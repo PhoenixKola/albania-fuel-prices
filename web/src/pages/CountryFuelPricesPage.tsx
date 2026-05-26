@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { LatestEurope } from "../models/fuel";
-import { getCountryPageBySlug } from "../config/countryPages";
+import { getCountryEditorial } from "../config/countryContent";
 
 type Props = {
   slug: string;
@@ -38,9 +38,9 @@ function compareNote(albaniaPrice: number | null, countryPrice: number | null, l
 }
 
 export default function CountryFuelPricesPage({ slug, data, loading, setCountry }: Props) {
-  const page = getCountryPageBySlug(slug);
+  const editorial = getCountryEditorial(slug);
 
-  if (!page) {
+  if (!editorial) {
     return (
       <article className="contentPage">
         <h1 className="contentPageTitle">Country page not found</h1>
@@ -52,60 +52,114 @@ export default function CountryFuelPricesPage({ slug, data, loading, setCountry 
     );
   }
 
-  const row = data?.countries.find((country) => country.country === page.dataCountryName) ?? null;
+  const row = data?.countries.find((country) => country.country === editorial.dataCountryName) ?? null;
   const albania = data?.countries.find((country) => country.country === "Albania") ?? null;
   const hasAnyPrice = !!row && [row.gasoline95_eur, row.diesel_eur, row.lpg_eur].some((value) => typeof value === "number");
 
   return (
     <article className="contentPage">
-      <h1 className="contentPageTitle">{page.label} fuel prices</h1>
+      <h1 className="contentPageTitle">{editorial.label} fuel prices today</h1>
       <p className="contentBody">
-        This country page gives a practical snapshot of available fuel prices in {page.label}. It is designed for users comparing Albania with nearby Balkan and European markets, not for predicting one exact station pump price.
+        This page provides a comprehensive overview of fuel prices in {editorial.label}, with practical comparison context for Albanian drivers and travelers. It combines the latest available data with market analysis, border advice, and refueling strategies.
       </p>
 
+      {data?.source ? (
+        <p className="contentBodyMuted">
+          Data source: {data.source} | Last fetched: {data.fetched_at_utc ? new Date(data.fetched_at_utc).toLocaleDateString("en-GB", { dateStyle: "medium" }) : "recently"}
+        </p>
+      ) : null}
+
       <section className="contentSection">
-        <h2 className="contentHeading">Today&apos;s available prices</h2>
+        <h2 className="contentHeading">Current {editorial.label} fuel prices</h2>
         {loading ? <p className="contentBody">Loading latest fuel data...</p> : null}
         {!loading && !hasAnyPrice ? (
           <p className="contentBody">
-            We currently do not have complete public price values for {page.label} in the latest dataset. Data coverage depends on upstream source publication and may change over time.
+            We currently do not have complete public price values for {editorial.label} in the latest dataset. Data coverage depends on upstream source publication and may change over time. The editorial content below remains relevant for understanding this market.
           </p>
         ) : null}
         {!loading && hasAnyPrice ? (
-          <ul className="contentList">
-            {renderPrice("Petrol (95)", row?.gasoline95_eur ?? null)}
-            {renderPrice("Diesel", row?.diesel_eur ?? null)}
-            {renderPrice("LPG", row?.lpg_eur ?? null)}
-          </ul>
+          <>
+            <ul className="contentList">
+              {renderPrice("Petrol (Gasoline 95)", row?.gasoline95_eur ?? null)}
+              {renderPrice("Diesel", row?.diesel_eur ?? null)}
+              {renderPrice("LPG (Autogas)", row?.lpg_eur ?? null)}
+            </ul>
+            <p className="contentBody">
+              All prices are expressed in EUR per liter for consistent cross-country comparison. These represent country-level reference values from public data sources, not guaranteed prices at any specific station.
+            </p>
+          </>
         ) : null}
       </section>
 
       <section className="contentSection">
-        <h2 className="contentHeading">Price context for {page.label}</h2>
-        <p className="contentBody">{page.context}</p>
-        <p className="contentBody">{page.compareHint}</p>
+        <h2 className="contentHeading">{editorial.label} fuel market overview</h2>
+        <p className="contentBody">{editorial.marketOverview}</p>
       </section>
 
       <section className="contentSection">
-        <h2 className="contentHeading">How {page.label} compares with Albania</h2>
+        <h2 className="contentHeading">How {editorial.label} compares with Albania</h2>
+        {!loading && hasAnyPrice ? (
+          <ul className="contentList">
+            <li>{compareNote(albania?.gasoline95_eur ?? null, row?.gasoline95_eur ?? null, "Petrol (95)")}</li>
+            <li>{compareNote(albania?.diesel_eur ?? null, row?.diesel_eur ?? null, "Diesel")}</li>
+            <li>{compareNote(albania?.lpg_eur ?? null, row?.lpg_eur ?? null, "LPG")}</li>
+          </ul>
+        ) : null}
+        <p className="contentBody">{editorial.albaniaContext}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Travel routes and relevance</h2>
+        <p className="contentBody">{editorial.travelRelevance}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Understanding petrol, diesel, and LPG in {editorial.label}</h2>
+        <p className="contentBody">{editorial.fuelInterpretation}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Border crossing and refueling advice</h2>
+        <p className="contentBody">{editorial.borderAdvice}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Data coverage and limitations</h2>
+        <p className="contentBody">{editorial.dataLimitations}</p>
+        <p className="contentBody">{editorial.sourceTransparency}</p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Frequently asked questions about {editorial.label} fuel prices</h2>
+        {editorial.faqs.map((faq, i) => (
+          <div key={i}>
+            <h3 className="contentFaqQuestion">{faq.question}</h3>
+            <p className="contentFaqAnswer">{faq.answer}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Explore more</h2>
+        <p className="contentBody">
+          Use the interactive fuel comparison tools on this site to dig deeper into {editorial.label} pricing:
+        </p>
         <ul className="contentList">
-          <li>{compareNote(albania?.gasoline95_eur ?? null, row?.gasoline95_eur ?? null, "Petrol")}</li>
-          <li>{compareNote(albania?.diesel_eur ?? null, row?.diesel_eur ?? null, "Diesel")}</li>
-          <li>{compareNote(albania?.lpg_eur ?? null, row?.lpg_eur ?? null, "LPG")}</li>
+          {editorial.relatedLinks.map((link) => (
+            <li key={link.to}>
+              <Link className="inlineLink" to={link.to}>{link.label}</Link>
+            </li>
+          ))}
+          <li>
+            <Link
+              className="inlineLink"
+              to="/"
+              onClick={() => setCountry(editorial.dataCountryName)}
+            >
+              View {editorial.label} on the interactive dashboard
+            </Link>
+          </li>
         </ul>
-        <p className="contentBody">
-          If you want to switch the dashboard to this country, use the <Link className="inlineLink" to="/" onClick={() => setCountry(page.dataCountryName)}>homepage fuel tool</Link> and select {page.label} from the country picker.
-        </p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Data transparency and limitations</h2>
-        <p className="contentBody">
-          Prices on this page are informational averages from public datasets and may change after publication. They are useful for comparison and planning, but users should still verify local or official sources before making purchasing decisions.
-        </p>
-        <p className="contentBody">
-          Read more in <Link className="inlineLink" to="/methodology">Methodology</Link> and the <Link className="inlineLink" to="/europe-fuel-comparison">Europe fuel comparison guide</Link>.
-        </p>
       </section>
     </article>
   );
