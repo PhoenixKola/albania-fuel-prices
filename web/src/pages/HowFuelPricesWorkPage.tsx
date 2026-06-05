@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
+import AdBar from "../components/ads/AdBar";
 
 type Props = { t: TDict };
 
@@ -77,6 +78,8 @@ export default function HowFuelPricesWorkPage({ t }: Props) {
           Treat fuel prices as decision support, not guaranteed station invoices. If you are planning a trip from Tirana to Pristina, Ohrid, or Podgorica, use country-level values to estimate the budget first, then confirm local prices before departure.
         </p>
       </section>
+
+      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
     </article>
   );
 }

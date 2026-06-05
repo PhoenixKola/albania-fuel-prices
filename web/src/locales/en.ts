@@ -286,6 +286,12 @@ export const en = {
   termsContactP1:
     "If you have questions about these Terms of Use, please contact us at fenixkola@gmail.com.",
 
+  navGames: "Games",
+  navFuelQuiz: "Fuel Quiz",
+  navDailyChallenge: "Daily Challenge",
+  navEditorialPolicy: "Editorial Policy",
+  navDisclaimer: "Disclaimer",
+
   // Guide navigation
   navMethodology: "Methodology",
   navHowPricesWork: "How Fuel Prices Work",

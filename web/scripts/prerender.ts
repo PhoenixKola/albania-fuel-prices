@@ -14,6 +14,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "../dist");
@@ -244,6 +245,58 @@ const STATIC_ROUTES: RouteEntry[] = [
     `,
   },
   {
+    path: "/editorial-policy",
+    title: "Editorial Policy | Fuel Today",
+    description: "Read how Fuel Today selects, produces, and maintains fuel price content — including data sourcing standards, editorial independence, accuracy principles, and corrections policy.",
+    jsonLdType: "WebPage",
+    content: `
+      <article class="contentPage">
+        <h1 class="contentPageTitle">Editorial Policy</h1>
+        <p class="contentBody">Karburanti Sot publishes fuel price data and editorial context to help drivers, commuters, and travelers make informed decisions. This page explains how we select, produce, and maintain that content.</p>
+        <section class="contentSection">
+          <h2 class="contentHeading">Our editorial mission</h2>
+          <p class="contentBody">Our goal is to present publicly available fuel price data accurately, transparently, and in a practically useful form. Every editorial comment is derived directly from the underlying data and publicly available market knowledge — not from commercial arrangements with fuel companies or advertisers.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">Data sourcing standards</h2>
+          <p class="contentBody">All fuel price data comes from publicly available third-party sources. We do not accept sponsored data feeds. Exchange-rate conversions use a public FX API and are labeled clearly as estimates.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">Editorial independence</h2>
+          <p class="contentBody">Karburanti Sot is funded through display advertising. Advertising revenue does not influence which countries are covered or what editorial commentary is written. We do not accept paid placements or sponsored articles.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">Accuracy and corrections</h2>
+          <p class="contentBody">We present country-level prices as public reference values, not guarantees of the exact price at any station. If you identify an error, contact us at fenixkola@gmail.com with the country, page, value shown, and your source. We verify and correct promptly.</p>
+        </section>
+      </article>
+    `,
+  },
+  {
+    path: "/disclaimer",
+    title: "Disclaimer | Fuel Today",
+    description: "Read the Fuel Today disclaimer: fuel price data is informational only, trip estimates are approximate, and no financial advice is provided.",
+    jsonLdType: "WebPage",
+    content: `
+      <article class="contentPage">
+        <h1 class="contentPageTitle">Disclaimer</h1>
+        <p class="contentBody">The information on Karburanti Sot is provided for general informational and reference purposes only. By using this website, you acknowledge the limitations described here.</p>
+        <section class="contentSection">
+          <h2 class="contentHeading">Fuel price data is informational only</h2>
+          <p class="contentBody">Prices displayed are country-level reference values from public datasets. They do not represent the exact price at any specific station. Local competition, brand pricing, promotions, and wholesale delivery timing can all cause station prices to differ from the displayed figures.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">No financial or commercial advice</h2>
+          <p class="contentBody">Nothing on this website constitutes financial advice. Exchange-rate conversions are indicative estimates only. Trip cost calculations are approximations for planning purposes — actual fuel costs will vary.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">Limitation of liability</h2>
+          <p class="contentBody">To the fullest extent permitted by law, Karburanti Sot shall not be liable for any loss or damage arising from reliance on information on this site, decisions made about refueling or travel planning, or any inaccuracy in the data displayed.</p>
+        </section>
+      </article>
+    `,
+  },
+  {
     path: "/methodology",
     title: "Methodology | How Fuel Today Collects and Updates Data",
     description: "Review data sources, update frequency, fuel definitions, and limitations behind Fuel Today's Albania and Europe fuel price comparison data.",
@@ -359,99 +412,127 @@ const STATIC_ROUTES: RouteEntry[] = [
 ];
 
 function buildCountryRoutes(): RouteEntry[] {
-  const countries = [
-    {
-      slug: "albania", label: "Albania",
-      overview: "Albania's fuel market features imported refined products, moderate taxation, and competition among major chains like Kastrati and KFG. The ALL/EUR exchange rate adds volatility to EUR-equivalent pricing.",
-      comparison: "As the home market for most users, Albania serves as the baseline reference for all comparisons. The Tirana-Pristina highway, southern route to Greece, and northern corridor to Montenegro each cross a price boundary.",
-    },
-    {
-      slug: "kosovo", label: "Kosovo",
-      overview: "Kosovo has one of the most competitive fuel markets in the Western Balkans with low excise duties and uses the Euro directly, eliminating exchange-rate complications for Albanian visitors.",
-      comparison: "Kosovo is the most natural comparison due to the high traffic on the Tirana-Pristina corridor. Price differences are typically small (0.02-0.05 EUR/L).",
-    },
-    {
-      slug: "montenegro", label: "Montenegro",
-      overview: "Montenegro uses the Euro despite not being an EU member. Its fuel market has moderate excise duties — higher than Albania but lower than Italy or Croatia. Coastal tourism creates seasonal demand surges.",
-      comparison: "Montenegro is typically 0.05-0.15 EUR/L more expensive than Albania, driven by slightly higher excise rates. Important for Adriatic coastal trips north of Shkodër.",
-    },
-    {
-      slug: "north-macedonia", label: "North Macedonia",
-      overview: "North Macedonia has government-regulated maximum fuel prices, creating predictable pricing. The country has domestic refining capacity and the Denar is pegged to the Euro for stability.",
-      comparison: "Prices are generally close to Albania. The regulated market means less frequent price changes. Good LPG infrastructure compared to other Balkan countries.",
-    },
-    {
-      slug: "greece", label: "Greece",
-      overview: "Greece has among the highest fuel prices in Southern Europe due to substantial excise duties and 24% VAT. Significant domestic refining capacity exists, but high taxation keeps prices elevated.",
-      comparison: "The most significant price jump for Albanian drivers crossing south — typically 0.20-0.40 EUR/L higher. Fill up in Albania before the border crossing.",
-    },
-    {
-      slug: "italy", label: "Italy",
-      overview: "Italy has some of the highest fuel prices in the EU due to decades of accumulated excise duties (accise) that were introduced as temporary measures but never removed, combined with 22% VAT.",
-      comparison: "Italian fuel is 0.40-0.60 EUR/L above Albanian prices — one of the largest differences in the Mediterranean. Relevant for ferry travelers between Durrës/Vlorë and Bari/Brindisi.",
-    },
-    {
-      slug: "croatia", label: "Croatia",
-      overview: "Croatia joined the eurozone in 2023. The government sets maximum retail prices based on Mediterranean market formulas. Excise duties are mid-range for the EU.",
-      comparison: "Croatian fuel is typically 0.15-0.25 EUR/L more expensive than Albania. Relevant for Adriatic coastal trips through Montenegro to Dubrovnik and Split.",
-    },
-    {
-      slug: "portugal", label: "Portugal",
-      overview: "Portugal has fuel prices in the upper-middle range for Western Europe with significant excise duties and 23% VAT. Atlantic refinery access provides some price insulation.",
-      comparison: "Serves as a western European benchmark — typically 0.25-0.45 EUR/L more expensive than Albania, demonstrating how tax policy transforms similar base costs into different pump prices.",
-    },
-    {
-      slug: "switzerland", label: "Switzerland",
-      overview: "Switzerland presents a paradox: despite high living costs, fuel prices are often lower than many EU countries because Swiss fuel excise duties are significantly lower than neighboring Germany, France, or Italy.",
-      comparison: "Challenges assumptions about pricing — Swiss fuel is moderate in EUR terms. Important benchmark showing that income level does not determine pump prices; tax policy does.",
-    },
-    {
-      slug: "united-kingdom", label: "United Kingdom",
-      overview: "The UK has among the highest fuel prices in Europe due to substantial fuel duty (52.95p/L) plus 20% VAT. The market features competition between major brands and cheaper supermarket stations.",
-      comparison: "UK fuel is typically 0.40-0.60 EUR/L more expensive than Albania. GBP/EUR fluctuations add complexity to comparisons. Useful as a non-Euro, high-income benchmark.",
-    },
-  ];
+  return COUNTRY_EDITORIAL.map((c) => {
+    const faqItems = c.faqs
+      .map(
+        (faq) => `
+        <div class="faqItem">
+          <h3 class="faqQuestion">${escapeHtml(faq.question)}</h3>
+          <p class="contentBody">${escapeHtml(faq.answer)}</p>
+        </div>`
+      )
+      .join("");
 
-  return countries.map((c) => ({
-    path: `/fuel-prices/${c.slug}`,
-    title: `${c.label} Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today`,
-    description: `Current ${c.label} fuel prices with Albania comparison. Understand market dynamics, border refueling advice, and practical travel context.`,
-    jsonLdType: "WebPage",
-    content: `
+    const relatedItems = c.relatedLinks
+      .map((link) => `<li><a href="${link.to}">${escapeHtml(link.label)}</a></li>`)
+      .join("");
+
+    return {
+      path: `/fuel-prices/${c.slug}`,
+      title: c.metaTitle,
+      description: c.metaDescription,
+      jsonLdType: "FAQPage",
+      content: `
       <article class="contentPage">
-        <h1 class="contentPageTitle">${c.label} fuel prices today</h1>
-        <p class="contentBody">This page provides a comprehensive overview of fuel prices in ${c.label}, with practical comparison context for Albanian drivers and travelers.</p>
+        <h1 class="contentPageTitle">${escapeHtml(c.label)} fuel prices today</h1>
+        <p class="contentBody">This page provides a comprehensive overview of fuel prices in ${escapeHtml(c.label)}, with practical comparison context for Albanian drivers and travelers.</p>
+
         <section class="contentSection">
-          <h2 class="contentHeading">${c.label} fuel market overview</h2>
-          <p class="contentBody">${c.overview}</p>
+          <h2 class="contentHeading">${escapeHtml(c.label)} fuel market overview</h2>
+          <p class="contentBody">${escapeHtml(c.marketOverview)}</p>
         </section>
+
         <section class="contentSection">
-          <h2 class="contentHeading">How ${c.label} compares with Albania</h2>
-          <p class="contentBody">${c.comparison}</p>
+          <h2 class="contentHeading">How ${escapeHtml(c.label)} compares with Albania</h2>
+          <p class="contentBody">${escapeHtml(c.albaniaContext)}</p>
         </section>
+
         <section class="contentSection">
-          <h2 class="contentHeading">Data and methodology</h2>
-          <p class="contentBody">Prices shown are country-level reference values from public fuel price aggregators, expressed in EUR per liter. They are useful for comparison and planning but may differ from specific station prices. See <a href="/methodology">Methodology</a> for full details.</p>
+          <h2 class="contentHeading">Travel and driving context</h2>
+          <p class="contentBody">${escapeHtml(c.travelRelevance)}</p>
         </section>
+
+        <section class="contentSection">
+          <h2 class="contentHeading">Understanding petrol, diesel, and LPG prices</h2>
+          <p class="contentBody">${escapeHtml(c.fuelInterpretation)}</p>
+        </section>
+
+        <section class="contentSection">
+          <h2 class="contentHeading">Border crossings and refueling advice</h2>
+          <p class="contentBody">${escapeHtml(c.borderAdvice)}</p>
+        </section>
+
+        <section class="contentSection">
+          <h2 class="contentHeading">Data coverage and limitations</h2>
+          <p class="contentBody">${escapeHtml(c.dataLimitations)}</p>
+          <p class="contentBody">${escapeHtml(c.sourceTransparency)}</p>
+        </section>
+
+        <section class="contentSection">
+          <h2 class="contentHeading">Frequently asked questions</h2>
+          ${faqItems}
+        </section>
+
         <section class="contentSection">
           <h2 class="contentHeading">Related resources</h2>
           <ul class="contentList">
-            <li><a href="/europe-fuel-comparison">Europe fuel comparison guide</a></li>
-            <li><a href="/road-trip-fuel-guide">Road trip fuel guide</a></li>
-            <li><a href="/rankings">European fuel rankings</a></li>
-            <li><a href="/compare">Compare countries</a></li>
-            <li><a href="/methodology">Data methodology</a></li>
+            ${relatedItems}
           </ul>
         </section>
       </article>
     `,
-  }));
+    };
+  });
 }
 
 // ─── HTML generation ────────────────────────────────────────────────────────
 
 function generateJsonLd(route: RouteEntry): string {
   const canonical = `${SITE_URL}${route.path === "/" ? "" : route.path}`;
+
+  const publisher = {
+    "@type": "Organization",
+    name: "Karburanti Sot",
+    url: SITE_URL,
+  };
+
+  const author = {
+    "@type": "Organization",
+    name: "Karburanti Sot",
+    url: SITE_URL,
+  };
+
+  if (route.jsonLdType === "FAQPage") {
+    const editorial = COUNTRY_EDITORIAL.find(
+      (c) => `/fuel-prices/${c.slug}` === route.path
+    );
+    const mainEntity = editorial
+      ? editorial.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        }))
+      : [];
+
+    return JSON.stringify(
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        name: route.title,
+        url: canonical,
+        inLanguage: "en",
+        description: route.description,
+        publisher,
+        mainEntity,
+      },
+      null,
+      2
+    );
+  }
+
   const base: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": route.jsonLdType,
@@ -459,14 +540,12 @@ function generateJsonLd(route: RouteEntry): string {
     url: canonical,
     inLanguage: "en",
     description: route.description,
+    publisher,
   };
 
-  if (route.jsonLdType === "WebSite") {
-    base.publisher = {
-      "@type": "Organization",
-      name: "Karburanti Sot",
-      url: SITE_URL,
-    };
+  if (route.jsonLdType === "Article") {
+    base.author = author;
+    base.datePublished = "2025-01-01";
   }
 
   return JSON.stringify(base, null, 2);

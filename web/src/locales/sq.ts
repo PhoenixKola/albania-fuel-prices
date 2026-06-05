@@ -157,6 +157,11 @@ export const sq = {
   navGuides: "Guida",
   navPrivacy: "Politika e Privatësisë",
   navTerms: "Kushtet e Përdorimit",
+  navGames: "Lojëra",
+  navFuelQuiz: "Quiz Karburanti",
+  navDailyChallenge: "Sfida Ditore",
+  navEditorialPolicy: "Politika Editoriale",
+  navDisclaimer: "Mohim Përgjegjësie",
   footerTagline: "Të dhëna të pavarura për çmimet e karburantit për drejtuesit dhe udhëtarët në Europë.",
   footerCopyright: (year: number) => `© ${year} Karburanti Sot. Të gjitha të drejtat e rezervuara.`,
 

@@ -126,6 +126,42 @@ export const STATIC_ROUTES: RouteConfig[] = [
     changefreq: "yearly",
     jsonLdType: "WebPage",
   },
+  {
+    path: "/daily-challenge",
+    title: "Daily Challenge — 5 Fuel Price Questions | Fuel Today",
+    description:
+      "Test yourself with today's 5 fuel price questions. Same questions for everyone, refreshes daily. Compare petrol and diesel prices across Europe.",
+    priority: 0.8,
+    changefreq: "daily",
+    jsonLdType: "WebPage",
+  },
+  {
+    path: "/fuel-quiz",
+    title: "Fuel Price Quiz — Which Country Has Cheaper Fuel? | Fuel Today",
+    description:
+      "Test your knowledge of European fuel prices. Guess which country has cheaper petrol or diesel using live market data. Track your score and streak.",
+    priority: 0.8,
+    changefreq: "weekly",
+    jsonLdType: "WebPage",
+  },
+  {
+    path: "/editorial-policy",
+    title: "Editorial Policy | Fuel Today",
+    description:
+      "Read how Fuel Today selects, produces, and maintains fuel price content — including data sourcing standards, editorial independence, accuracy principles, and corrections policy.",
+    priority: 0.5,
+    changefreq: "yearly",
+    jsonLdType: "WebPage",
+  },
+  {
+    path: "/disclaimer",
+    title: "Disclaimer | Fuel Today",
+    description:
+      "Read the Fuel Today disclaimer: fuel price data is informational only, trip estimates are approximate, and no financial advice is provided.",
+    priority: 0.4,
+    changefreq: "yearly",
+    jsonLdType: "WebPage",
+  },
 ];
 
 export function getRouteConfig(path: string): RouteConfig | undefined {

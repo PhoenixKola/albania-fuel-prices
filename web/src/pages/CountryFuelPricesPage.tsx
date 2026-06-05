@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { LatestEurope } from "../models/fuel";
 import { getCountryEditorial } from "../config/countryContent";
+import AdBar from "../components/ads/AdBar";
 
 type Props = {
   slug: string;
@@ -161,6 +162,8 @@ export default function CountryFuelPricesPage({ slug, data, loading, setCountry 
           </li>
         </ul>
       </section>
+
+      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
     </article>
   );
 }

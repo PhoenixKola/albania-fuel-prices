@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
+import AdBar from "../components/ads/AdBar";
 
 type Props = { t: TDict };
 
@@ -79,6 +80,8 @@ export default function EuropeFuelComparisonPage({ t }: Props) {
           Use country pages for context: <Link to="/fuel-prices/albania" className="inlineLink">Albania</Link>, <Link to="/fuel-prices/kosovo" className="inlineLink">Kosovo</Link>, <Link to="/fuel-prices/montenegro" className="inlineLink">Montenegro</Link>, <Link to="/fuel-prices/north-macedonia" className="inlineLink">North Macedonia</Link>, <Link to="/fuel-prices/greece" className="inlineLink">Greece</Link>, <Link to="/fuel-prices/italy" className="inlineLink">Italy</Link>, <Link to="/fuel-prices/croatia" className="inlineLink">Croatia</Link>, <Link to="/fuel-prices/portugal" className="inlineLink">Portugal</Link>, <Link to="/fuel-prices/switzerland" className="inlineLink">Switzerland</Link>, and <Link to="/fuel-prices/united-kingdom" className="inlineLink">United Kingdom</Link>.
         </p>
       </section>
+
+      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
     </article>
   );
 }

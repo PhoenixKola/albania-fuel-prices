@@ -31,6 +31,10 @@ const AboutPage = lazy(() => import("../pages/AboutPage"));
 const ContactPage = lazy(() => import("../pages/ContactPage"));
 const PrivacyPage = lazy(() => import("../pages/PrivacyPage"));
 const TermsPage = lazy(() => import("../pages/TermsPage"));
+const EditorialPolicyPage = lazy(() => import("../pages/EditorialPolicyPage"));
+const DisclaimerPage = lazy(() => import("../pages/DisclaimerPage"));
+const FuelQuizPage = lazy(() => import("../pages/FuelQuizPage"));
+const DailyChallengePage = lazy(() => import("../pages/DailyChallengePage"));
 const MethodologyPage = lazy(() => import("../pages/MethodologyPage"));
 const HowFuelPricesWorkPage = lazy(() => import("../pages/HowFuelPricesWorkPage"));
 const EuropeFuelComparisonPage = lazy(() => import("../pages/EuropeFuelComparisonPage"));
@@ -210,6 +214,16 @@ export default function App() {
           <Route path="/contact" element={<ContactPage t={t} />} />
           <Route path="/privacy" element={<PrivacyPage t={t} />} />
           <Route path="/terms" element={<TermsPage t={t} />} />
+          <Route path="/editorial-policy" element={<EditorialPolicyPage t={t} />} />
+          <Route path="/disclaimer" element={<DisclaimerPage t={t} />} />
+          <Route
+            path="/fuel-quiz"
+            element={<FuelQuizPage data={data} loading={loading} />}
+          />
+          <Route
+            path="/daily-challenge"
+            element={<DailyChallengePage data={data} loading={loading} />}
+          />
           <Route path="/methodology" element={<MethodologyPage t={t} />} />
           <Route path="/how-fuel-prices-work" element={<HowFuelPricesWorkPage t={t} />} />
           <Route path="/europe-fuel-comparison" element={<EuropeFuelComparisonPage t={t} />} />

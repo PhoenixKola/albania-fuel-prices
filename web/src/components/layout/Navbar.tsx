@@ -16,6 +16,8 @@ type Props = {
   onToggleTheme: () => void;
 };
 
+type DropdownId = "games" | "guides" | "about";
+
 function SunIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
@@ -64,19 +66,22 @@ export default function Navbar({
   onToggleTheme,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [guidesOpen, setGuidesOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<DropdownId | null>(null);
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
+  const gamesRef = useRef<HTMLDivElement>(null);
+  const guidesRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
   const [lastPath, setLastPath] = useState(location.pathname);
 
-  // Close menu on route change
+  // Close everything on route change
   if (lastPath !== location.pathname) {
     setLastPath(location.pathname);
     if (menuOpen) setMenuOpen(false);
-    if (guidesOpen) setGuidesOpen(false);
+    if (openDropdown) setOpenDropdown(null);
   }
 
-  // Close menu on outside click
+  // Close mobile menu on outside click
   useEffect(() => {
     if (!menuOpen) return;
     const handler = (e: MouseEvent) => {
@@ -88,7 +93,7 @@ export default function Navbar({
     return () => document.removeEventListener("mousedown", handler);
   }, [menuOpen]);
 
-  // Close menu on Escape
+  // Close mobile menu on Escape
   useEffect(() => {
     if (!menuOpen) return;
     const handler = (e: KeyboardEvent) => {
@@ -98,13 +103,47 @@ export default function Navbar({
     return () => document.removeEventListener("keydown", handler);
   }, [menuOpen]);
 
+  // Close any open dropdown on outside click
+  useEffect(() => {
+    if (!openDropdown) return;
+    const refs: Record<DropdownId, React.RefObject<HTMLDivElement | null>> = {
+      games: gamesRef,
+      guides: guidesRef,
+      about: aboutRef,
+    };
+    const ref = refs[openDropdown];
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [openDropdown]);
+
+  // Close any open dropdown on Escape
+  useEffect(() => {
+    if (!openDropdown) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenDropdown(null);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [openDropdown]);
+
+  const toggle = (id: DropdownId) =>
+    setOpenDropdown((prev) => (prev === id ? null : id));
+
   const navLinks = [
     { to: "/", label: t.navHome },
     { to: "/compare", label: t.navCompare },
     { to: "/rankings", label: t.navRankings },
     { to: "/stations", label: t.navStations },
-    { to: "/about", label: t.navAbout },
-    { to: "/contact", label: t.navContact },
+  ];
+
+  const gamesLinks = [
+    { to: "/fuel-quiz", label: t.navFuelQuiz },
+    { to: "/daily-challenge", label: t.navDailyChallenge },
   ];
 
   const guideLinks = [
@@ -114,10 +153,49 @@ export default function Navbar({
     { to: "/road-trip-fuel-guide", label: t.navRoadTripGuide },
   ];
 
-  const mobileLinks = [...navLinks, ...guideLinks];
+  const aboutLinks = [
+    { to: "/about", label: t.navAbout },
+    { to: "/contact", label: t.navContact },
+  ];
+
+  const mobileLinks = [...navLinks, ...gamesLinks, ...guideLinks, ...aboutLinks];
 
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
+
+  const renderDropdown = (
+    id: DropdownId,
+    label: string,
+    links: { to: string; label: string }[],
+    ref: React.RefObject<HTMLDivElement | null>,
+    ariaLabel: string
+  ) => (
+    <div className="navMenuWrap" ref={ref}>
+      <button
+        className={`navMenuBtn ${links.some((l) => isActive(l.to)) ? "navLinkActive" : ""}`}
+        onClick={() => toggle(id)}
+        aria-haspopup="menu"
+        aria-expanded={openDropdown === id}
+      >
+        {label}
+      </button>
+      {openDropdown === id && (
+        <div className="navMenu" role="menu" aria-label={ariaLabel}>
+          {links.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              role="menuitem"
+              className={`navMenuLink ${isActive(link.to) ? "navMenuLinkActive" : ""}`}
+              onClick={() => setOpenDropdown(null)}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <nav className="navbar" ref={menuRef}>
@@ -130,7 +208,7 @@ export default function Navbar({
           </div>
         </Link>
 
-        {/* Desktop nav links */}
+        {/* Desktop nav */}
         <div className="navLinks">
           {navLinks.map((link) => (
             <Link
@@ -142,32 +220,9 @@ export default function Navbar({
             </Link>
           ))}
 
-          <div className="navMenuWrap">
-            <button
-              className={`navMenuBtn ${guideLinks.some((link) => isActive(link.to)) ? "navLinkActive" : ""}`}
-              onClick={() => setGuidesOpen((prev) => !prev)}
-              aria-haspopup="menu"
-              aria-expanded={guidesOpen}
-            >
-              {t.navGuides}
-            </button>
-
-            {guidesOpen ? (
-              <div className="navMenu" role="menu" aria-label="Guides menu">
-                {guideLinks.map((link) => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    role="menuitem"
-                    className={`navMenuLink ${isActive(link.to) ? "navMenuLinkActive" : ""}`}
-                    onClick={() => setGuidesOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            ) : null}
-          </div>
+          {renderDropdown("games", t.navGames, gamesLinks, gamesRef, "Games menu")}
+          {renderDropdown("guides", t.navGuides, guideLinks, guidesRef, "Guides menu")}
+          {renderDropdown("about", t.navAbout, aboutLinks, aboutRef, "About menu")}
         </div>
 
         {/* Desktop actions */}
@@ -185,6 +240,7 @@ export default function Navbar({
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
 
+          {/* Language toggle disabled until AdSense approval — Albanian not monetizable */}
           {/* <button
             className="btn btn-ghost"
             onClick={onToggleLang}
@@ -195,7 +251,7 @@ export default function Navbar({
           </button> */}
         </div>
 
-        {/* Hamburger button (mobile only) */}
+        {/* Hamburger (mobile only) */}
         <button
           className="hamburgerBtn"
           onClick={() => setMenuOpen((p) => !p)}
@@ -226,10 +282,7 @@ export default function Navbar({
           <div className="mobileMenuActions">
             <button
               className="btn btn-primary mobileMenuBtn"
-              onClick={() => {
-                onRefresh();
-                setMenuOpen(false);
-              }}
+              onClick={() => { onRefresh(); setMenuOpen(false); }}
               disabled={refreshing}
             >
               {refreshing ? t.refreshing : t.refresh}
@@ -237,10 +290,7 @@ export default function Navbar({
 
             <button
               className="btn btn-ghost mobileMenuBtn"
-              onClick={() => {
-                onToggleTheme();
-                setMenuOpen(false);
-              }}
+              onClick={() => { onToggleTheme(); setMenuOpen(false); }}
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
               <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
@@ -248,10 +298,7 @@ export default function Navbar({
 
             {/* <button
               className="btn btn-ghost mobileMenuBtn"
-              onClick={() => {
-                onToggleLang();
-                setMenuOpen(false);
-              }}
+              onClick={() => { onToggleLang(); setMenuOpen(false); }}
             >
               {lang === "en" ? t.langSQ : t.langEN}
             </button> */}

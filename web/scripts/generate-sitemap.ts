@@ -32,6 +32,10 @@ const ROUTES: SitemapEntry[] = [
   { path: "/road-trip-fuel-guide", priority: 0.9, changefreq: "monthly" },
   { path: "/privacy", priority: 0.4, changefreq: "yearly" },
   { path: "/terms", priority: 0.4, changefreq: "yearly" },
+  { path: "/daily-challenge", priority: 0.8, changefreq: "daily" },
+  { path: "/fuel-quiz", priority: 0.8, changefreq: "weekly" },
+  { path: "/editorial-policy", priority: 0.5, changefreq: "yearly" },
+  { path: "/disclaimer", priority: 0.4, changefreq: "yearly" },
   // Country pages (all indexable with rich content)
   { path: "/fuel-prices/albania", priority: 0.8, changefreq: "weekly" },
   { path: "/fuel-prices/kosovo", priority: 0.8, changefreq: "weekly" },

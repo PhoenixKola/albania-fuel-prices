@@ -1,39 +1,22 @@
 import { useEffect } from "react";
-import type { Lang } from "../../models/i18n";
 
 type Props = {
   adClient: string;
   adSlot: string;
   enabled?: boolean;
-  lang?: Lang;
 };
 
-export default function AdBar({ adClient, adSlot, enabled = true, lang = "en" }: Props) {
-  const shouldRender = enabled && lang === "en";
+export default function AdBar({ adClient, adSlot, enabled = true }: Props) {
+  const shouldRender = enabled;
 
-  const requestAd = () => {
+  useEffect(() => {
+    if (!shouldRender) return;
     try {
       // @ts-expect-error - AdSense injects this global
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
-      // Ignore until AdSense is available.
+      // AdSense not yet available; it will auto-push when the script loads.
     }
-  };
-
-  useEffect(() => {
-    if (!shouldRender) return;
-
-    requestAd();
-
-    const onConsentAdsReady = () => {
-      requestAd();
-    };
-
-    window.addEventListener("fueltoday:adsense-ready", onConsentAdsReady);
-
-    return () => {
-      window.removeEventListener("fueltoday:adsense-ready", onConsentAdsReady);
-    };
   }, [shouldRender]);
 
   if (!shouldRender) return null;

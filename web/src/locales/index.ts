@@ -144,6 +144,11 @@ export type TDict = {
   navGuides: string;
   navPrivacy: string;
   navTerms: string;
+  navGames: string;
+  navFuelQuiz: string;
+  navDailyChallenge: string;
+  navEditorialPolicy: string;
+  navDisclaimer: string;
   footerTagline: string;
   footerCopyright: (year: number) => string;
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
+import AdBar from "../components/ads/AdBar";
 
 type Props = { t: TDict };
 
@@ -74,6 +75,8 @@ export default function MethodologyPage({ t }: Props) {
           Before making travel or purchasing decisions, users should verify prices with local stations or official channels. For practical examples, see <Link to="/road-trip-fuel-guide" className="inlineLink">Road trip fuel guide</Link>.
         </p>
       </section>
+
+      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
     </article>
   );
 }

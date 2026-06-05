@@ -75,7 +75,7 @@ export default function HomePage({
     await copyText(text);
   };
 
-  const canShowAds = lang === "en" && !loading && !error && !!data && data.countries.length > 0;
+  const canShowAds = !loading && !error && !!data && data.countries.length > 0;
 
   const editorialItems =
     data?.countries?.map((c) => ({
@@ -128,7 +128,6 @@ export default function HomePage({
         adClient="ca-pub-2653462201538649"
         adSlot="5789581249"
         enabled={canShowAds}
-        lang={lang}
       />
     </>
   );

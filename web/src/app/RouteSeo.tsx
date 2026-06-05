@@ -121,6 +121,42 @@ export default function RouteSeo({ data, loading }: Props) {
       };
     }
 
+    if (pathname === "/fuel-quiz") {
+      return {
+        title: "Fuel Price Quiz — Which Country Has Cheaper Fuel? | Fuel Today",
+        description:
+          "Test your knowledge of European fuel prices. Guess which country has cheaper petrol or diesel using live market data. Track your score and streak.",
+        path: pathname,
+      };
+    }
+
+    if (pathname === "/daily-challenge") {
+      return {
+        title: "Daily Challenge — 5 Fuel Price Questions | Fuel Today",
+        description:
+          "Test yourself with today's 5 fuel price questions. Same questions for everyone, refreshes daily. Compare petrol and diesel prices across Europe.",
+        path: pathname,
+      };
+    }
+
+    if (pathname === "/editorial-policy") {
+      return {
+        title: "Editorial Policy | Fuel Today",
+        description:
+          "Read how Fuel Today selects, produces, and maintains fuel price content — including data sourcing standards, editorial independence, accuracy principles, and corrections policy.",
+        path: pathname,
+      };
+    }
+
+    if (pathname === "/disclaimer") {
+      return {
+        title: "Disclaimer | Fuel Today",
+        description:
+          "Read the Fuel Today disclaimer: fuel price data is informational only, trip estimates are approximate, and no financial advice is provided.",
+        path: pathname,
+      };
+    }
+
     if (pathname.startsWith("/fuel-prices/")) {
       const slug = pathname.replace("/fuel-prices/", "");
       const editorial = getCountryEditorial(slug);
