@@ -1,202 +1,202 @@
 {
   "region": "Europe",
-  "as_of": "2026-06-07",
+  "as_of": "2026-06-08",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-06-07T09:32:30.990Z",
+  "fetched_at_utc": "2026-06-08T11:18:51.991Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
       "country": "Albania",
-      "gasoline95_eur": 1.811,
-      "diesel_eur": 1.938,
-      "lpg_eur": 0.723
+      "gasoline95_eur": 1.832,
+      "diesel_eur": 1.96,
+      "lpg_eur": 0.731
     },
     {
       "country": "Andorra",
-      "gasoline95_eur": 1.586,
-      "diesel_eur": 1.597,
-      "lpg_eur": 0.876
+      "gasoline95_eur": 1.604,
+      "diesel_eur": 1.615,
+      "lpg_eur": 0.885
     },
     {
       "country": "Belarus",
-      "gasoline95_eur": 0.831,
-      "diesel_eur": 0.831,
-      "lpg_eur": 0.413
+      "gasoline95_eur": 0.84,
+      "diesel_eur": 0.84,
+      "lpg_eur": 0.418
     },
     {
       "country": "Belgium",
-      "gasoline95_eur": 1.786,
-      "diesel_eur": 1.966,
-      "lpg_eur": 0.875
+      "gasoline95_eur": 1.807,
+      "diesel_eur": 1.988,
+      "lpg_eur": 0.885
     },
     {
       "country": "Bosnia and Herzegovina",
-      "gasoline95_eur": 1.53,
-      "diesel_eur": 1.627,
-      "lpg_eur": 0.727
+      "gasoline95_eur": 1.548,
+      "diesel_eur": 1.646,
+      "lpg_eur": 0.735
     },
     {
       "country": "Bulgaria",
-      "gasoline95_eur": 1.53,
-      "diesel_eur": 1.665,
-      "lpg_eur": 0.748
+      "gasoline95_eur": 1.547,
+      "diesel_eur": 1.684,
+      "lpg_eur": 0.757
     },
     {
       "country": "Croatia",
-      "gasoline95_eur": 1.699,
-      "diesel_eur": 1.784,
-      "lpg_eur": 0.882
+      "gasoline95_eur": 1.718,
+      "diesel_eur": 1.804,
+      "lpg_eur": 0.892
     },
     {
       "country": "Czechia",
-      "gasoline95_eur": 1.785,
-      "diesel_eur": 1.681,
-      "lpg_eur": 0.938
+      "gasoline95_eur": 1.805,
+      "diesel_eur": 1.7,
+      "lpg_eur": 0.949
     },
     {
       "country": "Estonia",
-      "gasoline95_eur": 1.776,
-      "diesel_eur": 1.776,
-      "lpg_eur": 0.98
+      "gasoline95_eur": 1.796,
+      "diesel_eur": 1.796,
+      "lpg_eur": 0.991
     },
     {
       "country": "France",
-      "gasoline95_eur": 2.017,
-      "diesel_eur": 2.043,
-      "lpg_eur": 1.078
+      "gasoline95_eur": 2.039,
+      "diesel_eur": 2.066,
+      "lpg_eur": 1.09
     },
     {
       "country": "Germany",
-      "gasoline95_eur": 1.901,
-      "diesel_eur": 1.863,
-      "lpg_eur": 1.177
+      "gasoline95_eur": 1.922,
+      "diesel_eur": 1.884,
+      "lpg_eur": 1.19
     },
     {
       "country": "Greece",
-      "gasoline95_eur": 2.063,
-      "diesel_eur": 1.739,
-      "lpg_eur": 1.114
+      "gasoline95_eur": 2.086,
+      "diesel_eur": 1.759,
+      "lpg_eur": 1.127
     },
     {
       "country": "Hungary",
-      "gasoline95_eur": 1.675,
-      "diesel_eur": 1.731,
-      "lpg_eur": 1.036
+      "gasoline95_eur": 1.694,
+      "diesel_eur": 1.75,
+      "lpg_eur": 1.048
     },
     {
       "country": "Italy",
-      "gasoline95_eur": 1.943,
-      "diesel_eur": 2.006,
-      "lpg_eur": 0.796
+      "gasoline95_eur": 1.965,
+      "diesel_eur": 2.029,
+      "lpg_eur": 0.805
     },
     {
       "country": "Latvia",
-      "gasoline95_eur": 1.851,
-      "diesel_eur": 1.843,
-      "lpg_eur": 1.019
+      "gasoline95_eur": 1.872,
+      "diesel_eur": 1.864,
+      "lpg_eur": 1.031
     },
     {
       "country": "Lithuania",
-      "gasoline95_eur": 1.805,
-      "diesel_eur": 1.898,
-      "lpg_eur": 0.862
+      "gasoline95_eur": 1.826,
+      "diesel_eur": 1.92,
+      "lpg_eur": 0.872
     },
     {
       "country": "Luxembourg",
-      "gasoline95_eur": 1.703,
-      "diesel_eur": 1.729,
-      "lpg_eur": 0.749
+      "gasoline95_eur": 1.722,
+      "diesel_eur": 1.748,
+      "lpg_eur": 0.758
     },
     {
       "country": "Moldova",
-      "gasoline95_eur": 1.495,
-      "diesel_eur": 1.38,
-      "lpg_eur": 0.799
+      "gasoline95_eur": 1.512,
+      "diesel_eur": 1.396,
+      "lpg_eur": 0.808
     },
     {
       "country": "Poland",
-      "gasoline95_eur": 1.511,
-      "diesel_eur": 1.585,
-      "lpg_eur": 0.855
+      "gasoline95_eur": 1.529,
+      "diesel_eur": 1.602,
+      "lpg_eur": 0.865
     },
     {
       "country": "Portugal",
-      "gasoline95_eur": 1.936,
-      "diesel_eur": 1.871,
-      "lpg_eur": 0.962
+      "gasoline95_eur": 1.958,
+      "diesel_eur": 1.892,
+      "lpg_eur": 0.973
     },
     {
       "country": "Romania",
-      "gasoline95_eur": 1.835,
-      "diesel_eur": 1.832,
-      "lpg_eur": 0.845
+      "gasoline95_eur": 1.855,
+      "diesel_eur": 1.853,
+      "lpg_eur": 0.854
     },
     {
       "country": "Russia",
-      "gasoline95_eur": 0.807,
-      "diesel_eur": 0.92,
-      "lpg_eur": 0.362
+      "gasoline95_eur": 0.816,
+      "diesel_eur": 0.931,
+      "lpg_eur": 0.366
     },
     {
       "country": "San Marino",
-      "gasoline95_eur": 1.52,
-      "diesel_eur": 1.658,
-      "lpg_eur": 0.766
+      "gasoline95_eur": 1.537,
+      "diesel_eur": 1.677,
+      "lpg_eur": 0.775
     },
     {
       "country": "Serbia",
-      "gasoline95_eur": 1.669,
-      "diesel_eur": 1.89,
-      "lpg_eur": 0.936
+      "gasoline95_eur": 1.688,
+      "diesel_eur": 1.911,
+      "lpg_eur": 0.946
     },
     {
       "country": "Slovakia",
-      "gasoline95_eur": 1.8,
-      "diesel_eur": 1.718,
-      "lpg_eur": 0.882
+      "gasoline95_eur": 1.82,
+      "diesel_eur": 1.737,
+      "lpg_eur": 0.892
     },
     {
       "country": "Slovenia",
-      "gasoline95_eur": 1.603,
-      "diesel_eur": 1.646,
-      "lpg_eur": 1.029
+      "gasoline95_eur": 1.621,
+      "diesel_eur": 1.665,
+      "lpg_eur": 1.04
     },
     {
       "country": "Spain",
-      "gasoline95_eur": 1.532,
-      "diesel_eur": 1.627,
-      "lpg_eur": 1.025
+      "gasoline95_eur": 1.549,
+      "diesel_eur": 1.645,
+      "lpg_eur": 1.037
     },
     {
       "country": "Switzerland",
-      "gasoline95_eur": 2.078,
-      "diesel_eur": 2.317,
-      "lpg_eur": 1.26
+      "gasoline95_eur": 2.101,
+      "diesel_eur": 2.344,
+      "lpg_eur": 1.274
     },
     {
       "country": "The Netherlands",
-      "gasoline95_eur": 2.384,
-      "diesel_eur": 2.268,
-      "lpg_eur": 1.004
+      "gasoline95_eur": 2.411,
+      "diesel_eur": 2.293,
+      "lpg_eur": 1.015
     },
     {
       "country": "Türkiye",
-      "gasoline95_eur": 1.177,
-      "diesel_eur": 1.221,
-      "lpg_eur": 0.603
+      "gasoline95_eur": 1.19,
+      "diesel_eur": 1.235,
+      "lpg_eur": 0.61
     },
     {
       "country": "Ukraine",
-      "gasoline95_eur": 1.5,
-      "diesel_eur": 1.695,
-      "lpg_eur": 0.91
+      "gasoline95_eur": 1.517,
+      "diesel_eur": 1.714,
+      "lpg_eur": 0.92
     },
     {
       "country": "United Kingdom",
-      "gasoline95_eur": 1.836,
-      "diesel_eur": 2.13,
-      "lpg_eur": 1.08
+      "gasoline95_eur": 1.857,
+      "diesel_eur": 2.154,
+      "lpg_eur": 1.092
     }
   ]
 }
