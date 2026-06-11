@@ -133,6 +133,18 @@ export type TDict = {
   version: string;
   allCountries: string;
   favorites: string;
+  homeDashboard: string;
+  homeLivePrice: string;
+  homeAddFavorites: string;
+  homeInsights: string;
+  homeFreshness: string;
+  homeConfidence: string;
+  homeVerified: string;
+  homeMarketMoves: string;
+  homeNearbySubtitle: string;
+  homeCompareSubtitle: string;
+  homeRankingsSubtitle: string;
+  allFuelPrices: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -269,6 +281,18 @@ export const i18n: Record<Lang, TDict> = {
     version: "Version",
     allCountries: "All",
     favorites: "Favorites",
+    homeDashboard: "Fuel dashboard",
+    homeLivePrice: "Live price",
+    homeAddFavorites: "Add favorite countries",
+    homeInsights: "Quick intelligence",
+    homeFreshness: "Freshness",
+    homeConfidence: "Source confidence",
+    homeVerified: "Verified",
+    homeMarketMoves: "Market moves",
+    homeNearbySubtitle: "Find pumps around you",
+    homeCompareSubtitle: "Compare your saved countries",
+    homeRankingsSubtitle: "See cheapest markets",
+    allFuelPrices: "All fuel prices",
   },
   sq: {
     title: "Çmimet e Karburanteve në Europë",
@@ -403,5 +427,17 @@ export const i18n: Record<Lang, TDict> = {
     version: "Versioni",
     allCountries: "Të gjitha",
     favorites: "Të preferuarat",
+    homeDashboard: "Paneli i karburantit",
+    homeLivePrice: "Çmimi live",
+    homeAddFavorites: "Shto shtete të preferuara",
+    homeInsights: "Informacion i shpejtë",
+    homeFreshness: "Freskia",
+    homeConfidence: "Besueshmëria e burimit",
+    homeVerified: "Verifikuar",
+    homeMarketMoves: "Lëvizjet e tregut",
+    homeNearbySubtitle: "Gjej pika pranë teje",
+    homeCompareSubtitle: "Krahaso shtetet e ruajtura",
+    homeRankingsSubtitle: "Shiko tregjet më të lira",
+    allFuelPrices: "Të gjitha çmimet",
   },
 };

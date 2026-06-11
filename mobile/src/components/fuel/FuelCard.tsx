@@ -115,10 +115,10 @@ export default function FuelCard(props: {
   };
 
   const fmtDelta = (currentEur: number | null | undefined, prevEur: number | null | undefined) => {
-    if (currentEur == null || prevEur == null) return "—";
+    if (currentEur == null || prevEur == null) return "--";
 
     const diffEur = currentEur - prevEur;
-    if (!Number.isFinite(diffEur) || Math.abs(diffEur) < 0.0001) return "—";
+    if (!Number.isFinite(diffEur) || Math.abs(diffEur) < 0.0001) return "--";
 
     const sign = diffEur > 0 ? "+" : "-";
     const absEur = Math.abs(diffEur);
@@ -131,10 +131,6 @@ export default function FuelCard(props: {
     const absLocal = absEur * r;
     return `${sign}${formatMoney(absLocal, currency)}`;
   };
-
-  // const baseDiesel = baseline?.diesel_eur ?? props.prevSelected?.diesel_eur ?? null;
-  // const baseGas = baseline?.gasoline95_eur ?? props.prevSelected?.gasoline95_eur ?? null;
-  // const baseLpg = baseline?.lpg_eur ?? props.prevSelected?.lpg_eur ?? null;
 
   const baseDiesel = props.prevSelected?.diesel_eur ?? null;
   const baseGas = props.prevSelected?.gasoline95_eur ?? null;
@@ -158,12 +154,12 @@ export default function FuelCard(props: {
     const isSq = props.t?.title?.includes("Çmimet") || props.t?.langSQ === "AL";
 
     const headline = isSq
-      ? `⛽ ${fuelName} ne ${props.country}: ${priceText}`
-      : `⛽ ${fuelName} in ${props.country}: ${priceText}`;
+      ? `${fuelName} ne ${props.country}: ${priceText}`
+      : `${fuelName} in ${props.country}: ${priceText}`;
 
-    const cta = isSq ? `📲 Shkarko aplikacionin: ${PLAY_STORE_URL}` : `📲 Get the app: ${PLAY_STORE_URL}`;
+    const cta = isSq ? `Shkarko aplikacionin: ${PLAY_STORE_URL}` : `Get the app: ${PLAY_STORE_URL}`;
 
-    const details = [`${props.t.title} — ${props.country}`, `${fuelName}: ${priceText}`, asOf, source]
+    const details = [`${props.t.title} - ${props.country}`, `${fuelName}: ${priceText}`, asOf, source]
       .filter(Boolean)
       .join("\n");
 
@@ -179,73 +175,61 @@ export default function FuelCard(props: {
       ? props.t.currencyEUR ?? "EUR"
       : props.t.currencyLocal ?? "Local";
 
+  const statusText = props.loading
+    ? props.t.loading ?? "Loading"
+    : props.isFromCache
+      ? props.t.showingCached ?? "Cached"
+      : props.t.homeVerified ?? "Verified";
+
   return (
     <View style={s.styles.card}>
       <View style={s.styles.headerRow}>
         <View style={s.styles.headerLeft}>
           <View style={s.styles.headerIcon}>
-            <Ionicons name="speedometer-outline" size={18} color={props.theme.colors.linkText} />
+            <Ionicons name="grid-outline" size={18} color={props.theme.colors.linkText} />
           </View>
 
           <View style={s.styles.flex1}>
-            <View style={s.styles.titleRow}>
-              <Text style={s.styles.title}>{props.t.selectCountry}</Text>
-
-              <View style={s.styles.badgeRow}>
-                <View style={s.styles.badge}>
-                  <Ionicons
-                    name={props.isFromCache ? "cloud-offline-outline" : "pulse-outline"}
-                    size={14}
-                    color={props.theme.colors.linkText}
-                  />
-                  <Text style={s.styles.badgeText}>
-                    {props.isFromCache ? props.t.cachedWorksOffline ?? "Cached" : props.t.live ?? "Live"}
-                  </Text>
-                </View>
-
-                {props.loading ? (
-                  <View style={s.styles.loadingPill}>
-                    <Ionicons name="time-outline" size={14} color={props.theme.colors.muted} />
-                    <Text style={s.styles.loadingText}>{props.t.loading ?? "Loading"}</Text>
-                  </View>
-                ) : null}
-              </View>
+            <Text style={s.styles.title} numberOfLines={1}>
+              {props.t.allFuelPrices}
+            </Text>
+            <View style={s.styles.metaRow}>
+              {flag ? <Text style={s.styles.flag}>{flag}</Text> : null}
+              <Text style={s.styles.subText} numberOfLines={1}>
+                {props.country} · {props.t.currency}: {modeLabel}
+                {!canLocal && currency !== "EUR" ? ` · ${props.t.fxUnavailable ?? "FX unavailable"}` : ""}
+              </Text>
             </View>
           </View>
         </View>
 
         <View style={s.styles.headerActions}>
+          <AnimatedPressable onPress={props.onRefresh} contentStyle={s.styles.iconBtn} scaleIn={0.98} disabled={props.refreshing}>
+            <Ionicons name="refresh-outline" size={18} color={props.theme.colors.text} />
+          </AnimatedPressable>
           <AnimatedPressable onPress={onShare} contentStyle={s.styles.iconBtn} scaleIn={0.98}>
             <Ionicons name="share-outline" size={18} color={props.theme.colors.text} />
           </AnimatedPressable>
         </View>
       </View>
 
-      <View style={s.styles.countryRow}>
-        <View style={s.styles.flex1}>
-          <View style={s.styles.countryTitleRow}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              {flag ? <Text style={{ fontSize: 20 }}>{flag}</Text> : null}
-              <Text style={s.styles.countryName}>{props.country}</Text>
-            </View>
-
-            <View style={s.styles.modeChip}>
-              <Ionicons name={mode === "eur" ? "logo-euro" : "cash-outline"} size={14} color={props.theme.colors.text} />
-              <Text style={s.styles.modeChipText} numberOfLines={1}>
-                {mode === "eur" ? "EUR" : currency}
-              </Text>
-            </View>
-          </View>
-
-          <Text style={s.styles.subText}>
-            {props.t.currency}: {modeLabel}
-            {!canLocal && currency !== "EUR" ? ` · ${props.t.fxUnavailable ?? "FX unavailable"}` : ""}
+      <View style={s.styles.statusStrip}>
+        <View style={s.styles.badge}>
+          <Ionicons
+            name={props.isFromCache ? "cloud-offline-outline" : "shield-checkmark-outline"}
+            size={14}
+            color={props.theme.colors.linkText}
+          />
+          <Text style={s.styles.badgeText} numberOfLines={1}>
+            {statusText}
           </Text>
         </View>
 
         <AnimatedPressable onPress={props.onOpenCountrySearch} contentStyle={s.styles.changeBtn} scaleIn={0.98}>
-          <Ionicons name="swap-horizontal-outline" size={16} color={props.theme.colors.text} />
-          <Text style={s.styles.changeBtnText}>{props.t.changeCountry}</Text>
+          <Ionicons name="swap-horizontal-outline" size={15} color={props.theme.colors.text} />
+          <Text style={s.styles.changeBtnText} numberOfLines={1}>
+            {props.t.changeCountry}
+          </Text>
         </AnimatedPressable>
       </View>
 
@@ -285,9 +269,11 @@ export default function FuelCard(props: {
 
       <View style={s.styles.sourceRow}>
         <View style={s.styles.flex1}>
-          <Text style={s.styles.label}>{props.t.source}</Text>
+          <Text style={s.styles.label} numberOfLines={1}>
+            {props.t.source}
+          </Text>
           <Text style={s.styles.sourceText} numberOfLines={2}>
-            {props.data?.source ?? "—"}
+            {props.data?.source ?? "--"}
           </Text>
         </View>
 
@@ -302,10 +288,6 @@ export default function FuelCard(props: {
           </AnimatedPressable>
         ) : null}
       </View>
-
-      <Text style={s.styles.mutedSmall}>
-        {props.data?.fetched_at_utc ? props.t.fetchedAt(new Date(props.data.fetched_at_utc).toLocaleString()) : ""}
-      </Text>
     </View>
   );
 }
@@ -321,7 +303,7 @@ function PriceTile(props: {
 }) {
   const s = useMemo(() => makeFuelCardStyles(props.theme), [props.theme]);
 
-  const showDelta = props.delta !== "—";
+  const showDelta = props.delta !== "--";
   const deltaText = props.delta;
   const sign = showDelta ? deltaText.trim().slice(0, 1) : "";
   const rest = showDelta ? deltaText.trim().slice(1) : "";
@@ -361,12 +343,14 @@ function PriceTile(props: {
               <Text style={s.styles.deltaText}>{isMinus ? rest : deltaText}</Text>
             </>
           ) : (
-            <Text style={s.styles.deltaText}>—</Text>
+            <Text style={s.styles.deltaText}>--</Text>
           )}
         </View>
       </View>
 
-      <Text style={s.styles.tileValue}>{props.value}</Text>
+      <Text style={s.styles.tileValue} numberOfLines={1} adjustsFontSizeToFit>
+        {props.value}
+      </Text>
     </View>
   );
 }

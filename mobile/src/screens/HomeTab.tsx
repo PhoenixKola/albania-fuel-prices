@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native";
 
 import { useApp } from "../context/AppContext";
 import { makeHomeStyles } from "./HomeScreen.styles";
 
-import QuickSwitchCard from "../components/layout/QuickSwitchCard";
 import FuelCard from "../components/fuel/FuelCard";
 import ErrorCard from "../components/feedback/ErrorCard";
 import CountrySearchModal from "../components/country/CountrySearchModal";
-import FeedbackCurrencyBar from "../components/layout/FeedbackCurrencyBar";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
 
 import type { FuelType } from "../types/fuel";
@@ -20,6 +19,7 @@ import { getFlagForCountry } from "../utils/countryFlag";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 type Sentiment = "good" | "bad" | "neutral";
+type ShortcutRoute = "Stations" | "Compare" | "Settings";
 
 const fuelIcons: Record<FuelType, IconName> = {
   gasoline95: "car-sport-outline",
@@ -30,9 +30,6 @@ const fuelIcons: Record<FuelType, IconName> = {
 function homeCopy(lang: "en" | "sq") {
   if (lang === "sq") {
     return {
-      snapshot: "Pamje e shpejte",
-      updated: "Perditesuar",
-      favorites: "Te preferuarat",
       live: "Live",
       cached: "Cache",
       loading: "Po ngarkohet",
@@ -52,9 +49,6 @@ function homeCopy(lang: "en" | "sq") {
   }
 
   return {
-    snapshot: "Fuel snapshot",
-    updated: "Updated",
-    favorites: "Favorites",
     live: "Live",
     cached: "Cached",
     loading: "Loading",
@@ -75,6 +69,7 @@ function homeCopy(lang: "en" | "sq") {
 
 export default function HomeTab() {
   const ctx = useApp();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const s = useMemo(() => makeHomeStyles(ctx.theme), [ctx.theme]);
 
   const [countryModalOpen, setCountryModalOpen] = useState(false);
@@ -83,10 +78,11 @@ export default function HomeTab() {
   const flag = useMemo(() => getFlagForCountry(ctx.country), [ctx.country]);
   const currency = useMemo(() => getCurrencyForCountry(ctx.country), [ctx.country]);
   const isLightTheme = ctx.theme.name === "light";
-  const heroIconColor = isLightTheme ? ctx.theme.colors.linkText : "#FFFFFF";
-  const heroActionIconColor = isLightTheme ? ctx.theme.colors.primaryText : "#FFFFFF";
-  const inactiveFuelIconColor = isLightTheme ? ctx.theme.colors.muted : "rgba(255,255,255,0.78)";
-  const activeFuelIconColor = isLightTheme ? ctx.theme.colors.primaryText : "#111827";
+  const lightHero = isLightTheme;
+  const heroIconColor = lightHero ? ctx.theme.colors.linkText : "#FFFFFF";
+  const heroActionIconColor = lightHero ? ctx.theme.colors.primaryText : "#FFFFFF";
+  const activeFuelIconColor = lightHero ? ctx.theme.colors.primaryText : "#052E2B";
+  const inactiveFuelIconColor = lightHero ? ctx.theme.colors.muted : "rgba(255,255,255,0.74)";
 
   const fuelOptions = useMemo(
     () => [
@@ -148,6 +144,7 @@ export default function HomeTab() {
           : deltaEur < 0
             ? copy.cheaper
             : copy.higher;
+
     const rankTone: Sentiment =
       rank && total ? (rank <= Math.ceil(total / 3) ? "good" : rank > Math.ceil((total * 2) / 3) ? "bad" : "neutral") : "neutral";
     const averageTone: Sentiment = avgDiff == null || Math.abs(avgDiff) < 0.0001 ? "neutral" : avgDiff < 0 ? "good" : "bad";
@@ -185,69 +182,113 @@ export default function HomeTab() {
   const statusLabel = ctx.loading ? copy.loading : ctx.isFromCache ? copy.cached : copy.live;
   const statusIcon: IconName = ctx.loading ? "time-outline" : ctx.isFromCache ? "cloud-offline-outline" : "pulse-outline";
   const updatedLabel = ctx.data?.as_of ?? null;
+  const sourceLabel = ctx.data?.source ? ctx.t.homeVerified : copy.noData;
+
+  const shortcuts: Array<{
+    route: ShortcutRoute;
+    icon: IconName;
+    title: string;
+    subtitle: string;
+    tone: "blue" | "green" | "amber";
+  }> = [
+    {
+      route: "Stations",
+      icon: "navigate-outline",
+      title: ctx.t.stationsTitle,
+      subtitle: ctx.t.homeNearbySubtitle,
+      tone: "blue"
+    },
+    {
+      route: "Compare",
+      icon: "git-compare-outline",
+      title: ctx.t.compareTitle,
+      subtitle: ctx.t.homeCompareSubtitle,
+      tone: "green"
+    },
+    {
+      route: "Compare",
+      icon: "podium-outline",
+      title: ctx.t.rankingsTitle,
+      subtitle: ctx.t.homeRankingsSubtitle,
+      tone: "amber"
+    }
+  ];
 
   return (
     <View style={s.screen}>
+      <View pointerEvents="none" style={s.bgGlowPrimary} />
+      <View pointerEvents="none" style={s.bgGlowSecondary} />
+
       <ScrollView
         contentContainerStyle={s.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={ctx.refreshing} onRefresh={ctx.refreshAll} />}
+        refreshControl={<RefreshControl refreshing={ctx.refreshing} onRefresh={ctx.refreshAll} tintColor={ctx.theme.colors.primary} />}
       >
+        <View style={s.topBar}>
+          <View style={s.topTitleWrap}>
+            <Text style={s.topEyebrow} numberOfLines={1}>
+              {ctx.t.homeDashboard}
+            </Text>
+            <Text style={s.topTitle} numberOfLines={1}>
+              {ctx.t.title}
+            </Text>
+            <Text style={s.topUpdated} numberOfLines={1}>
+              {updatedLabel ? `${ctx.t.lastUpdated}: ${updatedLabel}` : ctx.t.subtitleLoading}
+            </Text>
+          </View>
+
+          <View style={s.topActions}>
+            <View style={s.statusPill}>
+              <Ionicons name={statusIcon} size={13} color={ctx.theme.colors.linkText} />
+              <Text style={s.statusPillText} numberOfLines={1}>
+                {statusLabel}
+              </Text>
+            </View>
+
+            <AnimatedPressable
+              onPress={ctx.openFeedback}
+              contentStyle={s.topIconBtn}
+              scaleIn={0.96}
+            >
+              <Ionicons name="mail-outline" size={18} color={ctx.theme.colors.text} />
+            </AnimatedPressable>
+
+            <AnimatedPressable
+              onPress={() => ctx.openRewardModal()}
+              contentStyle={[s.topIconBtn, ctx.canAskReward && !ctx.reward.unlocked ? s.topIconBtnAccent : null]}
+              scaleIn={0.96}
+              disabled={!ctx.canAskReward || ctx.reward.unlocked}
+            >
+              <Ionicons
+                name={ctx.reward.unlocked ? "checkmark-circle" : "gift-outline"}
+                size={18}
+                color={ctx.reward.unlocked ? ctx.theme.colors.primary : ctx.theme.colors.text}
+              />
+            </AnimatedPressable>
+          </View>
+        </View>
+
         <View style={s.hero}>
-          <View style={s.heroBandTop} />
-          <View style={s.heroBandBottom} />
+          <View pointerEvents="none" style={s.heroAura} />
+          <View pointerEvents="none" style={s.heroBandTop} />
+          <View pointerEvents="none" style={s.heroBandBottom} />
 
           <View style={s.heroTopRow}>
             <View style={s.heroBrandRow}>
               <View style={s.heroIcon}>
-                <Ionicons name="flame-outline" size={20} color={heroIconColor} />
+                <Ionicons name="speedometer-outline" size={20} color={heroIconColor} />
               </View>
 
               <View style={s.heroTitleWrap}>
                 <Text style={s.heroEyebrow} numberOfLines={1}>
-                  {copy.snapshot}
+                  {ctx.t.homeLivePrice}
                 </Text>
-                <Text style={s.heroTitle} numberOfLines={2}>
-                  {ctx.t.title}
-                </Text>
-              </View>
-            </View>
-
-            <View style={s.heroStatus}>
-              <Ionicons name={statusIcon} size={14} color={heroIconColor} />
-              <Text style={s.heroStatusText} numberOfLines={1}>
-                {statusLabel}
-              </Text>
-            </View>
-          </View>
-
-          <View style={s.heroMainRow}>
-            <View style={s.heroPriceBlock}>
-              <View style={s.countryLine}>
-                {flag ? <Text style={s.countryFlag}>{flag}</Text> : null}
-                <Text style={s.heroCountry} numberOfLines={1}>
-                  {ctx.country}
-                </Text>
-              </View>
-
-              <Text style={s.heroFuel} numberOfLines={1}>
-                {hero.fuelName}
-              </Text>
-              <Text style={s.heroPrice} adjustsFontSizeToFit numberOfLines={1}>
-                {hero.price}
-              </Text>
-              <View style={s.heroMetaRow}>
-                <Text style={s.heroSubline} numberOfLines={1}>
-                  {hero.secondaryPrice ?? (ctx.data ? ctx.t.subtitleAsOf(ctx.data.as_of) : ctx.t.subtitleLoading)}
-                </Text>
-                {updatedLabel ? (
-                  <View style={s.freshBadge}>
-                    <Ionicons name="calendar-clear-outline" size={12} color={heroIconColor} />
-                    <Text style={s.freshBadgeText} numberOfLines={1}>
-                      {copy.updated} {updatedLabel}
-                    </Text>
-                  </View>
-                ) : null}
+                <View style={s.countryLine}>
+                  {flag ? <Text style={s.countryFlag}>{flag}</Text> : null}
+                  <Text style={s.heroCountry} numberOfLines={1}>
+                    {ctx.country}
+                  </Text>
+                </View>
               </View>
             </View>
 
@@ -261,31 +302,17 @@ export default function HomeTab() {
             </AnimatedPressable>
           </View>
 
-          {ctx.favorites.length ? (
-            <View style={s.heroFavoritesBlock}>
-              <Text style={s.heroFavoritesLabel} numberOfLines={1}>
-                {copy.favorites}
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.heroFavoritesRow}>
-                {ctx.favorites.slice(0, 8).map((country) => {
-                  const active = country === ctx.country;
-                  return (
-                    <AnimatedPressable
-                      key={country}
-                      onPress={() => ctx.setCountryTracked(country)}
-                      contentStyle={[s.heroFavoritePill, active ? s.heroFavoritePillActive : null]}
-                      scaleIn={0.97}
-                    >
-                      <Text style={[s.heroFavoriteText, active ? s.heroFavoriteTextActive : null]} numberOfLines={1}>
-                        {getFlagForCountry(country) ? `${getFlagForCountry(country)} ` : ""}
-                        {country}
-                      </Text>
-                    </AnimatedPressable>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          ) : null}
+          <View style={s.heroPriceBlock}>
+            <Text style={s.heroFuel} numberOfLines={1}>
+              {hero.fuelName}
+            </Text>
+            <Text style={s.heroPrice} adjustsFontSizeToFit numberOfLines={1}>
+              {hero.price}
+            </Text>
+            <Text style={s.heroSubline} numberOfLines={1}>
+              {hero.secondaryPrice ?? (ctx.data ? ctx.t.subtitleAsOf(ctx.data.as_of) : ctx.t.subtitleLoading)}
+            </Text>
+          </View>
 
           <View style={s.fuelSelector}>
             {fuelOptions.map((option) => {
@@ -305,18 +332,44 @@ export default function HomeTab() {
               );
             })}
           </View>
+
+          <View style={s.favoriteRailWrap}>
+            {ctx.favorites.length ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.heroFavoritesRow}>
+                {ctx.favorites.slice(0, 8).map((country) => {
+                  const active = country === ctx.country;
+                  return (
+                    <AnimatedPressable
+                      key={country}
+                      onPress={() => ctx.setCountryTracked(country)}
+                      contentStyle={[s.heroFavoritePill, active ? s.heroFavoritePillActive : null]}
+                      scaleIn={0.97}
+                    >
+                      <Text style={[s.heroFavoriteText, active ? s.heroFavoriteTextActive : null]} numberOfLines={1}>
+                        {getFlagForCountry(country) ? `${getFlagForCountry(country)} ` : ""}
+                        {country}
+                      </Text>
+                    </AnimatedPressable>
+                  );
+                })}
+              </ScrollView>
+            ) : (
+              <AnimatedPressable onPress={() => setCountryModalOpen(true)} contentStyle={s.emptyFavoriteCta} scaleIn={0.98}>
+                <Ionicons name="star-outline" size={16} color={heroIconColor} />
+                <Text style={s.emptyFavoriteText} numberOfLines={1}>
+                  {ctx.t.homeAddFavorites}
+                </Text>
+              </AnimatedPressable>
+            )}
+          </View>
         </View>
 
-        <FeedbackCurrencyBar
-          theme={ctx.theme}
-          t={ctx.t}
-          onFeedbackPress={ctx.openFeedback}
-          onUnlockPress={() => ctx.openRewardModal()}
-          unlockDisabled={!ctx.canAskReward || ctx.reward.unlocked}
-          rewardUnlocked={ctx.reward.unlocked}
-          headerBtnStyle={s.headerBtn}
-          headerBtnTextStyle={s.headerBtnText}
-        />
+        <View style={s.sectionHeader}>
+          <Text style={s.sectionTitle}>{ctx.t.homeInsights}</Text>
+          <Text style={s.sectionSub} numberOfLines={1}>
+            {ctx.t.homeMarketMoves}
+          </Text>
+        </View>
 
         <View style={s.insightGrid}>
           <InsightTile
@@ -343,16 +396,28 @@ export default function HomeTab() {
             tone="amber"
             sentiment={hero.trendTone}
           />
+          <InsightTile
+            icon={ctx.isFromCache ? "cloud-offline-outline" : "shield-checkmark-outline"}
+            label={ctx.isFromCache ? ctx.t.homeFreshness : ctx.t.homeConfidence}
+            value={ctx.isFromCache ? statusLabel : sourceLabel}
+            caption={updatedLabel ?? ctx.t.showingCached}
+            tone="blue"
+            sentiment={ctx.isFromCache ? "neutral" : "good"}
+          />
         </View>
 
-        <QuickSwitchCard
-          theme={ctx.theme}
-          t={ctx.t}
-          favorites={ctx.favorites}
-          currentCountry={ctx.country}
-          onEdit={() => setCountryModalOpen(true)}
-          onSelect={(c: any) => ctx.setCountryTracked(c)}
-        />
+        <View style={s.shortcutGrid}>
+          {shortcuts.map((item) => (
+            <ShortcutCard
+              key={`${item.title}-${item.icon}`}
+              icon={item.icon}
+              title={item.title}
+              subtitle={item.subtitle}
+              tone={item.tone}
+              onPress={() => navigation.navigate(item.route)}
+            />
+          ))}
+        </View>
 
         {ctx.error ? (
           <ErrorCard theme={ctx.theme} title={ctx.t.couldntLoad} message={ctx.error} cta={ctx.t.tryAgain} onPress={ctx.refreshAll} />
@@ -425,6 +490,31 @@ export default function HomeTab() {
           {props.caption}
         </Text>
       </View>
+    );
+  }
+
+  function ShortcutCard(props: {
+    icon: IconName;
+    title: string;
+    subtitle: string;
+    tone: "blue" | "green" | "amber";
+    onPress: () => void;
+  }) {
+    return (
+      <AnimatedPressable onPress={props.onPress} contentStyle={s.shortcutCard} scaleIn={0.97}>
+        <View style={[s.shortcutIcon, s[`insightIcon_${props.tone}`]]}>
+          <Ionicons name={props.icon} size={19} color={ctx.theme.colors.text} />
+        </View>
+        <View style={s.shortcutTextWrap}>
+          <Text style={s.shortcutTitle} numberOfLines={1}>
+            {props.title}
+          </Text>
+          <Text style={s.shortcutSub} numberOfLines={2}>
+            {props.subtitle}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={17} color={ctx.theme.colors.muted} />
+      </AnimatedPressable>
     );
   }
 }

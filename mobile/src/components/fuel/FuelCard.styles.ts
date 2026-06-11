@@ -27,6 +27,9 @@ type FuelCardStyles = {
   countryTitleRow: ViewStyle;
   countryName: TextStyle;
   subText: TextStyle;
+  metaRow: ViewStyle;
+  flag: TextStyle;
+  statusStrip: ViewStyle;
 
   modeChip: ViewStyle;
   modeChipText: TextStyle;
@@ -81,22 +84,27 @@ export const makeFuelCardStyles = (theme: Theme) => {
   const styles = StyleSheet.create<FuelCardStyles>({
     card: {
       backgroundColor: theme.colors.card,
-      borderRadius: 18,
+      borderRadius: 22,
       padding: 16,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      gap: 12
+      gap: 12,
+      shadowColor: "#000",
+      shadowOpacity: theme.name === "dark" ? 0.14 : 0.05,
+      shadowRadius: 14,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 2
     },
 
     flex1: { flex: 1 },
 
-    headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 12 },
+    headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
     headerLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
 
     headerIcon: {
       width: 40,
       height: 40,
-      borderRadius: 16,
+      borderRadius: 15,
       backgroundColor: theme.colors.linkBg,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -105,6 +113,17 @@ export const makeFuelCardStyles = (theme: Theme) => {
     },
 
     title: { fontSize: 16, fontWeight: "900", color: theme.colors.text },
+
+    metaRow: {
+      marginTop: 4,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6
+    },
+
+    flag: {
+      fontSize: 16
+    },
 
     badgeRow: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "nowrap" },
 
@@ -136,12 +155,12 @@ export const makeFuelCardStyles = (theme: Theme) => {
 
     loadingText: { fontWeight: "900", color: theme.colors.muted, fontSize: 12 },
 
-    headerActions: { flexDirection: "row", alignItems: "center", gap: 10 },
+    headerActions: { flexDirection: "row", alignItems: "center", gap: 8 },
 
     iconBtn: {
       width: 44,
       height: 44,
-      borderRadius: 16,
+      borderRadius: 14,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -169,7 +188,14 @@ export const makeFuelCardStyles = (theme: Theme) => {
 
     modeChipText: { fontSize: 12, fontWeight: "900", color: theme.colors.text, maxWidth: 80 },
 
-    subText: { marginTop: 6, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
+    subText: { flex: 1, color: theme.colors.muted, fontWeight: "800", fontSize: 12 },
+
+    statusStrip: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10
+    },
 
     changeBtn: {
       flexDirection: "row",
@@ -177,7 +203,7 @@ export const makeFuelCardStyles = (theme: Theme) => {
       gap: 8,
       paddingVertical: 10,
       paddingHorizontal: 12,
-      borderRadius: 16,
+      borderRadius: 15,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
       borderColor: theme.colors.border
@@ -216,7 +242,7 @@ export const makeFuelCardStyles = (theme: Theme) => {
     tile: {
       borderRadius: 18,
       padding: 12,
-      backgroundColor: theme.colors.tile,
+      backgroundColor: theme.name === "light" ? "rgba(239,246,244,0.86)" : theme.colors.tile,
       borderWidth: 1,
       borderColor: theme.colors.border,
       gap: 10

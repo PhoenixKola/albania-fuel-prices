@@ -1,9 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Linking } from "react-native";
-import mobileAds, { TestIds } from "react-native-google-mobile-ads";
 import { useReturnInterstitial } from "../hooks/useReturnInterstitial";
 import { useRewardUnlock } from "../hooks/useRewardUnlock";
 
+import { ADS_ENABLED, AD_UNITS } from "../constants/ads";
 import { DATA_URL, PLAY_STORE_URL } from "../constants/urls";
 import {
   STORAGE_COMPARE_KEY,
@@ -25,6 +25,8 @@ import { useNearbyStations } from "../hooks/useNearbyStations";
 import { useRatePrompt } from "../hooks/useRatePrompt";
 import { getCurrencyForCountry } from "../utils/currency";
 import { hasRate } from "../utils/money";
+
+declare const require: (name: string) => any;
 
 export type CurrencyMode = "eur" | "local";
 
@@ -175,20 +177,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const fx = useFxRates();
 
   useEffect(() => {
+    if (!ADS_ENABLED) return;
+    const adsModule = require("react-native-google-mobile-ads");
+    const mobileAds = adsModule.default ?? adsModule;
     mobileAds().initialize();
   }, []);
 
-  const adUnitId = __DEV__ ? TestIds.BANNER : "ca-app-pub-2653462201538649/5444199958";
-  const interstitialUnitId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-2653462201538649/5721527391";
+  const adUnitId = ADS_ENABLED ? AD_UNITS.banner : "";
+  const interstitialUnitId = ADS_ENABLED ? AD_UNITS.interstitial : "";
   const { markMapsOpened } = useReturnInterstitial({
+    enabled: ADS_ENABLED,
     unitId: interstitialUnitId,
     cooldownMs: 2 * 60 * 1000,
     maxPerSession: 3,
     minBackgroundMs: 1200
   });
 
-  const rewardedUnitId = __DEV__ ? TestIds.REWARDED : "ca-app-pub-2653462201538649/2269367545";
-  const reward = useRewardUnlock({ unitId: rewardedUnitId, durationMinutes: 30 });
+  const rewardedUnitId = ADS_ENABLED ? AD_UNITS.rewarded : "";
+  const reward = useRewardUnlock({ enabled: ADS_ENABLED, unitId: rewardedUnitId, durationMinutes: 30 });
 
   const maxCompare = reward.unlocked ? 5 : 3;
 

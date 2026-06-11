@@ -1,20 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppState } from "react-native";
-import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 
 type Options = {
+  enabled?: boolean;
   unitId: string;
   cooldownMs?: number;
   maxPerSession?: number;
   minBackgroundMs?: number;
 };
 
+declare const require: (name: string) => any;
+
 export function useReturnInterstitial(opts: Options) {
+  const enabled = opts.enabled ?? true;
   const cooldownMs = opts.cooldownMs ?? 2 * 60 * 1000;
   const maxPerSession = opts.maxPerSession ?? 3;
   const minBackgroundMs = opts.minBackgroundMs ?? 1200;
 
-  const ad = useMemo(() => InterstitialAd.createForAdRequest(opts.unitId), [opts.unitId]);
+  const ad = useMemo(() => {
+    if (!enabled || !opts.unitId) return null;
+    const { InterstitialAd } = require("react-native-google-mobile-ads");
+    return InterstitialAd.createForAdRequest(opts.unitId);
+  }, [enabled, opts.unitId]);
 
   const [loaded, setLoaded] = useState(false);
 
@@ -26,6 +33,8 @@ export function useReturnInterstitial(opts: Options) {
   const leftAtRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!ad) return;
+    const { AdEventType } = require("react-native-google-mobile-ads");
     const unsubLoaded = ad.addAdEventListener(AdEventType.LOADED, () => setLoaded(true));
     const unsubClosed = ad.addAdEventListener(AdEventType.CLOSED, () => {
       setLoaded(false);
@@ -43,6 +52,7 @@ export function useReturnInterstitial(opts: Options) {
   }, [ad]);
 
   useEffect(() => {
+    if (!ad) return;
     const sub = AppState.addEventListener("change", (next) => {
       const prev = appStateRef.current;
       appStateRef.current = next;
@@ -84,6 +94,7 @@ export function useReturnInterstitial(opts: Options) {
 
   return {
     markMapsOpened: () => {
+      if (!enabled) return;
       pendingRef.current = true;
     }
   };

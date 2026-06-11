@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AdEventType, RewardedAd, RewardedAdEventType } from "react-native-google-mobile-ads";
 import { STORAGE_REWARD_UNTIL_UTC } from "../constants/storage";
 
 type Options = {
+  enabled?: boolean;
   unitId: string;
   durationMinutes: number;
 };
+
+declare const require: (name: string) => any;
 
 function parseDateMs(iso: string | null) {
   if (!iso) return 0;
@@ -15,7 +17,12 @@ function parseDateMs(iso: string | null) {
 }
 
 export function useRewardUnlock(opts: Options) {
-  const ad = useMemo(() => RewardedAd.createForAdRequest(opts.unitId), [opts.unitId]);
+  const enabled = opts.enabled ?? true;
+  const ad = useMemo(() => {
+    if (!enabled || !opts.unitId) return null;
+    const { RewardedAd } = require("react-native-google-mobile-ads");
+    return RewardedAd.createForAdRequest(opts.unitId);
+  }, [enabled, opts.unitId]);
 
   const [loaded, setLoaded] = useState(false);
   const [unlockUntilMs, setUnlockUntilMs] = useState<number>(0);
@@ -39,6 +46,15 @@ export function useRewardUnlock(opts: Options) {
 
   useEffect(() => {
     let cancelled = false;
+
+    if (!ad) {
+      loadStored();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const { AdEventType, RewardedAdEventType } = require("react-native-google-mobile-ads");
 
     const unsubLoaded = ad.addAdEventListener(RewardedAdEventType.LOADED, () => {
       if (!cancelled) setLoaded(true);
@@ -78,6 +94,7 @@ export function useRewardUnlock(opts: Options) {
   }, [ad, loadStored, setUnlockForDuration]);
 
   const showRewardedAndUnlock = useCallback(async () => {
+    if (!enabled || !ad) return false;
     if (!loaded) {
       ad.load();
       return false;
@@ -89,7 +106,7 @@ export function useRewardUnlock(opts: Options) {
     } catch {
       return false;
     }
-  }, [ad, loaded]);
+  }, [ad, enabled, loaded]);
 
   const refreshStored = useCallback(async () => {
     await loadStored();
