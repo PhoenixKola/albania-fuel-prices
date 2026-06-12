@@ -84,6 +84,26 @@ export const en = {
     "Karburanti Sot helps drivers compare fuel prices, estimate trip costs, and understand how pricing changes across countries. Instead of showing only raw numbers, the site adds context around price rankings, likely cost differences, exchange-rate effects, and practical travel use cases.",
   heroLiveFallback: "Live price tools and country comparisons",
   heroUpdatedAt: (s: string) => `Updated ${s}`,
+  heroShowcaseBadge: "Updated daily \u00b7 Europe-wide coverage",
+  heroShowcaseTitle: "Fuel prices across Europe, made beautifully simple.",
+  heroShowcaseSubtitle:
+    "Compare countries, track daily updates, and find nearby stations with a premium app built for smarter driving.",
+  heroShowcasePrimaryCta: "Explore prices",
+  heroShowcaseSecondaryCta: "Find stations",
+  heroShowcaseTrust1: "Daily updates",
+  heroShowcaseTrust2: "Europe-wide coverage",
+  heroShowcaseTrust3: "Compare in seconds",
+  heroShowcaseFloat1: "42 countries",
+  heroShowcaseFloat2: "Diesel \u00b7 Petrol \u00b7 LPG",
+  heroShowcaseMockupStatus: "Updated today",
+  heroShowcaseMockupPill: "Albania \u00b7 Diesel",
+  heroShowcaseMockupCardTitle: "Today's fuel pulse",
+  heroShowcaseMockupRow1: "#14 cheapest in Europe",
+  heroShowcaseMockupRow2: "Below Europe average",
+  heroShowcaseMockupRow3: "Updated today",
+  heroShowcaseRank: (rank: number) => `#${rank} cheapest in Europe`,
+  heroShowcaseBelowAverage: "Below Europe average",
+  heroShowcaseAboveAverage: "Above Europe average",
 
   editorialTitle: "Today's fuel price summary",
   editorialEmpty:
@@ -144,7 +164,7 @@ export const en = {
   sourceCardInterpretationNote:
     "The figures on this page should be read as a practical comparison of public fuel data, not as a guarantee of the exact pump price at every station. Local stations, taxes, reporting times, and exchange-rate effects can all change the final price users see.",
   sourceCardMethodologyNote:
-    "Methodology: the site compares country-level fuel prices and presents them in a simpler format for travel planning, comparison, and rough cost estimation. These numbers are most useful as market guidance rather than as a promise for one exact station.",
+    "Methodology: the site compares country-level fuel prices and presents them in a simpler format for travel planning, comparison, and rough cost estimation. These numbers are most useful as market guidance rather than as a promise for one exact station. Global estimates (US, Canada, Australia, Japan, China, India, Brazil, Mexico, South Korea) use reference values from GlobalPetrolPrices.com with a small daily variation applied — treat them as approximate context only.",
   sourceUrlLabel: "URL",
 
   // Navigation & Footer

@@ -145,6 +145,30 @@ export type TDict = {
   homeCompareSubtitle: string;
   homeRankingsSubtitle: string;
   allFuelPrices: string;
+  homeSearchCountries: string;
+  homeUpdatedToday: string;
+  homeSourceVerified: string;
+  homeNoPrice: string;
+  homeRankBadge: (rank: number) => string;
+  homeOutOf: (total: number) => string;
+  homeFuelPulse: string;
+  homeSelectedPrice: string;
+  homeEuropeAverage: string;
+  homeTrend: string;
+  homeWidgets: string;
+  homeMore: string;
+  homeNearAverage: string;
+  homeBelowAverage: string;
+  homeAboveAverage: string;
+  homeNoPrevious: string;
+  homeStableTrend: string;
+  homeCheaperTrend: string;
+  homeHigherTrend: string;
+  homeCheapestToday: string;
+  homeEuropeAverageWidget: string;
+  homeNearbyStationsWidget: string;
+  homeSavedCountriesWidget: string;
+  homeCompareCountriesWidget: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -293,6 +317,30 @@ export const i18n: Record<Lang, TDict> = {
     homeCompareSubtitle: "Compare your saved countries",
     homeRankingsSubtitle: "See cheapest markets",
     allFuelPrices: "All fuel prices",
+    homeSearchCountries: "Search countries",
+    homeUpdatedToday: "Updated today",
+    homeSourceVerified: "Verified",
+    homeNoPrice: "No price",
+    homeRankBadge: (rank: number) => `#${rank} cheapest in Europe`,
+    homeOutOf: (total: number) => `of ${total} countries`,
+    homeFuelPulse: "Today's fuel pulse",
+    homeSelectedPrice: "Selected price",
+    homeEuropeAverage: "Europe average",
+    homeTrend: "Trend",
+    homeWidgets: "Widgets",
+    homeMore: "More",
+    homeNearAverage: "Near Europe average",
+    homeBelowAverage: "Below Europe average",
+    homeAboveAverage: "Above Europe average",
+    homeNoPrevious: "No previous update",
+    homeStableTrend: "Holding steady",
+    homeCheaperTrend: "Cheaper than previous update",
+    homeHigherTrend: "Higher than previous update",
+    homeCheapestToday: "Cheapest today",
+    homeEuropeAverageWidget: "Europe average",
+    homeNearbyStationsWidget: "Nearby stations",
+    homeSavedCountriesWidget: "Saved countries",
+    homeCompareCountriesWidget: "Compare countries",
   },
   sq: {
     title: "Çmimet e Karburanteve në Europë",
@@ -439,5 +487,29 @@ export const i18n: Record<Lang, TDict> = {
     homeCompareSubtitle: "Krahaso shtetet e ruajtura",
     homeRankingsSubtitle: "Shiko tregjet më të lira",
     allFuelPrices: "Të gjitha çmimet",
+    homeSearchCountries: "Kerko shtete",
+    homeUpdatedToday: "Perditesuar sot",
+    homeSourceVerified: "Verifikuar",
+    homeNoPrice: "Pa cmim",
+    homeRankBadge: (rank: number) => `#${rank} me lire ne Evrope`,
+    homeOutOf: (total: number) => `nga ${total} shtete`,
+    homeFuelPulse: "Pulsi i karburantit sot",
+    homeSelectedPrice: "Cmimi i zgjedhur",
+    homeEuropeAverage: "Mesatarja evropiane",
+    homeTrend: "Tendenca",
+    homeWidgets: "Widget-e",
+    homeMore: "Me shume",
+    homeNearAverage: "Afer mesatares evropiane",
+    homeBelowAverage: "Nen mesataren evropiane",
+    homeAboveAverage: "Mbi mesataren evropiane",
+    homeNoPrevious: "Pa perditesim te meparshem",
+    homeStableTrend: "I qendrueshem",
+    homeCheaperTrend: "Me lire se perditesimi i kaluar",
+    homeHigherTrend: "Me shtrenjte se perditesimi i kaluar",
+    homeCheapestToday: "Me lire sot",
+    homeEuropeAverageWidget: "Mesatarja evropiane",
+    homeNearbyStationsWidget: "Pika afer",
+    homeSavedCountriesWidget: "Shtete te ruajtura",
+    homeCompareCountriesWidget: "Krahaso shtetet",
   },
 };

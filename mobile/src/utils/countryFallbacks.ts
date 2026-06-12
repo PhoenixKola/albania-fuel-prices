@@ -1,4 +1,4 @@
-import type { CountryPrices, LatestEurope } from "../models/fuel";
+import type { CountryPrices, LatestEurope } from "../types/fuel";
 
 const FALLBACK_COUNTRIES: CountryPrices[] = [
   { country: "Australia", gasoline95_eur: 1.057, diesel_eur: 1.246, lpg_eur: 0.383 },
@@ -13,7 +13,7 @@ const FALLBACK_COUNTRIES: CountryPrices[] = [
   { country: "United States", gasoline95_eur: 1.024, diesel_eur: 1.193, lpg_eur: null }
 ];
 
-function withCountryFallbacks(data: LatestEurope): LatestEurope {
+export function withCountryFallbacks(data: LatestEurope): LatestEurope {
   const existing = new Set(data.countries.map((country) => country.country.toLowerCase()));
   const missing = FALLBACK_COUNTRIES.filter((country) => !existing.has(country.country.toLowerCase()));
   if (!missing.length) return data;
@@ -22,10 +22,4 @@ function withCountryFallbacks(data: LatestEurope): LatestEurope {
     ...data,
     countries: [...data.countries, ...missing].sort((a, b) => a.country.localeCompare(b.country))
   };
-}
-
-export async function fetchLatestEurope(url: string): Promise<LatestEurope> {
-  const r = await fetch(url, { cache: "no-store" });
-  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-  return withCountryFallbacks(await r.json());
 }

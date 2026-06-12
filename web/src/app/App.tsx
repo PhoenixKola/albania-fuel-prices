@@ -69,12 +69,8 @@ export default function App() {
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-    });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, [pathname]);
 
   const [lang, setLang] = useLocalStorageState<Lang>(STORAGE_LANG_KEY, "en", {
@@ -158,6 +154,7 @@ export default function App() {
                 countries={countries}
                 country={country}
                 selected={selected}
+                fuelType={fuelType}
                 setCountry={setCountry}
                 currency={currency}
                 setCurrency={setCurrency}

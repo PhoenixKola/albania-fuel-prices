@@ -67,6 +67,15 @@ export default function MethodologyPage({ t }: Props) {
       </section>
 
       <section className="contentSection">
+        <h2 className="contentHeading">Global country estimates</h2>
+        <p className="contentBody">
+          Countries outside Europe (United States, Canada, Australia, Japan, China, India, Brazil, Mexico, South Korea) are shown as <strong>rough estimates</strong> for general reference. Base values were sourced from{" "}
+          <a href="https://www.globalpetrolprices.com" target="_blank" rel="noreferrer" className="inlineLink">GlobalPetrolPrices.com</a>{" "}
+          and converted to EUR/L. A small daily variation is applied to reflect typical market movement — these figures are not live data and should not be used for purchasing or travel decisions. They are provided solely to give a broad global context alongside European prices.
+        </p>
+      </section>
+
+      <section className="contentSection">
         <h2 className="contentHeading">Fuel types and limitations</h2>
         <p className="contentBody">
           Petrol (95), diesel, and LPG are shown only when each value exists in the source. Missing fields are not guessed or interpolated. Local station offers, promotions, and micro-regional pricing are outside country-level scope.

@@ -87,6 +87,25 @@ export type TDict = {
   heroSubtitle: string;
   heroLiveFallback: string;
   heroUpdatedAt: (s: string) => string;
+  heroShowcaseBadge: string;
+  heroShowcaseTitle: string;
+  heroShowcaseSubtitle: string;
+  heroShowcasePrimaryCta: string;
+  heroShowcaseSecondaryCta: string;
+  heroShowcaseTrust1: string;
+  heroShowcaseTrust2: string;
+  heroShowcaseTrust3: string;
+  heroShowcaseFloat1: string;
+  heroShowcaseFloat2: string;
+  heroShowcaseMockupStatus: string;
+  heroShowcaseMockupPill: string;
+  heroShowcaseMockupCardTitle: string;
+  heroShowcaseMockupRow1: string;
+  heroShowcaseMockupRow2: string;
+  heroShowcaseMockupRow3: string;
+  heroShowcaseRank: (rank: number) => string;
+  heroShowcaseBelowAverage: string;
+  heroShowcaseAboveAverage: string;
 
   editorialTitle: string;
   editorialEmpty: string;

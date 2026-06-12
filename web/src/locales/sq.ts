@@ -84,6 +84,26 @@ export const sq = {
     "Karburanti Sot i ndihmon drejtuesit të krahasojnë çmimet e karburantit, të vlerësojnë kostot e udhëtimit dhe të kuptojnë si ndryshojnë çmimet mes vendeve. Në vend që të shfaqë vetëm numra të papërpunuar, faqja shton kontekst për renditjet, diferencat e mundshme të kostos, efektet e kursit të këmbimit dhe rastet praktike të përdorimit.",
   heroLiveFallback: "Mjete live për çmime dhe krahasime mes vendeve",
   heroUpdatedAt: (s: string) => `Përditësuar ${s}`,
+  heroShowcaseBadge: "P\u00ebrdit\u00ebsime ditore \u00b7 Mbulim n\u00eb Evrop\u00eb",
+  heroShowcaseTitle: "\u00c7mimet e karburantit n\u00eb Evrop\u00eb, t\u00eb thjeshtuara bukur.",
+  heroShowcaseSubtitle:
+    "Krahaso shtetet, ndiq p\u00ebrdit\u00ebsimet ditore dhe gjej pikat m\u00eb t\u00eb af\u00ebrta me nj\u00eb aplikacion premium p\u00ebr vendime m\u00eb t\u00eb zgjuara n\u00eb rrug\u00eb.",
+  heroShowcasePrimaryCta: "Shiko \u00e7mimet",
+  heroShowcaseSecondaryCta: "Gjej pikat",
+  heroShowcaseTrust1: "P\u00ebrdit\u00ebsime ditore",
+  heroShowcaseTrust2: "Mbulim n\u00eb Evrop\u00eb",
+  heroShowcaseTrust3: "Krahasim n\u00eb sekonda",
+  heroShowcaseFloat1: "42 shtete",
+  heroShowcaseFloat2: "Naft\u00eb \u00b7 Benzin\u00eb \u00b7 LPG",
+  heroShowcaseMockupStatus: "P\u00ebrdit\u00ebsuar sot",
+  heroShowcaseMockupPill: "Shqip\u00ebri \u00b7 Naft\u00eb",
+  heroShowcaseMockupCardTitle: "Pulsi i karburantit sot",
+  heroShowcaseMockupRow1: "#14 m\u00eb lir\u00eb n\u00eb Evrop\u00eb",
+  heroShowcaseMockupRow2: "N\u00ebn mesataren evropiane",
+  heroShowcaseMockupRow3: "P\u00ebrdit\u00ebsuar sot",
+  heroShowcaseRank: (rank: number) => `#${rank} m\u00eb lir\u00eb n\u00eb Evrop\u00eb`,
+  heroShowcaseBelowAverage: "N\u00ebn mesataren evropiane",
+  heroShowcaseAboveAverage: "Mbi mesataren evropiane",
 
   editorialTitle: "Përmbledhja e çmimeve të sotme të karburantit",
   editorialEmpty:
@@ -144,7 +164,7 @@ export const sq = {
   sourceCardInterpretationNote:
     "Shifrat në këtë faqe duhen lexuar si krahasim praktik i të dhënave publike të karburantit, jo si garanci për çmimin e saktë në çdo pikë. Pikat lokale, taksat, koha e raportimit dhe efekti i kursit të këmbimit mund të ndryshojnë rezultatin final.",
   sourceCardMethodologyNote:
-    "Metodologjia: faqja krahason çmimet e karburantit në nivel vendi dhe i paraqet në një formë më të thjeshtë për planifikim udhëtimi, krahasim dhe vlerësim të kostove. Këto shifra janë më të dobishme si orientim tregu.",
+    "Metodologjia: faqja krahason çmimet e karburantit në nivel vendi dhe i paraqet në një formë më të thjeshtë për planifikim udhëtimi, krahasim dhe vlerësim të kostove. Këto shifra janë më të dobishme si orientim tregu. Vlerësimet globale (SHBA, Kanada, Australi, Japoni, Kinë, Indi, Brazil, Meksikë, Kore e Jugut) përdorin vlera referuese nga GlobalPetrolPrices.com me një ndryshim të vogël ditor — trajtohen vetëm si kontekst aproximativ.",
   sourceUrlLabel: "URL",
 
   // Navigation & Footer

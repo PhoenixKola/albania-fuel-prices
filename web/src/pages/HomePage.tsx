@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
-import type { CountryPrices, LatestEurope } from "../models/fuel";
+import type { CountryPrices, FuelType, LatestEurope } from "../models/fuel";
 import type { TDict } from "../locales";
 import type { FxRates } from "../utils/currency";
 
@@ -27,6 +27,7 @@ type Props = {
   countries: string[];
   country: string;
   selected: CountryPrices | null;
+  fuelType: FuelType;
   setCountry: (c: string) => void;
   currency: Currency;
   setCurrency: (c: Currency) => void;
@@ -45,6 +46,7 @@ export default function HomePage({
   countries,
   country,
   selected,
+  fuelType,
   setCountry,
   currency,
   setCurrency,
@@ -89,7 +91,17 @@ export default function HomePage({
     <>
       <ToastHost message={toast} />
 
-      <HeroIntro t={t} lang={lang} updatedAt={data?.fetched_at_utc ?? null} />
+      <HeroIntro
+        t={t}
+        lang={lang}
+        updatedAt={data?.fetched_at_utc ?? null}
+        data={data}
+        country={country}
+        selected={selected}
+        fuelType={fuelType}
+        currency={currency}
+        fxRates={fxRates}
+      />
 
       <EditorialSummary t={t} items={editorialItems} />
 
@@ -97,19 +109,21 @@ export default function HomePage({
 
       {error ? <Notice t={t} message={error} onRetry={refresh} /> : null}
 
-      <FuelCard
-        t={t}
-        data={data}
-        loading={loading}
-        countries={countries}
-        country={country}
-        selected={selected}
-        onSelectCountry={setCountry}
-        currency={currency}
-        fxRates={fxRates}
-        onCopy={copyText}
-        onShare={shareText}
-      />
+      <div id="price-tool">
+        <FuelCard
+          t={t}
+          data={data}
+          loading={loading}
+          countries={countries}
+          country={country}
+          selected={selected}
+          onSelectCountry={setCountry}
+          currency={currency}
+          fxRates={fxRates}
+          onCopy={copyText}
+          onShare={shareText}
+        />
+      </div>
 
       <MethodologySection
         t={t}

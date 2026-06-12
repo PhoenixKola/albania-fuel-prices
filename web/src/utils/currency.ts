@@ -6,9 +6,13 @@ function norm(s: string) {
 
 const RAW: Record<string, string> = {
   Albania: "ALL",
+  Australia: "AUD",
   Austria: "EUR",
   Belgium: "EUR",
+  Brazil: "BRL",
   Bulgaria: "BGN",
+  Canada: "CAD",
+  China: "CNY",
   Croatia: "EUR",
   "Czech Republic": "CZK",
   Czechia: "CZK",
@@ -17,17 +21,23 @@ const RAW: Record<string, string> = {
   Germany: "EUR",
   Greece: "EUR",
   Hungary: "HUF",
+  India: "INR",
   Italy: "EUR",
+  Japan: "JPY",
   Netherlands: "EUR",
+  Mexico: "MXN",
   Norway: "NOK",
   Poland: "PLN",
   Romania: "RON",
   Serbia: "RSD",
+  "South Korea": "KRW",
   Sweden: "SEK",
   Switzerland: "CHF",
   Turkey: "TRY",
   "United Kingdom": "GBP",
+  "United States": "USD",
   UK: "GBP",
+  USA: "USD",
 };
 
 const MAP: Record<string, string> = Object.fromEntries(Object.entries(RAW).map(([k, v]) => [norm(k), v]));
