@@ -23383,12 +23383,15 @@
           "lpg_eur": 0.873
         },
         {
+<<<<<<< HEAD
           "country": "Australia",
           "gasoline95_eur": 1.057,
           "diesel_eur": 1.246,
           "lpg_eur": 0.383
         },
         {
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
           "country": "Belarus",
           "gasoline95_eur": 0.835,
           "diesel_eur": 0.835,
@@ -23407,18 +23410,22 @@
           "lpg_eur": 0.725
         },
         {
+<<<<<<< HEAD
           "country": "Brazil",
           "gasoline95_eur": 1.134,
           "diesel_eur": 1.175,
           "lpg_eur": null
         },
         {
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
           "country": "Bulgaria",
           "gasoline95_eur": 1.515,
           "diesel_eur": 1.62,
           "lpg_eur": 0.697
         },
         {
+<<<<<<< HEAD
           "country": "Canada",
           "gasoline95_eur": 1.24,
           "diesel_eur": 1.285,
@@ -23431,6 +23438,8 @@
           "lpg_eur": null
         },
         {
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
           "country": "Croatia",
           "gasoline95_eur": 1.645,
           "diesel_eur": 1.701,
@@ -23473,18 +23482,22 @@
           "lpg_eur": 1.031
         },
         {
+<<<<<<< HEAD
           "country": "India",
           "gasoline95_eur": 0.977,
           "diesel_eur": 0.882,
           "lpg_eur": 0.6
         },
         {
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
           "country": "Italy",
           "gasoline95_eur": 1.913,
           "diesel_eur": 2.02,
           "lpg_eur": 0.804
         },
         {
+<<<<<<< HEAD
           "country": "Japan",
           "gasoline95_eur": 0.914,
           "diesel_eur": 0.857,
@@ -23497,6 +23510,8 @@
           "lpg_eur": null
         },
         {
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
           "country": "Latvia",
           "gasoline95_eur": 1.763,
           "diesel_eur": 1.768,
@@ -23515,12 +23530,15 @@
           "lpg_eur": 0.748
         },
         {
+<<<<<<< HEAD
           "country": "Mexico",
           "gasoline95_eur": 1.399,
           "diesel_eur": 1.34,
           "lpg_eur": null
         },
         {
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
           "country": "Moldova",
           "gasoline95_eur": 1.44,
           "diesel_eur": 1.353,
@@ -23575,12 +23593,15 @@
           "lpg_eur": 1.026
         },
         {
+<<<<<<< HEAD
           "country": "South Korea",
           "gasoline95_eur": 1.321,
           "diesel_eur": 1.318,
           "lpg_eur": 0.717
         },
         {
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
           "country": "Spain",
           "gasoline95_eur": 1.511,
           "diesel_eur": 1.604,
@@ -23615,12 +23636,15 @@
           "gasoline95_eur": 1.824,
           "diesel_eur": 2.099,
           "lpg_eur": 1.093
+<<<<<<< HEAD
         },
         {
           "country": "United States",
           "gasoline95_eur": 1.024,
           "diesel_eur": 1.193,
           "lpg_eur": null
+=======
+>>>>>>> 1d1bf2c223a264edd73b6b09b30c3fc50d1df7ba
         }
       ]
     }
