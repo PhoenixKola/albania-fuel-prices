@@ -1,6 +1,9 @@
 export const DATA_URL =
   "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json";
 
+export const TRENDS_URL =
+  "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/trends.json";
+
 export const STORAGE_LANG_KEY = "lang";
 export const STORAGE_COUNTRY_KEY = "country";
 export const STORAGE_THEME_KEY = "theme";

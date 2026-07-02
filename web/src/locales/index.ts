@@ -43,6 +43,27 @@ export type TDict = {
   cheapest: string;
   mostExpensive: string;
   fuelType: string;
+  rankingsYou: string;
+  rankingsTableNote: string;
+  rankingsEuropeAverage: string;
+  rankingsCountryCol: string;
+  rankingsTrendCol: string;
+  rankingsWeekCol: string;
+  rankingsPriceCol: string;
+  rankingsShowLess: string;
+  rankingsShowAll: (n: number) => string;
+  rankingsGlobalTitle: string;
+  rankingsGlobalNote: string;
+
+  trendTitle: string;
+  trendCurrent: string;
+  trendLow: string;
+  trendHigh: string;
+  trendFlatWeek: string;
+  trendWeekSuffix: string;
+
+  accordionMethodology: string;
+  accordionGuide: string;
 
   tools: string;
   tabFill: string;

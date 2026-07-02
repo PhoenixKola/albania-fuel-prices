@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import type { FxRates } from "../../utils/currency";
 import { fuelLabel, getEurPrice } from "../../utils/fuel";
 import { formatFuelPrice } from "../../utils/priceDisplay";
+import { isEuropeanCountry } from "../../utils/regions";
 
 type HeroIntroProps = {
   t: TDict;
@@ -40,11 +41,12 @@ export default function HeroIntro({ t, lang, updatedAt, data, country, selected,
   const heroFuel = fuelLabel(t, fuelType);
   const pricedCountries =
     data?.countries
-      ?.map((item) => ({ country: item.country, price: getEurPrice(item, fuelType) }))
+      ?.filter((item) => isEuropeanCountry(item.country))
+      .map((item) => ({ country: item.country, price: getEurPrice(item, fuelType) }))
       .filter((item): item is { country: string; price: number } => typeof item.price === "number" && Number.isFinite(item.price))
       .sort((a, b) => a.price - b.price) ?? [];
   const rank =
-    selectedPrice != null && pricedCountries.length
+    selectedPrice != null && isEuropeanCountry(country) && pricedCountries.length
       ? pricedCountries.filter((item) => item.price < selectedPrice).length + 1
       : null;
   const average = pricedCountries.length
@@ -59,9 +61,6 @@ export default function HeroIntro({ t, lang, updatedAt, data, country, selected,
 
   return (
     <section className="contentHero" aria-labelledby="home-hero-title">
-      <div className="contentHeroGlow contentHeroGlowOne" aria-hidden="true" />
-      <div className="contentHeroGlow contentHeroGlowTwo" aria-hidden="true" />
-
       <div className="contentHeroCopy">
         <div className="contentHeroBadge">{t.heroShowcaseBadge}</div>
         <h1 id="home-hero-title" className="contentHeroTitle">{t.heroShowcaseTitle}</h1>
@@ -84,7 +83,6 @@ export default function HeroIntro({ t, lang, updatedAt, data, country, selected,
       </div>
 
       <div className="contentHeroVisual" aria-hidden="true">
-        <div className="heroGridOrb" />
         <div className="heroFloatCard heroFloatCardTop">{t.heroShowcaseFloat1}</div>
         <div className="heroFloatCard heroFloatCardBottom">{t.heroShowcaseFloat2}</div>
 

@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { Animated, Easing, Pressable } from "react-native";
+import { hapticLight } from "../../utils/haptics";
 
 export default function AnimatedPressable({
   onPress,
@@ -8,7 +9,8 @@ export default function AnimatedPressable({
   contentStyle,
   disabled,
   scaleIn = 0.98,
-  hitSlop
+  hitSlop,
+  haptic = true
 }: {
   onPress?: () => void;
   children: React.ReactNode;
@@ -17,11 +19,13 @@ export default function AnimatedPressable({
   disabled?: boolean;
   scaleIn?: number;
   hitSlop?: any;
+  haptic?: boolean;
 }) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const pressIn = () => {
     if (disabled) return;
+    if (haptic) hapticLight();
     Animated.timing(scale, { toValue: scaleIn, duration: 90, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
   };
 

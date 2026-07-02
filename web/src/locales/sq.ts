@@ -1,5 +1,5 @@
 export const sq = {
-  title: "Çmimet e Karburanteve në Europë",
+  title: "Karburanti Sot",
   subtitleAsOf: (d: string) => `Data: ${d}`,
   subtitleLoading: "Po ngarkohen të dhënat…",
   region: (r: string) => `Rajoni: ${r}`,
@@ -39,6 +39,28 @@ export const sq = {
   cheapest: "Më të lirat",
   mostExpensive: "Më të shtrenjtat",
   fuelType: "Karburanti",
+  rankingsYou: "Ju",
+  rankingsTableNote:
+    "Të gjitha shtetet europiane në bazën e të dhënave, të renditura nga më e lira te më e shtrenjta. Vlerat duhen lexuar si udhëzim tregu publik, jo si çmim i saktë për çdo pikë karburanti.",
+  rankingsEuropeAverage: "Mesatarja e Europës",
+  rankingsCountryCol: "Shteti",
+  rankingsTrendCol: "30 ditë",
+  rankingsWeekCol: "7d",
+  rankingsPriceCol: "Çmimi",
+  rankingsShowLess: "Shfaq më pak",
+  rankingsShowAll: (n: number) => `Shfaq të gjitha ${n} shtetet`,
+  rankingsGlobalTitle: "Përtej Europës",
+  rankingsGlobalNote: "Vlerësime referencë për tregjet globale",
+
+  trendTitle: "Ecuria e çmimit në 30 ditë",
+  trendCurrent: "Aktual",
+  trendLow: "Më i ulëti (30 ditë)",
+  trendHigh: "Më i larti (30 ditë)",
+  trendFlatWeek: "Stabil këtë javë",
+  trendWeekSuffix: "krahasuar me javën e kaluar",
+
+  accordionMethodology: "Si mblidhen dhe interpretohen këto të dhëna",
+  accordionGuide: "Udhëzuesi i plotë: çmimet e sotme, rrugët dhe pyetjet e shpeshta",
 
   tools: "Mjete të shpejta",
   tabFill: "Mbushje",

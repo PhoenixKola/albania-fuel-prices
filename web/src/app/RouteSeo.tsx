@@ -1,15 +1,9 @@
 import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import type { LatestEurope } from "../models/fuel";
 import Seo from "../components/meta/Seo";
 import { getCountryEditorial } from "../config/countryContent";
 
-type Props = {
-  data: LatestEurope | null;
-  loading: boolean;
-};
-
-export default function RouteSeo({ data, loading }: Props) {
+export default function RouteSeo() {
   const { pathname } = useLocation();
 
   const meta = useMemo(() => {
@@ -177,7 +171,7 @@ export default function RouteSeo({ data, loading }: Props) {
       path: "/404",
       noindex: true,
     };
-  }, [pathname, data, loading]);
+  }, [pathname]);
 
   return (
     <Seo

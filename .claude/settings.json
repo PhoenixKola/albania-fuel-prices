@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/history.json\" -o /tmp/remote-history.json)",
+      "Bash(node -e \"try { const h = JSON.parse\\(require\\('fs'\\).readFileSync\\('/tmp/remote-history.json','utf8'\\)\\); console.log\\('VALID JSON. series points:', h.series.length, 'first:', h.series[0]?.as_of, 'last:', h.series[h.series.length-1]?.as_of\\); } catch\\(e\\) { console.log\\('CORRUPT:', e.message\\); }\")",
+      "Bash(node -e *)",
+      "Bash(node -e ' *)",
+      "Bash(echo \"TSC exit: $?\")",
+      "Bash(echo \"exit=$?\")",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(npx expo *)"
+    ]
+  }
+}

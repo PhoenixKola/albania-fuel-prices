@@ -92,7 +92,9 @@ function loadResult(): DailyResult | null {
 function saveResult(result: DailyResult) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
-  } catch {}
+  } catch {
+    // storage unavailable — result just won't persist
+  }
 }
 
 type Props = {

@@ -9,33 +9,15 @@ export const makeHomeStyles = (theme: Theme) => {
   const faintText = light ? "rgba(16,32,51,0.52)" : "rgba(255,255,255,0.52)";
   const chromeBg = light ? "rgba(255,252,247,0.86)" : "rgba(255,255,255,0.10)";
   const chromeBorder = light ? "rgba(16,32,51,0.10)" : "rgba(255,255,255,0.14)";
-  const cardBg = light ? "rgba(255,252,247,0.94)" : "rgba(6, 10, 24, 0.96)";
+  const cardBg = light ? "rgba(255,252,247,0.94)" : theme.colors.card;
   const cardBorder = light ? "rgba(16,32,51,0.10)" : "rgba(255,255,255,0.12)";
-  const accent = light ? "#0E7490" : "#8DEDE1";
+  const accent = light ? "#0F766E" : "#8DEDE1";
   const actionBorder = light ? "rgba(16,32,51,0.09)" : "rgba(255,255,255,0.14)";
 
   return StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: light ? theme.colors.bg : "#050816"
-    },
-    bgOrbTop: {
-      position: "absolute",
-      top: -130,
-      right: -110,
-      width: 290,
-      height: 290,
-      borderRadius: 145,
-      backgroundColor: light ? "rgba(14, 165, 233, 0.16)" : "rgba(91, 33, 255, 0.30)"
-    },
-    bgOrbBottom: {
-      position: "absolute",
-      bottom: 80,
-      left: -140,
-      width: 260,
-      height: 260,
-      borderRadius: 130,
-      backgroundColor: light ? "rgba(45, 212, 191, 0.12)" : "rgba(45, 212, 191, 0.13)"
+      backgroundColor: theme.colors.bg
     },
     content: {
       paddingHorizontal: 16,
@@ -121,15 +103,6 @@ export const makeHomeStyles = (theme: Theme) => {
       shadowRadius: light ? 24 : 30,
       shadowOffset: { width: 0, height: 18 },
       elevation: 8
-    },
-    heroGlow: {
-      position: "absolute",
-      top: -54,
-      left: 22,
-      width: 230,
-      height: 230,
-      borderRadius: 115,
-      backgroundColor: light ? "rgba(14, 116, 144, 0.10)" : "rgba(45, 212, 191, 0.16)"
     },
     heroStatusRow: {
       flexDirection: "row",

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { Lang } from "../../models/i18n";
 import type { Theme } from "../../models/theme";
+import type { Currency } from "../../models/currency";
 import type { TDict } from "../../locales";
 
 type Props = {
@@ -10,6 +11,8 @@ type Props = {
   subtitle: string;
   lang: Lang;
   theme: Theme;
+  currency: Currency;
+  onSetCurrency: (c: Currency) => void;
   refreshing: boolean;
   onRefresh: () => void;
   onToggleLang: () => void;
@@ -61,6 +64,8 @@ export default function Navbar({
   logoSrc,
   subtitle,
   theme,
+  currency,
+  onSetCurrency,
   refreshing,
   onRefresh,
   onToggleTheme,
@@ -227,6 +232,23 @@ export default function Navbar({
 
         {/* Desktop actions */}
         <div className="navActions">
+          <div className="segRow navCurrencySeg" role="group" aria-label={t.currencyMode}>
+            <button
+              type="button"
+              className={`seg ${currency === "eur" ? "segActive" : ""}`}
+              onClick={() => onSetCurrency("eur")}
+            >
+              {t.currencyEUR}
+            </button>
+            <button
+              type="button"
+              className={`seg ${currency === "local" ? "segActive" : ""}`}
+              onClick={() => onSetCurrency("local")}
+            >
+              {t.currencyLocal}
+            </button>
+          </div>
+
           <button className="btn btn-primary" onClick={onRefresh} disabled={refreshing}>
             {refreshing ? t.refreshing : t.refresh}
           </button>
@@ -280,6 +302,23 @@ export default function Navbar({
           <div className="mobileMenuDivider" />
 
           <div className="mobileMenuActions">
+            <div className="segRow mobileMenuCurrencySeg" role="group" aria-label={t.currencyMode}>
+              <button
+                type="button"
+                className={`seg ${currency === "eur" ? "segActive" : ""}`}
+                onClick={() => onSetCurrency("eur")}
+              >
+                {t.currencyEUR}
+              </button>
+              <button
+                type="button"
+                className={`seg ${currency === "local" ? "segActive" : ""}`}
+                onClick={() => onSetCurrency("local")}
+              >
+                {t.currencyLocal}
+              </button>
+            </div>
+
             <button
               className="btn btn-primary mobileMenuBtn"
               onClick={() => { onRefresh(); setMenuOpen(false); }}

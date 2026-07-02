@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import * as cheerio from "cheerio";
 import { PDFParse } from "pdf-parse";
+import { buildTrends } from "./trends";
 
 const SOURCES = [
   {
@@ -359,12 +360,13 @@ async function main() {
   let history: HistoryEurope = { region: "Europe", unit: "EUR_per_liter", series: [] };
 
   if (fs.existsSync(historyPath)) {
-    try {
-      const parsed = JSON.parse(fs.readFileSync(historyPath, "utf8"));
-      if (parsed && Array.isArray(parsed.series)) {
-        history = { region: "Europe", unit: "EUR_per_liter", series: parsed.series };
-      }
-    } catch {}
+    // Fail hard on a corrupt history file: silently starting from an empty
+    // series would permanently discard months of accumulated price data.
+    const parsed = JSON.parse(fs.readFileSync(historyPath, "utf8"));
+    if (!parsed || !Array.isArray(parsed.series)) {
+      throw new Error("data/history.json exists but has no valid series — refusing to overwrite it.");
+    }
+    history = { region: "Europe", unit: "EUR_per_liter", series: parsed.series };
   }
 
   const kosovoLive = await fetchKosovoPrices();
@@ -409,7 +411,10 @@ async function main() {
 
   fs.writeFileSync(historyPath, JSON.stringify(history, null, 2), "utf8");
 
-  console.log("Wrote data/latest.json and data/history.json");
+  const trendsPath = path.join(outDir, "trends.json");
+  fs.writeFileSync(trendsPath, JSON.stringify(buildTrends(history)), "utf8");
+
+  console.log("Wrote data/latest.json, data/history.json and data/trends.json");
   console.log("As of:", latest.as_of, "Source:", latest.source);
   console.log("Countries:", latest.countries.length);
 }

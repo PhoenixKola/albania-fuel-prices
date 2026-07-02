@@ -18,8 +18,10 @@ import { i18n, type Lang, type TDict } from "../i18n";
 import type { FuelType, LatestEurope, CountryPrices } from "../types/fuel";
 import { useAsyncStorageState } from "../hooks/useAsyncStorageState";
 import { useFuelData } from "../hooks/useFuelData";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme, type ThemePreference } from "../hooks/useTheme";
 import { useFxRates } from "../hooks/useFxRates";
+import { useTrends, type Trends } from "../hooks/useTrends";
+import { hapticSuccess } from "../utils/haptics";
 import { useUserLocation } from "../hooks/useUserLocation";
 import { useNearbyStations } from "../hooks/useNearbyStations";
 import { useRatePrompt } from "../hooks/useRatePrompt";
@@ -51,6 +53,8 @@ type RewardPlaceholder = {
 type AppContextType = {
   theme: ReturnType<typeof useTheme>["theme"];
   themeName: ReturnType<typeof useTheme>["themeName"];
+  themePreference: ThemePreference;
+  setThemePreference: (v: ThemePreference) => void;
   toggleTheme: () => void;
 
   lang: Lang;
@@ -93,6 +97,7 @@ type AppContextType = {
   selected: CountryPrices | null;
 
   fxRates: Record<string, number> | null;
+  trends: Trends | null;
 
   loc: ReturnType<typeof useUserLocation>;
   nearby: ReturnType<typeof useNearbyStations>;
@@ -129,7 +134,7 @@ export function useApp(): AppContextType {
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const { theme, themeName, toggleTheme } = useTheme();
+  const { theme, themeName, themePreference, setThemePreference, toggleTheme } = useTheme();
 
   const { value: lang, setValue: setLang } = useAsyncStorageState<Lang>(STORAGE_LANG_KEY, "en", {
     deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
@@ -175,6 +180,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     useFuelData({ url: DATA_URL, country, setCountry });
 
   const fx = useFxRates();
+  const trends = useTrends();
 
   useEffect(() => {
     if (!ADS_ENABLED) return;
@@ -230,6 +236,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     toggleTheme();
     showToast(next === "dark" ? t.toastThemeDark : t.toastThemeLight);
   }, [themeName, toggleTheme, showToast, t]);
+
+  const setThemePreferenceTracked = useCallback(
+    (next: ThemePreference) => {
+      setThemePreference(next);
+      if (next === "dark") showToast(t.toastThemeDark);
+      else if (next === "light") showToast(t.toastThemeLight);
+    },
+    [setThemePreference, showToast, t]
+  );
 
   const setLangTracked = useCallback<AppContextType["setLang"]>(
     (next) => {
@@ -322,6 +337,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await reward.showRewardedAndUnlock();
     const act = pendingActionRef.current;
     closeRewardModal(false);
+    hapticSuccess();
     showToast(t.toastRewardsUnlocked);
     act?.();
   }, [reward, closeRewardModal, showToast, t]);
@@ -395,6 +411,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     () => ({
       theme,
       themeName,
+      themePreference,
+      setThemePreference: setThemePreferenceTracked,
       toggleTheme: toggleThemeTracked,
       lang,
       setLang: setLangTracked,
@@ -429,6 +447,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       countries,
       selected,
       fxRates: fx.rates,
+      trends,
       loc,
       nearby,
       reward,
@@ -452,6 +471,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [
       theme,
       themeName,
+      themePreference,
+      setThemePreferenceTracked,
       toggleThemeTracked,
       lang,
       setLangTracked,
@@ -482,6 +503,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       countries,
       selected,
       fx.rates,
+      trends,
       loc,
       nearby,
       reward,

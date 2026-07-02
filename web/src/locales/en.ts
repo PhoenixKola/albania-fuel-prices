@@ -1,5 +1,5 @@
 export const en = {
-  title: "Europe Fuel Prices",
+  title: "Fuel Today",
   subtitleAsOf: (d: string) => `As of ${d}`,
   subtitleLoading: "Loading latest data…",
   region: (r: string) => `Region: ${r}`,
@@ -39,6 +39,28 @@ export const en = {
   cheapest: "Cheapest",
   mostExpensive: "Most expensive",
   fuelType: "Fuel type",
+  rankingsYou: "You",
+  rankingsTableNote:
+    "All European countries in the dataset, sorted from cheapest to most expensive. Treat values as public market guidance rather than an exact price for every local station.",
+  rankingsEuropeAverage: "Europe average",
+  rankingsCountryCol: "Country",
+  rankingsTrendCol: "30 days",
+  rankingsWeekCol: "7d",
+  rankingsPriceCol: "Price",
+  rankingsShowLess: "Show less",
+  rankingsShowAll: (n: number) => `Show all ${n} countries`,
+  rankingsGlobalTitle: "Beyond Europe",
+  rankingsGlobalNote: "Reference estimates for global markets",
+
+  trendTitle: "30-day price trend",
+  trendCurrent: "Current",
+  trendLow: "30-day low",
+  trendHigh: "30-day high",
+  trendFlatWeek: "Stable this week",
+  trendWeekSuffix: "vs last week",
+
+  accordionMethodology: "How this data is collected and interpreted",
+  accordionGuide: "Full guide: today's prices, routes, and FAQs",
 
   tools: "Quick tools",
   tabFill: "Fill-up",

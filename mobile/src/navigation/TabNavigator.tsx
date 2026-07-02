@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -22,10 +22,7 @@ export default function TabNavigator() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: ctx.theme.colors.bg }} edges={["top", "left", "right"]}>
-      <StatusBar
-        barStyle={ctx.themeName === "dark" ? "light-content" : "dark-content"}
-        backgroundColor={ctx.theme.colors.bg}
-      />
+      <StatusBar style={ctx.themeName === "dark" ? "light" : "dark"} />
 
       <NavigationContainer>
         <Tab.Navigator

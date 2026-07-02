@@ -78,10 +78,12 @@ export default function FuelQuizPage({ data, loading }: Props) {
     setLastCorrect(null);
   }, [eligible]);
 
+  // Start the first round once data arrives. Deferred a tick so the state
+  // updates don't cascade synchronously inside the effect.
   useEffect(() => {
-    if (eligible.length >= 2 && gameState === "idle") {
-      newRound();
-    }
+    if (eligible.length < 2 || gameState !== "idle") return;
+    const id = setTimeout(newRound, 0);
+    return () => clearTimeout(id);
   }, [eligible, gameState, newRound]);
 
   const handlePick = (country: string) => {

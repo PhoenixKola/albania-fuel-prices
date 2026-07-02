@@ -17,6 +17,7 @@ import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import { useTheme } from "../hooks/useTheme";
 import { useFuelData } from "../hooks/useFuelData";
 import { useFxRates } from "../hooks/useFxRates";
+import { useTrends } from "../hooks/useTrends";
 import { useWatchlist } from "../hooks/useWatchlist";
 import { useToast } from "../hooks/useToast";
 
@@ -111,6 +112,7 @@ export default function App() {
   });
 
   const fx = useFxRates();
+  const trends = useTrends();
   const { watchlist, add, remove, has } = useWatchlist();
   const { toast, show } = useToast();
 
@@ -132,15 +134,25 @@ export default function App() {
           subtitle={subtitle}
           lang={lang}
           theme={theme}
+          currency={currency}
+          onSetCurrency={setCurrency}
           refreshing={refreshing}
           onRefresh={handleRefresh}
           onToggleLang={toggleLang}
           onToggleTheme={toggleTheme}
         />
 
-        <RouteSeo data={data} loading={loading} />
+        <RouteSeo />
 
-        <Suspense fallback={<section className="contentSection"><p className="contentBody">Loading page...</p></section>}>
+        <Suspense
+          fallback={
+            <section className="contentSection pageSkeleton" aria-busy="true">
+              <div className="skeletonBlock skeletonBlockTitle" />
+              <div className="skeletonBlock" />
+              <div className="skeletonBlock skeletonBlockShort" />
+            </section>
+          }
+        >
         <Routes>
           <Route
             path="/"
@@ -155,10 +167,12 @@ export default function App() {
                 country={country}
                 selected={selected}
                 fuelType={fuelType}
+                setFuelType={setFuelType}
                 setCountry={setCountry}
                 currency={currency}
                 setCurrency={setCurrency}
                 fxRates={fx.rates}
+                trends={trends}
                 toast={toast}
                 show={show}
                 refresh={refresh}
@@ -203,6 +217,8 @@ export default function App() {
                 setFuelType={setFuelType}
                 currency={currency}
                 fxRates={fx.rates}
+                trends={trends}
+                country={country}
                 onOpen={setCountry}
               />
             }

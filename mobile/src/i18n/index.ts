@@ -110,6 +110,37 @@ export type TDict = {
   appearance: string;
   themeLight: string;
   themeDark: string;
+  themeSystem: string;
+
+  trendCardTitle: string;
+  trendStableWeek: string;
+  trendVsLastWeek: string;
+  trendLow: string;
+  trendHigh: string;
+
+  scopeEurope: string;
+  scopeWorld: string;
+  rankingsCheapTitle: string;
+  rankingsCheapSubtitle: (fuel: string) => string;
+  rankingsFavoritesTitle: string;
+  rankingsFavoritesSubtitle: (fuel: string) => string;
+  rankingsAroundYouTitle: string;
+  rankingsAroundYouSubtitle: string;
+  yourRankInFavorites: (n: number) => string;
+  notInFavoritesRank: string;
+  addFavoritesToUseFavoritesRanking: string;
+  you: string;
+  locked: string;
+  unlocked: string;
+
+  aboutSection: string;
+  privacyPolicy: string;
+  privacyPolicySubtitle: string;
+  termsOfUse: string;
+  termsOfUseSubtitle: string;
+  shareApp: string;
+  shareAppSubtitle: string;
+  shareAppMessage: string;
   darkMode: string;
   darkModeOn: string;
   darkModeOff: string;
@@ -173,7 +204,7 @@ export type TDict = {
 
 export const i18n: Record<Lang, TDict> = {
   en: {
-    title: "Europe Fuel Prices",
+    title: "Fuel Today",
     subtitleAsOf: (d: string) => `As of ${d}`,
     subtitleLoading: "Loading latest data…",
     fetching: "Fetching latest data…",
@@ -282,6 +313,37 @@ export const i18n: Record<Lang, TDict> = {
     appearance: "Appearance",
     themeLight: "Light",
     themeDark: "Dark",
+    themeSystem: "Auto",
+
+    trendCardTitle: "30-day trend",
+    trendStableWeek: "Stable this week",
+    trendVsLastWeek: "vs last week",
+    trendLow: "Low",
+    trendHigh: "High",
+
+    scopeEurope: "Europe",
+    scopeWorld: "World",
+    rankingsCheapTitle: "Cheapest",
+    rankingsCheapSubtitle: (fuel: string) => `Cheapest countries for ${fuel}`,
+    rankingsFavoritesTitle: "Favorites ranking",
+    rankingsFavoritesSubtitle: (fuel: string) => `Your favorites ranked by ${fuel}`,
+    rankingsAroundYouTitle: "Around you",
+    rankingsAroundYouSubtitle: "Your position with neighbors",
+    yourRankInFavorites: (n: number) => `Your favorites rank: #${n}`,
+    notInFavoritesRank: "Your country is not in your favorites list.",
+    addFavoritesToUseFavoritesRanking: "Add at least 2 favorites to use Favorites ranking.",
+    you: "You",
+    locked: "Locked",
+    unlocked: "Unlocked",
+
+    aboutSection: "About",
+    privacyPolicy: "Privacy Policy",
+    privacyPolicySubtitle: "How your data is handled",
+    termsOfUse: "Terms of Use",
+    termsOfUseSubtitle: "Rules for using the app",
+    shareApp: "Share App",
+    shareAppSubtitle: "Tell your friends about Karburanti Sot",
+    shareAppMessage: "Compare fuel prices across Albania and Europe with Karburanti Sot:",
     darkMode: "Dark Mode",
     darkModeOn: "On",
     darkModeOff: "Off",
@@ -343,7 +405,7 @@ export const i18n: Record<Lang, TDict> = {
     homeCompareCountriesWidget: "Compare countries",
   },
   sq: {
-    title: "Çmimet e Karburanteve në Europë",
+    title: "Karburanti Sot",
     subtitleAsOf: (d: string) => `Data: ${d}`,
     subtitleLoading: "Po ngarkohen të dhënat…",
     fetching: "Po shkarkohen të dhënat…",
@@ -452,6 +514,37 @@ export const i18n: Record<Lang, TDict> = {
     appearance: "Pamja",
     themeLight: "E çelët",
     themeDark: "E errët",
+    themeSystem: "Auto",
+
+    trendCardTitle: "Ecuria 30-ditore",
+    trendStableWeek: "Stabil këtë javë",
+    trendVsLastWeek: "krahasuar me javën e kaluar",
+    trendLow: "Më i ulëti",
+    trendHigh: "Më i larti",
+
+    scopeEurope: "Europa",
+    scopeWorld: "Bota",
+    rankingsCheapTitle: "Më të lirat",
+    rankingsCheapSubtitle: (fuel: string) => `Shtetet më të lira për ${fuel}`,
+    rankingsFavoritesTitle: "Renditja e të preferuarave",
+    rankingsFavoritesSubtitle: (fuel: string) => `Të preferuarat sipas ${fuel}`,
+    rankingsAroundYouTitle: "Rreth jush",
+    rankingsAroundYouSubtitle: "Pozicioni juaj me fqinjët",
+    yourRankInFavorites: (n: number) => `Renditja në të preferuarat: #${n}`,
+    notInFavoritesRank: "Shteti juaj nuk është në listën e të preferuarave.",
+    addFavoritesToUseFavoritesRanking: "Shto të paktën 2 të preferuara për këtë renditje.",
+    you: "Ju",
+    locked: "E kyçur",
+    unlocked: "E zhbllokuar",
+
+    aboutSection: "Rreth aplikacionit",
+    privacyPolicy: "Politika e Privatësisë",
+    privacyPolicySubtitle: "Si trajtohen të dhënat e tua",
+    termsOfUse: "Kushtet e Përdorimit",
+    termsOfUseSubtitle: "Rregullat e përdorimit të aplikacionit",
+    shareApp: "Ndaje aplikacionin",
+    shareAppSubtitle: "Tregoju miqve për Karburanti Sot",
+    shareAppMessage: "Krahaso çmimet e karburanteve në Shqipëri dhe Europë me Karburanti Sot:",
     darkMode: "Modaliteti i errët",
     darkModeOn: "Aktiv",
     darkModeOff: "Joaktiv",

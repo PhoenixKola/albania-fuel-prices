@@ -26,10 +26,10 @@ export default function BottomTabBar({ state, descriptors, navigation }: BottomT
   const showAdBar = ADS_ENABLED;
 
   const tabLabels: Record<string, string> = {
-    Home: (t as any).homeTitle ?? "Home",
-    Stations: (t as any).stationsTitle ?? "Stations",
-    Compare: (t as any).compareTitle ?? "Compare",
-    Settings: (t as any).settingsTitle ?? "Settings",
+    Home: t.homeTitle,
+    Stations: t.stationsTitle,
+    Compare: t.compareTitle,
+    Settings: t.settingsTitle,
   };
 
   return (

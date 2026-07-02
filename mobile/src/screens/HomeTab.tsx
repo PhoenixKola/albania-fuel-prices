@@ -5,18 +5,21 @@ import { LinearGradient } from "expo-linear-gradient";
 import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native";
 
 import { useApp } from "../context/AppContext";
-import { makeHomeStyles } from "./HomeScreen.styles";
+import { makeHomeStyles } from "./HomeTab.styles";
 
 import CountrySearchModal from "../components/country/CountrySearchModal";
 import FavoritesQuickSheet from "../components/country/FavoritesQuickSheet";
 import ErrorCard from "../components/feedback/ErrorCard";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
+import TrendCard from "../components/fuel/TrendCard";
 
 import type { FuelType } from "../types/fuel";
 import { convertEur, getCurrencyForCountry } from "../utils/currency";
 import { fuelLabel, getFuelPrice } from "../utils/fuel";
 import { formatMoney } from "../utils/money";
 import { getFlagForCountry } from "../utils/countryFlag";
+import { isEuropeanCountry } from "../utils/regions";
+import { getWeeklyDeltaEur } from "../hooks/useTrends";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 type ShortcutRoute = "Stations" | "Compare" | "Settings";
@@ -38,15 +41,15 @@ export default function HomeTab() {
   const isLightTheme = ctx.theme.name === "light";
   const topIconColor = isLightTheme ? "#172033" : "#FFFFFF";
   const searchIconColor = isLightTheme ? "rgba(15,23,42,0.58)" : "rgba(255,255,255,0.72)";
-  const accentColor = isLightTheme ? "#0E7490" : "#8DEDE1";
+  const accentColor = isLightTheme ? "#0F766E" : "#8DEDE1";
   const actionIconColor = isLightTheme ? "#172033" : "#FFFFFF";
   const fuelInactiveColor = isLightTheme ? "rgba(15,23,42,0.56)" : "rgba(255,255,255,0.72)";
   const fuelActiveColor = isLightTheme ? "#FFFFFF" : "#07111F";
-  const refreshTint = isLightTheme ? "#0E7490" : "#8DEDE1";
+  const refreshTint = isLightTheme ? "#0F766E" : "#8DEDE1";
   const heroGradient = (
     isLightTheme
-      ? ["#FFFFFF", "#EFF6FF", "#EDE9FE", "#F8FAFC"]
-      : ["#5B21FF", "#3511C8", "#120A3A", "#050816"]
+      ? ["#FFFFFF", "#F0FAF7", "#E7F4F0", "#F7F3EC"]
+      : ["#134E4A", "#0E3538", "#0A1F2B", "#07111F"]
   ) as [string, string, string, string];
 
   const flag = useMemo(() => getFlagForCountry(ctx.country), [ctx.country]);
@@ -67,9 +70,12 @@ export default function HomeTab() {
     const displayValue =
       ctx.effectiveCurrencyMode === "local" ? convertEur(selectedEur, currency, ctx.fxRates) : selectedEur;
 
+    // Europe-only stats: the dataset also carries global reference markets
+    // (US, Australia, …) that must not skew the "Europe average" or rank.
     const pricedCountries =
       ctx.data?.countries
-        ?.map((country) => ({ country: country.country, price: getFuelPrice(country, ctx.fuelType) }))
+        ?.filter((country) => isEuropeanCountry(country.country))
+        .map((country) => ({ country: country.country, price: getFuelPrice(country, ctx.fuelType) }))
         .filter((item): item is { country: string; price: number } => typeof item.price === "number" && Number.isFinite(item.price))
         .sort((a, b) => a.price - b.price) ?? [];
 
@@ -78,12 +84,17 @@ export default function HomeTab() {
     const avgDisplay =
       ctx.effectiveCurrencyMode === "local" ? convertEur(averageEur, currency, ctx.fxRates) : averageEur;
     const rank =
-      selectedEur != null && Number.isFinite(selectedEur) && total
+      selectedEur != null && Number.isFinite(selectedEur) && total && isEuropeanCountry(ctx.country)
         ? pricedCountries.filter((item) => item.price < selectedEur).length + 1
         : null;
     const averageDiffEur = selectedEur != null && averageEur != null ? selectedEur - averageEur : null;
+
+    // Prefer the real 7-day change from trend history; fall back to the
+    // delta vs the previously cached fetch when trends are unavailable.
+    const weeklyDeltaEur = getWeeklyDeltaEur(ctx.trends, ctx.country, ctx.fuelType);
     const previousEur = getFuelPrice(ctx.prevSelected, ctx.fuelType);
-    const deltaEur = selectedEur != null && previousEur != null ? selectedEur - previousEur : null;
+    const fallbackDeltaEur = selectedEur != null && previousEur != null ? selectedEur - previousEur : null;
+    const deltaEur = weeklyDeltaEur ?? fallbackDeltaEur;
     const deltaDisplay =
       ctx.effectiveCurrencyMode === "local"
         ? convertEur(Math.abs(deltaEur ?? 0), currency, ctx.fxRates)
@@ -101,9 +112,11 @@ export default function HomeTab() {
         ? ctx.t.homeNoPrevious
         : Math.abs(deltaEur) < 0.0001
           ? ctx.t.homeStableTrend
-          : deltaEur < 0
-            ? ctx.t.homeCheaperTrend
-            : ctx.t.homeHigherTrend;
+          : weeklyDeltaEur != null
+            ? ctx.t.trendVsLastWeek
+            : deltaEur < 0
+              ? ctx.t.homeCheaperTrend
+              : ctx.t.homeHigherTrend;
 
     const averageTone: "good" | "bad" | "neutral" =
       averageDiffEur == null || Math.abs(averageDiffEur) < 0.0001 ? "neutral" : averageDiffEur < 0 ? "good" : "bad";
@@ -137,6 +150,7 @@ export default function HomeTab() {
     ctx.selected,
     ctx.t,
     ctx.country,
+    ctx.trends,
     currency
   ]);
 
@@ -144,18 +158,15 @@ export default function HomeTab() {
   const statusLabel = ctx.loading ? ctx.t.fetching : ctx.isFromCache ? ctx.t.showingCached : ctx.t.homeUpdatedToday;
   const sourceLabel = ctx.data?.source ? ctx.t.homeSourceVerified : ctx.t.homeNoPrice;
 
-  const actions: Array<{ label: string; icon: IconName; route: ShortcutRoute; tone: Tone }> = [
+  const actions: Array<{ label: string; icon: IconName; route: ShortcutRoute; tone: Tone; params?: object }> = [
     { label: ctx.t.stationsTitle, icon: "navigate-outline", route: "Stations", tone: "teal" },
-    { label: ctx.t.compareTitle, icon: "git-compare-outline", route: "Compare", tone: "blue" },
-    { label: ctx.t.rankingsTitle, icon: "podium-outline", route: "Compare", tone: "violet" },
+    { label: ctx.t.compareTitle, icon: "git-compare-outline", route: "Compare", tone: "blue", params: { subTab: "compare" } },
+    { label: ctx.t.rankingsTitle, icon: "podium-outline", route: "Compare", tone: "violet", params: { subTab: "rankings" } },
     { label: ctx.t.homeMore, icon: "ellipsis-horizontal", route: "Settings", tone: "amber" }
   ];
 
   return (
     <View style={s.screen}>
-      <View pointerEvents="none" style={s.bgOrbTop} />
-      <View pointerEvents="none" style={s.bgOrbBottom} />
-
       <ScrollView
         contentContainerStyle={s.content}
         showsVerticalScrollIndicator={false}
@@ -207,8 +218,6 @@ export default function HomeTab() {
         </View>
 
         <LinearGradient colors={heroGradient} style={s.hero}>
-          <View pointerEvents="none" style={s.heroGlow} />
-
           <View style={s.heroStatusRow}>
             <View style={s.livePill}>
               <Ionicons name={ctx.isFromCache ? "cloud-offline-outline" : "pulse-outline"} size={13} color={accentColor} />
@@ -264,7 +273,7 @@ export default function HomeTab() {
                 icon={action.icon}
                 label={action.label}
                 tone={action.tone}
-                onPress={() => navigation.navigate(action.route)}
+                onPress={() => navigation.navigate(action.route, action.params)}
               />
             ))}
           </View>
@@ -275,11 +284,13 @@ export default function HomeTab() {
                 icon={action.icon}
                 label={action.label}
                 tone={action.tone}
-                onPress={() => navigation.navigate(action.route)}
+                onPress={() => navigation.navigate(action.route, action.params)}
               />
             ))}
           </View>
         </View>
+
+        <TrendCard theme={ctx.theme} t={ctx.t} trends={ctx.trends} country={ctx.country} fuelType={ctx.fuelType} />
 
         <View style={s.marketCard}>
           <View style={s.marketHeader}>

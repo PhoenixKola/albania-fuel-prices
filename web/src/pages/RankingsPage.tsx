@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { TDict } from "../locales";
 import type { LatestEurope, FuelType } from "../models/fuel";
 import type { Currency } from "../models/currency";
 import type { FxRates } from "../utils/currency";
+import type { Trends } from "../models/trends";
 import RankingCard from "../components/fuel/RankingCard";
 
 type Props = {
@@ -12,6 +13,8 @@ type Props = {
   setFuelType: (v: FuelType) => void;
   currency: Currency;
   fxRates: FxRates | null;
+  trends: Trends | null;
+  country: string;
   onOpen: (country: string) => void;
 };
 
@@ -22,8 +25,17 @@ export default function RankingsPage({
   setFuelType,
   currency,
   fxRates,
+  trends,
+  country,
   onOpen,
 }: Props) {
+  const navigate = useNavigate();
+
+  const openCountry = (c: string) => {
+    onOpen(c);
+    navigate("/");
+  };
+
   return (
     <>
       <div className="pageHeader">
@@ -37,7 +49,9 @@ export default function RankingsPage({
         setFuelType={setFuelType}
         currency={currency}
         fxRates={fxRates}
-        onOpen={onOpen}
+        trends={trends}
+        currentCountry={country}
+        onOpen={openCountry}
       />
 
       <article className="contentPage">

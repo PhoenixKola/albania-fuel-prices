@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRoute, type RouteProp } from "@react-navigation/native";
 
 import { useApp } from "../context/AppContext";
 import CompareCard from "../components/fuel/CompareCard";
@@ -10,16 +11,24 @@ import CountrySearchModal from "../components/country/CountrySearchModal";
 import { makeScreenHeaderStyles } from "./screenHeader.styles";
 
 type SubTab = "compare" | "rankings";
+type CompareRouteParams = { subTab?: SubTab };
 
 export default function CompareTab() {
   const ctx = useApp();
   const hs = useMemo(() => makeScreenHeaderStyles(ctx.theme), [ctx.theme]);
+  const route = useRoute<RouteProp<Record<string, CompareRouteParams>, string>>();
 
   const [subTab, setSubTab] = useState<SubTab>("compare");
   const [compareModalOpen, setCompareModalOpen] = useState(false);
 
-  const compareLabel = ((ctx.t as any).compareTitle ?? "Compare") as string;
-  const rankingsLabel = ((ctx.t as any).rankingsTitle ?? "Rankings") as string;
+  // Home shortcuts navigate here with an explicit target sub-tab.
+  useEffect(() => {
+    const requested = route.params?.subTab;
+    if (requested === "compare" || requested === "rankings") setSubTab(requested);
+  }, [route.params?.subTab]);
+
+  const compareLabel = ctx.t.compareTitle;
+  const rankingsLabel = ctx.t.rankingsTitle;
 
   return (
     <View style={{ flex: 1, backgroundColor: ctx.theme.colors.bg }}>

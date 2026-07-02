@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Linking, ScrollView, Text, View } from "react-native";
+import { Linking, ScrollView, Share, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useApp } from "../context/AppContext";
@@ -8,12 +8,41 @@ import { makeSettingsStyles } from "./SettingsTab.styles";
 import { makeScreenHeaderStyles } from "./screenHeader.styles";
 import { PLAY_STORE_URL } from "../constants/urls";
 
+declare const require: (name: string) => any;
+
+const PRIVACY_URL = "https://karburantisot.com/privacy";
+const TERMS_URL = "https://karburantisot.com/terms";
+
+function getAppVersion(): string {
+  try {
+    const Constants = require("expo-constants").default;
+    return Constants?.expoConfig?.version ?? "";
+  } catch {
+    return "";
+  }
+}
+
 export default function SettingsTab() {
   const ctx = useApp();
   const s = useMemo(() => makeSettingsStyles(ctx.theme), [ctx.theme]);
   const hs = useMemo(() => makeScreenHeaderStyles(ctx.theme), [ctx.theme]);
 
   const isDark = ctx.themeName === "dark";
+  const appVersion = useMemo(() => getAppVersion(), []);
+
+  const themeOptions = [
+    { value: "system" as const, label: ctx.t.themeSystem, icon: "phone-portrait-outline" as const },
+    { value: "light" as const, label: ctx.t.themeLight, icon: "sunny-outline" as const },
+    { value: "dark" as const, label: ctx.t.themeDark, icon: "moon-outline" as const },
+  ];
+
+  const shareApp = async () => {
+    try {
+      await Share.share({ message: `${ctx.t.shareAppMessage} ${PLAY_STORE_URL}` });
+    } catch {
+      // user dismissed the share sheet
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: ctx.theme.colors.bg }}>
@@ -23,42 +52,50 @@ export default function SettingsTab() {
             <Ionicons name="settings-outline" size={18} color={ctx.theme.colors.primary} />
           </View>
           <View>
-            <Text style={hs.title}>{(ctx.t as any).settingsTitle ?? "Settings"}</Text>
-            <Text style={hs.subtitle}>{(ctx.t as any).settingsSubtitle ?? "Customize your experience"}</Text>
+            <Text style={hs.title}>{ctx.t.settingsTitle}</Text>
+            <Text style={hs.subtitle}>{ctx.t.settingsSubtitle}</Text>
           </View>
         </View>
 
         {/* Appearance */}
         <View style={s.section}>
-          <Text style={s.sectionTitle}>{(ctx.t as any).appearance ?? "Appearance"}</Text>
+          <Text style={s.sectionTitle}>{ctx.t.appearance}</Text>
 
           <View style={s.row}>
             <View style={s.rowLeft}>
-              <View style={[s.rowIconWrap, { backgroundColor: isDark ? "rgba(250,204,21,0.15)" : "rgba(99,102,241,0.12)" }]}>
-                <Ionicons name={isDark ? "sunny-outline" : "moon-outline"} size={18} color={isDark ? "#FBBF24" : "#6366F1"} />
+              <View style={[s.rowIconWrap, { backgroundColor: isDark ? "rgba(250,204,21,0.15)" : "rgba(15,118,110,0.12)" }]}>
+                <Ionicons name={isDark ? "moon-outline" : "sunny-outline"} size={18} color={isDark ? "#FBBF24" : "#0F766E"} />
               </View>
               <View>
-                <Text style={s.rowLabel}>{(ctx.t as any).darkMode ?? "Dark Mode"}</Text>
-                <Text style={s.rowSubLabel}>{isDark ? ((ctx.t as any).darkModeOn ?? "On") : ((ctx.t as any).darkModeOff ?? "Off")}</Text>
+                <Text style={s.rowLabel}>{ctx.t.appearance}</Text>
+                <Text style={s.rowSubLabel}>
+                  {ctx.themePreference === "system"
+                    ? ctx.t.themeSystem
+                    : ctx.themePreference === "dark"
+                      ? ctx.t.themeDark
+                      : ctx.t.themeLight}
+                </Text>
               </View>
             </View>
             <View style={s.toggleRow}>
-              <AnimatedPressable
-                onPress={() => !isDark || ctx.toggleTheme()}
-                contentStyle={[s.pill, !isDark ? s.pillActive : null]}
-                scaleIn={0.97}
-              >
-                <Ionicons name="sunny-outline" size={14} color={!isDark ? ctx.theme.colors.primaryText : ctx.theme.colors.text} />
-                <Text style={[s.pillText, !isDark ? s.pillTextActive : null]}>{ctx.t.themeLight}</Text>
-              </AnimatedPressable>
-              <AnimatedPressable
-                onPress={() => isDark || ctx.toggleTheme()}
-                contentStyle={[s.pill, isDark ? s.pillActive : null]}
-                scaleIn={0.97}
-              >
-                <Ionicons name="moon-outline" size={14} color={isDark ? ctx.theme.colors.primaryText : ctx.theme.colors.text} />
-                <Text style={[s.pillText, isDark ? s.pillTextActive : null]}>{ctx.t.themeDark}</Text>
-              </AnimatedPressable>
+              {themeOptions.map((option) => {
+                const active = ctx.themePreference === option.value;
+                return (
+                  <AnimatedPressable
+                    key={option.value}
+                    onPress={() => ctx.setThemePreference(option.value)}
+                    contentStyle={[s.pill, active ? s.pillActive : null]}
+                    scaleIn={0.97}
+                  >
+                    <Ionicons
+                      name={option.icon}
+                      size={14}
+                      color={active ? ctx.theme.colors.primaryText : ctx.theme.colors.text}
+                    />
+                    <Text style={[s.pillText, active ? s.pillTextActive : null]}>{option.label}</Text>
+                  </AnimatedPressable>
+                );
+              })}
             </View>
           </View>
 
@@ -68,7 +105,7 @@ export default function SettingsTab() {
                 <Ionicons name="globe-outline" size={18} color="#3B82F6" />
               </View>
               <View>
-                <Text style={s.rowLabel}>{(ctx.t as any).language ?? "Language"}</Text>
+                <Text style={s.rowLabel}>{ctx.t.language}</Text>
                 <Text style={s.rowSubLabel}>{ctx.lang === "en" ? "English" : "Shqip"}</Text>
               </View>
             </View>
@@ -124,7 +161,7 @@ export default function SettingsTab() {
 
         {/* Data & Sources */}
         <View style={s.section}>
-          <Text style={s.sectionTitle}>{(ctx.t as any).dataSource ?? "Data & Sources"}</Text>
+          <Text style={s.sectionTitle}>{ctx.t.dataSource}</Text>
 
           <View style={s.row}>
             <View style={s.rowLeft}>
@@ -156,7 +193,7 @@ export default function SettingsTab() {
                 <Ionicons name="time-outline" size={18} color="#F59E0B" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={s.rowLabel}>{(ctx.t as any).lastUpdated ?? "Last Updated"}</Text>
+                <Text style={s.rowLabel}>{ctx.t.lastUpdated}</Text>
                 <Text style={s.rowSubLabel}>
                   {ctx.data?.as_of ?? "—"}
                   {ctx.isFromCache ? ` · ${ctx.t.showingCached}` : ""}
@@ -188,7 +225,7 @@ export default function SettingsTab() {
 
         {/* Feedback & Support */}
         <View style={s.section}>
-          <Text style={s.sectionTitle}>{(ctx.t as any).feedbackSupport ?? "Feedback & Support"}</Text>
+          <Text style={s.sectionTitle}>{ctx.t.feedbackSupport}</Text>
 
           <AnimatedPressable onPress={ctx.openFeedback} contentStyle={s.row} scaleIn={0.99}>
             <View style={s.rowLeft}>
@@ -197,7 +234,7 @@ export default function SettingsTab() {
               </View>
               <View>
                 <Text style={s.rowLabel}>{ctx.t.feedback}</Text>
-                <Text style={s.rowSubLabel}>{(ctx.t as any).feedbackSubtitle ?? "Send us your thoughts"}</Text>
+                <Text style={s.rowSubLabel}>{ctx.t.feedbackSubtitle}</Text>
               </View>
             </View>
             <Ionicons name="chevron-forward" size={18} color={ctx.theme.colors.muted} />
@@ -209,19 +246,63 @@ export default function SettingsTab() {
                 <Ionicons name="star-outline" size={18} color="#FBBF24" />
               </View>
               <View>
-                <Text style={s.rowLabel}>{(ctx.t as any).rateApp ?? "Rate App"}</Text>
-                <Text style={s.rowSubLabel}>{(ctx.t as any).rateAppSubtitle ?? "Rate us on Google Play"}</Text>
+                <Text style={s.rowLabel}>{ctx.t.rateApp}</Text>
+                <Text style={s.rowSubLabel}>{ctx.t.rateAppSubtitle}</Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={ctx.theme.colors.muted} />
+          </AnimatedPressable>
+
+          <AnimatedPressable onPress={shareApp} contentStyle={[s.row, s.rowBorder]} scaleIn={0.99}>
+            <View style={s.rowLeft}>
+              <View style={[s.rowIconWrap, { backgroundColor: "rgba(45,212,191,0.12)" }]}>
+                <Ionicons name="share-social-outline" size={18} color="#14B8A6" />
+              </View>
+              <View>
+                <Text style={s.rowLabel}>{ctx.t.shareApp}</Text>
+                <Text style={s.rowSubLabel}>{ctx.t.shareAppSubtitle}</Text>
               </View>
             </View>
             <Ionicons name="chevron-forward" size={18} color={ctx.theme.colors.muted} />
           </AnimatedPressable>
         </View>
 
+        {/* About */}
+        <View style={s.section}>
+          <Text style={s.sectionTitle}>{ctx.t.aboutSection}</Text>
+
+          <AnimatedPressable onPress={() => Linking.openURL(PRIVACY_URL)} contentStyle={s.row} scaleIn={0.99}>
+            <View style={s.rowLeft}>
+              <View style={[s.rowIconWrap, { backgroundColor: "rgba(99,102,241,0.12)" }]}>
+                <Ionicons name="shield-checkmark-outline" size={18} color="#6366F1" />
+              </View>
+              <View>
+                <Text style={s.rowLabel}>{ctx.t.privacyPolicy}</Text>
+                <Text style={s.rowSubLabel}>{ctx.t.privacyPolicySubtitle}</Text>
+              </View>
+            </View>
+            <Ionicons name="open-outline" size={16} color={ctx.theme.colors.muted} />
+          </AnimatedPressable>
+
+          <AnimatedPressable onPress={() => Linking.openURL(TERMS_URL)} contentStyle={[s.row, s.rowBorder]} scaleIn={0.99}>
+            <View style={s.rowLeft}>
+              <View style={[s.rowIconWrap, { backgroundColor: "rgba(148,163,184,0.14)" }]}>
+                <Ionicons name="document-text-outline" size={18} color="#94A3B8" />
+              </View>
+              <View>
+                <Text style={s.rowLabel}>{ctx.t.termsOfUse}</Text>
+                <Text style={s.rowSubLabel}>{ctx.t.termsOfUseSubtitle}</Text>
+              </View>
+            </View>
+            <Ionicons name="open-outline" size={16} color={ctx.theme.colors.muted} />
+          </AnimatedPressable>
+        </View>
+
         {/* Footer */}
-        {/* <View style={s.footer}>
-          <Text style={s.footerText}>Europe Fuel Prices</Text>
-          <Text style={s.footerVersion}>{(ctx.t as any).version ?? "Version"} 1.0.0</Text>
-        </View> */}
+        <View style={s.footer}>
+          <Text style={s.footerText}>Karburanti Sot</Text>
+          {appVersion ? <Text style={s.footerVersion}>{ctx.t.version} {appVersion}</Text> : null}
+        </View>
       </ScrollView>
     </View>
   );

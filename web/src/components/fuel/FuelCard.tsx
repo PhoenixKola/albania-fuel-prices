@@ -1,12 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { CountryPrices, LatestEurope } from "../../models/fuel";
 import type { TDict } from "../../locales";
 import type { Currency } from "../../models/currency";
 import type { FxRates } from "../../utils/currency";
+import type { Trends } from "../../models/trends";
+import { getTrendSeries, getWeeklyDeltaEur } from "../../models/trends";
 import { formatFuelPrice } from "../../utils/priceDisplay";
 import LoadingRow from "../feedback/LeadingRow";
 import PriceKpi from "./PriceKpi";
-import { usePriceMemory } from "../../hooks/usePriceMemory";
 import { getIso2ForCountry, getFlagImgUrl } from "../../utils/countryFlag";
 
 type Props = {
@@ -19,9 +20,17 @@ type Props = {
   onSelectCountry: (next: string) => void;
   currency: Currency;
   fxRates: FxRates | null;
+  trends: Trends | null;
   onCopy: (text: string) => void;
   onShare: (text: string) => void;
 };
+
+/**
+ * Countries most relevant to the site's core audience: Albania's neighbors
+ * and the most common travel corridors. Stable, so returning visitors see
+ * the same chips every time.
+ */
+const QUICK_COUNTRIES = ["Albania", "Kosovo", "Greece", "Italy", "Montenegro", "North Macedonia", "Croatia"];
 
 export default function FuelCard({
   t,
@@ -33,46 +42,17 @@ export default function FuelCard({
   onSelectCountry,
   currency,
   fxRates,
+  trends,
   onCopy,
   onShare,
 }: Props) {
-  const [q, setQ] = useState("");
-  const deltas = usePriceMemory(country, selected);
-
   const currentIso2 = useMemo(() => getIso2ForCountry(country), [country]);
 
-  const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    if (!s) return countries;
-    return countries.filter((c) => c.toLowerCase().includes(s));
-  }, [q, countries]);
-
-  const selectOptions = useMemo(() => {
-    const set = new Set(filtered);
-    if (country && !set.has(country) && countries.includes(country)) {
-      return [country, ...filtered];
-    }
-    return filtered;
-  }, [filtered, country, countries]);
-
-  const [shuffleSeed] = useState(() => Math.random());
-  const quickCountries = useMemo(() => {
-    const a = [...countries];
-    let s = shuffleSeed;
-    for (let i = a.length - 1; i > 0; i--) {
-      s = (s * 9301 + 49297) % 233280;
-      const j = Math.floor((s / 233280) * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a.slice(0, 6);
-  }, [countries, shuffleSeed]);
-
-  const chipCountries = useMemo(() => {
-    if (q.trim()) {
-      return filtered.filter((c) => c !== country).slice(0, 7);
-    }
-    return quickCountries.filter((c) => c !== country);
-  }, [q, filtered, quickCountries, country]);
+  const available = useMemo(() => new Set(countries), [countries]);
+  const chipCountries = useMemo(
+    () => QUICK_COUNTRIES.filter((c) => c !== country && available.has(c)).slice(0, 6),
+    [country, available]
+  );
 
   const g = selected?.gasoline95_eur ?? null;
   const d = selected?.diesel_eur ?? null;
@@ -93,20 +73,17 @@ export default function FuelCard({
     return lines.filter(Boolean).join("\n");
   }, [t, country, data?.as_of, data?.source, g, d, l, currency, fxRates]);
 
-  const resultCount = q.trim() ? filtered.length : countries.length;
   const regionText = data?.region ? t.region(data.region) : "";
 
-  void setQ;
-  void resultCount;
+  const kpis = [
+    { key: "gasoline95" as const, label: t.gasoline95, value: fmt(g) },
+    { key: "diesel" as const, label: t.diesel, value: fmt(d) },
+    { key: "lpg" as const, label: t.lpg, value: fmt(l) },
+  ];
 
   return (
     <div className="card fuelHeroCard">
       <div className="fuelHeroTop">
-        {/* <div className="fuelHeroEyebrow">
-          <span className="livePill">{data?.source ?? t.source}</span>
-          {data?.as_of ? <span className="ghostPill">{data.as_of}</span> : null}
-        </div> */}
-
         <div className="fuelHeroHeadline">
           <div className="fuelHeroText">
             <div className="fuelHeroLabel">{t.selectCountry}</div>
@@ -133,24 +110,10 @@ export default function FuelCard({
         {data ? (
           <>
             <div className="fuelControlGrid">
-              {/* <div className="field">
-                <div className="label">{t.selectCountry}</div>
-                <div className="searchShell">
-                  <input
-                    className="input inputSearch"
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    placeholder={t.selectCountry}
-                    autoComplete="off"
-                  />
-                  <span className="searchCount">{resultCount}</span>
-                </div>
-              </div> */}
-
               <div className="field">
                 <div className="label">{t.selectCountry}</div>
                 <select className="select" value={country} onChange={(e) => onSelectCountry(e.target.value)}>
-                  {selectOptions.map((c) => (
+                  {countries.map((c) => (
                     <option key={c} value={c}>
                       {c}
                     </option>
@@ -168,46 +131,35 @@ export default function FuelCard({
                 {currentIso2 ? <><img src={getFlagImgUrl(currentIso2)} alt={country} className="countryFlagImg" />{" "}</> : null}{country}
               </button>
 
-              {chipCountries.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className="countryChip"
-                  onClick={() => onSelectCountry(c)}
-                >
-                  {(() => { const iso2 = getIso2ForCountry(c); return iso2 ? <><img src={getFlagImgUrl(iso2)} alt={c} className="countryFlagImg" />{" "}</> : null; })()}{c}
-                </button>
-              ))}
+              {chipCountries.map((c) => {
+                const iso2 = getIso2ForCountry(c);
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    className="countryChip"
+                    onClick={() => onSelectCountry(c)}
+                  >
+                    {iso2 ? <><img src={getFlagImgUrl(iso2)} alt={c} className="countryFlagImg" />{" "}</> : null}{c}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="kpiGrid">
-              <PriceKpi
-                label={t.gasoline95}
-                value={fmt(g)}
-                secondary={currency === "eur" ? t.currencyEUR : t.currencyLocal}
-                delta={deltas.gasoline95 == null ? null : Number(deltas.gasoline95.toFixed(3))}
-                currency={currency}
-                onCopy={() => onCopy(`${country} • ${t.gasoline95}: ${fmt(g)}`)}
-                copyLabel={t.copy}
-              />
-              <PriceKpi
-                label={t.diesel}
-                value={fmt(d)}
-                secondary={currency === "eur" ? t.currencyEUR : t.currencyLocal}
-                delta={deltas.diesel == null ? null : Number(deltas.diesel.toFixed(3))}
-                currency={currency}
-                onCopy={() => onCopy(`${country} • ${t.diesel}: ${fmt(d)}`)}
-                copyLabel={t.copy}
-              />
-              <PriceKpi
-                label={t.lpg}
-                value={fmt(l)}
-                secondary={currency === "eur" ? t.currencyEUR : t.currencyLocal}
-                delta={deltas.lpg == null ? null : Number(deltas.lpg.toFixed(3))}
-                currency={currency}
-                onCopy={() => onCopy(`${country} • ${t.lpg}: ${fmt(l)}`)}
-                copyLabel={t.copy}
-              />
+              {kpis.map((kpi) => (
+                <PriceKpi
+                  key={kpi.key}
+                  label={kpi.label}
+                  value={kpi.value}
+                  secondary={currency === "eur" ? t.currencyEUR : t.currencyLocal}
+                  weeklyDelta={getWeeklyDeltaEur(trends, country, kpi.key)}
+                  sparkline={getTrendSeries(trends, country, kpi.key)}
+                  weeklyLabel={t.trendWeekSuffix}
+                  onCopy={() => onCopy(`${country} • ${kpi.label}: ${kpi.value}`)}
+                  copyLabel={t.copy}
+                />
+              ))}
             </div>
 
             <div className="mutedHint">{t.hint}</div>
