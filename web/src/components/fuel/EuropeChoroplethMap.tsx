@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { feature } from "topojson-client";
 import { geoAzimuthalEqualArea, geoPath } from "d3-geo";
 import countriesTopo from "world-atlas/countries-110m.json";
@@ -16,6 +16,12 @@ type Props = {
 
 const W = 760;
 const H = 420;
+const EUROPE_BOUNDS = {
+  minLon: -25,
+  maxLon: 46,
+  minLat: 34,
+  maxLat: 72,
+};
 
 const ATLAS_TO_DATA: Record<string, string> = {
   "Bosnia and Herz.": "Bosnia and Herzegovina",
@@ -39,7 +45,38 @@ function colorFor(value: number | null, min: number, max: number) {
   return "#134e4a";
 }
 
+function pointInEuropeWindow(point: number[]) {
+  const [lon, lat] = point;
+  return (
+    lon >= EUROPE_BOUNDS.minLon &&
+    lon <= EUROPE_BOUNDS.maxLon &&
+    lat >= EUROPE_BOUNDS.minLat &&
+    lat <= EUROPE_BOUNDS.maxLat
+  );
+}
+
+function ringInEuropeWindow(ring: number[][]) {
+  return ring.some(pointInEuropeWindow);
+}
+
+function keepEuropeanGeometry(geometry: Geometry): Geometry | null {
+  if (geometry.type === "Polygon") {
+    const rings = geometry.coordinates.filter(ringInEuropeWindow);
+    return rings.length ? { ...geometry, coordinates: rings } : null;
+  }
+
+  if (geometry.type === "MultiPolygon") {
+    const polygons = geometry.coordinates
+      .map((polygon) => polygon.filter(ringInEuropeWindow))
+      .filter((polygon) => polygon.length > 0);
+    return polygons.length ? { ...geometry, coordinates: polygons } : null;
+  }
+
+  return geometry;
+}
+
 export default function EuropeChoroplethMap({ data, fuelType, currentCountry, onOpen }: Props) {
+  const [zoom, setZoom] = useState(1.15);
   const model = useMemo(() => {
     if (!data) return null;
 
@@ -61,7 +98,16 @@ export default function EuropeChoroplethMap({ data, fuelType, currentCountry, on
         const atlasName = String((f.properties as any)?.name ?? "");
         const dataName = ATLAS_TO_DATA[atlasName] ?? atlasName;
         if (!byCountry.has(dataName)) return null;
-        return { feature: f as Feature<Geometry>, atlasName, dataName, value: byCountry.get(dataName) ?? null };
+
+        const geometry = keepEuropeanGeometry(f.geometry as Geometry);
+        if (!geometry) return null;
+
+        return {
+          feature: { ...(f as Feature<Geometry>), geometry },
+          atlasName,
+          dataName,
+          value: byCountry.get(dataName) ?? null,
+        };
       })
       .filter((row): row is { feature: Feature<Geometry>; atlasName: string; dataName: string; value: number | null } => !!row);
 
@@ -85,33 +131,42 @@ export default function EuropeChoroplethMap({ data, fuelType, currentCountry, on
       <div className="choroplethHeader">
         <div>
           <div className="cardTitle">Europe price map</div>
-          <div className="cardSubtle">Darker countries are more expensive. Russia is kept in the table but hidden here so the map stays readable.</div>
+          <div className="cardSubtle">Darker countries are more expensive. The map is cropped to Europe so the countries stay easy to click.</div>
         </div>
-        <div className="choroplethScale">
-          <span>{model.min.toFixed(3)}</span>
-          <span className="choroplethGradient" />
-          <span>{model.max.toFixed(3)} EUR/L</span>
+        <div className="choroplethHeaderTools">
+          <div className="choroplethScale">
+            <span>{model.min.toFixed(3)}</span>
+            <span className="choroplethGradient" />
+            <span>{model.max.toFixed(3)} EUR/L</span>
+          </div>
+          <div className="mapZoomControls" aria-label="Map zoom controls">
+            <button type="button" onClick={() => setZoom((z) => Math.max(1, Number((z - 0.15).toFixed(2))))}>-</button>
+            <span>{Math.round(zoom * 100)}%</span>
+            <button type="button" onClick={() => setZoom((z) => Math.min(1.75, Number((z + 0.15).toFixed(2))))}>+</button>
+          </div>
         </div>
       </div>
 
       <div className="choroplethMapWrap">
         <svg className="choroplethMap" viewBox={`0 0 ${W} ${H}`} role="img">
-          {model.rows.map((row) => {
-            const active = row.dataName === currentCountry;
-            return (
-              <path
-                key={row.dataName}
-                d={row.d}
-                className={`choroplethCountry ${active ? "choroplethCountryActive" : ""}`}
-                fill={colorFor(row.value, model.min, model.max)}
-                onClick={() => onOpen(row.dataName)}
-              >
-                <title>
-                  {row.dataName}: {row.value == null ? "No data" : `${row.value.toFixed(3)} EUR/L`}
-                </title>
-              </path>
-            );
-          })}
+          <g transform={`translate(${W / 2} ${H / 2}) scale(${zoom}) translate(${-W / 2} ${-H / 2})`}>
+            {model.rows.map((row) => {
+              const active = row.dataName === currentCountry;
+              return (
+                <path
+                  key={row.dataName}
+                  d={row.d}
+                  className={`choroplethCountry ${active ? "choroplethCountryActive" : ""}`}
+                  fill={colorFor(row.value, model.min, model.max)}
+                  onClick={() => onOpen(row.dataName)}
+                >
+                  <title>
+                    {row.dataName}: {row.value == null ? "No data" : `${row.value.toFixed(3)} EUR/L`}
+                  </title>
+                </path>
+              );
+            })}
+          </g>
         </svg>
       </div>
     </section>

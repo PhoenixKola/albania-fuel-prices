@@ -55,6 +55,25 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: numbe
   }
 }
 
+function stationSearchErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  const name = error instanceof Error ? error.name : "";
+
+  if (message.includes("504") || message.toLowerCase().includes("timeout") || name === "AbortError") {
+    return "Station search is taking longer than expected. Please refresh again or try a smaller radius.";
+  }
+
+  if (message.includes("429")) {
+    return "Station search is busy right now. Please wait a minute and try again.";
+  }
+
+  if (message.includes("502") || message.includes("503") || message.toLowerCase().includes("failed to fetch")) {
+    return "Station search is temporarily unavailable. Please try again in a moment.";
+  }
+
+  return "Could not load nearby stations. Please check your connection and try again.";
+}
+
 export function useNearbyStationsWeb(center: { lat: number; lon: number } | null, radiusM: number) {
   const lat = center?.lat ?? null;
   const lon = center?.lon ?? null;
@@ -137,7 +156,7 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
       parsed.sort((a, b) => a.distanceKm - b.distanceKm);
       setStations(parsed);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(stationSearchErrorMessage(e));
     } finally {
       inFlightRef.current = false;
       setLoading(false);

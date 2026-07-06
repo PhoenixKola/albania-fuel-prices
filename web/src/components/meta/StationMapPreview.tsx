@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 type Station = {
   id: string | number;
   name: string;
@@ -24,7 +26,7 @@ function latToTileY(lat: number, zoom: number) {
 }
 
 export default function StationMapPreview({ center, stations, onSelect }: Props) {
-  const zoom = 13;
+  const [zoom, setZoom] = useState(13);
   const centerX = lonToTileX(center.lon, zoom);
   const centerY = latToTileY(center.lat, zoom);
   const tileX = Math.floor(centerX);
@@ -45,6 +47,12 @@ export default function StationMapPreview({ center, stations, onSelect }: Props)
 
   return (
     <div className="stationMapPreview" aria-label="Nearby fuel station map">
+      <div className="stationMapControls" aria-label="Station map zoom controls">
+        <button type="button" onClick={() => setZoom((z) => Math.max(12, z - 1))} disabled={zoom <= 12}>-</button>
+        <span>{zoom}</span>
+        <button type="button" onClick={() => setZoom((z) => Math.min(16, z + 1))} disabled={zoom >= 16}>+</button>
+      </div>
+
       <div className="stationMapTiles">
         {tiles.map((tile) => (
           <img

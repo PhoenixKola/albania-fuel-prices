@@ -189,8 +189,8 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
           </div>
         )}
 
-        {loc.error ? <div className="alert">{loc.error}</div> : null}
-        {nearby.error ? <div className="alert">{nearby.error}</div> : null}
+        {loc.error ? <div className="alert nearbyAlert">{loc.error}</div> : null}
+        {nearby.error ? <div className="alert nearbyAlert">{nearby.error}</div> : null}
 
         {loc.coords ? (
           <div className="nearbyMapListGrid">

@@ -1769,10 +1769,16 @@ select {
   gap: 12px;
   flex-wrap: wrap;
   margin-top: 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .nearbyActionRow {
   justify-content: flex-end;
+}
+
+.nearbyAlert {
+  margin-bottom: 16px;
 }
 
 .nearbyTableWrap {
@@ -2536,10 +2542,10 @@ select {
 .heroPhoneAmount {
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
-  font-size: clamp(34px, 5vw, 44px);
+  font-size: clamp(28px, 3vw, 34px);
   font-weight: 800;
 }
 
@@ -3155,6 +3161,7 @@ select {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
   gap: 14px;
   align-items: start;
+  margin-top: 16px;
 }
 
 .stationMapPreview {
@@ -3177,6 +3184,62 @@ select {
   position: absolute;
   width: 256px;
   height: 256px;
+}
+
+.stationMapControls,
+.mapZoomControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.stationMapControls {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  left: 12px;
+  padding: 5px;
+}
+
+.mapZoomControls {
+  padding: 5px;
+}
+
+.stationMapControls button,
+.mapZoomControls button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--text);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.stationMapControls button:disabled,
+.mapZoomControls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.stationMapControls span,
+.mapZoomControls span {
+  min-width: 34px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+:root[data-theme="light"] .stationMapControls,
+:root[data-theme="light"] .mapZoomControls {
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .stationMapCenter,
@@ -3239,6 +3302,14 @@ select {
   font-weight: 800;
 }
 
+.choroplethHeaderTools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .choroplethGradient {
   width: 112px;
   height: 10px;
@@ -3250,14 +3321,13 @@ select {
 .choroplethMapWrap {
   border: 1px solid var(--border);
   border-radius: 20px;
-  overflow: auto;
+  overflow: hidden;
   background: linear-gradient(180deg, rgba(45, 212, 191, 0.08), rgba(15, 23, 42, 0.08));
 }
 
 .choroplethMap {
   width: 100%;
   height: auto;
-  min-width: 560px;
   display: block;
 }
 
@@ -3290,6 +3360,11 @@ select {
   .choroplethHeader {
     flex-direction: column;
   }
+
+  .choroplethHeaderTools {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 @media (max-width: 520px) {
@@ -3297,9 +3372,6 @@ select {
     padding: 14px;
   }
 
-  .choroplethMap {
-    min-width: 520px;
-  }
 }
 
 .inlineLink {

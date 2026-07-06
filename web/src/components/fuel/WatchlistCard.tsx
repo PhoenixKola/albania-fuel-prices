@@ -56,7 +56,6 @@ export default function WatchlistCard({
 
   rows.sort((a, b) => (a.eur ?? Infinity) - (b.eur ?? Infinity));
 
-  const isCurrentSaved = has.has(current);
   const selectedAlreadySaved = has.has(countryToAdd);
 
   return (
@@ -65,20 +64,9 @@ export default function WatchlistCard({
         <div className="watchlistTopRow">
           <div className="watchlistTopText">
             <div className="watchlistTitleWrap">
-              <div className="watchlistTitle">{t.watchlist}</div>
-              <div className="watchlistSub">{current}</div>
+              <div className="watchlistTitle">Compare countries</div>
+              <div className="watchlistSub">Choose the countries you want side by side.</div>
             </div>
-          </div>
-
-          <div className="watchlistTopAction">
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() => onAdd(current)}
-              disabled={isCurrentSaved}
-            >
-              {t.addToWatchlist}
-            </button>
           </div>
         </div>
 
@@ -88,7 +76,7 @@ export default function WatchlistCard({
 
         <div className="watchlistAddPanel">
           <div className="field watchlistAddField">
-            <div className="label">Add country to compare</div>
+            <div className="label">Country to compare</div>
             <select className="select" value={countryToAdd} onChange={(e) => setCountryToAdd(e.target.value)}>
               {countries.map((country) => (
                 <option key={country} value={country}>
@@ -103,7 +91,7 @@ export default function WatchlistCard({
             onClick={() => onAdd(countryToAdd)}
             disabled={!countryToAdd || selectedAlreadySaved}
           >
-            {selectedAlreadySaved ? "Added" : t.addToWatchlist}
+            {selectedAlreadySaved ? "Already added" : "Add to comparison"}
           </button>
         </div>
 
