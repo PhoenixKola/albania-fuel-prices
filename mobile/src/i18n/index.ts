@@ -82,6 +82,7 @@ export type TDict = {
   stationsNearbyShowMore: string;
   stationsNearbyShowAll: string;
   stationsNearbyCollapse: string;
+  stationsTryWiderRadius: string;
   tapToSwitch: string;
   quickSwitchEmpty: string;
   unlockTitle: (m: number) => string;
@@ -110,7 +111,6 @@ export type TDict = {
   appearance: string;
   themeLight: string;
   themeDark: string;
-  themeSystem: string;
 
   trendCardTitle: string;
   trendStableWeek: string;
@@ -285,6 +285,7 @@ export const i18n: Record<Lang, TDict> = {
     stationsNearbyShowMore: "Show more",
     stationsNearbyShowAll: "Show all",
     stationsNearbyCollapse: "Collapse",
+    stationsTryWiderRadius: "Try a wider radius or refresh the station list.",
     tapToSwitch: "Tap a country to switch instantly.",
     quickSwitchEmpty: "Add favorites to switch countries in one tap.",
     unlockTitle: (m: number) => `Unlock bonus for ${m} min`,
@@ -313,7 +314,6 @@ export const i18n: Record<Lang, TDict> = {
     appearance: "Appearance",
     themeLight: "Light",
     themeDark: "Dark",
-    themeSystem: "Auto",
 
     trendCardTitle: "30-day trend",
     trendStableWeek: "Stable this week",
@@ -486,6 +486,7 @@ export const i18n: Record<Lang, TDict> = {
     stationsNearbyShowMore: "Shfaq më shumë",
     stationsNearbyShowAll: "Shfaq të gjitha",
     stationsNearbyCollapse: "Mbyll",
+    stationsTryWiderRadius: "Provo nje radius me te gjere ose rifresko listen.",
     tapToSwitch: "Prek një shtet për ta ndërruar menjëherë.",
     quickSwitchEmpty: "Shto të preferuarat që t’i ndërroni shtetet me një prekje.",
     unlockTitle: (m: number) => `Zhblloko bonus për ${m} min`,
@@ -514,7 +515,6 @@ export const i18n: Record<Lang, TDict> = {
     appearance: "Pamja",
     themeLight: "E çelët",
     themeDark: "E errët",
-    themeSystem: "Auto",
 
     trendCardTitle: "Ecuria 30-ditore",
     trendStableWeek: "Stabil këtë javë",

@@ -21,6 +21,7 @@ import { useFuelData } from "../hooks/useFuelData";
 import { useTheme, type ThemePreference } from "../hooks/useTheme";
 import { useFxRates } from "../hooks/useFxRates";
 import { useTrends, type Trends } from "../hooks/useTrends";
+import { usePriceAlerts } from "../hooks/usePriceAlerts";
 import { hapticSuccess } from "../utils/haptics";
 import { useUserLocation } from "../hooks/useUserLocation";
 import { useNearbyStations } from "../hooks/useNearbyStations";
@@ -98,6 +99,7 @@ type AppContextType = {
 
   fxRates: Record<string, number> | null;
   trends: Trends | null;
+  priceAlerts: ReturnType<typeof usePriceAlerts>;
 
   loc: ReturnType<typeof useUserLocation>;
   nearby: ReturnType<typeof useNearbyStations>;
@@ -181,6 +183,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const fx = useFxRates();
   const trends = useTrends();
+  const priceAlerts = usePriceAlerts(data, t);
 
   useEffect(() => {
     if (!ADS_ENABLED) return;
@@ -448,6 +451,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       selected,
       fxRates: fx.rates,
       trends,
+      priceAlerts,
       loc,
       nearby,
       reward,
@@ -504,6 +508,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       selected,
       fx.rates,
       trends,
+      priceAlerts,
       loc,
       nearby,
       reward,

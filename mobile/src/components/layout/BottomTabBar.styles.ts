@@ -5,16 +5,16 @@ export const makeBottomTabBarStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       backgroundColor: theme.colors.bg,
-      paddingHorizontal: 14,
+      paddingHorizontal: 10,
       paddingTop: 8
     },
     tabRow: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: 6,
+      gap: 4,
       paddingTop: 8,
-      paddingHorizontal: 8,
+      paddingHorizontal: 6,
       borderRadius: 28,
       backgroundColor: theme.name === "light" ? "rgba(255,252,247,0.94)" : "rgba(13,27,47,0.96)",
       borderWidth: 1,
@@ -27,7 +27,7 @@ export const makeBottomTabBarStyles = (theme: Theme) =>
     },
     tab: {
       flex: 1,
-      minHeight: 54,
+      minHeight: 52,
       alignItems: "center",
       justifyContent: "center",
       paddingVertical: 5,
@@ -49,8 +49,8 @@ export const makeBottomTabBarStyles = (theme: Theme) =>
       backgroundColor: theme.colors.linkBg
     },
     iconBubble: {
-      width: 30,
-      height: 26,
+      width: 28,
+      height: 25,
       borderRadius: 13,
       alignItems: "center",
       justifyContent: "center",
@@ -70,8 +70,8 @@ export const makeBottomTabBarStyles = (theme: Theme) =>
       backgroundColor: theme.name === "light" ? "rgba(15,118,110,0.12)" : "rgba(45,212,191,0.12)"
     },
     tabLabel: {
-      fontSize: 10,
-      lineHeight: 13,
+      fontSize: 9,
+      lineHeight: 12,
       fontWeight: "800"
     },
     tabLabelActive: {

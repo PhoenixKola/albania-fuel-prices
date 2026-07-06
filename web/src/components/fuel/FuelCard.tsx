@@ -63,12 +63,15 @@ export default function FuelCard({
   const shareText = useMemo(() => {
     const F = (v: number | null) => formatFuelPrice(country, v, currency, fxRates);
     const lines = [
-      `${t.shareTextTitle}`,
-      `${country} — ${data?.as_of ?? ""}`,
+      "Fuel Today | Karburanti Sot",
+      `${country} fuel prices${data?.as_of ? ` - ${data.as_of}` : ""}`,
+      "",
       `${t.gasoline95}: ${F(g)}`,
       `${t.diesel}: ${F(d)}`,
       `${t.lpg}: ${F(l)}`,
-      `${t.source}: ${data?.source ?? "—"}`,
+      "",
+      `${t.source}: ${data?.source ?? "-"}`,
+      "https://karburantisot.com",
     ];
     return lines.filter(Boolean).join("\n");
   }, [t, country, data?.as_of, data?.source, g, d, l, currency, fxRates]);

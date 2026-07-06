@@ -70,12 +70,12 @@ export const makeHomeStyles = (theme: Theme) => {
     topIconCluster: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8
+      gap: 6
     },
     topCircle: {
-      width: 46,
-      height: 46,
-      borderRadius: 23,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: chromeBg,
@@ -348,6 +348,123 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     pulseValueBad: {
       color: light ? "#B45309" : "#FBBF24"
+    },
+
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.55)",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 18
+    },
+    alertModal: {
+      width: "100%",
+      maxWidth: 520,
+      borderRadius: 22,
+      padding: 16,
+      gap: 14,
+      backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    alertModalHeader: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 12
+    },
+    alertModalTitle: {
+      color: theme.colors.text,
+      fontSize: 18,
+      fontWeight: "800"
+    },
+    alertModalSub: {
+      marginTop: 4,
+      color: theme.colors.muted,
+      fontSize: 12,
+      fontWeight: "700"
+    },
+    alertCloseBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    alertSegment: {
+      flexDirection: "row",
+      gap: 8,
+      padding: 3,
+      borderRadius: 16,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    alertSegmentItem: { flex: 1 },
+    alertSegmentBtn: {
+      minHeight: 42,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 13
+    },
+    alertSegmentBtnActive: {
+      backgroundColor: theme.colors.primary
+    },
+    alertSegmentText: {
+      color: theme.colors.muted,
+      fontSize: 13,
+      fontWeight: "800"
+    },
+    alertSegmentTextActive: {
+      color: theme.colors.primaryText
+    },
+    alertInput: {
+      minHeight: 50,
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      color: theme.colors.text,
+      backgroundColor: theme.colors.tile,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      fontSize: 18,
+      fontWeight: "800"
+    },
+    alertActions: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      gap: 10
+    },
+    alertGhostBtn: {
+      minHeight: 44,
+      justifyContent: "center",
+      paddingHorizontal: 14,
+      borderRadius: 15,
+      backgroundColor: theme.colors.pillBg,
+      borderWidth: 1,
+      borderColor: theme.colors.border
+    },
+    alertGhostText: {
+      color: theme.colors.text,
+      fontSize: 13,
+      fontWeight: "800"
+    },
+    alertPrimaryBtn: {
+      minHeight: 44,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      paddingHorizontal: 14,
+      borderRadius: 15,
+      backgroundColor: theme.colors.primary
+    },
+    alertPrimaryText: {
+      color: theme.colors.primaryText,
+      fontSize: 13,
+      fontWeight: "800"
     }
   });
 };

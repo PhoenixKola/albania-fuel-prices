@@ -12,6 +12,8 @@ import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeRankingStyles } from "./RankingCard.styles";
 import { CurrencyMode, formatFuelPrice } from "../../utils/priceDisplay";
 import { getFlagForCountry } from "../../utils/countryFlag";
+import { formatMoney } from "../../utils/money";
+import { getWeeklyDeltaEur, type Trends } from "../../hooks/useTrends";
 
 type Scope = "europe" | "world" | "favorites";
 
@@ -19,6 +21,7 @@ export default function RankingCard(props: {
   theme: Theme;
   t: TDict;
   data: LatestEurope | null;
+  trends: Trends | null;
   fuelType: FuelType;
   setFuelType: (v: FuelType | ((p: FuelType) => FuelType)) => void;
   currentCountry: string;
@@ -79,6 +82,17 @@ export default function RankingCard(props: {
     return idx >= 0 ? idx + 1 : null;
   }, [sorted, props.currentCountry]);
 
+  const scopeStats = useMemo(() => {
+    const prices = sorted.filter((x): x is { country: string; price: number } => typeof x.price === "number");
+    if (!prices.length) return null;
+
+    const cheapest = prices[0];
+    const expensive = prices[prices.length - 1];
+    const avg = prices.reduce((sum, x) => sum + x.price, 0) / prices.length;
+
+    return { cheapest, expensive, avg };
+  }, [sorted]);
+
   const aroundYou = useMemo(() => {
     if (!sorted.length) return [];
     const idx = sorted.findIndex((x) => x.country === props.currentCountry);
@@ -93,8 +107,29 @@ export default function RankingCard(props: {
 
   const fuelName = fuelLabel(props.fuelType, props.t);
 
+  const formatDelta = (country: string) => {
+    const delta = getWeeklyDeltaEur(props.trends, country, props.fuelType);
+    if (delta == null) return null;
+
+    if (Math.abs(delta) < 0.001) {
+      return {
+        text: props.t.trendStableWeek,
+        icon: "remove-outline" as const,
+        tone: "flat" as const
+      };
+    }
+
+    return {
+      text: `${delta > 0 ? "+" : "-"}${formatMoney(Math.abs(delta), "EUR")}`,
+      icon: delta > 0 ? ("arrow-up-outline" as const) : ("arrow-down-outline" as const),
+      tone: delta > 0 ? ("up" as const) : ("down" as const)
+    };
+  };
+
   const renderRow = (r: { country: string; price: number | null }, displayRank: number, keyPrefix: string) => {
     const active = r.country === props.currentCountry;
+    const favorite = favoritesSet.has(r.country);
+    const delta = formatDelta(r.country);
 
     const medalIcon =
       displayRank === 1 ? "trophy-outline" : displayRank === 2 ? "medal-outline" : displayRank === 3 ? "ribbon-outline" : null;
@@ -134,13 +169,33 @@ export default function RankingCard(props: {
                 <Text style={s.youPillText}>{props.t.you}</Text>
               </View>
             ) : null}
+            {favorite && !active ? (
+              <View style={s.youPill}>
+                <Ionicons name="star" size={13} color={props.theme.colors.text} />
+                <Text style={s.youPillText}>{props.t.favorites}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
 
         <View style={s.right}>
-          <Text style={[s.price, active ? s.priceActive : null]}>
-            {formatFuelPrice(r.country, r.price, props.currencyMode, props.fxRates)}
-          </Text>
+          <View style={s.priceStack}>
+            <Text style={[s.price, active ? s.priceActive : null]}>
+              {formatFuelPrice(r.country, r.price, props.currencyMode, props.fxRates)}
+            </Text>
+            {delta ? (
+              <View
+                style={[
+                  s.deltaPill,
+                  delta.tone === "up" ? s.deltaUp : null,
+                  delta.tone === "down" ? s.deltaDown : null
+                ]}
+              >
+                <Ionicons name={delta.icon} size={12} color={props.theme.colors.muted} />
+                <Text style={s.deltaText}>{delta.text}</Text>
+              </View>
+            ) : null}
+          </View>
           <Ionicons name="chevron-forward" size={16} color={props.theme.colors.muted} />
         </View>
       </AnimatedPressable>
@@ -151,6 +206,45 @@ export default function RankingCard(props: {
 
   return (
     <View style={s.card}>
+      <View style={s.hero}>
+        <View style={s.heroTop}>
+          <View style={s.headerIcon}>
+            <Ionicons name="podium-outline" size={20} color={props.theme.colors.primary} />
+          </View>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={s.heroLabel}>{fuelName}</Text>
+            <Text style={s.heroTitle} numberOfLines={1}>
+              {scopeStats?.cheapest?.country ?? props.t.rankingsTitle}
+            </Text>
+            <Text style={s.heroSub} numberOfLines={1}>
+              {scopeStats ? props.t.rankingsCheapSubtitle(fuelName) : props.t.rankUnavailable}
+            </Text>
+          </View>
+        </View>
+
+        <View style={s.metricGrid}>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.rankingsCheapTitle}</Text>
+            <Text style={s.metricValue} numberOfLines={1}>{scopeStats?.cheapest?.country ?? "—"}</Text>
+            <Text style={s.metricSub}>
+              {scopeStats ? formatFuelPrice(scopeStats.cheapest.country, scopeStats.cheapest.price, props.currencyMode, props.fxRates) : "—"}
+            </Text>
+          </View>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.homeEuropeAverage ?? "Average"}</Text>
+            <Text style={s.metricValue}>{scopeStats ? formatMoney(scopeStats.avg, "EUR") : "—"}</Text>
+            <Text style={s.metricSub}>{scope === "world" ? props.t.scopeWorld : scope === "favorites" ? props.t.favorites : props.t.scopeEurope}</Text>
+          </View>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.rankingsExpensiveTitle}</Text>
+            <Text style={s.metricValue} numberOfLines={1}>{scopeStats?.expensive?.country ?? "—"}</Text>
+            <Text style={s.metricSub}>
+              {scopeStats ? formatFuelPrice(scopeStats.expensive.country, scopeStats.expensive.price, props.currencyMode, props.fxRates) : "—"}
+            </Text>
+          </View>
+        </View>
+      </View>
+
       <SegmentedControl theme={props.theme} value={props.fuelType} items={fuelItems} onChange={props.setFuelType} />
 
       <SegmentedControl

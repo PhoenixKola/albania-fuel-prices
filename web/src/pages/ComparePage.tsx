@@ -3,6 +3,7 @@ import type { TDict } from "../locales";
 import type { LatestEurope, FuelType } from "../models/fuel";
 import type { Currency } from "../models/currency";
 import type { FxRates } from "../utils/currency";
+import type { Trends } from "../models/trends";
 import WatchlistCard from "../components/fuel/WatchlistCard";
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
   fuelType: FuelType;
   currency: Currency;
   fxRates: FxRates | null;
+  trends: Trends | null;
 };
 
 export default function ComparePage({
@@ -31,6 +33,7 @@ export default function ComparePage({
   fuelType,
   currency,
   fxRates,
+  trends,
 }: Props) {
   return (
     <>
@@ -50,6 +53,7 @@ export default function ComparePage({
         fuelType={fuelType}
         currency={currency}
         fxRates={fxRates}
+        trends={trends}
       />
 
       <article className="contentPage">

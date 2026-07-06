@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Modal, RefreshControl, ScrollView, Share, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native";
@@ -20,9 +20,10 @@ import { formatMoney } from "../utils/money";
 import { getFlagForCountry } from "../utils/countryFlag";
 import { isEuropeanCountry } from "../utils/regions";
 import { getWeeklyDeltaEur } from "../hooks/useTrends";
+import { PLAY_STORE_URL } from "../constants/urls";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
-type ShortcutRoute = "Stations" | "Compare" | "Settings";
+type ShortcutRoute = "Stations" | "Compare" | "Rankings" | "Settings";
 type Tone = "teal" | "blue" | "violet" | "amber";
 
 const fuelIcons: Record<FuelType, IconName> = {
@@ -37,6 +38,9 @@ export default function HomeTab() {
   const s = useMemo(() => makeHomeStyles(ctx.theme), [ctx.theme]);
   const [quickSheetOpen, setQuickSheetOpen] = useState(false);
   const [countryModalOpen, setCountryModalOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertDirection, setAlertDirection] = useState<"below" | "above">("below");
+  const [alertTarget, setAlertTarget] = useState("");
 
   const isLightTheme = ctx.theme.name === "light";
   const topIconColor = isLightTheme ? "#172033" : "#FFFFFF";
@@ -54,6 +58,8 @@ export default function HomeTab() {
 
   const flag = useMemo(() => getFlagForCountry(ctx.country), [ctx.country]);
   const currency = useMemo(() => getCurrencyForCountry(ctx.country), [ctx.country]);
+  const currentEurPrice = getFuelPrice(ctx.selected, ctx.fuelType);
+  const currentAlert = ctx.priceAlerts.getRule(ctx.country, ctx.fuelType);
 
   const fuelOptions = useMemo(
     () => [
@@ -158,10 +164,23 @@ export default function HomeTab() {
   const statusLabel = ctx.loading ? ctx.t.fetching : ctx.isFromCache ? ctx.t.showingCached : ctx.t.homeUpdatedToday;
   const sourceLabel = ctx.data?.source ? ctx.t.homeSourceVerified : ctx.t.homeNoPrice;
 
+  const shareCurrentPrice = async () => {
+    const lines = [
+      "Fuel Today | Karburanti Sot",
+      `${dashboard.fuelName} in ${ctx.country}: ${dashboard.price}`,
+      ctx.data?.as_of ? ctx.t.subtitleAsOf(ctx.data.as_of) : "",
+      "",
+      `Open app: ${PLAY_STORE_URL}`,
+    ];
+    try {
+      await Share.share({ message: lines.filter(Boolean).join("\n") });
+    } catch {}
+  };
+
   const actions: Array<{ label: string; icon: IconName; route: ShortcutRoute; tone: Tone; params?: object }> = [
     { label: ctx.t.stationsTitle, icon: "navigate-outline", route: "Stations", tone: "teal" },
-    { label: ctx.t.compareTitle, icon: "git-compare-outline", route: "Compare", tone: "blue", params: { subTab: "compare" } },
-    { label: ctx.t.rankingsTitle, icon: "podium-outline", route: "Compare", tone: "violet", params: { subTab: "rankings" } },
+    { label: ctx.t.compareTitle, icon: "git-compare-outline", route: "Compare", tone: "blue" },
+    { label: ctx.t.rankingsTitle, icon: "podium-outline", route: "Rankings", tone: "violet" },
     { label: ctx.t.homeMore, icon: "ellipsis-horizontal", route: "Settings", tone: "amber" }
   ];
 
@@ -197,6 +216,21 @@ export default function HomeTab() {
           <View style={s.topIconCluster}>
             <AnimatedPressable onPress={ctx.openFeedback} contentStyle={s.topCircle} scaleIn={0.96}>
               <Ionicons name="chatbubble-ellipses-outline" size={18} color={topIconColor} />
+            </AnimatedPressable>
+            <AnimatedPressable onPress={shareCurrentPrice} contentStyle={s.topCircle} scaleIn={0.96}>
+              <Ionicons name="share-social-outline" size={18} color={topIconColor} />
+            </AnimatedPressable>
+            <AnimatedPressable
+              onPress={() => {
+                if (currentEurPrice == null) return;
+                setAlertDirection(currentAlert?.direction ?? "below");
+                setAlertTarget((currentAlert?.targetEur ?? currentEurPrice).toFixed(3));
+                setAlertOpen(true);
+              }}
+              contentStyle={[s.topCircle, currentAlert ? s.topCircleAccent : null]}
+              scaleIn={0.96}
+            >
+              <Ionicons name={currentAlert ? "notifications" : "notifications-outline"} size={18} color={currentAlert ? accentColor : topIconColor} />
             </AnimatedPressable>
             <AnimatedPressable
               onPress={() => ctx.openRewardModal()}
@@ -351,6 +385,75 @@ export default function HomeTab() {
           setCountryModalOpen(false);
         }}
       />
+
+      <Modal visible={alertOpen} transparent animationType="fade" onRequestClose={() => setAlertOpen(false)}>
+        <View style={s.modalBackdrop}>
+          <View style={s.alertModal}>
+            <View style={s.alertModalHeader}>
+              <View>
+                <Text style={s.alertModalTitle}>Price alert</Text>
+                <Text style={s.alertModalSub}>{ctx.country} | {fuelLabel(ctx.fuelType, ctx.t)}</Text>
+              </View>
+              <AnimatedPressable onPress={() => setAlertOpen(false)} contentStyle={s.alertCloseBtn} scaleIn={0.98}>
+                <Ionicons name="close" size={18} color={ctx.theme.colors.text} />
+              </AnimatedPressable>
+            </View>
+
+            <View style={s.alertSegment}>
+              {(["below", "above"] as const).map((direction) => (
+                <AnimatedPressable
+                  key={direction}
+                  onPress={() => setAlertDirection(direction)}
+                  style={s.alertSegmentItem}
+                  contentStyle={[s.alertSegmentBtn, alertDirection === direction ? s.alertSegmentBtnActive : null]}
+                  scaleIn={0.98}
+                >
+                  <Text style={[s.alertSegmentText, alertDirection === direction ? s.alertSegmentTextActive : null]}>
+                    {direction === "below" ? "Below" : "Above"}
+                  </Text>
+                </AnimatedPressable>
+              ))}
+            </View>
+
+            <TextInput
+              value={alertTarget}
+              onChangeText={setAlertTarget}
+              keyboardType="decimal-pad"
+              placeholder="1.650"
+              placeholderTextColor={ctx.theme.colors.muted}
+              style={s.alertInput}
+            />
+
+            <View style={s.alertActions}>
+              {currentAlert ? (
+                <AnimatedPressable
+                  onPress={() => {
+                    ctx.priceAlerts.removeRule(currentAlert.id);
+                    setAlertOpen(false);
+                  }}
+                  contentStyle={s.alertGhostBtn}
+                  scaleIn={0.98}
+                >
+                  <Text style={s.alertGhostText}>Remove</Text>
+                </AnimatedPressable>
+              ) : null}
+              <AnimatedPressable
+                onPress={() => {
+                  const target = Number(alertTarget.replace(",", "."));
+                  if (!Number.isFinite(target) || target <= 0) return;
+                  ctx.priceAlerts.upsertRule(ctx.country, ctx.fuelType, alertDirection, target);
+                  setAlertOpen(false);
+                }}
+                contentStyle={s.alertPrimaryBtn}
+                scaleIn={0.98}
+              >
+                <Ionicons name="notifications-outline" size={17} color={ctx.theme.colors.primaryText} />
+                <Text style={s.alertPrimaryText}>Save alert</Text>
+              </AnimatedPressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 

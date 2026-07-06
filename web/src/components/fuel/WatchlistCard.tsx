@@ -3,9 +3,11 @@ import type { TDict } from "../../locales";
 import Chip from "../ui/Chip";
 import { getEurPrice, fuelLabel } from "../../utils/fuel";
 import type { Currency } from "../../models/currency";
+import type { Trends } from "../../models/trends";
 import { formatFuelPrice } from "../../utils/priceDisplay";
 import type { FxRates } from "../../utils/currency";
 import { getIso2ForCountry, getFlagImgUrl } from "../../utils/countryFlag";
+import CompareTrendChart from "./CompareTrendChart";
 
 type Props = {
   t: TDict;
@@ -19,6 +21,7 @@ type Props = {
   fuelType: FuelType;
   currency: Currency;
   fxRates: FxRates | null;
+  trends: Trends | null;
 };
 
 export default function WatchlistCard({
@@ -33,6 +36,7 @@ export default function WatchlistCard({
   fuelType,
   currency,
   fxRates,
+  trends,
 }: Props) {
   const rows =
     data?.countries
@@ -117,6 +121,8 @@ export default function WatchlistCard({
         {watchlist.length ? (
           <div className="tableWrap watchlistTableWrap">
             <div className="tableTitle">{t.compare}</div>
+
+            <CompareTrendChart trends={trends} countries={rows.map((row) => row.country)} fuelType={fuelType} />
 
             <div className="table watchlistTable">
               {rows.map((r, index) => (

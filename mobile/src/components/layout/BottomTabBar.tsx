@@ -16,6 +16,7 @@ const TAB_ICONS: Record<string, { active: IconName; inactive: IconName }> = {
   Home: { active: "home", inactive: "home-outline" },
   Stations: { active: "navigate", inactive: "navigate-outline" },
   Compare: { active: "git-compare", inactive: "git-compare-outline" },
+  Rankings: { active: "podium", inactive: "podium-outline" },
   Settings: { active: "settings", inactive: "settings-outline" },
 };
 
@@ -29,6 +30,7 @@ export default function BottomTabBar({ state, descriptors, navigation }: BottomT
     Home: t.homeTitle,
     Stations: t.stationsTitle,
     Compare: t.compareTitle,
+    Rankings: t.rankingsTitle,
     Settings: t.settingsTitle,
   };
 

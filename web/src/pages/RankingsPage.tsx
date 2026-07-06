@@ -5,6 +5,7 @@ import type { Currency } from "../models/currency";
 import type { FxRates } from "../utils/currency";
 import type { Trends } from "../models/trends";
 import RankingCard from "../components/fuel/RankingCard";
+import EuropeChoroplethMap from "../components/fuel/EuropeChoroplethMap";
 
 type Props = {
   t: TDict;
@@ -53,6 +54,8 @@ export default function RankingsPage({
         currentCountry={country}
         onOpen={openCountry}
       />
+
+      <EuropeChoroplethMap data={data} fuelType={fuelType} currentCountry={country} onOpen={openCountry} />
 
       <article className="contentPage">
         <section className="contentSection">

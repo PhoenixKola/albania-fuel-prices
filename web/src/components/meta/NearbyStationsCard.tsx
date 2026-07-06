@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { TDict } from "../../locales";
 import { useUserLocationWeb } from "../../hooks/useUserLocationWeb";
 import { useNearbyStationsWeb } from "../../hooks/useNearbyStationsWeb";
+import StationMapPreview from "./StationMapPreview";
 
 type Station = {
   id: string | number;
@@ -203,8 +204,17 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
         {nearby.error ? <div className="alert">{nearby.error}</div> : null}
 
         {loc.coords ? (
-          <div className="tableWrap nearbyTableWrap">
-            <div className="table nearbyTable">
+          <div className="nearbyMapListGrid">
+            <StationMapPreview
+              center={loc.coords}
+              stations={nearby.stations}
+              onSelect={(station) => {
+                window.open(`https://www.google.com/maps?q=${station.lat},${station.lon}`, "_blank", "noopener,noreferrer");
+              }}
+            />
+
+            <div className="tableWrap nearbyTableWrap">
+              <div className="table nearbyTable">
               {nearby.loading && shown.length === 0 ? (
                 <div className="mutedBox nearbyLoadingBox">
                   <span className="spinner" aria-hidden="true" />
@@ -252,6 +262,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                   </div>
                 </a>
               ))}
+              </div>
             </div>
           </div>
         ) : null}

@@ -3,8 +3,10 @@ import { Routes, Route, useLocation, useParams } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import type { FuelType } from "../models/fuel";
 import type { LatestEurope } from "../models/fuel";
+import type { Trends } from "../models/trends";
 import type { Currency } from "../models/currency";
 import { i18n } from "../locales";
+import type { TDict } from "../locales";
 import {
   DATA_URL,
   STORAGE_LANG_KEY,
@@ -47,18 +49,26 @@ import RouteSeo from "./RouteSeo";
 import logo from "../assets/Logo.png";
 
 type CountryFuelRouteProps = {
+  t: TDict;
   data: LatestEurope | null;
+  trends: Trends | null;
+  fuelType: FuelType;
+  setFuelType: (v: FuelType) => void;
   loading: boolean;
   setCountry: (country: string) => void;
 };
 
-function CountryFuelRoute({ data, loading, setCountry }: CountryFuelRouteProps) {
+function CountryFuelRoute({ t, data, trends, fuelType, setFuelType, loading, setCountry }: CountryFuelRouteProps) {
   const { countrySlug } = useParams<{ countrySlug: string }>();
 
   return (
     <CountryFuelPricesPage
       slug={countrySlug ?? ""}
+      t={t}
       data={data}
+      trends={trends}
+      fuelType={fuelType}
+      setFuelType={setFuelType}
       loading={loading}
       setCountry={setCountry}
     />
@@ -204,6 +214,7 @@ export default function App() {
                 fuelType={fuelType}
                 currency={currency}
                 fxRates={fx.rates}
+                trends={trends}
               />
             }
           />
@@ -243,7 +254,17 @@ export default function App() {
           <Route path="/road-trip-fuel-guide" element={<RoadTripFuelGuidePage t={t} />} />
           <Route
             path="/fuel-prices/:countrySlug"
-            element={<CountryFuelRoute data={data} loading={loading} setCountry={setCountry} />}
+            element={
+              <CountryFuelRoute
+                t={t}
+                data={data}
+                trends={trends}
+                fuelType={fuelType}
+                setFuelType={setFuelType}
+                loading={loading}
+                setCountry={setCountry}
+              />
+            }
           />
           <Route path="*" element={<NotFoundPage t={t} />} />
         </Routes>

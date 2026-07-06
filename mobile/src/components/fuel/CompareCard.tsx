@@ -5,12 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 
 import type { Theme } from "../../theme/theme";
 import type { FuelType, LatestEurope } from "../../types/fuel";
+import type { Trends } from "../../hooks/useTrends";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
 import { getCurrencyForCountry, convertEur } from "../../utils/currency";
 import { formatMoney, hasRate } from "../../utils/money";
 import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeCompareStyles } from "./CompareCard.styles";
 import { getFlagForCountry } from "../../utils/countryFlag";
+import CompareTrendCard from "./CompareTrendCard";
 
 type CurrencyMode = "eur" | "local";
 
@@ -45,6 +47,7 @@ export default function CompareCard(props: {
   theme: Theme;
   t: any;
   data: LatestEurope | null;
+  trends: Trends | null;
   fuelType: FuelType;
   compareCountries: string[];
   onRemove: (c: string) => void;
@@ -161,6 +164,21 @@ export default function CompareCard(props: {
     return eurVals.length ? Math.min(...eurVals) : null;
   }, [rows]);
 
+  const comparisonSummary = useMemo(() => {
+    const priced = rows.filter((x) => x.eur != null) as Array<(typeof rows)[number] & { eur: number }>;
+    if (!priced.length) return null;
+
+    const cheapest = priced.reduce((best, row) => (row.eur < best.eur ? row : best), priced[0]);
+    const mostExpensive = priced.reduce((worst, row) => (row.eur > worst.eur ? row : worst), priced[0]);
+    const spread = mostExpensive.eur - cheapest.eur;
+
+    return {
+      cheapest,
+      spreadText: spread > 0.001 ? formatMoney(spread, "EUR") : "—",
+      count: rows.length
+    };
+  }, [rows]);
+
   const modeLabel =
     props.currencyMode === "eur"
       ? (props.t.currencyEUR ?? "EUR")
@@ -173,53 +191,53 @@ export default function CompareCard(props: {
 
   return (
     <View style={s.card}>
-      <View style={s.headerRow}>
-        {/* <View style={s.headerLeft}>
+      <View style={s.hero}>
+        <View style={s.heroTop}>
           <View style={s.headerIcon}>
-            <Ionicons name="git-compare-outline" size={18} color={props.theme.colors.linkText} />
+            <Ionicons name="git-compare-outline" size={20} color={props.theme.colors.primary} />
           </View>
-
-          <View style={{ flex: 1 }}>
-            <Text style={s.title}>{props.t.compareTitle}</Text>
-            <Text style={s.subtitle} numberOfLines={3}>
-              {props.t.compareSubtitle(fuelName)}
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={s.heroLabel}>{fuelName}</Text>
+            <Text style={s.heroTitle} numberOfLines={1}>
+              {comparisonSummary?.cheapest?.name ?? props.t.compareTitle}
+            </Text>
+            <Text style={s.heroSub} numberOfLines={1}>
+              {comparisonSummary ? `${props.t.best ?? "Best"} value` : props.t.compareHint}
             </Text>
           </View>
-        </View> */}
+        </View>
 
-        <View style={s.headerActions}>
-          <View style={s.pills}>
-            <View style={s.pill}>
-              <Ionicons name="layers-outline" size={14} color={props.theme.colors.muted} />
-              <Text style={s.pillText}>
-                {props.compareCountries.length}/{props.maxCompare}
-              </Text>
-            </View>
-
-            <View style={s.pill}>
-              <Ionicons
-                name={props.currencyMode === "eur" ? "logo-euro" : "cash-outline"}
-                size={14}
-                color={props.theme.colors.muted}
-              />
-              <Text style={s.pillText}>{modeLabel}</Text>
-            </View>
-
-            <AnimatedPressable onPress={() => setSetsOpen(true)} contentStyle={s.iconBtn} scaleIn={0.98}>
-              <Ionicons name="bookmark-outline" size={18} color={props.theme.colors.text} />
-            </AnimatedPressable>
-
-            <AnimatedPressable
-              onPress={props.onAddPress}
-              disabled={!canAddMore}
-              contentStyle={[s.btn, !canAddMore ? s.btnDisabled : null]}
-              scaleIn={0.98}
-            >
-              <Ionicons name="add" size={18} color={props.theme.colors.text} />
-              <Text style={s.btnText}>{props.t.addCountry}</Text>
-            </AnimatedPressable>
+        <View style={s.metricGrid}>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.selected}</Text>
+            <Text style={s.metricValue}>{props.compareCountries.length}/{props.maxCompare}</Text>
+          </View>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>Spread</Text>
+            <Text style={s.metricValue}>{comparisonSummary?.spreadText ?? "—"}</Text>
+          </View>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.currency}</Text>
+            <Text style={s.metricValue}>{modeLabel}</Text>
           </View>
         </View>
+      </View>
+
+      <View style={s.actionRow}>
+        <AnimatedPressable onPress={() => setSetsOpen(true)} contentStyle={s.btn} scaleIn={0.98}>
+          <Ionicons name="bookmark-outline" size={17} color={props.theme.colors.text} />
+          <Text style={s.btnText}>{props.t.savedSets ?? "Saved"}</Text>
+        </AnimatedPressable>
+
+        <AnimatedPressable
+          onPress={props.onAddPress}
+          disabled={!canAddMore}
+          contentStyle={[s.btnPrimary, !canAddMore ? s.btnDisabled : null]}
+          scaleIn={0.98}
+        >
+          <Ionicons name="add" size={18} color={props.theme.colors.primaryText} />
+          <Text style={s.btnPrimaryText}>{props.t.addCountry}</Text>
+        </AnimatedPressable>
       </View>
 
       {props.compareCountries.length < 2 ? (
@@ -237,11 +255,26 @@ export default function CompareCard(props: {
       ) : null}
 
       {props.compareCountries.length === 0 ? (
-        <View style={s.notice}>
-          <Ionicons name="information-circle-outline" size={16} color={props.theme.colors.muted} />
-          <Text style={s.noticeText}>{props.t.compareEmpty ?? "Add countries to start comparing."}</Text>
+        <View style={s.emptyState}>
+          <View style={s.emptyIcon}>
+            <Ionicons name="git-compare-outline" size={24} color={props.theme.colors.primary} />
+          </View>
+          <Text style={s.emptyTitle}>{props.t.compareEmpty ?? "Add countries to start comparing."}</Text>
+          <Text style={s.emptyText}>{props.t.compareHint}</Text>
+          <AnimatedPressable onPress={props.onAddPress} contentStyle={s.emptyCta} scaleIn={0.98}>
+            <Ionicons name="add" size={18} color={props.theme.colors.primaryText} />
+            <Text style={s.emptyCtaText}>{props.t.addCountry}</Text>
+          </AnimatedPressable>
         </View>
       ) : null}
+
+      <CompareTrendCard
+        theme={props.theme}
+        t={props.t}
+        trends={props.trends}
+        countries={props.compareCountries}
+        fuelType={props.fuelType}
+      />
 
       <View style={s.rows}>
         {rows.map((r) => {

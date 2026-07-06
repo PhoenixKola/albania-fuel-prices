@@ -31,7 +31,6 @@ export default function SettingsTab() {
   const appVersion = useMemo(() => getAppVersion(), []);
 
   const themeOptions = [
-    { value: "system" as const, label: ctx.t.themeSystem, icon: "phone-portrait-outline" as const },
     { value: "light" as const, label: ctx.t.themeLight, icon: "sunny-outline" as const },
     { value: "dark" as const, label: ctx.t.themeDark, icon: "moon-outline" as const },
   ];
@@ -68,13 +67,7 @@ export default function SettingsTab() {
               </View>
               <View>
                 <Text style={s.rowLabel}>{ctx.t.appearance}</Text>
-                <Text style={s.rowSubLabel}>
-                  {ctx.themePreference === "system"
-                    ? ctx.t.themeSystem
-                    : ctx.themePreference === "dark"
-                      ? ctx.t.themeDark
-                      : ctx.t.themeLight}
-                </Text>
+                <Text style={s.rowSubLabel}>{ctx.themePreference === "dark" ? ctx.t.themeDark : ctx.t.themeLight}</Text>
               </View>
             </View>
             <View style={s.toggleRow}>

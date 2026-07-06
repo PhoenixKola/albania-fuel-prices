@@ -1,11 +1,18 @@
 import { Link } from "react-router-dom";
-import type { LatestEurope } from "../models/fuel";
+import type { FuelType, LatestEurope } from "../models/fuel";
+import type { Trends } from "../models/trends";
+import type { TDict } from "../locales";
 import { getCountryEditorial } from "../config/countryContent";
 import AdBar from "../components/ads/AdBar";
+import TrendCard from "../components/fuel/TrendCard";
 
 type Props = {
   slug: string;
+  t: TDict;
   data: LatestEurope | null;
+  trends: Trends | null;
+  fuelType: FuelType;
+  setFuelType: (v: FuelType) => void;
   loading: boolean;
   setCountry: (country: string) => void;
 };
@@ -38,7 +45,7 @@ function compareNote(albaniaPrice: number | null, countryPrice: number | null, l
   return `${label}: about ${absDiff} EUR/L lower than Albania.`;
 }
 
-export default function CountryFuelPricesPage({ slug, data, loading, setCountry }: Props) {
+export default function CountryFuelPricesPage({ slug, t, data, trends, fuelType, setFuelType, loading, setCountry }: Props) {
   const editorial = getCountryEditorial(slug);
 
   if (!editorial) {
@@ -90,6 +97,23 @@ export default function CountryFuelPricesPage({ slug, data, loading, setCountry 
             </p>
           </>
         ) : null}
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">{editorial.label} 30-day fuel price trend</h2>
+        <p className="contentBody">
+          Follow the recent movement for petrol, diesel, and LPG in {editorial.label}. The chart uses the same daily
+          history file as the dashboard, so it updates automatically when new source data is published.
+        </p>
+        <div className="contentToolEmbed">
+          <TrendCard
+            t={t}
+            trends={trends}
+            country={editorial.dataCountryName}
+            fuelType={fuelType}
+            setFuelType={setFuelType}
+          />
+        </div>
       </section>
 
       <section className="contentSection">

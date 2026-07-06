@@ -85,6 +85,11 @@ export default function StationsCard(props: {
   }, [props.stations, favSet]);
 
   const shownStations = useMemo(() => stationsSorted.slice(0, visible), [stationsSorted, visible]);
+  const nearest = stationsSorted[0] ?? null;
+  const openCount = useMemo(
+    () => stationsSorted.filter((st) => st.isOpen24Hours || st.isOpenNow === true).length,
+    [stationsSorted]
+  );
 
   const canShowMore = visible < stationsSorted.length;
   const canShowAll = visible < stationsSorted.length;
@@ -119,35 +124,43 @@ export default function StationsCard(props: {
 
   return (
     <View style={s.card}>
-      {/* <View style={s.headerRow}>
-        <View style={s.headerLeft}>
-          <View style={s.headerIcon}>
-            <Ionicons name="navigate-outline" size={18} color={props.theme.colors.linkText} />
+      <View style={s.hero}>
+        <View style={s.heroTop}>
+          <View style={s.heroIcon}>
+            <Ionicons name="map-outline" size={20} color={props.theme.colors.primary} />
           </View>
-
-          <View style={{ flex: 1 }}>
-            <Text style={s.title}>{props.t.stationsNearbyTitle}</Text>
-            <Text style={s.subtitle} numberOfLines={2}>
-              {props.t.stationsNearbyFound(props.totalCount)}
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={s.heroLabel}>{props.t.stationsNearbyTitle}</Text>
+            <Text style={s.heroTitle} numberOfLines={1}>
+              {props.permission === "granted"
+                ? props.t.stationsNearbyFound(props.totalCount)
+                : props.t.stationsNearbyUseMyLocation}
             </Text>
           </View>
-        </View>
-
-        <View style={s.headerRight}>
-          <View style={s.headerPills}>
-            {canResetProvider ? (
-              <AnimatedPressable onPress={resetProvider} contentStyle={s.pillBtn} scaleIn={0.98}>
-                <Ionicons name="map-outline" size={14} color={props.theme.colors.text} />
-                <Text style={s.pillBtnText}>{props.t.resetMaps ?? "Maps"}</Text>
-              </AnimatedPressable>
-            ) : null}
-          </View>
-
-          <AnimatedPressable onPress={props.onRefresh} contentStyle={s.iconBtn} scaleIn={0.98}>
-            {props.loading ? <ActivityIndicator /> : <Ionicons name="refresh" size={18} color={props.theme.colors.text} />}
+          <AnimatedPressable onPress={props.onRefresh} contentStyle={s.refreshBtn} scaleIn={0.96}>
+            {props.loading ? (
+              <ActivityIndicator color={props.theme.colors.text} />
+            ) : (
+              <Ionicons name="refresh" size={18} color={props.theme.colors.text} />
+            )}
           </AnimatedPressable>
         </View>
-      </View> */}
+
+        <View style={s.metricGrid}>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.radius}</Text>
+            <Text style={s.metricValue}>{Math.round(props.radiusM / 1000)} km</Text>
+          </View>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>Nearest</Text>
+            <Text style={s.metricValue}>{nearest ? `${nearest.distanceKm.toFixed(1)} km` : "—"}</Text>
+          </View>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.stationsNearbyOpenNow}</Text>
+            <Text style={s.metricValue}>{openCount || "—"}</Text>
+          </View>
+        </View>
+      </View>
 
       <View style={s.radiusRow}>
         <Text style={s.radiusLabel}>{props.t.radius}</Text>
@@ -179,11 +192,12 @@ export default function StationsCard(props: {
       </View>
 
       {props.permission !== "granted" ? (
-        <View style={s.notice}>
-          <View style={s.noticeTop}>
-            <Ionicons name="location-outline" size={18} color={props.theme.colors.muted} />
-            <Text style={s.noticeText}>{props.t.stationsNearbyNeedLocation}</Text>
+        <View style={s.emptyState}>
+          <View style={s.emptyIcon}>
+            <Ionicons name="location-outline" size={24} color={props.theme.colors.primary} />
           </View>
+          <Text style={s.emptyTitle}>{props.t.stationsNearbyUseMyLocation}</Text>
+          <Text style={s.emptyText}>{props.t.stationsNearbyNeedLocation}</Text>
 
           <AnimatedPressable onPress={props.onRequestLocation} disabled={props.locating} contentStyle={s.primaryBtn} scaleIn={0.98}>
             {props.locating ? (
@@ -204,12 +218,20 @@ export default function StationsCard(props: {
         <>
           <View style={s.countRow}>
             <Text style={s.mutedText}>{props.t.stationsNearbyShowing(shownStations.length, props.totalCount)}</Text>
+            {props.fromCache ? <Text style={s.cacheText}>{props.t.stationsNearbyCached}</Text> : null}
           </View>
 
           {props.totalCount === 0 && !props.loading ? (
-            <View style={s.emptyCard}>
-              <Ionicons name="alert-circle-outline" size={18} color={props.theme.colors.muted} />
-              <Text style={s.emptyText}>{props.t.stationsNearbyNone}</Text>
+            <View style={s.emptyState}>
+              <View style={s.emptyIcon}>
+                <Ionicons name="map-outline" size={24} color={props.theme.colors.primary} />
+              </View>
+              <Text style={s.emptyTitle}>{props.t.stationsNearbyNone}</Text>
+              <Text style={s.emptyText}>{props.t.stationsTryWiderRadius}</Text>
+              <AnimatedPressable onPress={props.onRefresh} contentStyle={s.secondaryBtn} scaleIn={0.98}>
+                <Ionicons name="refresh-outline" size={17} color={props.theme.colors.text} />
+                <Text style={s.secondaryBtnText}>{props.t.stationsNearbyRefresh}</Text>
+              </AnimatedPressable>
             </View>
           ) : null}
 
@@ -275,7 +297,9 @@ export default function StationsCard(props: {
                         <Ionicons name={isFav ? "star" : "star-outline"} size={18} color={isFav ? props.theme.colors.linkText : props.theme.colors.muted} />
                       </AnimatedPressable>
 
-                      <Ionicons name="chevron-forward" size={16} color={props.theme.colors.muted} />
+                      <View style={s.mapCue}>
+                        <Ionicons name="navigate" size={14} color={props.theme.colors.primary} />
+                      </View>
                     </View>
                   </AnimatedPressable>
                 );

@@ -13,6 +13,7 @@ import GlobalToast from "../components/ui/GlobalToast";
 import HomeTab from "../screens/HomeTab";
 import StationsTab from "../screens/StationsTab";
 import CompareTab from "../screens/CompareTab";
+import RankingsTab from "../screens/RankingsTab";
 import SettingsTab from "../screens/SettingsTab";
 
 const Tab = createBottomTabNavigator();
@@ -32,6 +33,7 @@ export default function TabNavigator() {
           <Tab.Screen name="Home" component={HomeTab} />
           <Tab.Screen name="Stations" component={StationsTab} />
           <Tab.Screen name="Compare" component={CompareTab} />
+          <Tab.Screen name="Rankings" component={RankingsTab} />
           <Tab.Screen name="Settings" component={SettingsTab} />
         </Tab.Navigator>
       </NavigationContainer>
