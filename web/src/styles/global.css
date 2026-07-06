@@ -1974,6 +1974,23 @@ select {
   align-items: center;
 }
 
+.watchlistAddPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: 16px;
+}
+
+.watchlistAddField {
+  margin: 0;
+}
+
+.watchlistAddBtn {
+  min-height: 46px;
+  white-space: nowrap;
+}
+
 .watchlistStats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1982,6 +1999,14 @@ select {
 }
 
 @media (max-width: 700px) {
+  .watchlistAddPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .watchlistAddBtn {
+    width: 100%;
+  }
+
   .watchlistStats {
     grid-template-columns: 1fr;
   }
@@ -2492,12 +2517,32 @@ select {
 }
 
 .heroPhoneBalance {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
   margin-top: 78px;
   color: #ffffff;
-  font-size: 44px;
   line-height: 1;
-  font-weight: 800;
   text-align: center;
+}
+
+.heroPhoneAmount {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(34px, 5vw, 44px);
+  font-weight: 800;
+}
+
+.heroPhoneUnit {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 20px;
+  font-weight: 800;
 }
 
 .heroPhonePill {
@@ -3120,10 +3165,7 @@ select {
 
 .stationMapTiles {
   position: absolute;
-  left: calc(50% - 384px);
-  top: calc(50% - 384px);
-  width: 768px;
-  height: 768px;
+  inset: 0;
 }
 
 .stationMapTile {
@@ -3134,6 +3176,7 @@ select {
 
 .stationMapCenter,
 .stationMapPin {
+  z-index: 2;
   position: absolute;
   transform: translate(-50%, -50%);
 }
@@ -3179,6 +3222,7 @@ select {
 
 .choroplethCard {
   margin-top: 18px;
+  padding: 18px;
 }
 
 .choroplethScale {
@@ -3201,13 +3245,14 @@ select {
 .choroplethMapWrap {
   border: 1px solid var(--border);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: auto;
   background: linear-gradient(180deg, rgba(45, 212, 191, 0.08), rgba(15, 23, 42, 0.08));
 }
 
 .choroplethMap {
   width: 100%;
-  min-height: 320px;
+  height: auto;
+  min-width: 560px;
   display: block;
 }
 
@@ -3239,6 +3284,16 @@ select {
   .compareTrendHeader,
   .choroplethHeader {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 520px) {
+  .choroplethCard {
+    padding: 14px;
+  }
+
+  .choroplethMap {
+    min-width: 520px;
   }
 }
 

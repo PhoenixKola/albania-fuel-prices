@@ -37,7 +37,7 @@ function formatUpdatedAt(value: string | Date | null | undefined, t: TDict, lang
 
 export default function HeroIntro({ t, lang, updatedAt, data, country, selected, fuelType, currency, fxRates }: HeroIntroProps) {
   const selectedPrice = getEurPrice(selected, fuelType);
-  const heroPrice = `${formatFuelPrice(country, selectedPrice, currency, fxRates)}/L`;
+  const heroPrice = formatFuelPrice(country, selectedPrice, currency, fxRates);
   const heroFuel = fuelLabel(t, fuelType);
   const pricedCountries =
     data?.countries
@@ -93,7 +93,10 @@ export default function HeroIntro({ t, lang, updatedAt, data, country, selected,
               <span>{t.heroShowcaseMockupStatus}</span>
               <span>•••</span>
             </div>
-            <div className="heroPhoneBalance">{heroPrice}</div>
+            <div className="heroPhoneBalance">
+              <span className="heroPhoneAmount">{heroPrice}</span>
+              <span className="heroPhoneUnit">/L</span>
+            </div>
             <div className="heroPhonePill">{country}<span aria-hidden="true"> · </span>{heroFuel}</div>
             <div className="heroPhoneActions">
               <span />

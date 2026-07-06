@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TDict } from "../../locales";
 import { useUserLocationWeb } from "../../hooks/useUserLocationWeb";
 import { useNearbyStationsWeb } from "../../hooks/useNearbyStationsWeb";
@@ -35,26 +35,30 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
     [t]
   );
 
-  const [visible, setVisible] = useState(10);
+  const PAGE_SIZE = 8;
+  const [page, setPage] = useState(0);
 
-  const shown = useMemo(() => nearby.stations.slice(0, visible), [nearby.stations, visible]);
+  const pageCount = Math.max(1, Math.ceil(nearby.stations.length / PAGE_SIZE));
+  const shown = useMemo(
+    () => nearby.stations.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
+    [nearby.stations, page]
+  );
 
-  const canCollapse = visible > 10;
-  const canShowMore = visible < nearby.stations.length;
-  const canShowAll = visible < nearby.stations.length;
-  const showActions = canCollapse || canShowMore || canShowAll;
+  useEffect(() => {
+    setPage((p) => Math.min(p, Math.max(0, pageCount - 1)));
+  }, [pageCount]);
 
   const radiusDisabled = !loc.coords || nearby.loading;
 
   const onChangeRadius = (v: number) => {
     if (radiusDisabled) return;
-    setVisible(10);
+    setPage(0);
     setRadiusM(v);
   };
 
   const onRefresh = () => {
     if (!loc.coords || nearby.loading) return;
-    setVisible(10);
+    setPage(0);
     nearby.refresh();
   };
 
@@ -160,40 +164,25 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
             </div>
 
             <div className="segRow nearbyActionRow">
-              {showActions ? (
+              {nearby.stations.length > PAGE_SIZE ? (
                 <>
-                  {canCollapse ? (
-                    <button
-                      className="btn btn-ghost"
-                      type="button"
-                      onClick={() => setVisible(10)}
-                      disabled={nearby.loading}
-                    >
-                      {t.stationsCollapse}
-                    </button>
-                  ) : null}
-
-                  {canShowMore ? (
-                    <button
-                      className="btn btn-ghost"
-                      type="button"
-                      onClick={() => setVisible((p) => Math.min(p + 10, nearby.stations.length))}
-                      disabled={nearby.loading}
-                    >
-                      {t.stationsShowMore}
-                    </button>
-                  ) : null}
-
-                  {canShowAll ? (
-                    <button
-                      className="btn btn-ghost"
-                      type="button"
-                      onClick={() => setVisible(nearby.stations.length)}
-                      disabled={nearby.loading}
-                    >
-                      {t.stationsShowAll}
-                    </button>
-                  ) : null}
+                  <button
+                    className="btn btn-ghost"
+                    type="button"
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={nearby.loading || page === 0}
+                  >
+                    Prev
+                  </button>
+                  <span className="badge nearbyPageBadge">Page {page + 1} / {pageCount}</span>
+                  <button
+                    className="btn btn-ghost"
+                    type="button"
+                    onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                    disabled={nearby.loading || page >= pageCount - 1}
+                  >
+                    Next
+                  </button>
                 </>
               ) : null}
             </div>
@@ -207,7 +196,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
           <div className="nearbyMapListGrid">
             <StationMapPreview
               center={loc.coords}
-              stations={nearby.stations}
+              stations={shown}
               onSelect={(station) => {
                 window.open(`https://www.google.com/maps?q=${station.lat},${station.lon}`, "_blank", "noopener,noreferrer");
               }}
@@ -235,7 +224,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                   rel="noreferrer"
                 >
                   <div className="nearbyRowLeft">
-                    <div className="nearbyRowIndex">{index + 1}</div>
+                    <div className="nearbyRowIndex">{page * PAGE_SIZE + index + 1}</div>
 
                     <div className="nearbyRowText">
                       <div className="nearbyRowName">{s.name}</div>

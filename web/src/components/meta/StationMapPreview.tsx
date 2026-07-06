@@ -29,30 +29,23 @@ export default function StationMapPreview({ center, stations, onSelect }: Props)
   const centerY = latToTileY(center.lat, zoom);
   const tileX = Math.floor(centerX);
   const tileY = Math.floor(centerY);
-  const fracX = centerX - tileX;
-  const fracY = centerY - tileY;
 
   const tiles = [];
   for (let y = -1; y <= 1; y++) {
     for (let x = -1; x <= 1; x++) {
-      tiles.push({ x: tileX + x, y: tileY + y, dx: x, dy: y });
+      tiles.push({ x: tileX + x, y: tileY + y });
     }
   }
 
   const project = (lat: number, lon: number) => {
-    const x = (lonToTileX(lon, zoom) - centerX) * TILE_SIZE + 1.5 * TILE_SIZE;
-    const y = (latToTileY(lat, zoom) - centerY) * TILE_SIZE + 1.5 * TILE_SIZE;
-    return { x: `${(x / (TILE_SIZE * 3)) * 100}%`, y: `${(y / (TILE_SIZE * 3)) * 100}%` };
+    const x = (lonToTileX(lon, zoom) - centerX) * TILE_SIZE;
+    const y = (latToTileY(lat, zoom) - centerY) * TILE_SIZE;
+    return { x: `calc(50% + ${x.toFixed(2)}px)`, y: `calc(50% + ${y.toFixed(2)}px)` };
   };
 
   return (
     <div className="stationMapPreview" aria-label="Nearby fuel station map">
-      <div
-        className="stationMapTiles"
-        style={{
-          transform: `translate(${-fracX * TILE_SIZE}px, ${-fracY * TILE_SIZE}px)`,
-        }}
-      >
+      <div className="stationMapTiles">
         {tiles.map((tile) => (
           <img
             key={`${tile.x}-${tile.y}`}
@@ -61,8 +54,8 @@ export default function StationMapPreview({ center, stations, onSelect }: Props)
             alt=""
             loading="lazy"
             style={{
-              left: `${(tile.dx + 1) * TILE_SIZE}px`,
-              top: `${(tile.dy + 1) * TILE_SIZE}px`,
+              left: `calc(50% + ${((tile.x - centerX) * TILE_SIZE).toFixed(2)}px)`,
+              top: `calc(50% + ${((tile.y - centerY) * TILE_SIZE).toFixed(2)}px)`,
             }}
           />
         ))}

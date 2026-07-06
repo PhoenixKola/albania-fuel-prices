@@ -46,6 +46,7 @@ export default function EuropeChoroplethMap({ data, fuelType, currentCountry, on
     const byCountry = new Map(
       data.countries
         .filter((row) => isEuropeanCountry(row.country))
+        .filter((row) => row.country !== "Russia")
         .map((row) => [row.country, getEurPrice(row, fuelType)])
     );
 
@@ -84,7 +85,7 @@ export default function EuropeChoroplethMap({ data, fuelType, currentCountry, on
       <div className="choroplethHeader">
         <div>
           <div className="cardTitle">Europe price map</div>
-          <div className="cardSubtle">Darker countries are more expensive for the selected fuel.</div>
+          <div className="cardSubtle">Darker countries are more expensive. Russia is kept in the table but hidden here so the map stays readable.</div>
         </div>
         <div className="choroplethScale">
           <span>{model.min.toFixed(3)}</span>

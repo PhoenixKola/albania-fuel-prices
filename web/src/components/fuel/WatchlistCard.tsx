@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import type { LatestEurope, FuelType } from "../../models/fuel";
 import type { TDict } from "../../locales";
 import Chip from "../ui/Chip";
@@ -38,6 +39,13 @@ export default function WatchlistCard({
   fxRates,
   trends,
 }: Props) {
+  const countries = useMemo(() => data?.countries?.map((c) => c.country).sort((a, b) => a.localeCompare(b)) ?? [], [data]);
+  const [countryToAdd, setCountryToAdd] = useState(current);
+
+  useEffect(() => {
+    if (!countryToAdd && current) setCountryToAdd(current);
+  }, [countryToAdd, current]);
+
   const rows =
     data?.countries
       ?.filter((c) => watchlist.includes(c.country))
@@ -49,6 +57,7 @@ export default function WatchlistCard({
   rows.sort((a, b) => (a.eur ?? Infinity) - (b.eur ?? Infinity));
 
   const isCurrentSaved = has.has(current);
+  const selectedAlreadySaved = has.has(countryToAdd);
 
   return (
     <div className="card watchlistCard">
@@ -76,6 +85,27 @@ export default function WatchlistCard({
         <p className="tinyNote" style={{ marginTop: 10, lineHeight: 1.7 }}>
           {t.watchlistGuidance}
         </p>
+
+        <div className="watchlistAddPanel">
+          <div className="field watchlistAddField">
+            <div className="label">Add country to compare</div>
+            <select className="select" value={countryToAdd} onChange={(e) => setCountryToAdd(e.target.value)}>
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            className="btn btn-primary watchlistAddBtn"
+            type="button"
+            onClick={() => onAdd(countryToAdd)}
+            disabled={!countryToAdd || selectedAlreadySaved}
+          >
+            {selectedAlreadySaved ? "Added" : t.addToWatchlist}
+          </button>
+        </div>
 
         <div className="watchlistStats">
           <div className="watchlistStat">
