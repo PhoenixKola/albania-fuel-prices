@@ -1257,6 +1257,11 @@ select {
   color: var(--muted);
 }
 
+.nearbyPageBadge {
+  display: flex;
+  align-items: center;
+}
+
 .spinner {
   width: 16px;
   height: 16px;
