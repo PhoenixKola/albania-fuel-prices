@@ -29,6 +29,7 @@ export default function Footer({ t }: Props) {
 
           <nav className="footerNav" aria-label="Guide navigation">
             <span className="footerNavHeading">{t.footerGuidesHeading}</span>
+            <Link to="/insights" className="footerLink">Insights</Link>
             <Link to="/daily-challenge" className="footerLink">{t.navDailyChallenge}</Link>
             <Link to="/fuel-quiz" className="footerLink">{t.navFuelQuiz}</Link>
             <Link to="/methodology" className="footerLink">{t.navMethodology}</Link>

@@ -11,6 +11,10 @@ export type RouteConfig = {
   changefreq: "daily" | "weekly" | "monthly" | "yearly";
   jsonLdType: "WebSite" | "WebPage" | "Article" | "FAQPage" | "ContactPage";
   noindex?: boolean;
+  /** Page content includes the daily-updated price data (sitemap lastmod = data as_of). */
+  priceBearing?: boolean;
+  /** Last meaningful editorial update, for non-price-bearing pages. */
+  lastmod?: string;
 };
 
 export const SITE_URL = "https://karburantisot.com";
@@ -26,6 +30,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 1.0,
     changefreq: "daily",
     jsonLdType: "WebSite",
+    priceBearing: true,
   },
   {
     path: "/stations",
@@ -35,6 +40,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "daily",
     jsonLdType: "WebPage",
+    lastmod: "2026-04-01",
   },
   {
     path: "/compare",
@@ -44,6 +50,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "daily",
     jsonLdType: "WebPage",
+    priceBearing: true,
   },
   {
     path: "/rankings",
@@ -53,6 +60,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "daily",
     jsonLdType: "WebPage",
+    priceBearing: true,
   },
   {
     path: "/about",
@@ -62,6 +70,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "monthly",
     jsonLdType: "WebPage",
+    lastmod: "2026-07-10",
   },
   {
     path: "/contact",
@@ -71,6 +80,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "monthly",
     jsonLdType: "ContactPage",
+    lastmod: "2026-03-31",
   },
   {
     path: "/methodology",
@@ -80,6 +90,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "monthly",
     jsonLdType: "Article",
+    lastmod: "2026-07-10",
   },
   {
     path: "/how-fuel-prices-work",
@@ -89,6 +100,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "monthly",
     jsonLdType: "Article",
+    lastmod: "2026-04-12",
   },
   {
     path: "/europe-fuel-comparison",
@@ -98,6 +110,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.9,
     changefreq: "monthly",
     jsonLdType: "Article",
+    lastmod: "2026-04-12",
   },
   {
     path: "/road-trip-fuel-guide",
@@ -107,6 +120,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.9,
     changefreq: "monthly",
     jsonLdType: "Article",
+    lastmod: "2026-04-12",
   },
   {
     path: "/privacy",
@@ -116,6 +130,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.4,
     changefreq: "yearly",
     jsonLdType: "WebPage",
+    lastmod: "2026-03-31",
   },
   {
     path: "/terms",
@@ -125,6 +140,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.4,
     changefreq: "yearly",
     jsonLdType: "WebPage",
+    lastmod: "2026-03-31",
   },
   {
     path: "/daily-challenge",
@@ -134,6 +150,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "daily",
     jsonLdType: "WebPage",
+    priceBearing: true,
   },
   {
     path: "/fuel-quiz",
@@ -143,6 +160,17 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "weekly",
     jsonLdType: "WebPage",
+    priceBearing: true,
+  },
+  {
+    path: "/insights",
+    title: "Fuel Market Insights | Fuel Today",
+    description:
+      "Analysis and background articles on the Albanian and Balkan fuel markets — taxes, cross-border savings, market structure, and monthly price recaps.",
+    priority: 0.8,
+    changefreq: "weekly",
+    jsonLdType: "WebPage",
+    lastmod: "2026-07-10",
   },
   {
     path: "/editorial-policy",
@@ -152,6 +180,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.5,
     changefreq: "yearly",
     jsonLdType: "WebPage",
+    lastmod: "2026-06-05",
   },
   {
     path: "/disclaimer",
@@ -161,6 +190,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.4,
     changefreq: "yearly",
     jsonLdType: "WebPage",
+    lastmod: "2026-06-05",
   },
 ];
 

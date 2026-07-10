@@ -35,6 +35,20 @@ export default function AboutPage({ t }: Props) {
         <h2 className="contentHeading">{t.aboutWhoTitle}</h2>
         <p className="contentBody">{t.aboutWhoP1}</p>
         <p className="contentBody">
+          Unlike most price-comparison sites, our entire data pipeline is public: the collection
+          scripts, the processing code, and every day of price history are published in an{" "}
+          <a
+            href="https://github.com/PhoenixKola/albania-fuel-prices"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inlineLink"
+          >
+            open-source repository on GitHub
+          </a>
+          . Anyone can inspect exactly how the numbers on this site are produced, or download the
+          raw dataset and verify them independently.
+        </p>
+        <p className="contentBody">
           {t.aboutWhoP2}{" "}
           <Link to="/contact" className="inlineLink">{t.navContact}</Link>
         </p>

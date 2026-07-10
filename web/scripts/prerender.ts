@@ -15,35 +15,55 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
+import { STATIC_ROUTES as ROUTE_CONFIGS } from "../src/config/routes";
+import { getPublishedArticles } from "../src/config/articles";
+import {
+  loadPriceContext,
+  renderCountryPriceSection,
+  renderHomeSnapshot,
+  renderRankingsTable,
+  renderComparePairs,
+  priceMetaPrefix,
+  type PriceContext,
+} from "./priceData";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "../dist");
 const SITE_URL = "https://karburantisot.com";
 const PUBLISHER_ID = "ca-pub-2653462201538649";
+const GITHUB_URL = "https://github.com/PhoenixKola/albania-fuel-prices";
 
 // ─── Route definitions with static content ─────────────────────────────────
 
 type RouteEntry = {
   path: string;
   title: string;
-  description: string;
+  description: string | ((ctx: PriceContext) => string);
   jsonLdType: string;
-  content: string; // visible HTML content for the page
+  /** Real first-publish date of the page (from git history). */
+  datePublished: string;
+  /** Last meaningful editorial update; price-bearing pages use data as_of instead. */
+  dateModified?: string;
+  /** Content changes with the daily data refresh. */
+  priceBearing?: boolean;
+  content: string | ((ctx: PriceContext) => string); // visible HTML content for the page
 };
 
-const COUNTRY_ROUTES = buildCountryRoutes();
 const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/",
     title: "Fuel Today Albania & Europe | Petrol, Diesel and LPG Prices",
     description: "Compare today's fuel prices in Albania and Europe, understand why prices move, estimate road-trip costs, and review transparent methodology before you travel.",
     jsonLdType: "WebSite",
-    content: `
+    datePublished: "2026-02-14",
+    priceBearing: true,
+    content: (ctx) => `
       <header class="contentHero">
         <h1 class="contentHeroTitle">Fuel prices in Albania and Europe, explained clearly</h1>
         <p class="contentHeroText">Karburanti Sot helps drivers compare fuel prices, estimate trip costs, and understand how pricing changes across countries. Instead of showing only raw numbers, the site adds context around price rankings, likely cost differences, exchange-rate effects, and practical travel use cases.</p>
       </header>
       <article class="contentPage">
+        ${renderHomeSnapshot(ctx)}
         <section class="contentSection">
           <h2 class="contentHeading">What this site does</h2>
           <p class="contentBody">Fuel Today (Karburanti Sot) is an independent fuel price comparison website for Albania and Europe. It collects public country-level fuel price data, converts it into a consistent EUR-per-liter format, and presents it with editorial context so drivers can make informed decisions about where and when to refuel.</p>
@@ -70,7 +90,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Data source attribution</h2>
-          <p class="contentBody">Fuel price data is sourced from publicly available European fuel price aggregators. Exchange rates come from a public FX API. All values are informational references — not guaranteed station prices. See the methodology page for full transparency about the data pipeline.</p>
+          <p class="contentBody">Fuel price data is sourced from publicly available European fuel price aggregators. Exchange rates come from a public FX API. All values are informational references — not guaranteed station prices. See the methodology page for full transparency about the data pipeline. The entire data pipeline and daily-updated dataset are <a href="${GITHUB_URL}" rel="noopener">open source on GitHub</a>, so anyone can verify the numbers independently.</p>
         </section>
       </article>
     `,
@@ -80,6 +100,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Nearby Fuel Stations | Fuel Today",
     description: "Find nearby fuel stations and use location-based context alongside country-level fuel price comparisons for Albania and Europe.",
     jsonLdType: "WebPage",
+    datePublished: "2026-04-01",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Nearby Fuel Stations</h1>
@@ -105,10 +126,13 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Compare Fuel Prices Across Countries | Fuel Today",
     description: "Build a country watchlist and compare petrol, diesel, and LPG prices across Albania and Europe for practical trip and budget planning.",
     jsonLdType: "WebPage",
-    content: `
+    datePublished: "2026-04-01",
+    priceBearing: true,
+    content: (ctx) => `
       <article class="contentPage">
         <h1 class="contentPageTitle">Compare Fuel Prices</h1>
         <p class="contentBody">Build a watchlist of countries you care about and compare petrol, diesel, and LPG prices side by side for practical trip planning and cross-border refueling decisions.</p>
+        ${renderComparePairs(ctx)}
         <section class="contentSection">
           <h2 class="contentHeading">How to use country comparisons effectively</h2>
           <p class="contentBody">Comparing fuel prices across countries is not just about finding the cheapest number. Exchange rates, tax structures, and data reporting schedules all affect how meaningful a direct comparison is. The watchlist feature is designed for drivers who regularly cross borders or plan multi-country road trips.</p>
@@ -128,10 +152,13 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Europe Fuel Price Rankings | Fuel Today",
     description: "Explore Europe fuel price rankings by fuel type and understand where Albania sits relative to nearby and western European markets.",
     jsonLdType: "WebPage",
-    content: `
+    datePublished: "2026-04-01",
+    priceBearing: true,
+    content: (ctx) => `
       <article class="contentPage">
         <h1 class="contentPageTitle">Europe Fuel Price Rankings</h1>
         <p class="contentBody">See which European countries have the cheapest and most expensive fuel prices for petrol, diesel, and LPG. Understand how tax policy, subsidies, and exchange rates create the ranking positions you see.</p>
+        ${renderRankingsTable(ctx)}
         <section class="contentSection">
           <h2 class="contentHeading">Understanding fuel price rankings</h2>
           <p class="contentBody">European fuel prices span a wide range. At the top you'll find countries with high excise duties (Netherlands, Finland, Italy), while at the bottom you'll find countries with lower taxation or subsidies (Kosovo, Poland, Bulgaria). Tax is the single biggest factor in cross-country differences.</p>
@@ -152,6 +179,8 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "About Fuel Today (Karburanti Sot)",
     description: "Learn why Fuel Today exists, who maintains it, data principles, editorial approach, and how corrections are handled for Albania and European fuel prices.",
     jsonLdType: "WebPage",
+    datePublished: "2026-03-31",
+    dateModified: "2026-07-10",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">About Karburanti Sot</h1>
@@ -162,7 +191,8 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Who maintains this project</h2>
-          <p class="contentBody">Karburanti Sot is maintained by an independent developer based in Albania. The project is not affiliated with any fuel company, government agency, or advertising network. The site is funded through advertising, which allows it to remain free for all users.</p>
+          <p class="contentBody">Karburanti Sot is built and maintained by a small independent team based in Tirana, Albania. The project is not affiliated with any fuel company, government agency, or advertising network. The site is funded through advertising, which allows it to remain free for all users.</p>
+          <p class="contentBody">Unlike most price-comparison sites, our entire data pipeline is public: the collection scripts, the processing code, and every day of price history are published in an <a href="${GITHUB_URL}" rel="noopener">open-source repository on GitHub</a>. Anyone can inspect exactly how the numbers on this site are produced, or download the raw dataset and verify them independently. Questions and corrections reach the team directly at <a href="mailto:fenixkola@gmail.com">fenixkola@gmail.com</a>.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Data principles</h2>
@@ -176,6 +206,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Contact Fuel Today",
     description: "Contact Fuel Today for data corrections, partnerships, or website feedback related to Albania and European fuel price comparisons.",
     jsonLdType: "ContactPage",
+    datePublished: "2026-03-31",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Contact Us</h1>
@@ -201,6 +232,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Privacy Policy | Fuel Today",
     description: "Read the Fuel Today privacy policy, including data usage, local storage behavior, advertising disclosures, and contact details.",
     jsonLdType: "WebPage",
+    datePublished: "2026-03-31",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Privacy Policy</h1>
@@ -225,6 +257,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Terms of Use | Fuel Today",
     description: "Review Fuel Today terms of use, informational data limitations, acceptable usage, and liability boundaries for fuel price guidance.",
     jsonLdType: "WebPage",
+    datePublished: "2026-03-31",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Terms of Use</h1>
@@ -249,6 +282,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Editorial Policy | Fuel Today",
     description: "Read how Fuel Today selects, produces, and maintains fuel price content — including data sourcing standards, editorial independence, accuracy principles, and corrections policy.",
     jsonLdType: "WebPage",
+    datePublished: "2026-06-05",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Editorial Policy</h1>
@@ -277,6 +311,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Disclaimer | Fuel Today",
     description: "Read the Fuel Today disclaimer: fuel price data is informational only, trip estimates are approximate, and no financial advice is provided.",
     jsonLdType: "WebPage",
+    datePublished: "2026-06-05",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Disclaimer</h1>
@@ -301,6 +336,8 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Methodology | How Fuel Today Collects and Updates Data",
     description: "Review data sources, update frequency, fuel definitions, and limitations behind Fuel Today's Albania and Europe fuel price comparison data.",
     jsonLdType: "Article",
+    datePublished: "2026-04-12",
+    dateModified: "2026-07-10",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Methodology: How Karburanti Sot Collects and Presents Fuel Price Data</h1>
@@ -329,6 +366,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "How Fuel Prices Work in Albania and Europe | Fuel Today",
     description: "Understand how crude oil, refining, taxes, transport, FX rates, and local demand shape petrol, diesel, and LPG prices across the Balkans and Europe.",
     jsonLdType: "Article",
+    datePublished: "2026-04-12",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">How Fuel Prices Work: From Crude Oil to the Pump</h1>
@@ -357,6 +395,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Europe Fuel Comparison with Albania | Fuel Today",
     description: "Compare Albania fuel prices with Kosovo, Montenegro, North Macedonia, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom.",
     jsonLdType: "Article",
+    datePublished: "2026-04-12",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Fuel Prices Across Europe: A Country-by-Country Comparison Guide</h1>
@@ -385,6 +424,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     title: "Road Trip Fuel Cost Guide from Albania | Fuel Today",
     description: "Estimate road trip fuel costs from Albania with practical route examples, consumption assumptions, and cross-border petrol and diesel price context.",
     jsonLdType: "Article",
+    datePublished: "2026-04-12",
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Road Trip Fuel Cost Guide: How to Estimate and Reduce Your Fuel Expenses</h1>
@@ -408,10 +448,61 @@ const STATIC_ROUTES: RouteEntry[] = [
       </article>
     `,
   },
-  ...COUNTRY_ROUTES,
+  {
+    path: "/daily-challenge",
+    title: "Daily Challenge — 5 Fuel Price Questions | Fuel Today",
+    description: "Test yourself with today's 5 fuel price questions. Same questions for everyone, refreshes daily. Compare petrol and diesel prices across Europe.",
+    jsonLdType: "WebPage",
+    datePublished: "2026-06-05",
+    priceBearing: true,
+    content: `
+      <article class="contentPage">
+        <h1 class="contentPageTitle">Daily Challenge: 5 Fuel Price Questions</h1>
+        <p class="contentBody">The Daily Challenge is a short quiz built from the same fuel price dataset that powers the rest of this site. Every day at midnight, five new questions are generated from the latest European price data — and everyone who plays that day gets exactly the same five questions, so scores are directly comparable.</p>
+        <section class="contentSection">
+          <h2 class="contentHeading">How the challenge works</h2>
+          <p class="contentBody">Each question asks you to compare two European countries: which one currently has cheaper petrol or diesel? The answers are checked against the current country-level averages listed on our <a href="/rankings">rankings page</a>, so the "correct" answer genuinely reflects today's market data, not trivia written months ago. After each question you see the actual prices, which is where the learning happens — most players are surprised by at least one pair.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">Why a fuel price quiz is genuinely useful</h2>
+          <p class="contentBody">If you drive across borders in the Balkans — Albania to Kosovo, Greece, Montenegro, or Italy by ferry — having an accurate mental map of relative fuel prices saves real money. A wrong assumption about which side of the border is cheaper can cost 10–20 EUR on a single tank. Playing the challenge for a week builds that mental map faster than reading tables, because the surprises stick.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">Where the questions come from</h2>
+          <p class="contentBody">Questions are generated automatically from our daily dataset of country-level average prices, collected from public European fuel price aggregators. The same numbers are shown on the <a href="/">homepage</a> and the country pages, and the collection process is documented on the <a href="/methodology">methodology page</a>. Your score and streak are stored only in your browser — no account is needed.</p>
+        </section>
+      </article>
+    `,
+  },
+  {
+    path: "/fuel-quiz",
+    title: "Fuel Price Quiz — Which Country Has Cheaper Fuel? | Fuel Today",
+    description: "Test your knowledge of European fuel prices. Guess which country has cheaper petrol or diesel using live market data. Track your score and streak.",
+    jsonLdType: "WebPage",
+    datePublished: "2026-06-05",
+    priceBearing: true,
+    content: `
+      <article class="contentPage">
+        <h1 class="contentPageTitle">Fuel Price Quiz: Which Country Has Cheaper Fuel?</h1>
+        <p class="contentBody">This quiz shows you two European countries and asks a single question: which one has cheaper fuel right now? It runs on the same live dataset as the rest of the site, so every answer is verified against current country-level averages rather than static trivia.</p>
+        <section class="contentSection">
+          <h2 class="contentHeading">How to play</h2>
+          <p class="contentBody">Pick petrol or diesel, then choose the country you think is cheaper. The quiz immediately reveals both prices in EUR per liter so you can see how close the pair really is. Some matchups are easy — Switzerland against Kosovo is not a fair fight — but pairs like Croatia vs Slovenia or Hungary vs Romania regularly surprise even drivers who cross those borders. Your running score and best streak are saved in your browser.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">What the quiz teaches</h2>
+          <p class="contentBody">European fuel prices are driven mostly by national tax policy, which means the price map does not follow intuition about "rich" and "cheap" countries. The quiz is a fast way to internalize the real ranking: where the Balkans sit relative to the eurozone, why island and mountain states price differently, and which neighboring pairs have the biggest gaps. That knowledge feeds directly into practical decisions covered in our <a href="/road-trip-fuel-guide">road trip fuel guide</a>.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">Data behind the questions</h2>
+          <p class="contentBody">Prices come from our daily-updated dataset of European country averages — the same numbers on the <a href="/rankings">rankings page</a> — sourced from public aggregators and documented on the <a href="/methodology">methodology page</a>. Because the data refreshes daily, the correct answer to a matchup can genuinely change from one week to the next when markets move.</p>
+        </section>
+      </article>
+    `,
+  },
 ];
 
-function buildCountryRoutes(): RouteEntry[] {
+function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
   return COUNTRY_EDITORIAL.map((c) => {
     const faqItems = c.faqs
       .map(
@@ -430,13 +521,15 @@ function buildCountryRoutes(): RouteEntry[] {
     return {
       path: `/fuel-prices/${c.slug}`,
       title: c.metaTitle,
-      description: c.metaDescription,
+      description: priceMetaPrefix(ctx, c.dataCountryName) + c.metaDescription,
       jsonLdType: "FAQPage",
+      datePublished: "2026-05-26",
+      priceBearing: true,
       content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">${escapeHtml(c.label)} fuel prices today</h1>
         <p class="contentBody">This page provides a comprehensive overview of fuel prices in ${escapeHtml(c.label)}, with practical comparison context for Albanian drivers and travelers.</p>
-
+        ${renderCountryPriceSection(ctx, c)}
         <section class="contentSection">
           <h2 class="contentHeading">${escapeHtml(c.label)} fuel market overview</h2>
           <p class="contentBody">${escapeHtml(c.marketOverview)}</p>
@@ -485,21 +578,82 @@ function buildCountryRoutes(): RouteEntry[] {
   });
 }
 
+function buildInsightRoutes(): RouteEntry[] {
+  const articles = getPublishedArticles();
+
+  const indexCards = articles
+    .map(
+      (a) => `
+        <section class="contentSection">
+          <h2 class="contentHeading"><a href="/insights/${a.slug}">${escapeHtml(a.title)}</a></h2>
+          <p class="contentBodyMuted">Published ${a.datePublished} · ${a.readMinutes} min read</p>
+          <p class="contentBody">${escapeHtml(a.description)}</p>
+        </section>`
+    )
+    .join("");
+
+  const indexRoute: RouteEntry = {
+    path: "/insights",
+    title: "Fuel Market Insights | Fuel Today",
+    description:
+      "Analysis and background articles on the Albanian and Balkan fuel markets — taxes, cross-border savings, market structure, and monthly price recaps.",
+    jsonLdType: "WebPage",
+    datePublished: "2026-07-10",
+    dateModified: articles[0]?.datePublished ?? "2026-07-10",
+    content: `
+      <article class="contentPage">
+        <h1 class="contentPageTitle">Fuel Market Insights</h1>
+        <p class="contentBody">Analysis and background articles on the Albanian and Balkan fuel markets, written by the Karburanti Sot team and grounded in the same daily price dataset that powers this site.</p>
+        ${indexCards}
+      </article>
+    `,
+  };
+
+  const articleRoutes: RouteEntry[] = articles.map((a) => ({
+    path: `/insights/${a.slug}`,
+    title: `${a.title} | Fuel Today`,
+    description: a.description,
+    jsonLdType: "Article",
+    datePublished: a.datePublished,
+    dateModified: a.dateModified,
+    content: `
+      <article class="contentPage">
+        <h1 class="contentPageTitle">${escapeHtml(a.title)}</h1>
+        <p class="contentBodyMuted">By the Karburanti Sot team · Published ${a.datePublished} · ${a.readMinutes} min read</p>
+        ${a.html}
+        <section class="contentSection">
+          <h2 class="contentHeading">Keep exploring</h2>
+          <ul class="contentList">
+            <li><a href="/insights">All insights articles</a></li>
+            <li><a href="/fuel-prices/albania">Albania fuel prices today</a></li>
+            <li><a href="/rankings">Europe fuel price rankings</a></li>
+          </ul>
+        </section>
+      </article>
+    `,
+  }));
+
+  return [indexRoute, ...articleRoutes];
+}
+
 // ─── HTML generation ────────────────────────────────────────────────────────
 
-function generateJsonLd(route: RouteEntry): string {
+function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContext): string {
   const canonical = `${SITE_URL}${route.path === "/" ? "" : route.path}`;
 
   const publisher = {
     "@type": "Organization",
     name: "Karburanti Sot",
     url: SITE_URL,
+    sameAs: [GITHUB_URL],
   };
 
-  const author = {
-    "@type": "Organization",
-    name: "Karburanti Sot",
-    url: SITE_URL,
+  const dateModified =
+    route.priceBearing && ctx.ok ? ctx.asOf : route.dateModified ?? route.datePublished;
+
+  const commonDates = {
+    datePublished: route.datePublished,
+    dateModified,
   };
 
   if (route.jsonLdType === "FAQPage") {
@@ -517,20 +671,38 @@ function generateJsonLd(route: RouteEntry): string {
         }))
       : [];
 
-    return JSON.stringify(
+    const graph: Record<string, unknown>[] = [
       {
-        "@context": "https://schema.org",
         "@type": "FAQPage",
         name: route.title,
         url: canonical,
         inLanguage: "en",
-        description: route.description,
+        description,
         publisher,
+        ...commonDates,
         mainEntity,
       },
-      null,
-      2
-    );
+    ];
+
+    // Country pages carry an actual daily-updated dataset — say so explicitly.
+    if (editorial && ctx.ok && ctx.prices.has(editorial.dataCountryName)) {
+      graph.push({
+        "@type": "Dataset",
+        name: `Daily fuel prices in ${editorial.label}`,
+        description: `Country-level average petrol (gasoline 95), diesel, and LPG prices in ${editorial.label}, in EUR per liter, updated daily from public aggregators.`,
+        url: canonical,
+        dateModified: ctx.asOf,
+        isBasedOn: ctx.sourceUrl || undefined,
+        creator: publisher,
+        distribution: {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json",
+        },
+      });
+    }
+
+    return JSON.stringify({ "@context": "https://schema.org", "@graph": graph }, null, 2);
   }
 
   const base: Record<string, unknown> = {
@@ -539,35 +711,47 @@ function generateJsonLd(route: RouteEntry): string {
     name: route.title,
     url: canonical,
     inLanguage: "en",
-    description: route.description,
+    description,
     publisher,
+    ...commonDates,
   };
 
   if (route.jsonLdType === "Article") {
-    base.author = author;
-    base.datePublished = "2025-01-01";
+    base.author = {
+      "@type": "Organization",
+      name: "Karburanti Sot",
+      url: `${SITE_URL}/about`,
+      sameAs: [GITHUB_URL],
+    };
+    base.headline = route.title;
   }
 
   return JSON.stringify(base, null, 2);
 }
 
-function generateHead(route: RouteEntry): string {
+function generateHead(route: RouteEntry, description: string, ctx: PriceContext): string {
   const canonical = `${SITE_URL}${route.path === "/" ? "" : route.path}`;
 
   return `
     <title>${escapeHtml(route.title)}</title>
-    <meta name="description" content="${escapeHtml(route.description)}" />
+    <meta name="description" content="${escapeHtml(description)}" />
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <link rel="canonical" href="${canonical}" />
     <meta name="google-adsense-account" content="${PUBLISHER_ID}" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Fuel Today" />
     <meta property="og:title" content="${escapeHtml(route.title)}" />
-    <meta property="og:description" content="${escapeHtml(route.description)}" />
+    <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:url" content="${canonical}" />
     <meta property="og:image" content="${SITE_URL}/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${escapeHtml(route.title)}" />
+    <meta name="twitter:description" content="${escapeHtml(description)}" />
+    <meta name="twitter:image" content="${SITE_URL}/og.png" />
     <script type="application/ld+json">
-${generateJsonLd(route)}
+${generateJsonLd(route, description, ctx)}
     </script>
   `;
 }
@@ -582,58 +766,82 @@ function escapeHtml(str: string): string {
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
-function main() {
+/**
+ * Strip ALL template SEO tags (title, description, robots, canonical,
+ * hreflang, og:*, twitter:*, adsense meta) so every prerendered page carries
+ * exactly one, route-specific set. Patterns tolerate multi-line tags.
+ */
+function stripTemplateSeoTags(html: string): string {
+  return html
+    .replace(/<title>[\s\S]*?<\/title>\s*/g, "")
+    .replace(/<meta\s+name="(description|robots|twitter:[^"]*)"[\s\S]*?\/>\s*/g, "")
+    .replace(/<meta\s+property="og:[^"]*"[\s\S]*?\/>\s*/g, "")
+    .replace(/<link\s+rel="(canonical|alternate)"[^>]*\/>\s*/g, "")
+    .replace(/<meta\s+name="google-adsense-account"[^>]*\/>\s*/g, "");
+}
+
+async function main() {
   const templatePath = resolve(DIST, "index.html");
   if (!existsSync(templatePath)) {
     console.error("dist/index.html not found. Run `vite build` first.");
     process.exit(1);
   }
 
-  const template = readFileSync(templatePath, "utf-8");
+  const ctx = await loadPriceContext();
+  if (ctx.ok) {
+    console.log(`✓ Loaded price data as of ${ctx.asOf} (${ctx.prices.size} countries)`);
+  }
+
+  const template = stripTemplateSeoTags(readFileSync(templatePath, "utf-8"));
+
+  // Prerendering overwrites dist/index.html (the "/" route), so this script
+  // can only run against a fresh `vite build` output — never twice in a row.
+  if (!template.includes('<div id="root"></div>')) {
+    console.error(
+      "dist/index.html has no empty root div — it was already prerendered. Run `vite build` first."
+    );
+    process.exit(1);
+  }
+
+  const routes = [...STATIC_ROUTES, ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
 
   let count = 0;
-  for (const route of STATIC_ROUTES) {
-    const head = generateHead(route);
+  for (const route of routes) {
+    const description =
+      typeof route.description === "function" ? route.description(ctx) : route.description;
+    const content = typeof route.content === "function" ? route.content(ctx) : route.content;
+    const head = generateHead(route, description, ctx);
 
-    // Replace the <title> and existing meta in the template head
-    let html = template;
-
-    // Inject our head tags before </head>
-    html = html.replace("</head>", `${head}\n  </head>`);
-
-    // Replace the generic <title>
-    html = html.replace(/<title>Fuel Prices Today<\/title>/, "");
-    // Remove the generic description meta
-    html = html.replace(/<meta\s+name="description"[^>]*\/>/, "");
-    // Remove the generic robots meta
-    html = html.replace(/<meta\s+name="robots"[^>]*\/>/, "");
-    // Remove generic canonical
-    html = html.replace(/<link\s+rel="canonical"[^>]*\/>/, "");
-    // Remove generic og tags
-    html = html.replace(/<meta\s+property="og:title"[^>]*\/>/g, "");
-    html = html.replace(/<meta\s+property="og:description"[^>]*\/>/g, "");
-    html = html.replace(/<meta\s+property="og:url"[^>]*\/>/g, "");
-    // Remove duplicate adsense meta (we inject our own)
-    html = html.replace(/<meta\s+name="google-adsense-account"[^>]*\/>/, "");
+    let html = template.replace("</head>", `${head}\n  </head>`);
 
     // Inject static content inside <div id="root">
-    html = html.replace(
-      '<div id="root"></div>',
-      `<div id="root">${route.content}</div>`
-    );
+    html = html.replace('<div id="root"></div>', `<div id="root">${content}</div>`);
 
-    // Determine output path
-    const outDir = route.path === "/"
-      ? DIST
-      : resolve(DIST, route.path.slice(1));
-
-    mkdirSync(outDir, { recursive: true });
-    const outFile = resolve(outDir, "index.html");
+    // Flat .html output: Cloudflare Pages serves /foo from foo.html with a
+    // direct 200 (and 308s /foo/ -> /foo), matching the slashless canonicals.
+    const outFile =
+      route.path === "/"
+        ? resolve(DIST, "index.html")
+        : resolve(DIST, `${route.path.slice(1)}.html`);
+    mkdirSync(dirname(outFile), { recursive: true });
     writeFileSync(outFile, html, "utf-8");
     count++;
+  }
+
+  // Guard against route-list drift: every indexable route in the app config
+  // must have prerendered output, otherwise the sitemap would point at 404s.
+  const rendered = new Set(routes.map((r) => r.path));
+  const missing = ROUTE_CONFIGS.filter((r) => !r.noindex && !rendered.has(r.path));
+  if (missing.length) {
+    console.error(
+      `✗ Prerender is missing routes declared in src/config/routes.ts: ${missing
+        .map((r) => r.path)
+        .join(", ")}`
+    );
+    process.exit(1);
   }
 
   console.log(`✓ Prerendered ${count} routes to ${DIST}`);
 }
 
-main();
+await main();

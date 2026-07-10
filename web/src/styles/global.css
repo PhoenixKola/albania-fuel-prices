@@ -2726,6 +2726,43 @@ select {
   margin-top: 6px;
 }
 
+/* Static price tables baked into prerendered pages */
+.contentTable {
+  width: 100%;
+  margin: 14px 0;
+  border-collapse: collapse;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.contentTable th,
+.contentTable td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.contentTable thead th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.contentTable tbody th {
+  font-weight: 600;
+}
+
+.contentTable a {
+  color: inherit;
+}
+
+.contentTableHighlight {
+  background: rgba(20, 184, 166, 0.08);
+}
+
 .contentInfoBox {
   margin-top: 14px;
   border-radius: var(--radius-sm);

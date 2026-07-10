@@ -29,9 +29,30 @@ jobs:
         run: npm run run
 
       - name: Commit changes (if any)
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/latest.json data/history.json data/trends.json
-          git diff --cached --quiet || git commit -m "Update fuel data"
-          git push
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Update fuel data"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Rebuilds the site so the prerendered HTML picks up today's prices.
+      # Only needed if the Cloudflare Pages project is NOT git-connected to
+      # main; set the CF_PAGES_DEPLOY_HOOK repo secret to enable it.
+      - name: Trigger Cloudflare Pages deploy
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          HOOK: ${{ secrets.CF_PAGES_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$HOOK" ]; then
+            curl -fsS -X POST "$HOOK"
+            echo "Deploy hook triggered."
+          else
+            echo "No CF_PAGES_DEPLOY_HOOK secret set; skipping (fine if the Pages project is git-connected)."
+          fi

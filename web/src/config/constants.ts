@@ -1,3 +1,10 @@
+/**
+ * Master ad switch. Keep FALSE while the AdSense "low value content" review is
+ * pending — a site under review does better with no ad slots rendered. Flip to
+ * true after approval. The verification script in index.html stays either way.
+ */
+export const ADS_ENABLED = false;
+
 export const DATA_URL =
   "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json";
 

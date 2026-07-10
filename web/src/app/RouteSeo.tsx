@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Seo from "../components/meta/Seo";
 import { getCountryEditorial } from "../config/countryContent";
+import { getArticle } from "../config/articles";
 
 export default function RouteSeo() {
   const { pathname } = useLocation();
@@ -149,6 +150,28 @@ export default function RouteSeo() {
           "Read the Fuel Today disclaimer: fuel price data is informational only, trip estimates are approximate, and no financial advice is provided.",
         path: pathname,
       };
+    }
+
+    if (pathname === "/insights") {
+      return {
+        title: "Fuel Market Insights | Fuel Today",
+        description:
+          "Analysis and background articles on the Albanian and Balkan fuel markets — taxes, cross-border savings, market structure, and monthly price recaps.",
+        path: pathname,
+      };
+    }
+
+    if (pathname.startsWith("/insights/")) {
+      const slug = pathname.replace("/insights/", "");
+      const article = getArticle(slug);
+
+      if (article) {
+        return {
+          title: `${article.title} | Fuel Today`,
+          description: article.description,
+          path: pathname,
+        };
+      }
     }
 
     if (pathname.startsWith("/fuel-prices/")) {

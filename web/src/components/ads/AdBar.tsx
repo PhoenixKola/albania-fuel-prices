@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { ADS_ENABLED } from "../../config/constants";
 
 type Props = {
   adClient: string;
@@ -7,7 +8,7 @@ type Props = {
 };
 
 export default function AdBar({ adClient, adSlot, enabled = true }: Props) {
-  const shouldRender = enabled;
+  const shouldRender = enabled && ADS_ENABLED;
 
   useEffect(() => {
     if (!shouldRender) return;

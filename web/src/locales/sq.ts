@@ -230,7 +230,7 @@ export const sq = {
     "Seksioni i metodologjisë në faqen kryesore shpjegon tubacionin e të dhënave në detaj, dhe FAQ mbulon pyetjet më të shpeshta rreth saktësisë, kohës së përditësimit dhe diferencës mes mesatareve kombëtare dhe çmimeve individuale të pikave.",
   aboutWhoTitle: "Kush e mirëmban këtë projekt",
   aboutWhoP1:
-    "Karburanti Sot mirëmbahet nga një zhvillues i pavarur me bazë në Shqipëri. Projekti nuk është i lidhur me asnjë kompani karburanti, agjenci qeveritare apo rrjet reklamash. Faqja financohet përmes reklamave, gjë që e lejon të mbetet falas për të gjithë përdoruesit.",
+    "Karburanti Sot ndërtohet dhe mirëmbahet nga një ekip i vogël i pavarur me bazë në Tiranë, Shqipëri. Projekti nuk është i lidhur me asnjë kompani karburanti, agjenci qeveritare apo rrjet reklamash. Faqja financohet përmes reklamave, gjë që e lejon të mbetet falas për të gjithë përdoruesit.",
   aboutWhoP2:
     "Nëse keni komente, korrigjime të dhënash apo pyetje bashkëpunimi, mund të kontaktoni mirëmbajtësin përmes faqes së kontaktit.",
 

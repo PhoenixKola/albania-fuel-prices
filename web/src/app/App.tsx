@@ -43,6 +43,8 @@ const HowFuelPricesWorkPage = lazy(() => import("../pages/HowFuelPricesWorkPage"
 const EuropeFuelComparisonPage = lazy(() => import("../pages/EuropeFuelComparisonPage"));
 const RoadTripFuelGuidePage = lazy(() => import("../pages/RoadTripFuelGuidePage"));
 const CountryFuelPricesPage = lazy(() => import("../pages/CountryFuelPricesPage"));
+const InsightsIndexPage = lazy(() => import("../pages/InsightsIndexPage"));
+const InsightArticlePage = lazy(() => import("../pages/InsightArticlePage"));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
 import RouteSeo from "./RouteSeo";
 
@@ -248,6 +250,8 @@ export default function App() {
             path="/daily-challenge"
             element={<DailyChallengePage data={data} loading={loading} />}
           />
+          <Route path="/insights" element={<InsightsIndexPage />} />
+          <Route path="/insights/:articleSlug" element={<InsightArticlePage />} />
           <Route path="/methodology" element={<MethodologyPage t={t} />} />
           <Route path="/how-fuel-prices-work" element={<HowFuelPricesWorkPage t={t} />} />
           <Route path="/europe-fuel-comparison" element={<EuropeFuelComparisonPage t={t} />} />

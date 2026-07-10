@@ -225,7 +225,7 @@ export const en = {
     "The methodology section on the home page explains the data pipeline in detail, and the FAQ covers the most common questions about accuracy, update timing, and the difference between national averages and individual station prices.",
   aboutWhoTitle: "Who maintains this project",
   aboutWhoP1:
-    "Karburanti Sot is maintained by an independent developer based in Albania. The project is not affiliated with any fuel company, government agency, or advertising network. The site is funded through advertising, which allows it to remain free for all users.",
+    "Karburanti Sot is built and maintained by a small independent team based in Tirana, Albania. The project is not affiliated with any fuel company, government agency, or advertising network. The site is funded through advertising, which allows it to remain free for all users.",
   aboutWhoP2:
     "If you have feedback, data corrections, or partnership inquiries, you can reach the maintainer through the contact page.",
 

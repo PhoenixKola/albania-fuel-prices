@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fuel Prices Today</title>
+    <meta name="robots" content="noindex" />
+    <title>Page not found | Fuel Today</title>
     <script>
-      // SPA fallback for GitHub Pages / static hosts
-      // Redirect to index.html with the path in the query string
+      // SPA fallback for static hosts: hand unknown paths to the app router.
       var path = window.location.pathname + window.location.search + window.location.hash;
       window.location.replace('/' + '?p=' + encodeURIComponent(path));
     </script>
   </head>
   <body>
+    <p>This page could not be found. Redirecting to the <a href="/">Fuel Today homepage</a>&hellip;</p>
     <noscript>
-      <p>Page not found. Go to <a href="/">Fuel Prices Today home</a>.</p>
+      <p>Page not found. Go to the <a href="/">Fuel Today homepage</a>.</p>
     </noscript>
   </body>
 </html>
