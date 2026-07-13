@@ -1,9 +1,9 @@
 {
   "region": "Europe",
-  "as_of": "2026-07-12",
+  "as_of": "2026-07-13",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-07-12T08:29:34.829Z",
+  "fetched_at_utc": "2026-07-13T09:45:40.976Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
@@ -20,8 +20,8 @@
     },
     {
       "country": "Australia",
-      "gasoline95_eur": 1.071,
-      "diesel_eur": 1.246,
+      "gasoline95_eur": 1.063,
+      "diesel_eur": 1.24,
       "lpg_eur": 0.388
     },
     {
@@ -44,8 +44,8 @@
     },
     {
       "country": "Brazil",
-      "gasoline95_eur": 1.144,
-      "diesel_eur": 1.183,
+      "gasoline95_eur": 1.139,
+      "diesel_eur": 1.17,
       "lpg_eur": null
     },
     {
@@ -56,14 +56,14 @@
     },
     {
       "country": "Canada",
-      "gasoline95_eur": 1.247,
-      "diesel_eur": 1.298,
-      "lpg_eur": 0.781
+      "gasoline95_eur": 1.239,
+      "diesel_eur": 1.275,
+      "lpg_eur": 0.792
     },
     {
       "country": "China",
-      "gasoline95_eur": 1.159,
-      "diesel_eur": 1.014,
+      "gasoline95_eur": 1.16,
+      "diesel_eur": 1.029,
       "lpg_eur": null
     },
     {
@@ -110,9 +110,9 @@
     },
     {
       "country": "India",
-      "gasoline95_eur": 0.964,
-      "diesel_eur": 0.88,
-      "lpg_eur": 0.603
+      "gasoline95_eur": 0.982,
+      "diesel_eur": 0.876,
+      "lpg_eur": 0.606
     },
     {
       "country": "Italy",
@@ -122,8 +122,8 @@
     },
     {
       "country": "Japan",
-      "gasoline95_eur": 0.917,
-      "diesel_eur": 0.847,
+      "gasoline95_eur": 0.912,
+      "diesel_eur": 0.861,
       "lpg_eur": null
     },
     {
@@ -152,8 +152,8 @@
     },
     {
       "country": "Mexico",
-      "gasoline95_eur": 1.419,
-      "diesel_eur": 1.338,
+      "gasoline95_eur": 1.407,
+      "diesel_eur": 1.355,
       "lpg_eur": null
     },
     {
@@ -212,9 +212,9 @@
     },
     {
       "country": "South Korea",
-      "gasoline95_eur": 1.315,
-      "diesel_eur": 1.305,
-      "lpg_eur": 0.708
+      "gasoline95_eur": 1.33,
+      "diesel_eur": 1.319,
+      "lpg_eur": 0.719
     },
     {
       "country": "Spain",
@@ -254,8 +254,8 @@
     },
     {
       "country": "United States",
-      "gasoline95_eur": 1.01,
-      "diesel_eur": 1.203,
+      "gasoline95_eur": 1.027,
+      "diesel_eur": 1.198,
       "lpg_eur": null
     }
   ]
