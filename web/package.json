@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && npm run prerender && npm run sitemap",
+    "build": "npm run generate && tsc -b && vite build && npm run prerender && npm run sitemap",
     "build:vite": "tsc -b && vite build",
+    "generate": "tsx scripts/generateAnalysis.ts",
     "prerender": "tsx scripts/prerender.ts",
     "sitemap": "tsx scripts/generate-sitemap.ts",
     "lint": "eslint .",

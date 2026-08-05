@@ -18,6 +18,7 @@ import SourceCard from "../components/meta/SourceCard";
 import Notice from "../components/feedback/Notice";
 import ToastHost from "../components/feedback/ToastHost";
 
+import { HOME_SUMMARY_HTML } from "../generated/homeSummary";
 import HeroIntro from "../components/content/HeroIntro";
 import EditorialSummary from "../components/content/EditorialSummary";
 import MethodologySection from "../components/content/MethodologySection";
@@ -150,6 +151,10 @@ export default function HomePage({
       </div>
 
       <TrendCard t={t} trends={trends} country={country} fuelType={fuelType} setFuelType={setFuelType} />
+
+      {HOME_SUMMARY_HTML ? (
+        <div dangerouslySetInnerHTML={{ __html: HOME_SUMMARY_HTML }} />
+      ) : null}
 
       <QuickCalcCard
         t={t}

@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { STATIC_ROUTES, SITE_URL } from "../src/config/routes";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
 import { getPublishedArticles } from "../src/config/articles";
+import { isCountryIndexable } from "../src/generated/indexableCountries";
 import { loadPriceContext } from "./priceData";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -40,7 +41,8 @@ async function main() {
       changefreq: r.changefreq,
       lastmod: r.priceBearing ? dataLastmod : r.lastmod ?? dataLastmod,
     })),
-    ...COUNTRY_EDITORIAL.map((c) => ({
+    // Countries with no upstream price data are noindexed — keep them out.
+    ...COUNTRY_EDITORIAL.filter((c) => isCountryIndexable(c.slug)).map((c) => ({
       path: `/fuel-prices/${c.slug}`,
       priority: 0.8,
       changefreq: "daily",

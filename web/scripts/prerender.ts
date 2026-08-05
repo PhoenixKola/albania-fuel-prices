@@ -16,7 +16,13 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
 import { STATIC_ROUTES as ROUTE_CONFIGS } from "../src/config/routes";
+import { i18n } from "../src/locales";
 import { getPublishedArticles } from "../src/config/articles";
+import { getCountryAnalysis } from "../src/generated/countryAnalysis";
+import { HOME_SUMMARY_HTML } from "../src/generated/homeSummary";
+import { MARKET_REPORT_HTML } from "../src/generated/marketReport";
+import { ANALYSIS_META } from "../src/generated/analysisMeta";
+import { isCountryIndexable } from "../src/generated/indexableCountries";
 import {
   loadPriceContext,
   renderCountryPriceSection,
@@ -46,8 +52,63 @@ type RouteEntry = {
   dateModified?: string;
   /** Content changes with the daily data refresh. */
   priceBearing?: boolean;
+  /** Keep out of the index (and the sitemap) — used for pages we can't fill. */
+  noindex?: boolean;
   content: string | ((ctx: PriceContext) => string); // visible HTML content for the page
 };
+
+/**
+ * Builds page HTML from the same locale strings the React pages render, so the
+ * prerendered version and the in-app version carry identical text. Previously
+ * these guides were hand-summarised in this file and shipped roughly a quarter
+ * of the words the app actually shows.
+ */
+function localeSections(
+  title: string,
+  intro: string,
+  sections: { title: string; paragraphs: string[] }[],
+  related: { label: string; to: string }[] = []
+): string {
+  const body = sections
+    .map(
+      (s) => `
+        <section class="contentSection">
+          <h2 class="contentHeading">${escapeHtml(s.title)}</h2>
+          ${s.paragraphs.map((p) => `<p class="contentBody">${escapeHtml(p)}</p>`).join("\n          ")}
+        </section>`
+    )
+    .join("");
+
+  const relatedBlock = related.length
+    ? `
+        <section class="contentSection">
+          <h2 class="contentHeading">Related reading</h2>
+          <ul class="contentList">
+            ${related.map((r) => `<li><a href="${r.to}">${escapeHtml(r.label)}</a></li>`).join("\n            ")}
+          </ul>
+        </section>`
+    : "";
+
+  return `
+      <article class="contentPage">
+        <h1 class="contentPageTitle">${escapeHtml(title)}</h1>
+        <p class="contentBody">${escapeHtml(intro)}</p>
+        ${body}
+        ${relatedBlock}
+      </article>
+    `;
+}
+
+/**
+ * Honest freshness notice. If the deployed build is running on stale data —
+ * which is what happens when the daily rebuild stops firing — say so on the
+ * page rather than presenting month-old numbers as "today".
+ */
+function freshnessNotice(): string {
+  if (!ANALYSIS_META.stale) return "";
+  return `
+        <p class="staleNotice" role="status">Our price feed was last updated on ${ANALYSIS_META.asOf} (${ANALYSIS_META.dataAgeDays} days ago). Figures below may be out of date while we restore the daily update.</p>`;
+}
 
 const STATIC_ROUTES: RouteEntry[] = [
   {
@@ -63,7 +124,9 @@ const STATIC_ROUTES: RouteEntry[] = [
         <p class="contentHeroText">Karburanti Sot helps drivers compare fuel prices, estimate trip costs, and understand how pricing changes across countries. Instead of showing only raw numbers, the site adds context around price rankings, likely cost differences, exchange-rate effects, and practical travel use cases.</p>
       </header>
       <article class="contentPage">
+        ${freshnessNotice()}
         ${renderHomeSnapshot(ctx)}
+        ${HOME_SUMMARY_HTML}
         <section class="contentSection">
           <h2 class="contentHeading">What this site does</h2>
           <p class="contentBody">Fuel Today (Karburanti Sot) is an independent fuel price comparison website for Albania and Europe. It collects public country-level fuel price data, converts it into a consistent EUR-per-liter format, and presents it with editorial context so drivers can make informed decisions about where and when to refuel.</p>
@@ -76,7 +139,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Albania and Balkan context</h2>
-          <p class="contentBody">Albania sits at the center of several busy cross-border driving corridors: Tirana-Pristina (Kosovo), Tirana-Podgorica (Montenegro), and Tirana-Ioannina (Greece). Fuel price differences at these borders are meaningful — ranging from negligible (Albania vs Kosovo) to substantial (Albania vs Greece, 0.20-0.40 EUR/L). Understanding these differences helps drivers plan refueling stops that can save 10-20 EUR per tank on cross-border trips.</p>
+          <p class="contentBody">Albania sits at the center of several busy cross-border driving corridors: Tirana–Pristina (Kosovo), Tirana–Podgorica (Montenegro), and Tirana–Ioannina (Greece). The price differences at those borders are large enough to be worth planning around, and they change: the Kosovo gap has widened substantially during 2026, while Greece and Italy have moved from being more expensive than Albania to slightly cheaper on diesel. Rather than quoting a fixed figure that will date, we publish the current gaps on the <a href="/compare">comparison page</a> and explain what they mean for a tank of fuel in our <a href="/insights/cross-border-fill-up-math">cross-border fill-up guide</a>.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Tools and guides</h2>
@@ -351,6 +414,23 @@ const STATIC_ROUTES: RouteEntry[] = [
           <p class="contentBody">Raw data is normalized into a consistent format: fuel prices expressed per liter with EUR as the common reference currency. No manual adjustments or editorial rounding are applied to the underlying price values.</p>
         </section>
         <section class="contentSection">
+          <h2 class="contentHeading">How we build our historical record</h2>
+          <p class="contentBody">Public price aggregators publish a snapshot of today and nothing else. Since ${ANALYSIS_META.startLabel || "February 2026"} we have captured that snapshot once a day and appended it to a public history file, which now holds ${ANALYSIS_META.daysObserved || 0} consecutive daily readings across ${ANALYSIS_META.countriesAnalysed || 0} markets. That record is what makes the analysis on this site possible, and it is published openly in our <a href="${GITHUB_URL}" rel="noopener">GitHub repository</a> so any figure we quote can be independently reproduced.</p>
+        </section>
+        <section class="contentSection">
+          <h2 class="contentHeading">How the analysis is calculated</h2>
+          <p class="contentBody">Every derived figure on this site is computed from that history file at build time. None of it comes from the upstream source.</p>
+          <ul class="contentList">
+            <li><strong>Period low, high and average</strong> — the minimum, maximum and arithmetic mean of all daily readings we hold for that country and fuel, with the dates on which the extremes occurred.</li>
+            <li><strong>Position in range (percentile)</strong> — the share of recorded days that were cheaper than today. 0% means today is the cheapest price we have recorded; 100% the most expensive.</li>
+            <li><strong>Volatility</strong> — the standard deviation of day-to-day percentage price changes across the full record. Higher values mean a market that reprices frequently and unpredictably.</li>
+            <li><strong>30/90-day change</strong> — the percentage difference between today's price and the reading from 30 or 90 observations earlier.</li>
+            <li><strong>Refuelling verdict</strong> — a plain-language reading of the percentile figure. It describes where today sits in our recorded range; it is not a price forecast.</li>
+            <li><strong>Cross-border spread history</strong> — the daily difference between two countries' prices, tracked over time.</li>
+          </ul>
+          <p class="contentBody">Statistics are only produced once we hold at least 30 daily readings for a country and fuel; below that threshold we show nothing rather than something unreliable. Countries absent from the upstream feed are excluded from search indexing rather than padded with placeholder content.</p>
+        </section>
+        <section class="contentSection">
           <h2 class="contentHeading">Exchange rate conversions</h2>
           <p class="contentBody">When comparing prices across different currencies, mid-market indicative rates from a public FX API are used. These are close approximations, not guaranteed conversion values.</p>
         </section>
@@ -367,28 +447,24 @@ const STATIC_ROUTES: RouteEntry[] = [
     description: "Understand how crude oil, refining, taxes, transport, FX rates, and local demand shape petrol, diesel, and LPG prices across the Balkans and Europe.",
     jsonLdType: "Article",
     datePublished: "2026-04-12",
-    content: `
-      <article class="contentPage">
-        <h1 class="contentPageTitle">How Fuel Prices Work: From Crude Oil to the Pump</h1>
-        <p class="contentBody">Fuel prices follow a chain from crude oil extraction through refining, distribution, and taxation to the final pump price. Understanding this chain helps interpret the price differences you see between countries.</p>
-        <section class="contentSection">
-          <h2 class="contentHeading">Crude oil: The starting point</h2>
-          <p class="contentBody">Global crude oil prices set the floor for all refined fuel products. Crude is traded as Brent (European benchmark) and WTI (US benchmark). When crude rises, pump prices follow with a 1–3 week lag.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Refining</h2>
-          <p class="contentBody">Crude oil is processed into petrol, diesel, kerosene, LPG, and other products. The refining margin fluctuates based on capacity, maintenance, and seasonal demand.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Taxes: The biggest variable</h2>
-          <p class="contentBody">In most European countries, taxes make up 40–60% of the pump price. The two components are excise duty (fixed per liter) and VAT (percentage of final price). This is why the same fuel costs €1.30/L in one country and €1.90/L in another.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Summary</h2>
-          <p class="contentBody">Pump price = crude oil + refining margin + distribution + excise duty + VAT + retail margin. Most cross-country differences come from tax. Most within-country differences come from retail margins and competition.</p>
-        </section>
-      </article>
-    `,
+    content: localeSections(
+      i18n.en.howPricesTitle,
+      i18n.en.howPricesIntro,
+      [
+        { title: i18n.en.howPricesCrudeTitle, paragraphs: [i18n.en.howPricesCrudeP1, i18n.en.howPricesCrudeP2] },
+        { title: i18n.en.howPricesRefiningTitle, paragraphs: [i18n.en.howPricesRefiningP1, i18n.en.howPricesRefiningP2] },
+        { title: i18n.en.howPricesDistributionTitle, paragraphs: [i18n.en.howPricesDistributionP1, i18n.en.howPricesDistributionP2] },
+        { title: i18n.en.howPricesTaxTitle, paragraphs: [i18n.en.howPricesTaxP1, i18n.en.howPricesTaxP2, i18n.en.howPricesTaxP3] },
+        { title: i18n.en.howPricesRetailTitle, paragraphs: [i18n.en.howPricesRetailP1, i18n.en.howPricesRetailP2] },
+        { title: i18n.en.howPricesSeasonalTitle, paragraphs: [i18n.en.howPricesSeasonalP1, i18n.en.howPricesSeasonalP2] },
+        { title: i18n.en.howPricesSummaryTitle, paragraphs: [i18n.en.howPricesSummaryP1] },
+      ],
+      [
+        { label: "Europe fuel comparison", to: "/europe-fuel-comparison" },
+        { label: "Daily market report", to: "/market-report" },
+        { label: "Methodology", to: "/methodology" },
+      ]
+    ),
   },
   {
     path: "/europe-fuel-comparison",
@@ -396,28 +472,24 @@ const STATIC_ROUTES: RouteEntry[] = [
     description: "Compare Albania fuel prices with Kosovo, Montenegro, North Macedonia, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom.",
     jsonLdType: "Article",
     datePublished: "2026-04-12",
-    content: `
-      <article class="contentPage">
-        <h1 class="contentPageTitle">Fuel Prices Across Europe: A Country-by-Country Comparison Guide</h1>
-        <p class="contentBody">Europe has some of the widest fuel price variation of any continent. A liter of diesel can cost nearly twice as much in Scandinavia as in parts of the Balkans. This guide explains why.</p>
-        <section class="contentSection">
-          <h2 class="contentHeading">Why prices vary so much</h2>
-          <p class="contentBody">The base cost of fuel is broadly similar across Europe. The differences come from taxes (dominant factor), local distribution costs, and government interventions like subsidies or price caps.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Regional patterns</h2>
-          <p class="contentBody">Scandinavian countries have the highest prices due to aggressive fuel taxation. Southern Europe (Spain, Portugal, Greece) falls mid-range. Central/Eastern Europe has lower prices. Balkan countries often have some of the lowest in Europe.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Diesel vs petrol</h2>
-          <p class="contentBody">Historically, diesel was taxed more lightly than petrol. That trend is reversing in many countries due to environmental concerns. In some countries, diesel is now MORE expensive than petrol.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Border effects</h2>
-          <p class="contentBody">Price differences at borders create refueling opportunities. Classic examples: Luxembourg (cheap fuel surrounded by expensive neighbors), Kosovo vs neighbors, Albania vs Greece. The compare tool on this site makes border strategies visible.</p>
-        </section>
-      </article>
-    `,
+    content: localeSections(
+      i18n.en.europeCompTitle,
+      i18n.en.europeCompIntro,
+      [
+        { title: i18n.en.europeCompWhyTitle, paragraphs: [i18n.en.europeCompWhyP1, i18n.en.europeCompWhyP2] },
+        { title: i18n.en.europeCompRegionsTitle, paragraphs: [i18n.en.europeCompRegionsP1, i18n.en.europeCompRegionsP2, i18n.en.europeCompRegionsP3, i18n.en.europeCompRegionsP4] },
+        { title: i18n.en.europeCompDieselVsPetrolTitle, paragraphs: [i18n.en.europeCompDieselVsPetrolP1, i18n.en.europeCompDieselVsPetrolP2] },
+        { title: i18n.en.europeCompLpgTitle, paragraphs: [i18n.en.europeCompLpgP1] },
+        { title: i18n.en.europeCompExchangeTitle, paragraphs: [i18n.en.europeCompExchangeP1] },
+        { title: i18n.en.europeCompBorderTitle, paragraphs: [i18n.en.europeCompBorderP1, i18n.en.europeCompBorderP2] },
+        { title: i18n.en.europeCompSummaryTitle, paragraphs: [i18n.en.europeCompSummaryP1] },
+      ],
+      [
+        { label: "Europe fuel price rankings", to: "/rankings" },
+        { label: "How fuel prices work", to: "/how-fuel-prices-work" },
+        { label: "Six months of Balkan fuel prices", to: "/insights/six-months-of-balkan-fuel-prices" },
+      ]
+    ),
   },
   {
     path: "/road-trip-fuel-guide",
@@ -425,28 +497,33 @@ const STATIC_ROUTES: RouteEntry[] = [
     description: "Estimate road trip fuel costs from Albania with practical route examples, consumption assumptions, and cross-border petrol and diesel price context.",
     jsonLdType: "Article",
     datePublished: "2026-04-12",
-    content: `
-      <article class="contentPage">
-        <h1 class="contentPageTitle">Road Trip Fuel Cost Guide: How to Estimate and Reduce Your Fuel Expenses</h1>
-        <p class="contentBody">Planning a road trip? Fuel is usually one of the biggest variable costs. This guide explains how to calculate fuel costs, factor in cross-border price differences, and keep expenses low.</p>
-        <section class="contentSection">
-          <h2 class="contentHeading">How to calculate trip fuel cost</h2>
-          <p class="contentBody">Formula: (distance ÷ 100) × consumption (L/100km) × price per liter = estimated cost. For multi-country trips, estimate each segment separately using the relevant country's fuel price.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Real-world consumption</h2>
-          <p class="contentBody">Manufacturer-stated consumption is almost always optimistic. Real-world consumption is typically 10–30% higher. Use your trip computer average, or add 15–20% to the manufacturer's combined figure.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Cross-border refueling strategy</h2>
-          <p class="contentBody">Fill your tank in the cheapest country on your route. Carry minimal fuel through expensive countries. The country comparison and ranking tools on this site make this strategy easy to plan.</p>
-        </section>
-        <section class="contentSection">
-          <h2 class="contentHeading">Example: Tirana to Thessaloniki</h2>
-          <p class="contentBody">300 km drive, 7.5 L/100km consumption. Fuel needed: 22.5 liters. At Albania's diesel price (~€1.45/L), cost is about €32.60. Greek diesel (~€1.60/L) would cost €36.00 for the same distance. The €3.40 difference shows why cross-border awareness matters.</p>
-        </section>
-      </article>
-    `,
+    content: localeSections(
+      i18n.en.roadTripTitle,
+      i18n.en.roadTripIntro,
+      [
+        { title: i18n.en.roadTripCalcTitle, paragraphs: [i18n.en.roadTripCalcP1, i18n.en.roadTripCalcP2] },
+        { title: i18n.en.roadTripConsumptionTitle, paragraphs: [i18n.en.roadTripConsumptionP1, i18n.en.roadTripConsumptionP2, i18n.en.roadTripConsumptionP3] },
+        { title: i18n.en.roadTripCrossBorderTitle, paragraphs: [i18n.en.roadTripCrossBorderP1, i18n.en.roadTripCrossBorderP2, i18n.en.roadTripCrossBorderP3] },
+        { title: i18n.en.roadTripPaymentTitle, paragraphs: [i18n.en.roadTripPaymentP1, i18n.en.roadTripPaymentP2] },
+        { title: i18n.en.roadTripSavingsTitle, paragraphs: [i18n.en.roadTripSavingsP1, i18n.en.roadTripSavingsP2, i18n.en.roadTripSavingsP3, i18n.en.roadTripSavingsP4, i18n.en.roadTripSavingsP5] },
+        { title: i18n.en.roadTripExampleTitle, paragraphs: [i18n.en.roadTripExampleP1, i18n.en.roadTripExampleP2, i18n.en.roadTripExampleP3] },
+        { title: i18n.en.roadTripSummaryTitle, paragraphs: [i18n.en.roadTripSummaryP1] },
+      ],
+      [
+        { label: "Cross-border fill-up math", to: "/insights/cross-border-fill-up-math" },
+        { label: "Compare countries", to: "/compare" },
+        { label: "Methodology", to: "/methodology" },
+      ]
+    ),
+  },
+  {
+    path: "/market-report",
+    title: `European Fuel Market Report — ${ANALYSIS_META.endLabel || "Daily Analysis"} | Fuel Today`,
+    description: `Daily European diesel market analysis computed from ${ANALYSIS_META.daysObserved} days of our own price observations: rankings, 30-day movers, volatility, and where today's prices sit in the historical range.`,
+    jsonLdType: "Article",
+    datePublished: "2026-08-05",
+    priceBearing: true,
+    content: `${freshnessNotice()}${MARKET_REPORT_HTML}`,
   },
   {
     path: "/daily-challenge",
@@ -525,18 +602,21 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
       jsonLdType: "FAQPage",
       datePublished: "2026-05-26",
       priceBearing: true,
+      noindex: !isCountryIndexable(c.slug),
       content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">${escapeHtml(c.label)} fuel prices today</h1>
         <p class="contentBody">This page provides a comprehensive overview of fuel prices in ${escapeHtml(c.label)}, with practical comparison context for Albanian drivers and travelers.</p>
+        ${freshnessNotice()}
         ${renderCountryPriceSection(ctx, c)}
+        ${getCountryAnalysis(c.slug)}
         <section class="contentSection">
           <h2 class="contentHeading">${escapeHtml(c.label)} fuel market overview</h2>
           <p class="contentBody">${escapeHtml(c.marketOverview)}</p>
         </section>
 
         <section class="contentSection">
-          <h2 class="contentHeading">How ${escapeHtml(c.label)} compares with Albania</h2>
+          <h2 class="contentHeading">${c.dataCountryName === "Albania" ? "Albania as the reference market" : `How ${escapeHtml(c.label)} compares with Albania`}</h2>
           <p class="contentBody">${escapeHtml(c.albaniaContext)}</p>
         </section>
 
@@ -732,12 +812,18 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
 function generateHead(route: RouteEntry, description: string, ctx: PriceContext): string {
   const canonical = `${SITE_URL}${route.path === "/" ? "" : route.path}`;
 
+  const robots = route.noindex
+    ? "noindex,follow"
+    : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
+
   return `
     <title>${escapeHtml(route.title)}</title>
     <meta name="description" content="${escapeHtml(description)}" />
-    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="robots" content="${robots}" />
     <link rel="canonical" href="${canonical}" />
     <meta name="google-adsense-account" content="${PUBLISHER_ID}" />
+    <meta name="data-as-of" content="${ANALYSIS_META.asOf}" />
+    <meta name="build-date" content="${new Date().toISOString().slice(0, 10)}" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Fuel Today" />
     <meta property="og:title" content="${escapeHtml(route.title)}" />

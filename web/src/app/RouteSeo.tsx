@@ -152,6 +152,15 @@ export default function RouteSeo() {
       };
     }
 
+    if (pathname === "/market-report") {
+      return {
+        title: "European Fuel Market Report | Fuel Today",
+        description:
+          "Daily European diesel market analysis: country rankings, 30-day movers, market volatility, and where today's prices sit within our recorded historical range.",
+        path: pathname,
+      };
+    }
+
     if (pathname === "/insights") {
       return {
         title: "Fuel Market Insights | Fuel Today",

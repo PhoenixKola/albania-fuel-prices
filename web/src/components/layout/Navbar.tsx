@@ -141,6 +141,7 @@ export default function Navbar({
 
   const navLinks = [
     { to: "/", label: t.navHome },
+    { to: "/market-report", label: "Market report" },
     { to: "/compare", label: t.navCompare },
     { to: "/rankings", label: t.navRankings },
     { to: "/stations", label: t.navStations },
@@ -152,6 +153,7 @@ export default function Navbar({
   ];
 
   const guideLinks = [
+    { to: "/insights", label: "Insights" },
     { to: "/methodology", label: t.navMethodology },
     { to: "/how-fuel-prices-work", label: t.navHowPricesWork },
     { to: "/europe-fuel-comparison", label: t.navEuropeComparison },

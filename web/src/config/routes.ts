@@ -163,6 +163,16 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priceBearing: true,
   },
   {
+    path: "/market-report",
+    title: "European Fuel Market Report | Fuel Today",
+    description:
+      "Daily European diesel market analysis: country rankings, 30-day movers, market volatility, and where today's prices sit within our recorded historical range.",
+    priority: 0.9,
+    changefreq: "daily",
+    jsonLdType: "Article",
+    priceBearing: true,
+  },
+  {
     path: "/insights",
     title: "Fuel Market Insights | Fuel Today",
     description:

@@ -1,0 +1,50 @@
+name: Verify live site is fresh
+
+# Insurance against the failure that got the site rejected: the data pipeline
+# kept running, but Cloudflare stopped rebuilding, so the deployed HTML served
+# month-old prices under "prices today" headings for weeks with nobody noticing.
+#
+# This job compares the date baked into the LIVE page against today and fails
+# loudly (GitHub emails you on failure) if the deployed site has fallen behind.
+
+on:
+  schedule:
+    - cron: "45 7 * * *" # ~90 min after the data update job
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deployed data freshness
+        run: |
+          set -euo pipefail
+          SITE="https://karburantisot.com"
+          MAX_AGE_DAYS=3
+
+          HTML=$(curl -fsS "$SITE/" || { echo "::error::Could not fetch $SITE"; exit 1; })
+
+          AS_OF=$(printf '%s' "$HTML" | grep -o '<meta name="data-as-of" content="[^"]*"' | head -1 | sed 's/.*content="//; s/"//')
+          BUILD=$(printf '%s' "$HTML" | grep -o '<meta name="build-date" content="[^"]*"' | head -1 | sed 's/.*content="//; s/"//')
+
+          if [ -z "$AS_OF" ]; then
+            echo "::error::No data-as-of marker found on the live homepage. The deployed build predates the freshness marker, which means it is very old."
+            exit 1
+          fi
+
+          TODAY=$(date -u +%F)
+          AGE=$(( ( $(date -u -d "$TODAY" +%s) - $(date -u -d "$AS_OF" +%s) ) / 86400 ))
+          BUILD_AGE=$(( ( $(date -u -d "$TODAY" +%s) - $(date -u -d "${BUILD:-$AS_OF}" +%s) ) / 86400 ))
+
+          echo "Live data as_of : $AS_OF (${AGE} days old)"
+          echo "Live build date : ${BUILD:-unknown} (${BUILD_AGE} days old)"
+
+          if [ "$AGE" -gt "$MAX_AGE_DAYS" ]; then
+            echo "::error::Deployed site is STALE — showing data from $AS_OF (${AGE} days old)."
+            echo "The daily data commit is probably fine; the site is not rebuilding."
+            echo "Fix: connect the Cloudflare Pages project to this repo so every commit deploys,"
+            echo "or set the CF_PAGES_DEPLOY_HOOK repository secret used by update-data.yml."
+            exit 1
+          fi
+
+          echo "✓ Live site is fresh."

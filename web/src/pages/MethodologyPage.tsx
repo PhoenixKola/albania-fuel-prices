@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
+import { ANALYSIS_META } from "../generated/analysisMeta";
 import AdBar from "../components/ads/AdBar";
 
 type Props = { t: TDict };
@@ -63,6 +64,44 @@ export default function MethodologyPage({ t }: Props) {
         </p>
         <p className="contentBody">
           The timestamp shown in the tool indicates when the dataset was refreshed. It should be interpreted as data availability timing, not as a guarantee of real-time pump updates.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">How we build our historical record</h2>
+        <p className="contentBody">
+          Public price aggregators publish a snapshot of today and nothing else. Since{" "}
+          <strong>{ANALYSIS_META.startLabel || "February 2026"}</strong> we have captured that
+          snapshot once a day and appended it to a public history file, which now holds{" "}
+          <strong>{ANALYSIS_META.daysObserved || 0} consecutive daily readings</strong> across{" "}
+          {ANALYSIS_META.countriesAnalysed || 0} markets. That record is what makes the analysis on
+          this site possible, and it is published openly in our{" "}
+          <a href="https://github.com/PhoenixKola/albania-fuel-prices" target="_blank" rel="noreferrer" className="inlineLink">
+            GitHub repository
+          </a>{" "}
+          so any figure we quote can be independently reproduced.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">How the analysis is calculated</h2>
+        <p className="contentBody">
+          Every derived figure on this site is computed from that history file at build time. None
+          of it comes from the upstream source:
+        </p>
+        <ul className="contentList">
+          <li><strong>Period low, high and average</strong> — the minimum, maximum and arithmetic mean of all daily readings we hold for that country and fuel, with the dates on which the extremes occurred.</li>
+          <li><strong>Position in range (percentile)</strong> — the share of recorded days that were cheaper than today. 0% means today is the cheapest price we have ever recorded; 100% means the most expensive.</li>
+          <li><strong>Volatility</strong> — the standard deviation of day-to-day percentage price changes across the full record. Higher values mean a market that reprices frequently and unpredictably.</li>
+          <li><strong>30/90-day change</strong> — the percentage difference between today's price and the reading from 30 or 90 observations earlier.</li>
+          <li><strong>Refuelling verdict</strong> — a plain-language reading of the percentile figure above. It is a description of where today sits in our recorded range, not a price forecast.</li>
+          <li><strong>Cross-border spread history</strong> — the daily difference between two countries' prices, tracked over time.</li>
+        </ul>
+        <p className="contentBody">
+          Statistics are only produced for a country and fuel once we hold at least 30 daily
+          readings for it; below that threshold we show nothing rather than something unreliable.
+          Countries absent from the upstream feed are excluded from search indexing rather than
+          padded with placeholder content.
         </p>
       </section>
 

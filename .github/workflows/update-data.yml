@@ -54,5 +54,5 @@ jobs:
             curl -fsS -X POST "$HOOK"
             echo "Deploy hook triggered."
           else
-            echo "No CF_PAGES_DEPLOY_HOOK secret set; skipping (fine if the Pages project is git-connected)."
+            echo "::warning::No CF_PAGES_DEPLOY_HOOK secret set. This is only safe if the Cloudflare Pages project is git-connected to this repo. If it is not, the site will keep serving stale prerendered prices — the exact failure that caused the AdSense rejection. The verify-live-site workflow will catch it."
           fi

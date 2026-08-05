@@ -3,6 +3,8 @@ import type { FuelType, LatestEurope } from "../models/fuel";
 import type { Trends } from "../models/trends";
 import type { TDict } from "../locales";
 import { getCountryEditorial } from "../config/countryContent";
+import { getCountryAnalysis } from "../generated/countryAnalysis";
+import { ANALYSIS_META } from "../generated/analysisMeta";
 import AdBar from "../components/ads/AdBar";
 import TrendCard from "../components/fuel/TrendCard";
 
@@ -63,6 +65,7 @@ export default function CountryFuelPricesPage({ slug, t, data, trends, fuelType,
   const row = data?.countries.find((country) => country.country === editorial.dataCountryName) ?? null;
   const albania = data?.countries.find((country) => country.country === "Albania") ?? null;
   const hasAnyPrice = !!row && [row.gasoline95_eur, row.diesel_eur, row.lpg_eur].some((value) => typeof value === "number");
+  const analysisHtml = getCountryAnalysis(slug);
 
   return (
     <article className="contentPage">
@@ -70,6 +73,13 @@ export default function CountryFuelPricesPage({ slug, t, data, trends, fuelType,
       <p className="contentBody">
         This page provides a comprehensive overview of fuel prices in {editorial.label}, with practical comparison context for Albanian drivers and travelers. It combines the latest available data with market analysis, border advice, and refueling strategies.
       </p>
+
+      {ANALYSIS_META.stale ? (
+        <p className="staleNotice" role="status">
+          Our price feed was last updated on {ANALYSIS_META.asOf} ({ANALYSIS_META.dataAgeDays} days ago).
+          Figures may be out of date while we restore the daily update.
+        </p>
+      ) : null}
 
       {data?.source ? (
         <p className="contentBodyMuted">
@@ -116,13 +126,19 @@ export default function CountryFuelPricesPage({ slug, t, data, trends, fuelType,
         </div>
       </section>
 
+      {analysisHtml ? <div dangerouslySetInnerHTML={{ __html: analysisHtml }} /> : null}
+
       <section className="contentSection">
         <h2 className="contentHeading">{editorial.label} fuel market overview</h2>
         <p className="contentBody">{editorial.marketOverview}</p>
       </section>
 
       <section className="contentSection">
-        <h2 className="contentHeading">How {editorial.label} compares with Albania</h2>
+        <h2 className="contentHeading">
+          {editorial.dataCountryName === "Albania"
+            ? "Albania as the reference market"
+            : `How ${editorial.label} compares with Albania`}
+        </h2>
         {!loading && hasAnyPrice ? (
           <ul className="contentList">
             <li>{compareNote(albania?.gasoline95_eur ?? null, row?.gasoline95_eur ?? null, "Petrol (95)")}</li>
