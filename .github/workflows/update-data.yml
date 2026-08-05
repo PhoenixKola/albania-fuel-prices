@@ -11,6 +11,8 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,17 +44,11 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # Rebuilds the site so the prerendered HTML picks up today's prices.
-      # Only needed if the Cloudflare Pages project is NOT git-connected to
-      # main; set the CF_PAGES_DEPLOY_HOOK repo secret to enable it.
-      - name: Trigger Cloudflare Pages deploy
-        if: steps.commit.outputs.changed == 'true'
-        env:
-          HOOK: ${{ secrets.CF_PAGES_DEPLOY_HOOK }}
-        run: |
-          if [ -n "$HOOK" ]; then
-            curl -fsS -X POST "$HOOK"
-            echo "Deploy hook triggered."
-          else
-            echo "::warning::No CF_PAGES_DEPLOY_HOOK secret set. This is only safe if the Cloudflare Pages project is git-connected to this repo. If it is not, the site will keep serving stale prerendered prices — the exact failure that caused the AdSense rejection. The verify-live-site workflow will catch it."
-          fi
+  # Rebuild and redeploy so the prerendered HTML carries today's prices.
+  # This must be an explicit call: the push above uses GITHUB_TOKEN, and pushes
+  # made with that token deliberately do not trigger other workflows.
+  deploy:
+    needs: update
+    if: needs.update.outputs.changed == 'true'
+    uses: ./.github/workflows/deploy-web.yml
+    secrets: inherit
