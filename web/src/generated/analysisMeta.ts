@@ -30,5 +30,5 @@ export const ANALYSIS_META: AnalysisMeta = {
   "endLabel": "5 August 2026",
   "daysObserved": 173,
   "countriesAnalysed": 42,
-  "generatedAt": "2026-08-05T17:58:11.050Z"
+  "generatedAt": "2026-08-05T19:15:48.734Z"
 };

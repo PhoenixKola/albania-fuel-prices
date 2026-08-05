@@ -19,7 +19,7 @@ type Props = {
   onToggleTheme: () => void;
 };
 
-type DropdownId = "games" | "guides" | "about";
+type DropdownId = "tools" | "games" | "guides" | "about";
 
 function SunIcon() {
   return (
@@ -74,6 +74,7 @@ export default function Navbar({
   const [openDropdown, setOpenDropdown] = useState<DropdownId | null>(null);
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
   const gamesRef = useRef<HTMLDivElement>(null);
   const guidesRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
@@ -112,6 +113,7 @@ export default function Navbar({
   useEffect(() => {
     if (!openDropdown) return;
     const refs: Record<DropdownId, React.RefObject<HTMLDivElement | null>> = {
+      tools: toolsRef,
       games: gamesRef,
       guides: guidesRef,
       about: aboutRef,
@@ -139,9 +141,14 @@ export default function Navbar({
   const toggle = (id: DropdownId) =>
     setOpenDropdown((prev) => (prev === id ? null : id));
 
+  // Only two links stay at the top level; everything else lives in a menu so
+  // the bar cannot overflow onto a second line as items are added.
   const navLinks = [
     { to: "/", label: t.navHome },
     { to: "/market-report", label: "Market report" },
+  ];
+
+  const toolLinks = [
     { to: "/compare", label: t.navCompare },
     { to: "/rankings", label: t.navRankings },
     { to: "/stations", label: t.navStations },
@@ -165,7 +172,14 @@ export default function Navbar({
     { to: "/contact", label: t.navContact },
   ];
 
-  const mobileLinks = [...navLinks, ...gamesLinks, ...guideLinks, ...aboutLinks];
+  // Grouped rather than one long flat list, so the drawer stays scannable.
+  const mobileGroups = [
+    { title: null, links: navLinks },
+    { title: "Tools", links: toolLinks },
+    { title: t.navGames, links: gamesLinks },
+    { title: t.navGuides, links: guideLinks },
+    { title: t.navAbout, links: aboutLinks },
+  ];
 
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
@@ -211,7 +225,10 @@ export default function Navbar({
           <img className="logoImg" src={logoSrc} alt="" aria-hidden="true" />
           <div className="hgroup">
             <span className="h1">{t.title}</span>
-            <p className="sub">{subtitle}</p>
+            <p className="sub">
+              <span className="subDot" aria-hidden="true" />
+              {subtitle}
+            </p>
           </div>
         </Link>
 
@@ -227,6 +244,7 @@ export default function Navbar({
             </Link>
           ))}
 
+          {renderDropdown("tools", "Tools", toolLinks, toolsRef, "Tools menu")}
           {renderDropdown("games", t.navGames, gamesLinks, gamesRef, "Games menu")}
           {renderDropdown("guides", t.navGuides, guideLinks, guidesRef, "Guides menu")}
           {renderDropdown("about", t.navAbout, aboutLinks, aboutRef, "About menu")}
@@ -286,23 +304,9 @@ export default function Navbar({
         </button>
       </div>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — actions first so Refresh is reachable without scrolling */}
       {menuOpen && (
         <div className="mobileMenu">
-          <div className="mobileMenuLinks">
-            {mobileLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`mobileMenuLink ${isActive(link.to) ? "mobileMenuLinkActive" : ""}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          <div className="mobileMenuDivider" />
-
           <div className="mobileMenuActions">
             <div className="segRow mobileMenuCurrencySeg" role="group" aria-label={t.currencyMode}>
               <button
@@ -343,6 +347,27 @@ export default function Navbar({
             >
               {lang === "en" ? t.langSQ : t.langEN}
             </button> */}
+          </div>
+
+          <div className="mobileMenuDivider" />
+
+          <div className="mobileMenuScroll">
+            {mobileGroups.map((group, i) => (
+              <div className="mobileMenuGroup" key={group.title ?? `group-${i}`}>
+                {group.title ? (
+                  <span className="mobileMenuGroupTitle">{group.title}</span>
+                ) : null}
+                {group.links.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`mobileMenuLink ${isActive(link.to) ? "mobileMenuLinkActive" : ""}`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       )}

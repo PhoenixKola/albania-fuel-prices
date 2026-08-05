@@ -129,10 +129,19 @@ export default function App() {
   const { watchlist, add, remove, has } = useWatchlist();
   const { toast, show } = useToast();
 
-  const subtitle = useMemo(
-    () => (data ? t.subtitleAsOf(data.as_of) : t.subtitleLoading),
-    [data, t]
-  );
+  const subtitle = useMemo(() => {
+    if (!data) return t.subtitleLoading;
+    const parsed = new Date(`${data.as_of}T00:00:00Z`);
+    const pretty = Number.isNaN(parsed.getTime())
+      ? data.as_of
+      : parsed.toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          timeZone: "UTC",
+        });
+    return t.subtitleAsOf(pretty);
+  }, [data, t, lang]);
 
   const handleRefresh = useCallback(() => {
     refresh();

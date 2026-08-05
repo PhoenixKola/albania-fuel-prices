@@ -177,6 +177,7 @@ input {
   font-weight: 600;
   color: var(--muted);
   text-decoration: none;
+  white-space: nowrap;
   transition: color 0.15s ease, background 0.15s ease;
 }
 
@@ -208,6 +209,7 @@ input {
   font-weight: 600;
   padding: 8px 12px;
   cursor: pointer;
+  white-space: nowrap;
   transition: color 0.15s ease, background 0.15s ease;
 }
 
@@ -286,9 +288,46 @@ input {
 
 /* Mobile menu */
 
+/* Drawer is capped to the viewport: actions stay pinned at the top and only
+   the link list scrolls, so Refresh is always reachable without scrolling. */
 .mobileMenu {
-  padding: 8px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  /* Drawer opens below the sticky bar, so subtract that offset plus a margin.
+     dvh keeps it correct while mobile browser chrome shows and hides. */
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
+  padding: 10px 12px 12px;
   border-top: 1px solid var(--border);
+}
+
+.mobileMenuScroll {
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.mobileMenuGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileMenuGroup + .mobileMenuGroup {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.mobileMenuGroupTitle {
+  padding: 0 12px 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
 }
 
 .mobileMenuLinks {
@@ -299,8 +338,8 @@ input {
 
 .mobileMenuLink {
   display: block;
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 9px 12px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
   color: var(--muted);
@@ -328,10 +367,24 @@ input {
   margin: 8px 0;
 }
 
+/* Currency segment and the two action buttons share one compact row-pair
+   instead of three stacked full-width blocks. */
 .mobileMenuActions {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.mobileMenuActions .mobileMenuCurrencySeg {
+  flex: 1 1 100%;
+}
+
+.mobileMenuActions .mobileMenuBtn {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
 }
 
 .mobileMenuBtn {
@@ -362,7 +415,9 @@ input {
 
 /* Responsive breakpoints */
 
-@media (max-width: 860px) {
+/* Switch to the drawer at 1024px: between ~861px and 1000px the full bar
+   (6 nav items + currency + refresh + theme) overflowed by ~44px. */
+@media (max-width: 1024px) {
   .navLinks,
   .navActions {
     display: none;
@@ -375,7 +430,7 @@ input {
   }
 }
 
-@media (min-width: 861px) {
+@media (min-width: 1025px) {
   .mobileMenu {
     display: none;
   }
@@ -420,13 +475,29 @@ input {
   text-overflow: ellipsis;
 }
 
+/* Data freshness badge — the whole point of the site, so make it legible */
 .sub {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 5px 0 0;
+  padding: 2px 9px 2px 7px;
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.subDot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: #14b8a6;
 }
 
 .actions {
@@ -467,7 +538,8 @@ input {
 .btn-primary {
   background: linear-gradient(180deg, rgba(20, 184, 166, 0.95), rgba(20, 184, 166, 0.75));
   border-color: rgba(20, 184, 166, 0.55);
-  box-shadow: 0 12px 30px rgba(20, 184, 166, 0.18);
+  /* Plain elevation, not a coloured bloom — the teal glow read as artificial. */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
   transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -2430,13 +2502,13 @@ select {
 .heroCtaPrimary {
   background: #ffffff;
   color: #07111f;
-  box-shadow: 0 16px 36px rgba(255, 255, 255, 0.16);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 :root[data-theme="light"] .heroCtaPrimary {
   background: #101827;
   color: #ffffff;
-  box-shadow: 0 16px 36px rgba(16, 24, 39, 0.16);
+  box-shadow: 0 1px 2px rgba(16, 24, 39, 0.22);
 }
 
 .heroCtaSecondary {
