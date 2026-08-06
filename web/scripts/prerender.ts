@@ -37,7 +37,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "../dist");
 const SITE_URL = "https://karburantisot.com";
 const PUBLISHER_ID = "ca-pub-2653462201538649";
-const GITHUB_URL = "https://github.com/PhoenixKola/albania-fuel-prices";
 
 // ─── Route definitions with static content ─────────────────────────────────
 
@@ -153,7 +152,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Data source attribution</h2>
-          <p class="contentBody">Fuel price data is sourced from publicly available European fuel price aggregators. Exchange rates come from a public FX API. All values are informational references — not guaranteed station prices. See the methodology page for full transparency about the data pipeline. The entire data pipeline and daily-updated dataset are <a href="${GITHUB_URL}" rel="noopener">open source on GitHub</a>, so anyone can verify the numbers independently.</p>
+          <p class="contentBody">Fuel price data is sourced from publicly available European fuel price aggregators. Exchange rates come from a public FX API. All values are informational references — not guaranteed station prices. Our <a href="/methodology">methodology page</a> documents the full pipeline: which sources we use, how values are normalised, and exactly how every derived figure on this site is calculated.</p>
         </section>
       </article>
     `,
@@ -255,7 +254,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         <section class="contentSection">
           <h2 class="contentHeading">Who maintains this project</h2>
           <p class="contentBody">Karburanti Sot is built and maintained by a small independent team based in Tirana, Albania. The project is not affiliated with any fuel company, government agency, or advertising network. The site is funded through advertising, which allows it to remain free for all users.</p>
-          <p class="contentBody">Unlike most price-comparison sites, our entire data pipeline is public: the collection scripts, the processing code, and every day of price history are published in an <a href="${GITHUB_URL}" rel="noopener">open-source repository on GitHub</a>. Anyone can inspect exactly how the numbers on this site are produced, or download the raw dataset and verify them independently. Questions and corrections reach the team directly at <a href="mailto:fenixkola@gmail.com">fenixkola@gmail.com</a>.</p>
+          <p class="contentBody">Unlike most price-comparison sites, we document exactly how our numbers are produced. Our <a href="/methodology">methodology page</a> sets out every source we use, how values are normalised and converted, how our daily historical record is built, and precisely how each derived figure — ranges, percentiles, volatility — is calculated. Where we cannot stand behind a number, we say so rather than publishing it. Questions and corrections reach the team directly at <a href="mailto:fenixkola@gmail.com">fenixkola@gmail.com</a>.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Data principles</h2>
@@ -415,7 +414,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">How we build our historical record</h2>
-          <p class="contentBody">Public price aggregators publish a snapshot of today and nothing else. Since ${ANALYSIS_META.startLabel || "February 2026"} we have captured that snapshot once a day and appended it to a public history file, which now holds ${ANALYSIS_META.daysObserved || 0} consecutive daily readings across ${ANALYSIS_META.countriesAnalysed || 0} markets. That record is what makes the analysis on this site possible, and it is published openly in our <a href="${GITHUB_URL}" rel="noopener">GitHub repository</a> so any figure we quote can be independently reproduced.</p>
+          <p class="contentBody">Public price aggregators publish a snapshot of today and nothing else. Since ${ANALYSIS_META.startLabel || "February 2026"} we have captured that snapshot once a day and appended it to our own history file, which now holds ${ANALYSIS_META.daysObserved || 0} consecutive daily readings across ${ANALYSIS_META.countriesAnalysed || 0} markets, with no gaps. That record is what makes the analysis on this site possible: the upstream sources publish only today's snapshot, so ranges, records and trends simply do not exist unless someone keeps the history. The exact calculations applied to it are described below.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">How the analysis is calculated</h2>
@@ -725,7 +724,6 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
     "@type": "Organization",
     name: "Karburanti Sot",
     url: SITE_URL,
-    sameAs: [GITHUB_URL],
   };
 
   const dateModified =
@@ -774,11 +772,9 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
         dateModified: ctx.asOf,
         isBasedOn: ctx.sourceUrl || undefined,
         creator: publisher,
-        distribution: {
-          "@type": "DataDownload",
-          encodingFormat: "application/json",
-          contentUrl: "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/latest.json",
-        },
+        temporalCoverage: `${ANALYSIS_META.startDate}/${ctx.asOf}`,
+        measurementTechnique:
+          "Daily capture of published country-level average fuel prices, normalised to EUR per liter",
       });
     }
 
@@ -801,8 +797,7 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
       "@type": "Organization",
       name: "Karburanti Sot",
       url: `${SITE_URL}/about`,
-      sameAs: [GITHUB_URL],
-    };
+      };
     base.headline = route.title;
   }
 

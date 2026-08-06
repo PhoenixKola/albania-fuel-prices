@@ -328,7 +328,7 @@ export function renderMarketReport(
 
         <section class="contentSection">
           <h2 class="contentHeading">How this report is produced</h2>
-          <p class="contentBody">Every figure is computed at build time from <code>history.json</code>, the public dataset this site has been appending to daily since ${hist.startLabel}. The dataset and the code that produces it are <a href="https://github.com/PhoenixKola/albania-fuel-prices" rel="noopener">open source</a>, so any claim on this page can be independently reproduced. Raw daily prices originate from public aggregators as described in our <a href="/methodology">methodology</a>; the analysis, ranges, volatility measures and interpretations are our own.</p>
+          <p class="contentBody">Every figure is recomputed on each build from the daily price record this site has been appending to since ${hist.startLabel} — ${hist.daysObserved} consecutive readings with no gaps. Raw daily prices originate from public aggregators as described in our <a href="/methodology">methodology</a>, which also documents exactly how each figure here is calculated; the analysis, ranges, volatility measures and interpretations are our own.</p>
         </section>
       </article>`;
 }

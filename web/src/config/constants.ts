@@ -11,8 +11,6 @@ export const DATA_URL =
 export const TRENDS_URL =
   "https://raw.githubusercontent.com/PhoenixKola/albania-fuel-prices/main/data/trends.json";
 
-export const GITHUB_REPO_URL = "https://github.com/PhoenixKola/albania-fuel-prices";
-
 export const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.phoenixkola.karburantisot";
 

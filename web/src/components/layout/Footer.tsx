@@ -3,7 +3,7 @@ import type { TDict } from "../../locales";
 import { COUNTRY_EDITORIAL } from "../../config/countryContent";
 import { isCountryIndexable } from "../../generated/indexableCountries";
 import { ANALYSIS_META } from "../../generated/analysisMeta";
-import { GITHUB_REPO_URL, PLAY_STORE_URL } from "../../config/constants";
+import { PLAY_STORE_URL } from "../../config/constants";
 import logo from "../../assets/Logo.png";
 
 type Props = {
@@ -20,12 +20,12 @@ function ageInDays(iso: string): number | null {
   return Math.round((today - then) / 86_400_000);
 }
 
-function GithubIcon() {
+function ChartIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="currentColor"
-        d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.72c-2.78.62-3.37-1.37-3.37-1.37-.45-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9l-.01 2.82c0 .27.18.6.69.49A10.03 10.03 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"
+        d="M4 19h16a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1V4a1 1 0 0 1 2 0v15Zm2.7-4.3a1 1 0 0 1-.4-1.36l3-5a1 1 0 0 1 1.45-.3l3.1 2.32 3.4-5.1a1 1 0 1 1 1.66 1.1l-4 6a1 1 0 0 1-1.43.25l-3.13-2.35-2.4 4a1 1 0 0 1-1.25.44Z"
       />
     </svg>
   );
@@ -147,15 +147,10 @@ export default function Footer({ t, dataAsOf }: Props) {
             ) : null}
 
             <div className="footerActions">
-              <a
-                className="footerChip"
-                href={GITHUB_REPO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GithubIcon />
-                <span>Open data on GitHub</span>
-              </a>
+              <Link className="footerChip" to="/methodology">
+                <ChartIcon />
+                <span>How we collect data</span>
+              </Link>
               <a
                 className="footerChip"
                 href={PLAY_STORE_URL}

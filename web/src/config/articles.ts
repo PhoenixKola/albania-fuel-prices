@@ -42,7 +42,7 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
     html: `
       <section class="contentSection">
         <h2 class="contentHeading">What this dataset is</h2>
-        <p class="contentBody">Since 14 February 2026 this site has recorded country-level petrol, diesel and LPG prices across Europe once a day, every day, and appended each reading to a public file. As of 5 August 2026 that record holds 173 consecutive daily observations covering 42 markets, with no gaps. The raw prices come from public aggregators; the historical record, and everything we derive from it below, is ours — and it is <a href="https://github.com/PhoenixKola/albania-fuel-prices" rel="noopener">published openly</a> so anyone can check our arithmetic.</p>
+        <p class="contentBody">Since 14 February 2026 this site has recorded country-level petrol, diesel and LPG prices across Europe once a day, every day. As of 5 August 2026 that record holds 173 consecutive daily observations covering 42 markets, with no gaps. The raw prices come from public aggregators; the historical record, and everything we derive from it below, is ours. Our <a href="/methodology">methodology page</a> documents exactly how each figure is calculated.</p>
         <p class="contentBody">Six months is long enough for patterns to appear that a daily price snapshot simply cannot show. Here is what ours shows.</p>
       </section>
 

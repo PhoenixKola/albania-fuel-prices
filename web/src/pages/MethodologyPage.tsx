@@ -72,14 +72,12 @@ export default function MethodologyPage({ t }: Props) {
         <p className="contentBody">
           Public price aggregators publish a snapshot of today and nothing else. Since{" "}
           <strong>{ANALYSIS_META.startLabel || "February 2026"}</strong> we have captured that
-          snapshot once a day and appended it to a public history file, which now holds{" "}
+          snapshot once a day and appended it to our own history file, which now holds{" "}
           <strong>{ANALYSIS_META.daysObserved || 0} consecutive daily readings</strong> across{" "}
-          {ANALYSIS_META.countriesAnalysed || 0} markets. That record is what makes the analysis on
-          this site possible, and it is published openly in our{" "}
-          <a href="https://github.com/PhoenixKola/albania-fuel-prices" target="_blank" rel="noreferrer" className="inlineLink">
-            GitHub repository
-          </a>{" "}
-          so any figure we quote can be independently reproduced.
+          {ANALYSIS_META.countriesAnalysed || 0} markets, with no gaps. That record is what makes
+          the analysis on this site possible: the upstream sources publish only today's snapshot,
+          so ranges, records and trends simply do not exist unless someone keeps the history. The
+          exact calculations applied to it are described below.
         </p>
       </section>
 
