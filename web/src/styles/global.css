@@ -3130,76 +3130,283 @@ select {
 
 /* ─── Footer ─── */
 
+/* ─── Site footer ─────────────────────────────────────────────────────────
+   Brand block carries the data-freshness status (the product's core claim),
+   with four link columns beside it. Legal links live in the bottom bar so
+   the columns stay evenly weighted. */
+
 .siteFooter {
-  margin-top: 40px;
-  padding-top: 24px;
+  margin-top: 56px;
+  padding: 32px 0 28px;
   border-top: 1px solid var(--border);
 }
 
 .footerInner {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
 }
 
-.footerTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
+.footerGrid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.6fr) repeat(4, minmax(0, 1fr));
+  gap: 32px 24px;
+  align-items: start;
 }
+
+/* Brand block */
 
 .footerBrand {
-  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.footerBrandRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.footerLogo {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
 }
 
 .footerSiteName {
-  font-weight: 700;
   font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .footerTagline {
-  margin: 8px 0 0;
+  margin: 0;
+  max-width: 38ch;
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-.footerNav {
+/* Live data status — operational transparency as a trust signal */
+
+.footerStatus {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 13px;
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  border-radius: var(--radius-sm);
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.footerStatusStale {
+  border-color: rgba(234, 179, 8, 0.4);
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.footerStatusDot {
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.22);
+}
+
+.footerStatusStale .footerStatusDot {
+  background: #eab308;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.22);
+}
+
+.footerStatusText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.footerStatusText strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.footerStatusMeta {
+  color: var(--muted);
+}
+
+/* GitHub / app chips */
+
+.footerActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
+  gap: 8px;
 }
 
-.footerNavHeading {
-  color: var(--text);
-  font-size: 13px;
+.footerChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 12.5px;
   font-weight: 600;
-  width: 100%;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+:root[data-theme="light"] .footerChip {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.footerChip:hover {
+  color: var(--text);
+  border-color: rgba(20, 184, 166, 0.45);
+  background: rgba(20, 184, 166, 0.1);
+}
+
+/* Link columns */
+
+.footerCol {
+  min-width: 0;
+}
+
+.footerColHeading {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  opacity: 0.85;
+}
+
+.footerColList {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .footerLink {
+  display: inline-block;
   color: var(--muted);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 13.5px;
+  font-weight: 500;
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .footerLink:hover {
   color: var(--text);
+  transform: translateX(2px);
 }
 
+/* Bottom bar */
+
 .footerBottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding-top: 20px;
   border-top: 1px solid var(--border);
-  padding-top: 16px;
 }
 
 .footerCopyright {
   margin: 0;
   color: var(--muted-2);
+  font-size: 12.5px;
+}
+
+.footerLegal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+
+.footerLegalLink {
+  color: var(--muted-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footerLegalLink:hover {
+  color: var(--text);
+}
+
+.footerFinePrint {
+  margin: 0;
+  max-width: 90ch;
+  color: var(--muted-2);
   font-size: 12px;
+  line-height: 1.65;
+}
+
+.footerInlineLink {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footerInlineLink:hover {
+  color: var(--text);
+}
+
+/* Responsive: 5 columns -> brand over 4 -> brand over 2 -> stacked */
+
+@media (max-width: 1100px) {
+  .footerGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .footerBrand {
+    grid-column: 1 / -1;
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 760px) {
+  .footerGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 26px 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .siteFooter {
+    margin-top: 40px;
+  }
+  .footerBottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* Keep two columns on phones — stacking all five blocks produced a footer
+   taller than the viewport. Single column only on very narrow screens. */
+@media (max-width: 340px) {
+  .footerGrid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
 }
 
 /* ─── Content pages (About, Contact, Privacy, Terms) ─── */

@@ -285,7 +285,7 @@ export default function App() {
         </Routes>
         </Suspense>
 
-        <Footer t={t} />
+        <Footer t={t} dataAsOf={data?.as_of ?? null} />
       </div>
     </div>
   );
