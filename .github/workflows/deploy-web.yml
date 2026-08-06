@@ -32,6 +32,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # update-data.yml commits today's prices and then calls this
+          # workflow. Without an explicit ref, checkout uses the SHA that
+          # triggered the run — the commit *before* the data landed — so the
+          # daily deploy would rebuild yesterday's prices every single day.
+          ref: main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -50,12 +56,21 @@ jobs:
         working-directory: web
         run: npm run build
 
-      - name: Show what is being deployed
-        working-directory: web
+      # Guards against silently shipping an old build: if the HTML we are about
+      # to upload does not carry the same date as the data in the repo, the
+      # checkout or the generate step went wrong and we want to know loudly.
+      - name: Verify build matches repo data
         run: |
-          echo "Data baked into the build:"
-          grep -o '<meta name="data-as-of" content="[^"]*"' dist/index.html || echo "  (marker missing!)"
-          echo "Pages: $(find dist -name '*.html' | wc -l)"
+          set -euo pipefail
+          REPO_AS_OF=$(python3 -c "import json;print(json.load(open('data/latest.json'))['as_of'])")
+          BUILT_AS_OF=$(grep -o '<meta name="data-as-of" content="[^"]*"' web/dist/index.html | sed 's/.*content="//; s/"//')
+          echo "repo data as_of : $REPO_AS_OF"
+          echo "built HTML as_of: $BUILT_AS_OF"
+          echo "pages           : $(find web/dist -name '*.html' | wc -l)"
+          if [ "$REPO_AS_OF" != "$BUILT_AS_OF" ]; then
+            echo "::error::Built HTML carries $BUILT_AS_OF but the repo has $REPO_AS_OF. Refusing to deploy a stale build."
+            exit 1
+          fi
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
