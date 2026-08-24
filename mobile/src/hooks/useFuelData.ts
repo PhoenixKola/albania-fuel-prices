@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { LatestEurope } from "../types/fuel";
 import { STORAGE_FUEL_CACHE_KEY, STORAGE_FUEL_PREV_KEY } from "../constants/storage";
-import { withCountryFallbacks } from "../utils/countryFallbacks";
 
 type CacheEnvelope = {
   savedAtUtc: string;
@@ -44,14 +43,14 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
     const raw = await AsyncStorage.getItem(STORAGE_FUEL_CACHE_KEY);
     const env = safeParseEnvelope(raw);
     if (env?.data) {
-      setData(withCountryFallbacks(env.data));
+      setData(env.data);
       setCacheSavedAtUtc(env.savedAtUtc);
       setIsFromCache(true);
     }
 
     const prevRaw = await AsyncStorage.getItem(STORAGE_FUEL_PREV_KEY);
     const prevEnv = safeParseEnvelope(prevRaw);
-    if (prevEnv?.data) setPrevData(withCountryFallbacks(prevEnv.data));
+    if (prevEnv?.data) setPrevData(prevEnv.data);
   }, []);
 
   const persistCache = useCallback(async (next: LatestEurope, prev: LatestEurope | null, nowIso: string) => {
@@ -80,7 +79,7 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
 
         const r = await fetch(url, { cache: "no-store" });
         if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        const json: LatestEurope = withCountryFallbacks(await r.json());
+        const json: LatestEurope = await r.json();
 
         if (prev) setPrevData(prev);
 

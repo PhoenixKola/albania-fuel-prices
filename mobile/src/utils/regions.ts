@@ -1,9 +1,8 @@
 /**
- * The dataset is branded "Europe" but includes a small set of global
- * reference markets (see ingest/run.ts GLOBAL_ESTIMATES_BASE and
- * utils/countryFallbacks.ts). Every Europe-scoped statistic (average, rank)
- * must exclude these, otherwise "Europe average" silently includes
- * Australia and Brazil.
+ * Non-European markets that may appear in the feed. Kept as a guard so any
+ * Europe-scoped statistic (average, rank) cannot silently include them.
+ * The dataset itself no longer carries these: the synthetic "global
+ * estimates" that used to be generated for them were removed in Aug 2026.
  */
 export const GLOBAL_MARKETS = new Set([
   "Australia",
