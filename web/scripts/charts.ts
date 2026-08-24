@@ -130,7 +130,7 @@ export function renderLineChart(opts: LineChartOptions): string {
   const gradId = `g${Math.abs(hashCode(title))}`;
 
   return `<div class="chartWrap">
-  <svg viewBox="0 0 ${width} ${height}" width="100%" height="auto" role="img" aria-label="${esc(title)}" class="priceChart" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-label="${esc(title)}" class="priceChart" preserveAspectRatio="xMidYMid meet">
     <title>${esc(title)}</title>
     <defs>
       <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">

@@ -1,19 +1,16 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import type { LatestEurope, CountryPrices } from "../models/fuel";
+import { Link } from "react-router-dom";
 import AdBar from "../components/ads/AdBar";
+import { getIso2ForCountry, getFlagImgUrl } from "../utils/countryFlag";
+import { isEuropeanCountry } from "../utils/regions";
 
-const FLAGS: Record<string, string> = {
-  Albania: "🇦🇱",
-  Kosovo: "🇽🇰",
-  Montenegro: "🇲🇪",
-  "North Macedonia": "🇲🇰",
-  Greece: "🇬🇷",
-  Italy: "🇮🇹",
-  Croatia: "🇭🇷",
-  Portugal: "🇵🇹",
-  Switzerland: "🇨🇭",
-  "United Kingdom": "🇬🇧",
-};
+/** Real flag image, matching the rest of the site. */
+function CountryFlag({ name }: { name: string }) {
+  const iso2 = getIso2ForCountry(name);
+  if (!iso2) return <span className="quizCardFlag" aria-hidden="true" />;
+  return <img className="quizCardFlagImg" src={getFlagImgUrl(iso2)} alt="" aria-hidden="true" />;
+}
 
 type FuelKey = "gasoline95_eur" | "diesel_eur";
 
@@ -102,7 +99,7 @@ type Props = {
   loading: boolean;
 };
 
-export default function DailyChallengePage({ data, loading }: Props) {
+function DailyChallengeGame({ data, loading }: Props) {
   const dayKey = useMemo(() => getDayKey(), []);
 
   const [savedResult, setSavedResult] = useState<DailyResult | null>(() => loadResult());
@@ -121,8 +118,15 @@ export default function DailyChallengePage({ data, loading }: Props) {
 
   const eligible = useMemo(() => {
     if (!data) return [];
+    // European markets only: this is a Europe-focused site, and pairings like
+    // "South Korea vs San Marino" made the game look untargeted.
     return data.countries
-      .filter((c) => typeof c.gasoline95_eur === "number" && typeof c.diesel_eur === "number")
+      .filter(
+        (c) =>
+          isEuropeanCountry(c.country) &&
+          typeof c.gasoline95_eur === "number" &&
+          typeof c.diesel_eur === "number"
+      )
       .map((c) => c.country)
       .sort();
   }, [data]);
@@ -264,7 +268,9 @@ export default function DailyChallengePage({ data, loading }: Props) {
                   <span className="dailyReviewMark">{correct ? "✅" : "❌"}</span>
                   <span className="dailyReviewText">
                     <strong>{fuel.label}:</strong>{" "}
-                    {FLAGS[cA.country] ?? ""} {cA.country} (€{priceA.toFixed(3)}) vs {FLAGS[cB.country] ?? ""} {cB.country} (€{priceB.toFixed(3)}) — cheaper: <strong>{cheaperCountry}</strong>
+                    <CountryFlag name={cA.country} /> {cA.country} (€{priceA.toFixed(3)}) vs{" "}
+                    <CountryFlag name={cB.country} /> {cB.country} (€{priceB.toFixed(3)}) — cheaper:{" "}
+                    <strong>{cheaperCountry}</strong>
                   </span>
                 </div>
               );
@@ -341,7 +347,7 @@ export default function DailyChallengePage({ data, loading }: Props) {
             disabled={revealed}
             aria-label={`Pick ${cA.country}`}
           >
-            <span className="quizCardFlag">{FLAGS[cA.country] ?? "🏳️"}</span>
+            <CountryFlag name={cA.country} />
             <span className="quizCardName">{cA.country}</span>
             {revealed && (
               <>
@@ -361,7 +367,7 @@ export default function DailyChallengePage({ data, loading }: Props) {
             disabled={revealed}
             aria-label={`Pick ${cB.country}`}
           >
-            <span className="quizCardFlag">{FLAGS[cB.country] ?? "🏳️"}</span>
+            <CountryFlag name={cB.country} />
             <span className="quizCardName">{cB.country}</span>
             {revealed && (
               <>
@@ -394,5 +400,77 @@ export default function DailyChallengePage({ data, loading }: Props) {
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Supporting content for the challenge. Rendered in every game state so the
+ * page is never just a widget: previously a visitor (and Googlebot, which
+ * executes JavaScript) saw about 30 words here, while the prerendered HTML
+ * carried the full introduction.
+ */
+function DailyChallengeAbout() {
+  return (
+    <article className="contentPage">
+      <section className="contentSection">
+        <h2 className="contentHeading">How the Daily Challenge works</h2>
+        <p className="contentBody">
+          Every day at midnight, five new questions are generated from the latest European fuel
+          price data collected by this site. Everyone who plays on a given day gets exactly the
+          same five questions, so scores are directly comparable — and because the questions are
+          built from live data rather than a fixed list, the correct answer to a matchup genuinely
+          changes as markets move.
+        </p>
+        <p className="contentBody">
+          Each question asks you to compare two European countries: which one currently has cheaper
+          petrol or diesel? Answers are checked against the same country-level averages published
+          on our <Link to="/rankings" className="inlineLink">rankings page</Link>, so nothing here
+          is trivia written months ago. After each answer you see both real prices, which is where
+          the learning happens — most players are surprised by at least one pair.
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Why a fuel price quiz is actually useful</h2>
+        <p className="contentBody">
+          If you drive across borders in the Balkans — Albania to Kosovo, Greece, Montenegro, or
+          Italy by ferry — an accurate mental map of relative fuel prices saves real money. A wrong
+          assumption about which side of a border is cheaper can cost €20–40 on a single tank, and
+          those gaps shift: Albanian diesel moved from cheaper than Greece to more expensive than
+          Greece during 2026. Playing for a week builds that map faster than reading tables,
+          because the surprises stick.
+        </p>
+        <p className="contentBody">
+          For the underlying numbers and what has been moving, see the{" "}
+          <Link to="/market-report" className="inlineLink">daily market report</Link> or our{" "}
+          <Link to="/insights/cross-border-fill-up-math" className="inlineLink">
+            cross-border fill-up guide
+          </Link>
+          .
+        </p>
+      </section>
+
+      <section className="contentSection">
+        <h2 className="contentHeading">Where the questions come from</h2>
+        <p className="contentBody">
+          Questions are generated automatically from our daily dataset of country-level average
+          prices, collected from public European fuel price aggregators and restricted to the
+          European markets this site tracks. The same figures appear on the{" "}
+          <Link to="/" className="inlineLink">homepage</Link> and on each country page, and the
+          collection process is documented on our{" "}
+          <Link to="/methodology" className="inlineLink">methodology page</Link>. Your score and
+          streak are stored only in your browser — no account is needed and nothing is sent to us.
+        </p>
+      </section>
+    </article>
+  );
+}
+
+export default function DailyChallengePage(props: Props) {
+  return (
+    <>
+      <DailyChallengeGame {...props} />
+      <DailyChallengeAbout />
+    </>
   );
 }

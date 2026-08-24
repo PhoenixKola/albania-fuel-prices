@@ -1,19 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import type { LatestEurope, CountryPrices } from "../models/fuel";
 import AdBar from "../components/ads/AdBar";
+import { getIso2ForCountry, getFlagImgUrl } from "../utils/countryFlag";
+import { isEuropeanCountry } from "../utils/regions";
 
-const FLAGS: Record<string, string> = {
-  Albania: "🇦🇱",
-  Kosovo: "🇽🇰",
-  Montenegro: "🇲🇪",
-  "North Macedonia": "🇲🇰",
-  Greece: "🇬🇷",
-  Italy: "🇮🇹",
-  Croatia: "🇭🇷",
-  Portugal: "🇵🇹",
-  Switzerland: "🇨🇭",
-  "United Kingdom": "🇬🇧",
-};
+/** Real flag image, matching the rest of the site. */
+function CountryFlag({ name }: { name: string }) {
+  const iso2 = getIso2ForCountry(name);
+  if (!iso2) return <span className="quizCardFlag" aria-hidden="true" />;
+  return <img className="quizCardFlagImg" src={getFlagImgUrl(iso2)} alt="" aria-hidden="true" />;
+}
 
 type FuelKey = "gasoline95_eur" | "diesel_eur";
 type GameState = "idle" | "picking" | "revealed";
@@ -61,8 +57,12 @@ export default function FuelQuizPage({ data, loading }: Props) {
 
   const eligible = useMemo(() => {
     if (!data) return [];
+    // European markets only — see DailyChallengePage for rationale.
     return data.countries.filter(
-      (c) => typeof c.gasoline95_eur === "number" && typeof c.diesel_eur === "number"
+      (c) =>
+        isEuropeanCountry(c.country) &&
+        typeof c.gasoline95_eur === "number" &&
+        typeof c.diesel_eur === "number"
     );
   }, [data]);
 
@@ -201,9 +201,7 @@ export default function FuelQuizPage({ data, loading }: Props) {
                     disabled={isRevealed}
                     aria-label={`Pick ${country.country}`}
                   >
-                    <span className="quizCardFlag">
-                      {FLAGS[country.country] ?? "🏳️"}
-                    </span>
+                    <CountryFlag name={country.country} />
                     <span className="quizCardName">{country.country}</span>
                     {isRevealed && (
                       <>

@@ -20,8 +20,8 @@ export type AnalysisMeta = {
 
 export const ANALYSIS_META: AnalysisMeta = {
   "asOf": "2026-08-06",
-  "dataAgeDays": 0,
-  "stale": false,
+  "dataAgeDays": 18,
+  "stale": true,
   "staleAfterDays": 3,
   "historyOk": true,
   "startDate": "2026-02-14",
@@ -30,5 +30,5 @@ export const ANALYSIS_META: AnalysisMeta = {
   "endLabel": "6 August 2026",
   "daysObserved": 174,
   "countriesAnalysed": 42,
-  "generatedAt": "2026-08-06T20:10:11.249Z"
+  "generatedAt": "2026-08-24T16:05:57.907Z"
 };
