@@ -77,7 +77,7 @@ export default function WatchlistCard({
         <div className="watchlistAddPanel">
           <div className="field watchlistAddField">
             <div className="label">Country to compare</div>
-            <select className="select" value={countryToAdd} onChange={(e) => setCountryToAdd(e.target.value)}>
+            <select className="select" aria-label={t.selectCountry} value={countryToAdd} onChange={(e) => setCountryToAdd(e.target.value)}>
               {countries.map((country) => (
                 <option key={country} value={country}>
                   {country}

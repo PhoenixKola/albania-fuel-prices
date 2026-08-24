@@ -115,7 +115,7 @@ export default function FuelCard({
             <div className="fuelControlGrid">
               <div className="field">
                 <div className="label">{t.selectCountry}</div>
-                <select className="select" value={country} onChange={(e) => onSelectCountry(e.target.value)}>
+                <select className="select" aria-label={t.selectCountry} value={country} onChange={(e) => onSelectCountry(e.target.value)}>
                   {countries.map((c) => (
                     <option key={c} value={c}>
                       {c}

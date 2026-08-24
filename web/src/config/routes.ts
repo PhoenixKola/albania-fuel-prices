@@ -106,7 +106,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     path: "/europe-fuel-comparison",
     title: "Europe Fuel Comparison with Albania | Fuel Today",
     description:
-      "Compare Albania fuel prices with Kosovo, Montenegro, North Macedonia, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom.",
+      "Compare Albania's fuel prices with Kosovo, Greece, Italy, Croatia, Portugal, Switzerland and the United Kingdom, and see why European prices differ.",
     priority: 0.9,
     changefreq: "monthly",
     jsonLdType: "Article",
@@ -186,7 +186,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     path: "/editorial-policy",
     title: "Editorial Policy | Fuel Today",
     description:
-      "Read how Fuel Today selects, produces, and maintains fuel price content — including data sourcing standards, editorial independence, accuracy principles, and corrections policy.",
+      "How Fuel Today selects, produces and maintains its content: data sourcing standards, editorial independence, accuracy principles and corrections.",
     priority: 0.5,
     changefreq: "yearly",
     jsonLdType: "WebPage",

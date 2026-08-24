@@ -148,7 +148,7 @@ export default function EuropeChoroplethMap({ data, fuelType, currentCountry, on
       </div>
 
       <div className="choroplethMapWrap">
-        <svg className="choroplethMap" viewBox={`0 0 ${W} ${H}`} role="img">
+        <svg className="choroplethMap" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Map of European ${fuelType} prices by country`}>
           <g transform={`translate(${W / 2} ${H / 2}) scale(${zoom}) translate(${-W / 2} ${-H / 2})`}>
             {model.rows.map((row) => {
               const active = row.dataName === currentCountry;

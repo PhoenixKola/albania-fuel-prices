@@ -30,6 +30,7 @@ import {
   renderRankingsTable,
   renderComparePairs,
   priceMetaPrefix,
+  composeDescription,
   type PriceContext,
 } from "./priceData";
 
@@ -129,7 +130,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         <section class="contentSection">
           <h2 class="contentHeading">What this site does</h2>
           <p class="contentBody">Fuel Today (Karburanti Sot) is an independent fuel price comparison website for Albania and Europe. It collects public country-level fuel price data, converts it into a consistent EUR-per-liter format, and presents it with editorial context so drivers can make informed decisions about where and when to refuel.</p>
-          <p class="contentBody">The site covers petrol (gasoline 95), diesel, and LPG prices across Albania, Kosovo, Montenegro, North Macedonia, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom. Data is sourced from public fuel price aggregators and updated based on upstream publication schedules.</p>
+          <p class="contentBody">The site tracks petrol (gasoline 95), diesel, and LPG across 33 European markets, with dedicated pages for Albania, Kosovo, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom. Data is sourced from public fuel price aggregators and updated daily. Where our source publishes no prices for a country, we say so rather than estimating.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">How to interpret country-level prices</h2>
@@ -342,7 +343,7 @@ const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/editorial-policy",
     title: "Editorial Policy | Fuel Today",
-    description: "Read how Fuel Today selects, produces, and maintains fuel price content — including data sourcing standards, editorial independence, accuracy principles, and corrections policy.",
+    description: "How Fuel Today selects, produces and maintains its content: data sourcing standards, editorial independence, accuracy principles and corrections.",
     jsonLdType: "WebPage",
     datePublished: "2026-06-05",
     content: `
@@ -468,7 +469,7 @@ const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/europe-fuel-comparison",
     title: "Europe Fuel Comparison with Albania | Fuel Today",
-    description: "Compare Albania fuel prices with Kosovo, Montenegro, North Macedonia, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom.",
+    description: "Compare Albania's fuel prices with Kosovo, Greece, Italy, Croatia, Portugal, Switzerland and the United Kingdom, and see why European prices differ.",
     jsonLdType: "Article",
     datePublished: "2026-04-12",
     content: localeSections(
@@ -518,7 +519,7 @@ const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/market-report",
     title: `European Fuel Market Report — ${ANALYSIS_META.endLabel || "Daily Analysis"} | Fuel Today`,
-    description: `Daily European diesel market analysis computed from ${ANALYSIS_META.daysObserved} days of our own price observations: rankings, 30-day movers, volatility, and where today's prices sit in the historical range.`,
+    description: `European diesel market analysis from ${ANALYSIS_META.daysObserved} days of our own observations: rankings, 30-day movers and volatility.`,
     jsonLdType: "Article",
     datePublished: "2026-08-05",
     priceBearing: true,
@@ -597,7 +598,7 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
     return {
       path: `/fuel-prices/${c.slug}`,
       title: c.metaTitle,
-      description: priceMetaPrefix(ctx, c.dataCountryName) + c.metaDescription,
+      description: composeDescription(priceMetaPrefix(ctx, c.dataCountryName), c.metaDescription),
       jsonLdType: "FAQPage",
       datePublished: "2026-05-26",
       priceBearing: true,
@@ -690,7 +691,7 @@ function buildInsightRoutes(): RouteEntry[] {
 
   const articleRoutes: RouteEntry[] = articles.map((a) => ({
     path: `/insights/${a.slug}`,
-    title: `${a.title} | Fuel Today`,
+    title: a.seoTitle ?? `${a.title} | Fuel Today`,
     description: a.description,
     jsonLdType: "Article",
     datePublished: a.datePublished,

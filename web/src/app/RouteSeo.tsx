@@ -66,7 +66,7 @@ export default function RouteSeo() {
       return {
         title: "Europe Fuel Comparison with Albania | Fuel Today",
         description:
-          "Compare Albania fuel prices with Kosovo, Montenegro, North Macedonia, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom.",
+          "Compare Albania's fuel prices with Kosovo, Greece, Italy, Croatia, Portugal, Switzerland and the United Kingdom, and see why European prices differ.",
         path: pathname,
       };
     }
@@ -138,7 +138,7 @@ export default function RouteSeo() {
       return {
         title: "Editorial Policy | Fuel Today",
         description:
-          "Read how Fuel Today selects, produces, and maintains fuel price content — including data sourcing standards, editorial independence, accuracy principles, and corrections policy.",
+          "How Fuel Today selects, produces and maintains its content: data sourcing standards, editorial independence, accuracy principles and corrections.",
         path: pathname,
       };
     }
@@ -176,7 +176,7 @@ export default function RouteSeo() {
 
       if (article) {
         return {
-          title: `${article.title} | Fuel Today`,
+          title: article.seoTitle ?? `${article.title} | Fuel Today`,
           description: article.description,
           path: pathname,
         };

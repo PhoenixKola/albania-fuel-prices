@@ -104,6 +104,7 @@ export default function QuickCalcCard({
           <div className="rateLabel">{t.exchangeRate}</div>
           <input
             className="input"
+                  aria-label={t.exchangeRate}
             inputMode="numeric"
             value={String(allPerEur)}
             onChange={(e) => setAllPerEur(clamp(Number(e.target.value || 0), 1, 9999))}
@@ -119,6 +120,7 @@ export default function QuickCalcCard({
                 <div className="label">{t.liters}</div>
                 <input
                   className="input"
+                  aria-label={t.liters}
                   inputMode="decimal"
                   value={String(liters)}
                   onChange={(e) => setLiters(clamp(Number(e.target.value || 0), 0, 999))}
@@ -150,6 +152,7 @@ export default function QuickCalcCard({
                 <div className="label">{t.budget}</div>
                 <input
                   className="input"
+                  aria-label={t.budget}
                   inputMode="decimal"
                   value={String(budget)}
                   onChange={(e) => setBudget(clamp(Number(e.target.value || 0), 0, 999999))}
@@ -171,6 +174,7 @@ export default function QuickCalcCard({
                 <div className="label">{t.distanceKm}</div>
                 <input
                   className="input"
+                  aria-label={t.distanceKm}
                   inputMode="decimal"
                   value={String(km)}
                   onChange={(e) => setKm(clamp(Number(e.target.value || 0), 0, 999999))}
@@ -180,6 +184,7 @@ export default function QuickCalcCard({
                 <div className="label">{t.consumption}</div>
                 <input
                   className="input"
+                  aria-label={t.consumption}
                   inputMode="decimal"
                   value={String(cons)}
                   onChange={(e) => setCons(clamp(Number(e.target.value || 0), 0, 99))}

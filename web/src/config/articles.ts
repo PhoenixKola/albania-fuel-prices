@@ -8,7 +8,7 @@
  * House rules for these pieces:
  *  - Every price quoted carries an explicit "as of" date, because prices move.
  *  - Claims about ranges, records and percentages come from our own dataset
- *    (data/history.json) and can be reproduced from the public repo.
+ *    (data/history.json) and are reproducible from our published method.
  *  - Market-structure background is framed as context, not as a scoop.
  *
  * When prices move materially, refresh the figures and bump `dateModified`.
@@ -20,6 +20,8 @@
 export type InsightArticle = {
   slug: string;
   title: string;
+  /** Shorter title for <title>/SERP when the headline would be truncated. */
+  seoTitle?: string;
   /** Meta description + index-card teaser. */
   description: string;
   datePublished: string;
@@ -34,15 +36,16 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
   {
     slug: "six-months-of-balkan-fuel-prices",
     title: "Six Months of Balkan Fuel Prices: What 173 Days of Our Own Data Show",
+    seoTitle: "Six Months of Balkan Fuel Price Data: Key Findings",
     description:
-      "We have recorded European fuel prices every single day since 14 February 2026. Albanian diesel is up 22.5% over that period, Albania has overtaken Greece and Italy on price, and the Kosovo gap has widened to €0.74 a liter. Here is the full analysis.",
+      "We have recorded European fuel prices every day since February 2026. Albanian diesel is up 22.5%, and Albania now costs more than Greece and Italy.",
     datePublished: "2026-08-05",
     published: true,
     readMinutes: 8,
     html: `
       <section class="contentSection">
         <h2 class="contentHeading">What this dataset is</h2>
-        <p class="contentBody">Since 14 February 2026 this site has recorded country-level petrol, diesel and LPG prices across Europe once a day, every day. As of 5 August 2026 that record holds 173 consecutive daily observations covering 42 markets, with no gaps. The raw prices come from public aggregators; the historical record, and everything we derive from it below, is ours. Our <a href="/methodology">methodology page</a> documents exactly how each figure is calculated.</p>
+        <p class="contentBody">Since 14 February 2026 this site has recorded country-level petrol, diesel and LPG prices across Europe once a day, every day. As of 5 August 2026 that record holds 173 consecutive daily observations covering 33 European markets, with no gaps. The raw prices come from public aggregators; the historical record, and everything we derive from it below, is ours. Our <a href="/methodology">methodology page</a> documents exactly how each figure is calculated.</p>
         <p class="contentBody">Six months is long enough for patterns to appear that a daily price snapshot simply cannot show. Here is what ours shows.</p>
       </section>
 
@@ -91,8 +94,9 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
   {
     slug: "why-albanian-fuel-costs-more-than-the-balkans",
     title: "Why Albanian Fuel Now Costs More Than Greece, Italy and Every Balkan Neighbour",
+    seoTitle: "Why Albanian Fuel Costs More Than Greece and Italy",
     description:
-      "Albania imports nearly every liter it burns, taxes it heavily, and buys it through a concentrated retail market. As of August 2026 that combination has pushed Albanian diesel above Greece and Italy. Here is the breakdown.",
+      "Albania imports nearly every liter it burns, taxes it heavily and buys through a concentrated retail market. What that does to the price at the pump.",
     datePublished: "2026-07-10",
     dateModified: "2026-08-05",
     published: true,
@@ -141,8 +145,9 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
   {
     slug: "diesel-petrol-lpg-real-cost-albania",
     title: "Diesel, Petrol or LPG in Albania: What Each Actually Costs You Per Year",
+    seoTitle: "Diesel, Petrol or LPG in Albania: Real Annual Costs",
     description:
-      "LPG costs a third of what diesel costs per liter in Albania. We run the real annual numbers for a 15,000 km driver at August 2026 prices — including the catches the per-liter price hides.",
+      "LPG costs a third of diesel per liter in Albania. The real annual bill for a 15,000 km driver at August 2026 prices, and the catches behind each fuel.",
     datePublished: "2026-07-10",
     dateModified: "2026-08-05",
     published: true,
@@ -186,8 +191,9 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
   {
     slug: "cross-border-fill-up-math",
     title: "Cross-Border Fill-Up Math: Pristina, Thessaloniki and the Bari Ferry",
+    seoTitle: "Cross-Border Fuel Savings: Kosovo, Greece and Italy",
     description:
-      "What you actually save by refuelling across the border on the three most common routes out of Albania — recalculated at August 2026 prices, where two of the three answers have flipped.",
+      "What you actually save refuelling across the border from Albania, recalculated at August 2026 prices, where two of the three answers have now flipped.",
     datePublished: "2026-08-05",
     published: true,
     readMinutes: 6,
@@ -226,7 +232,7 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
     slug: "lek-euro-fuel-prices",
     title: "The Lek, the Euro, and Your Fuel Bill",
     description:
-      "Every liter of fuel Albania consumes is bought abroad in hard currency. Here is how the exchange rate quietly sets the price you pay at the pump — and what our 2026 data shows about what happens when the cushion stops growing.",
+      "Albania buys every liter of fuel abroad in hard currency. How the exchange rate quietly sets the price you pay, and what our 2026 data shows.",
     datePublished: "2026-08-05",
     published: true,
     readMinutes: 5,
@@ -258,7 +264,7 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
     slug: "how-albania-fuel-retail-market-works",
     title: "How Albania's Fuel Retail Market Actually Works",
     description:
-      "From the tanker at Durrës to the pump in your neighbourhood: who imports Albania's fuel, how prices are set, and why the gap between competing stations is far smaller than you would expect.",
+      "From the tanker at Durres to your local pump: who imports Albania's fuel, how prices are actually set, and why competing stations barely differ.",
     datePublished: "2026-08-05",
     published: true,
     readMinutes: 6,

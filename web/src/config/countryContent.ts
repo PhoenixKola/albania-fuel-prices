@@ -46,7 +46,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Albania",
     metaTitle: "Albania Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Albania fuel prices for petrol, diesel, and LPG. Understand how Albanian prices compare to neighboring Balkan markets and plan cross-border trips.",
+      "How petrol, diesel and LPG prices in Albania compare with Balkan neighbours, plus cross-border advice.",
     marketOverview:
       "Albania's fuel market is characterized by a mix of imported refined products and moderate taxation. The country does not have significant domestic refining capacity, so pump prices are influenced heavily by Mediterranean wholesale markets, shipping costs from Italian and Greek refineries, and the ALL/EUR exchange rate. The Albanian government occasionally adjusts excise rates to manage price pressures, but generally allows market pricing. Competition among major retail chains like Kastrati, KFG, and smaller independents creates some regional price variation, particularly between Tirana and smaller cities.",
     albaniaContext:
@@ -102,7 +102,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Kosovo",
     metaTitle: "Kosovo Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Kosovo fuel prices with Albania comparison. Understand cross-border price dynamics on the Tirana–Pristina corridor and plan refueling stops.",
+      "Kosovo fuel prices versus Albania, and what the gap is worth on the Tirana-Pristina corridor.",
     marketOverview:
       "Kosovo has one of the most competitive fuel markets in the Western Balkans, with relatively low excise duties and a high density of fuel stations for its population size. The market is dominated by several major distributors, and pricing tends to be uniform across the country due to Kosovo's small geographic area. Kosovo uses the Euro as its currency, which eliminates exchange-rate complications for both local consumers and Albanian visitors. The absence of a domestic refining industry means all fuel is imported, primarily through North Macedonia and Albania, making logistics costs and regional wholesale markets the primary price drivers.",
     albaniaContext:
@@ -158,7 +158,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Montenegro",
     metaTitle: "Montenegro Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Montenegro fuel prices with Albania comparison. Plan coastal Adriatic routes and understand price differences at the Albanian-Montenegrin border.",
+      "Montenegro fuel market context for Albanian drivers planning coastal Adriatic routes.",
     marketOverview:
       "Montenegro uses the Euro despite not being an EU member, which simplifies pricing comparisons with eurozone neighbors. The country's fuel market is relatively concentrated, with a few major distributors controlling most retail outlets. Montenegro's small population (roughly 620,000) and limited domestic demand mean that wholesale pricing follows Mediterranean and Adriatic market patterns closely. Excise duties are moderate by European standards — higher than Kosovo or Albania but lower than Italy or Croatia. The coastal tourism season (June–September) creates noticeable demand surges that can temporarily push up station-level prices in popular areas like Budva, Kotor, and Bar.",
     albaniaContext:
@@ -212,9 +212,9 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     slug: "north-macedonia",
     label: "North Macedonia",
     dataCountryName: "North Macedonia",
-    metaTitle: "North Macedonia Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
+    metaTitle: "North Macedonia Fuel Prices — Petrol, Diesel & LPG",
     metaDescription:
-      "Current North Macedonia fuel prices with Albania comparison. Plan eastern Balkan routes via Ohrid, Bitola, and Skopje with cross-border refueling context.",
+      "North Macedonia fuel market context for drivers heading east from Albania via Ohrid.",
     marketOverview:
       "North Macedonia has a government-regulated fuel pricing mechanism where maximum retail prices are set periodically based on international market conditions. This creates a more predictable pricing environment compared to fully market-driven neighbors. The country has the OKTA refinery (now Makpetrol/LUKOIL-operated), giving it some domestic refining capacity. The Macedonian Denar (MKD) is pegged to the Euro, which provides exchange-rate stability. Major distributors include Makpetrol, OKTA, and several smaller chains. Competition between cities is moderate, but regulated maximums limit how much stations can differentiate on price.",
     albaniaContext:
@@ -270,7 +270,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Greece",
     metaTitle: "Greece Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Greece fuel prices compared with Albania. Understand the price jump at the Greek border and plan summer trips, island drives, and Thessaloniki routes.",
+      "Greek fuel prices versus Albania, and which side of the border is cheaper for petrol and diesel.",
     marketOverview:
       "Greece has among the highest fuel prices in Southern Europe, driven by substantial excise duties and 24% VAT on top of already-taxed fuel. The country has significant domestic refining capacity through Hellenic Petroleum (now HELLENiQ Energy) and Motor Oil Hellas, but high taxation keeps pump prices elevated. The Greek market is competitive at the retail level, with hundreds of branded and independent stations. However, island locations and remote rural areas face premium pricing due to higher distribution costs. Greece's fuel pricing is fully liberalized — the government monitors but does not cap retail prices.",
     albaniaContext:
@@ -326,7 +326,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Italy",
     metaTitle: "Italy Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Italy fuel prices compared with Albania. Understand Mediterranean benchmark pricing, Adriatic ferry route costs, and why Italian fuel is expensive.",
+      "Italian fuel prices versus Albania, with ferry-route advice and motorway pricing to watch for.",
     marketOverview:
       "Italy has some of the highest fuel prices in the EU, driven by extremely high excise duties (accise) that have accumulated through decades of temporary surcharges never removed. The Italian excise on petrol includes levies originally introduced for events ranging from the 1935 Abyssinian War to the 2009 L'Aquila earthquake. Combined with 22% VAT, the total tax burden makes Italian pump prices among the highest in Europe. The market is competitive at the retail level, with ENI, IP, Q8, TotalEnergies, and hundreds of independents. Self-service (no-staff) stations offer lower prices than full-service stations, sometimes by 0.10–0.15 EUR/L.",
     albaniaContext:
@@ -382,7 +382,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Croatia",
     metaTitle: "Croatia Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Croatia fuel prices with Albania comparison. Plan Adriatic coast routes via Montenegro and understand Croatian price levels for summer travel.",
+      "Croatian fuel prices versus Albania, with route context for the Adriatic coast and tourist season.",
     marketOverview:
       "Croatia joined the eurozone in January 2023, simplifying price comparisons with other Euro-using neighbors. The Croatian fuel market features government intervention: the state periodically sets maximum retail prices based on a formula tied to Mediterranean product markets and exchange rates. Major distributors include INA (the national oil company, partly owned by MOL), Petrol, Tifon, and Crodux. Croatia's excise duties sit in the mid-range for the EU — higher than Balkan non-EU states but lower than Italy, Netherlands, or Scandinavia. Coastal tourist areas may see slightly higher de facto prices during peak season.",
     albaniaContext:
@@ -438,7 +438,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Portugal",
     metaTitle: "Portugal Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Portugal fuel prices as a western European benchmark. Understand how Atlantic refinery access and tax policy create different pricing patterns.",
+      "Portuguese fuel prices as a western European benchmark against Albania and the Balkans.",
     marketOverview:
       "Portugal has fuel prices in the upper-middle range for Western Europe, driven by significant excise duties and 23% VAT. The country benefits from Atlantic refinery access (Galp's Sines and Matosinhos refineries) which provides some price insulation from Mediterranean market dynamics. Major retail brands include Galp, Repsol, BP, and Prio, along with growing hypermarket fuel stations (Intermarché, Leclerc) that often undercut branded stations. Portugal introduced temporary fuel tax reductions during the 2022–2023 energy crisis, some of which have been partially reversed. The country's geography means distribution costs vary between coastal cities and interior regions.",
     albaniaContext:
@@ -494,7 +494,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Switzerland",
     metaTitle: "Switzerland Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current Switzerland fuel prices as a high-income benchmark. Understand how CHF pricing, low fuel taxes, and premium wages create a unique price position.",
+      "Swiss fuel prices, Europe's most expensive market, and how far above Albania they sit.",
     marketOverview:
       "Switzerland presents a paradox: despite having one of the highest costs of living in Europe, its fuel prices are often LOWER than many EU countries. This is because Swiss fuel excise duties are significantly lower than in neighboring Germany, France, or Italy. Switzerland is not an EU member and is not bound by EU minimum excise rates. The country has no domestic refining and imports all refined products, primarily via pipeline from Rotterdam and by rail from Italian and German refineries. Major brands include BP, Shell, Migrol, Agrola, SOCAR, and several hypermarket chains (Migros, Coop). Prices are quoted in Swiss Francs (CHF), and the strong CHF means that nominal prices can appear high to visitors from weaker-currency countries while actually being moderate in EUR terms.",
     albaniaContext:
@@ -550,7 +550,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "United Kingdom",
     metaTitle: "UK Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Current United Kingdom fuel prices as a non-Euro benchmark. Understand how GBP pricing, North Sea refining, and high excise duty create UK price levels.",
+      "UK fuel prices as a non-euro benchmark, and how they compare with Albania and the eurozone.",
     marketOverview:
       "The United Kingdom has among the highest fuel prices in Europe, driven by substantial fuel duty (currently 52.95p per liter) plus 20% VAT on top. The UK benefits from domestic North Sea refining capacity and pipeline infrastructure, but the high tax burden keeps pump prices elevated. The market is highly competitive at retail level, with major brands (BP, Shell, Esso, Texaco) competing against supermarket stations (Tesco, Sainsbury's, Asda, Morrisons) that consistently undercut branded stations by 3–6p per liter. The UK uses Pounds Sterling (GBP) and prices per liter, which requires currency conversion for European comparisons.",
     albaniaContext:

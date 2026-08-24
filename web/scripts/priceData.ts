@@ -408,6 +408,14 @@ export function renderComparePairs(ctx: PriceContext): string {
 }
 
 /** Short live-price line for meta descriptions, or "" when unavailable. */
+/** Joins the live-price prefix to a base description, capped for SERP display. */
+export function composeDescription(prefix: string, base: string, max = 158): string {
+  const full = prefix + base;
+  if (full.length <= max) return full;
+  const cut = full.slice(0, max);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\s]+$/, "") + "…";
+}
+
 export function priceMetaPrefix(ctx: PriceContext, dataCountryName: string): string {
   if (!ctx.ok) return "";
   const p = ctx.prices.get(dataCountryName);

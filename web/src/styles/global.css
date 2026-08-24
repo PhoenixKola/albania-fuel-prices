@@ -1098,11 +1098,11 @@ select {
 }
 
 .deltaUp {
-  color: #22c55e;
+  color: var(--delta-up);
 }
 
 .deltaDown {
-  color: #ef4444;
+  color: var(--delta-down);
 }
 
 .deltaFlat {
@@ -4626,4 +4626,17 @@ select {
 .dailyReviewText .quizCardFlagImg {
   width: 18px;
   border-radius: 2px;
+}
+
+
+/* Delta colours meeting WCAG AA (4.5:1) on each theme's background.
+   The previous #22c55e / #ef4444 pair failed on light (2.3:1 and 3.3:1). */
+:root {
+  --delta-up: #4ade80;
+  --delta-down: #f87171;
+}
+
+:root[data-theme="light"] {
+  --delta-up: #15803d;
+  --delta-down: #b91c1c;
 }
