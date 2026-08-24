@@ -83,7 +83,7 @@ export default function HeroIntro({ t, lang, updatedAt, data, country, selected,
       </div>
 
       <div className="contentHeroVisual" aria-hidden="true">
-        <div className="heroFloatCard heroFloatCardTop">{t.heroShowcaseFloat1}</div>
+        <div className="heroFloatCard heroFloatCardTop">{t.heroShowcaseFloat1(data?.countries.length ?? 0)}</div>
         <div className="heroFloatCard heroFloatCardBottom">{t.heroShowcaseFloat2}</div>
 
         <div className="heroPhone">

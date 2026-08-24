@@ -19,12 +19,6 @@
       "lpg_eur": 0.866
     },
     {
-      "country": "Australia",
-      "gasoline95_eur": 1.067,
-      "diesel_eur": 1.244,
-      "lpg_eur": 0.383
-    },
-    {
       "country": "Belarus",
       "gasoline95_eur": 0.759,
       "diesel_eur": 0.759,
@@ -43,28 +37,10 @@
       "lpg_eur": 0.689
     },
     {
-      "country": "Brazil",
-      "gasoline95_eur": 1.131,
-      "diesel_eur": 1.181,
-      "lpg_eur": null
-    },
-    {
       "country": "Bulgaria",
       "gasoline95_eur": 1.526,
       "diesel_eur": 1.734,
       "lpg_eur": 0.632
-    },
-    {
-      "country": "Canada",
-      "gasoline95_eur": 1.223,
-      "diesel_eur": 1.273,
-      "lpg_eur": 0.791
-    },
-    {
-      "country": "China",
-      "gasoline95_eur": 1.157,
-      "diesel_eur": 1.019,
-      "lpg_eur": null
     },
     {
       "country": "Croatia",
@@ -109,22 +85,10 @@
       "lpg_eur": 0.948
     },
     {
-      "country": "India",
-      "gasoline95_eur": 0.964,
-      "diesel_eur": 0.894,
-      "lpg_eur": 0.606
-    },
-    {
       "country": "Italy",
       "gasoline95_eur": 1.975,
       "diesel_eur": 2.079,
       "lpg_eur": 0.739
-    },
-    {
-      "country": "Japan",
-      "gasoline95_eur": 0.924,
-      "diesel_eur": 0.857,
-      "lpg_eur": null
     },
     {
       "country": "Kosovo",
@@ -149,12 +113,6 @@
       "gasoline95_eur": 1.708,
       "diesel_eur": 1.901,
       "lpg_eur": 0.679
-    },
-    {
-      "country": "Mexico",
-      "gasoline95_eur": 1.406,
-      "diesel_eur": 1.343,
-      "lpg_eur": null
     },
     {
       "country": "Moldova",
@@ -211,12 +169,6 @@
       "lpg_eur": 0.965
     },
     {
-      "country": "South Korea",
-      "gasoline95_eur": 1.336,
-      "diesel_eur": 1.307,
-      "lpg_eur": 0.71
-    },
-    {
       "country": "Spain",
       "gasoline95_eur": 1.703,
       "diesel_eur": 1.84,
@@ -251,12 +203,6 @@
       "gasoline95_eur": 1.863,
       "diesel_eur": 2.097,
       "lpg_eur": 1.144
-    },
-    {
-      "country": "United States",
-      "gasoline95_eur": 1.025,
-      "diesel_eur": 1.209,
-      "lpg_eur": null
     }
   ]
 }

@@ -115,7 +115,7 @@ export const sq = {
   heroShowcaseTrust1: "P\u00ebrdit\u00ebsime ditore",
   heroShowcaseTrust2: "Mbulim n\u00eb Evrop\u00eb",
   heroShowcaseTrust3: "Krahasim n\u00eb sekonda",
-  heroShowcaseFloat1: "42 shtete",
+  heroShowcaseFloat1: (n: number) => `${n} shtete`,
   heroShowcaseFloat2: "Naft\u00eb \u00b7 Benzin\u00eb \u00b7 LPG",
   heroShowcaseMockupStatus: "P\u00ebrdit\u00ebsuar sot",
   heroShowcaseMockupPill: "Shqip\u00ebri \u00b7 Naft\u00eb",
@@ -186,7 +186,7 @@ export const sq = {
   sourceCardInterpretationNote:
     "Shifrat në këtë faqe duhen lexuar si krahasim praktik i të dhënave publike të karburantit, jo si garanci për çmimin e saktë në çdo pikë. Pikat lokale, taksat, koha e raportimit dhe efekti i kursit të këmbimit mund të ndryshojnë rezultatin final.",
   sourceCardMethodologyNote:
-    "Metodologjia: faqja krahason çmimet e karburantit në nivel vendi dhe i paraqet në një formë më të thjeshtë për planifikim udhëtimi, krahasim dhe vlerësim të kostove. Këto shifra janë më të dobishme si orientim tregu. Vlerësimet globale (SHBA, Kanada, Australi, Japoni, Kinë, Indi, Brazil, Meksikë, Kore e Jugut) përdorin vlera referuese nga GlobalPetrolPrices.com me një ndryshim të vogël ditor — trajtohen vetëm si kontekst aproximativ.",
+    "Metodologjia: faqja krahason çmimet e karburantit në nivel vendi dhe i paraqet në një formë më të thjeshtë për planifikim udhëtimi, krahasim dhe vlerësim të kostove. Këto shifra janë më të dobishme si orientim tregu.",
   sourceUrlLabel: "URL",
 
   // Navigation & Footer

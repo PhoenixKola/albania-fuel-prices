@@ -116,7 +116,7 @@ export type TDict = {
   heroShowcaseTrust1: string;
   heroShowcaseTrust2: string;
   heroShowcaseTrust3: string;
-  heroShowcaseFloat1: string;
+  heroShowcaseFloat1: (n: number) => string;
   heroShowcaseFloat2: string;
   heroShowcaseMockupStatus: string;
   heroShowcaseMockupPill: string;

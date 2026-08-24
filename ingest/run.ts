@@ -48,41 +48,6 @@ type HistoryEurope = {
   }>;
 };
 
-const GLOBAL_ESTIMATES_BASE: CountryPrices[] = [
-  { country: "Australia",    gasoline95_eur: 1.057, diesel_eur: 1.246, lpg_eur: 0.383 },
-  { country: "Brazil",       gasoline95_eur: 1.134, diesel_eur: 1.175, lpg_eur: null  },
-  { country: "Canada",       gasoline95_eur: 1.240, diesel_eur: 1.285, lpg_eur: 0.788 },
-  { country: "China",        gasoline95_eur: 1.144, diesel_eur: 1.025, lpg_eur: null  },
-  { country: "India",        gasoline95_eur: 0.977, diesel_eur: 0.882, lpg_eur: 0.600 },
-  { country: "Japan",        gasoline95_eur: 0.914, diesel_eur: 0.857, lpg_eur: null  },
-  { country: "Mexico",       gasoline95_eur: 1.399, diesel_eur: 1.340, lpg_eur: null  },
-  { country: "South Korea",  gasoline95_eur: 1.321, diesel_eur: 1.318, lpg_eur: 0.717 },
-  { country: "United States",gasoline95_eur: 1.024, diesel_eur: 1.193, lpg_eur: null  },
-];
-
-// Deterministic hash of (date + country + fuel) → small ±1.5% daily variation.
-// Same date always produces the same value; different dates drift gradually.
-function dailyVariation(base: number, dateStr: string, country: string, fuel: string): number {
-  const key = `${dateStr}|${country}|${fuel}`;
-  let h = 2166136261;
-  for (let i = 0; i < key.length; i++) {
-    h ^= key.charCodeAt(i);
-    h = (h * 16777619) >>> 0;
-  }
-  // Map hash → [-0.015, +0.015]
-  const pct = ((h % 1000) / 1000 - 0.5) * 0.03;
-  return Math.round(base * (1 + pct) * 1000) / 1000;
-}
-
-function buildEstimatedFallbacks(dateStr: string): CountryPrices[] {
-  return GLOBAL_ESTIMATES_BASE.map((row) => ({
-    country: row.country,
-    gasoline95_eur: row.gasoline95_eur != null ? dailyVariation(row.gasoline95_eur, dateStr, row.country, "g95") : null,
-    diesel_eur:     row.diesel_eur     != null ? dailyVariation(row.diesel_eur,     dateStr, row.country, "dsl") : null,
-    lpg_eur:        row.lpg_eur        != null ? dailyVariation(row.lpg_eur,        dateStr, row.country, "lpg") : null,
-  }));
-}
-
 function toNum(v: string) {
   const s = String(v).trim();
   if (!s || s === "-" || s.toLowerCase() === "n/a") return null;
@@ -378,8 +343,10 @@ async function main() {
     diesel_eur: null,
     lpg_eur: null,
   }).filter((country) => !sameCountry(country.country, "Kosovo"));
-  const ESTIMATED_COUNTRY_FALLBACKS = buildEstimatedFallbacks(picked.as_of);
-  const countries = upsertCountries(europeanCountries, ESTIMATED_COUNTRY_FALLBACKS);
+  // Only real, sourced prices are published. Non-European "reference" markets
+  // used to be synthesised here from hardcoded bases with a hash-derived daily
+  // wobble, which meant ~20% of the dataset was invented.
+  const countries = europeanCountries;
 
   if (kosovoLive) {
     console.log("Kosovo added from live/free source");

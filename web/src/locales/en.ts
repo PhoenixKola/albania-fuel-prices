@@ -115,7 +115,7 @@ export const en = {
   heroShowcaseTrust1: "Daily updates",
   heroShowcaseTrust2: "Europe-wide coverage",
   heroShowcaseTrust3: "Compare in seconds",
-  heroShowcaseFloat1: "42 countries",
+  heroShowcaseFloat1: (n: number) => `${n} countries`,
   heroShowcaseFloat2: "Diesel \u00b7 Petrol \u00b7 LPG",
   heroShowcaseMockupStatus: "Updated today",
   heroShowcaseMockupPill: "Albania \u00b7 Diesel",
@@ -186,7 +186,7 @@ export const en = {
   sourceCardInterpretationNote:
     "The figures on this page should be read as a practical comparison of public fuel data, not as a guarantee of the exact pump price at every station. Local stations, taxes, reporting times, and exchange-rate effects can all change the final price users see.",
   sourceCardMethodologyNote:
-    "Methodology: the site compares country-level fuel prices and presents them in a simpler format for travel planning, comparison, and rough cost estimation. These numbers are most useful as market guidance rather than as a promise for one exact station. Global estimates (US, Canada, Australia, Japan, China, India, Brazil, Mexico, South Korea) use reference values from GlobalPetrolPrices.com with a small daily variation applied — treat them as approximate context only.",
+    "Methodology: the site compares country-level fuel prices and presents them in a simpler format for travel planning, comparison, and rough cost estimation. These numbers are most useful as market guidance rather than as a promise for one exact station.",
   sourceUrlLabel: "URL",
 
   // Navigation & Footer
