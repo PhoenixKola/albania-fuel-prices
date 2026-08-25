@@ -15,7 +15,7 @@ import { getFlagForCountry } from "../../utils/countryFlag";
 import { formatMoney } from "../../utils/money";
 import { getWeeklyDeltaEur, type Trends } from "../../hooks/useTrends";
 
-type Scope = "europe" | "world" | "favorites";
+type Scope = "europe" | "favorites";
 
 export default function RankingCard(props: {
   theme: Theme;
@@ -43,10 +43,11 @@ export default function RankingCard(props: {
     [props.t]
   );
 
+  // "World" was dropped: the feed carries only European markets now, so that
+  // tab rendered an identical list to "Europe".
   const scopeItems = useMemo(
     () => [
       { value: "europe", label: props.t.scopeEurope },
-      { value: "world", label: props.t.scopeWorld },
       { value: "favorites", label: props.t.favorites }
     ],
     [props.t]
@@ -66,7 +67,6 @@ export default function RankingCard(props: {
 
   const sorted = useMemo(() => {
     if (scope === "europe") return europeSorted;
-    if (scope === "world") return allSorted;
     return allSorted.filter((x) => favoritesSet.has(x.country));
   }, [scope, europeSorted, allSorted, favoritesSet]);
 
@@ -206,42 +206,62 @@ export default function RankingCard(props: {
 
   return (
     <View style={s.card}>
-      <View style={s.hero}>
-        <View style={s.heroTop}>
-          <View style={s.headerIcon}>
-            <Ionicons name="podium-outline" size={20} color={props.theme.colors.primary} />
-          </View>
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={s.heroLabel}>{fuelName}</Text>
-            <Text style={s.heroTitle} numberOfLines={1}>
-              {scopeStats?.cheapest?.country ?? props.t.rankingsTitle}
+      {/* Snapshot: price-first tiles plus the reader's own standing. The old
+          hero repeated the cheapest country as a headline and echoed the
+          screen subtitle, so the same two facts appeared three times. */}
+      <View style={s.snapshot}>
+        <View style={s.metricGrid}>
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.rankingsCheapTitle}</Text>
+            <Text style={[s.metricPrice, s.metricPriceGood]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+              {scopeStats
+                ? formatFuelPrice(scopeStats.cheapest.country, scopeStats.cheapest.price, props.currencyMode, props.fxRates)
+                : "—"}
             </Text>
-            <Text style={s.heroSub} numberOfLines={1}>
-              {scopeStats ? props.t.rankingsCheapSubtitle(fuelName) : props.t.rankUnavailable}
+            <Text style={s.metricCountry} numberOfLines={1}>
+              {scopeStats ? `${getFlagForCountry(scopeStats.cheapest.country)} ${scopeStats.cheapest.country}` : "—"}
+            </Text>
+          </View>
+
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.homeEuropeAverage ?? "Average"}</Text>
+            <Text style={s.metricPrice} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+              {scopeStats ? formatMoney(scopeStats.avg, "EUR") : "—"}
+            </Text>
+            <Text style={s.metricCountry} numberOfLines={1}>
+              {scope === "favorites" ? props.t.favorites : props.t.scopeEurope}
+            </Text>
+          </View>
+
+          <View style={s.metricTile}>
+            <Text style={s.metricLabel}>{props.t.rankingsExpensiveTitle}</Text>
+            <Text style={[s.metricPrice, s.metricPriceBad]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+              {scopeStats
+                ? formatFuelPrice(scopeStats.expensive.country, scopeStats.expensive.price, props.currencyMode, props.fxRates)
+                : "—"}
+            </Text>
+            <Text style={s.metricCountry} numberOfLines={1}>
+              {scopeStats ? `${getFlagForCountry(scopeStats.expensive.country)} ${scopeStats.expensive.country}` : "—"}
             </Text>
           </View>
         </View>
 
-        <View style={s.metricGrid}>
-          <View style={s.metricTile}>
-            <Text style={s.metricLabel}>{props.t.rankingsCheapTitle}</Text>
-            <Text style={s.metricValue} numberOfLines={1}>{scopeStats?.cheapest?.country ?? "—"}</Text>
-            <Text style={s.metricSub}>
-              {scopeStats ? formatFuelPrice(scopeStats.cheapest.country, scopeStats.cheapest.price, props.currencyMode, props.fxRates) : "—"}
+        <View style={s.yourRankRow}>
+          <Text style={s.yourRankCountry} numberOfLines={1}>
+            {getFlagForCountry(props.currentCountry)
+              ? `${getFlagForCountry(props.currentCountry)} ${props.currentCountry}`
+              : props.currentCountry}
+          </Text>
+          {currentRankInScope != null ? (
+            <View style={s.yourRankPill}>
+              <Text style={s.yourRankNum}>{`#${currentRankInScope}`}</Text>
+              <Text style={s.yourRankTotal}>{`/ ${sorted.length}`}</Text>
+            </View>
+          ) : (
+            <Text style={s.yourRankNone} numberOfLines={1}>
+              {scope === "favorites" ? props.t.notInFavoritesRank : props.t.rankUnavailable}
             </Text>
-          </View>
-          <View style={s.metricTile}>
-            <Text style={s.metricLabel}>{props.t.homeEuropeAverage ?? "Average"}</Text>
-            <Text style={s.metricValue}>{scopeStats ? formatMoney(scopeStats.avg, "EUR") : "—"}</Text>
-            <Text style={s.metricSub}>{scope === "world" ? props.t.scopeWorld : scope === "favorites" ? props.t.favorites : props.t.scopeEurope}</Text>
-          </View>
-          <View style={s.metricTile}>
-            <Text style={s.metricLabel}>{props.t.rankingsExpensiveTitle}</Text>
-            <Text style={s.metricValue} numberOfLines={1}>{scopeStats?.expensive?.country ?? "—"}</Text>
-            <Text style={s.metricSub}>
-              {scopeStats ? formatFuelPrice(scopeStats.expensive.country, scopeStats.expensive.price, props.currencyMode, props.fxRates) : "—"}
-            </Text>
-          </View>
+          )}
         </View>
       </View>
 
@@ -264,25 +284,9 @@ export default function RankingCard(props: {
         </View>
       ) : null}
 
-      <View style={s.infoBanner}>
-        <Ionicons name="information-circle-outline" size={18} color={props.theme.colors.muted} />
-        <Text style={s.infoText}>
-          {scope === "favorites"
-            ? currentRankInScope != null
-              ? props.t.yourRankInFavorites(currentRankInScope)
-              : props.t.notInFavoritesRank
-            : currentRankInScope != null
-              ? props.t.yourRank(currentRankInScope)
-              : props.t.rankUnavailable}
-        </Text>
-      </View>
-
       <View style={s.sectionHeaderRow}>
         <Text style={s.sectionTitle}>
           {scope === "favorites" ? props.t.rankingsFavoritesTitle : props.t.rankingsCheapTitle}
-        </Text>
-        <Text style={s.sectionSub}>
-          {scope === "favorites" ? props.t.rankingsFavoritesSubtitle(fuelName) : props.t.rankingsCheapSubtitle(fuelName)}
         </Text>
       </View>
 

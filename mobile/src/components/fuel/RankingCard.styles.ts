@@ -12,68 +12,60 @@ export const makeRankingStyles = (theme: Theme) =>
       gap: theme.m.s(14)
     },
 
-    hero: {
+    // Snapshot: one tinted surface, no nested bordered cards. Tiles lead with
+    // the price because a number never truncates the way "Switzerland" did.
+    snapshot: {
       borderRadius: 18,
       padding: theme.m.s(14),
-      gap: theme.m.s(14),
-      backgroundColor: theme.name === "light" ? "#F2FAF8" : "rgba(45, 212, 191, 0.08)",
+      gap: theme.m.s(12),
+      backgroundColor: theme.name === "light" ? "#F2FAF8" : "rgba(45, 212, 191, 0.07)",
       borderWidth: 1,
-      borderColor: theme.name === "light" ? "rgba(15,118,110,0.14)" : "rgba(45,212,191,0.16)"
+      borderColor: theme.name === "light" ? "rgba(15,118,110,0.13)" : "rgba(45,212,191,0.15)"
     },
-    heroTop: { flexDirection: "row", alignItems: "center", gap: theme.m.s(12) },
-    heroLabel: {
+    metricGrid: { flexDirection: "row", gap: theme.m.s(10) },
+    metricTile: { flex: 1, minWidth: 0, gap: theme.m.s(3) },
+    metricLabel: {
       color: theme.colors.muted,
-      fontSize: theme.m.f(11),
       fontWeight: "700",
+      fontSize: theme.m.f(10),
       textTransform: "uppercase",
-      letterSpacing: 0.7
+      letterSpacing: 0.6,
+      // Reserve two lines so a label that wraps ("Most expensive", and longer
+      // translations) cannot push its price below the neighbouring tiles.
+      lineHeight: theme.m.f(13),
+      minHeight: theme.m.f(26)
     },
-    heroTitle: { marginTop: theme.m.s(2), color: theme.colors.text, fontWeight: "800", fontSize: theme.m.f(20) },
-    heroSub: { marginTop: theme.m.s(3), color: theme.colors.muted, fontWeight: "700", fontSize: theme.m.f(12) },
-    metricGrid: { flexDirection: "row", gap: theme.m.s(8) },
-    metricTile: {
-      flex: 1,
-      minHeight: 82,
-      borderRadius: 15,
-      padding: theme.m.s(10),
-      backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      justifyContent: "space-between"
-    },
-    metricLabel: { color: theme.colors.muted, fontWeight: "700", fontSize: theme.m.f(10) },
-    metricValue: { color: theme.colors.text, fontWeight: "800", fontSize: theme.m.f(13) },
-    metricSub: { color: theme.colors.muted, fontWeight: "700", fontSize: theme.m.f(11) },
+    metricPrice: { color: theme.colors.text, fontWeight: "800", fontSize: theme.m.f(19) },
+    metricPriceGood: { color: theme.name === "light" ? "#0F766E" : "#2DD4BF" },
+    metricPriceBad: { color: theme.name === "light" ? "#B45309" : "#FBBF24" },
+    metricCountry: { color: theme.colors.subText, fontWeight: "600", fontSize: theme.m.f(11) },
 
-    headerRow: { flexDirection: "column", alignItems: "flex-start", justifyContent: "space-between", gap: theme.m.s(12) },
-    headerLeft: { flexDirection: "row", alignItems: "center", gap: theme.m.s(12), flex: 1 },
-    headerIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 16,
-      backgroundColor: theme.colors.card,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      alignItems: "center",
-      justifyContent: "center"
-    },
-
-    title: { fontSize: theme.m.f(16), fontWeight: "800", color: theme.colors.text },
-    subtitle: { marginTop: theme.m.s(4), color: theme.colors.muted, fontWeight: "700", fontSize: theme.m.f(12) },
-
-    headerPills: { alignItems: "flex-end", gap: theme.m.s(8), flexDirection: "row" },
-    pill: {
+    // The reader's own standing, folded in so it is not a separate banner.
+    yourRankRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: theme.m.s(6),
-      paddingVertical: theme.m.s(6),
+      justifyContent: "space-between",
+      gap: theme.m.s(10),
+      paddingTop: theme.m.s(11),
+      borderTopWidth: 1,
+      borderTopColor: theme.name === "light" ? "rgba(15,118,110,0.13)" : "rgba(45,212,191,0.15)"
+    },
+    yourRankCountry: { flex: 1, minWidth: 0, color: theme.colors.text, fontWeight: "700", fontSize: theme.m.f(13) },
+    yourRankPill: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      gap: theme.m.s(4),
+      paddingVertical: theme.m.s(4),
       paddingHorizontal: theme.m.s(10),
       borderRadius: 999,
-      backgroundColor: theme.colors.pillBg,
-      borderWidth: 1,
-      borderColor: theme.colors.border
+      backgroundColor: theme.colors.linkBg
     },
-    pillText: { color: theme.colors.muted, fontWeight: "800", fontSize: theme.m.f(12), maxWidth: 120 },
+    yourRankNum: { color: theme.colors.linkText, fontWeight: "800", fontSize: theme.m.f(14) },
+    yourRankTotal: { color: theme.colors.muted, fontWeight: "700", fontSize: theme.m.f(11) },
+    yourRankNone: { color: theme.colors.muted, fontWeight: "700", fontSize: theme.m.f(12), flexShrink: 1 },
+
+
+
 
     infoBanner: {
       flexDirection: "row",
