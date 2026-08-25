@@ -2,14 +2,15 @@ import React, { useMemo } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { Theme } from "../../theme/theme";
+import type { TDict } from "../../i18n";
 import { getFlagForCountry } from "../../utils/countryFlag";
 
 type Props = {
   theme: Theme;
+  t: TDict;
   open: boolean;
   currentCountry: string;
   favorites: string[];
-  closeLabel: string;
   onSelect: (c: string) => void;
   onOpenFull: () => void;
   onClose: () => void;
@@ -17,10 +18,10 @@ type Props = {
 
 export default function FavoritesQuickSheet({
   theme,
+  t,
   open,
   currentCountry,
   favorites,
-  closeLabel,
   onSelect,
   onOpenFull,
   onClose,
@@ -46,7 +47,7 @@ export default function FavoritesQuickSheet({
         <Text style={s.rowName} numberOfLines={1}>{country}</Text>
         {isCurrent ? (
           <View style={s.currentBadge}>
-            <Text style={s.currentBadgeText}>Selected</Text>
+            <Text style={s.currentBadgeText}>{t.selected}</Text>
           </View>
         ) : null}
       </Pressable>
@@ -60,21 +61,21 @@ export default function FavoritesQuickSheet({
           <View style={s.handle} />
 
           <View style={s.headerRow}>
-            <Text style={s.title}>Quick switch</Text>
+            <Text style={s.title}>{t.quickSwitch}</Text>
             <Pressable onPress={onClose} style={s.closeBtn}>
-              <Text style={s.closeText}>{closeLabel}</Text>
+              <Text style={s.closeText}>{t.close}</Text>
             </Pressable>
           </View>
 
           <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
-            <Text style={s.sectionLabel}>Current</Text>
+            <Text style={s.sectionLabel}>{t.current}</Text>
             <View style={s.list}>
               <Row country={currentCountry} isCurrent />
             </View>
 
             {favList.length > 0 ? (
               <>
-                <Text style={s.sectionLabel}>Favorites</Text>
+                <Text style={s.sectionLabel}>{t.favorites}</Text>
                 <View style={s.list}>
                   {favList.map((c, i) => (
                     <View key={c}>
@@ -93,7 +94,7 @@ export default function FavoritesQuickSheet({
 
           <Pressable style={s.searchBtn} onPress={onOpenFull}>
             <Ionicons name="search" size={16} color={theme.colors.muted} />
-            <Text style={s.searchBtnText}>Search all countries</Text>
+            <Text style={s.searchBtnText}>{t.searchAllCountries}</Text>
             <Ionicons name="chevron-forward" size={15} color={theme.colors.muted} />
           </Pressable>
         </Pressable>

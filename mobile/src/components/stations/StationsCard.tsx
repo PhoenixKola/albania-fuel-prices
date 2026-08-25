@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { Theme } from "../../theme/theme";
+import type { TDict } from "../../i18n";
 import type { Station } from "../../hooks/useNearbyStations";
 import AnimatedPressable from "../ui/AnimatedPressable";
 import { makeStationsStyles } from "./StationsCard.styles";
@@ -31,7 +32,7 @@ async function openInMaps(lat: number, lon: number) {
 
 export default function StationsCard(props: {
   theme: Theme;
-  t: any;
+  t: TDict;
 
   permission: "unknown" | "granted" | "denied";
   locating: boolean;
@@ -152,7 +153,7 @@ export default function StationsCard(props: {
             <Text style={s.metricValue}>{Math.round(props.radiusM / 1000)} km</Text>
           </View>
           <View style={s.metricTile}>
-            <Text style={s.metricLabel}>Nearest</Text>
+            <Text style={s.metricLabel}>{props.t.nearest}</Text>
             <Text style={s.metricValue}>{nearest ? `${nearest.distanceKm.toFixed(1)} km` : "—"}</Text>
           </View>
           <View style={s.metricTile}>

@@ -13,6 +13,15 @@ declare const require: (name: string) => any;
 const PRIVACY_URL = "https://karburantisot.com/privacy";
 const TERMS_URL = "https://karburantisot.com/terms";
 
+/** Linking.openURL rejects when nothing can handle the URL; swallow that. */
+async function openUrl(url: string) {
+  try {
+    await Linking.openURL(url);
+  } catch {
+    // no handler installed, or the user cancelled the chooser
+  }
+}
+
 function getAppVersion(): string {
   try {
     const Constants = require("expo-constants").default;
@@ -29,6 +38,7 @@ export default function SettingsTab() {
 
   const isDark = ctx.themeName === "dark";
   const appVersion = useMemo(() => getAppVersion(), []);
+  const sourceUrl = ctx.data?.source_url ?? null;
 
   const themeOptions = [
     { value: "light" as const, label: ctx.t.themeLight, icon: "sunny-outline" as const },
@@ -168,9 +178,9 @@ export default function SettingsTab() {
                 </Text>
               </View>
             </View>
-            {ctx.data?.source_url ? (
+            {sourceUrl ? (
               <AnimatedPressable
-                onPress={() => Linking.openURL(ctx.data!.source_url)}
+                onPress={() => openUrl(sourceUrl)}
                 contentStyle={s.pill}
                 scaleIn={0.97}
               >
@@ -264,7 +274,7 @@ export default function SettingsTab() {
         <View style={s.section}>
           <Text style={s.sectionTitle}>{ctx.t.aboutSection}</Text>
 
-          <AnimatedPressable onPress={() => Linking.openURL(PRIVACY_URL)} contentStyle={s.row} scaleIn={0.99}>
+          <AnimatedPressable onPress={() => openUrl(PRIVACY_URL)} contentStyle={s.row} scaleIn={0.99}>
             <View style={s.rowLeft}>
               <View style={[s.rowIconWrap, { backgroundColor: "rgba(99,102,241,0.12)" }]}>
                 <Ionicons name="shield-checkmark-outline" size={18} color="#6366F1" />
@@ -277,7 +287,7 @@ export default function SettingsTab() {
             <Ionicons name="open-outline" size={16} color={ctx.theme.colors.muted} />
           </AnimatedPressable>
 
-          <AnimatedPressable onPress={() => Linking.openURL(TERMS_URL)} contentStyle={[s.row, s.rowBorder]} scaleIn={0.99}>
+          <AnimatedPressable onPress={() => openUrl(TERMS_URL)} contentStyle={[s.row, s.rowBorder]} scaleIn={0.99}>
             <View style={s.rowLeft}>
               <View style={[s.rowIconWrap, { backgroundColor: "rgba(148,163,184,0.14)" }]}>
                 <Ionicons name="document-text-outline" size={18} color="#94A3B8" />

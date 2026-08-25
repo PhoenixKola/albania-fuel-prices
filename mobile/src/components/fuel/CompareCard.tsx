@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { Theme } from "../../theme/theme";
+import type { TDict } from "../../i18n";
 import type { FuelType, LatestEurope } from "../../types/fuel";
 import type { Trends } from "../../hooks/useTrends";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
@@ -45,7 +46,7 @@ function safeParseSets(raw: string | null): CompareSet[] {
 
 export default function CompareCard(props: {
   theme: Theme;
-  t: any;
+  t: TDict;
   data: LatestEurope | null;
   trends: Trends | null;
   fuelType: FuelType;
@@ -181,8 +182,8 @@ export default function CompareCard(props: {
 
   const modeLabel =
     props.currencyMode === "eur"
-      ? (props.t.currencyEUR ?? "EUR")
-      : (props.t.currencyLocal ?? "Local");
+      ? props.t.currencyEUR
+      : props.t.currencyLocal;
 
   const applySet = (countries: string[]) => {
     props.onApplySet?.(countries.slice(0, props.maxCompare));
@@ -202,7 +203,7 @@ export default function CompareCard(props: {
               {comparisonSummary?.cheapest?.name ?? props.t.compareTitle}
             </Text>
             <Text style={s.heroSub} numberOfLines={1}>
-              {comparisonSummary ? `${props.t.best ?? "Best"} value` : props.t.compareHint}
+              {comparisonSummary ? `${props.t.best} value` : props.t.compareHint}
             </Text>
           </View>
         </View>
@@ -213,7 +214,7 @@ export default function CompareCard(props: {
             <Text style={s.metricValue}>{props.compareCountries.length}/{props.maxCompare}</Text>
           </View>
           <View style={s.metricTile}>
-            <Text style={s.metricLabel}>Spread</Text>
+            <Text style={s.metricLabel}>{props.t.spread}</Text>
             <Text style={s.metricValue}>{comparisonSummary?.spreadText ?? "—"}</Text>
           </View>
           <View style={s.metricTile}>
@@ -226,7 +227,7 @@ export default function CompareCard(props: {
       <View style={s.actionRow}>
         <AnimatedPressable onPress={() => setSetsOpen(true)} contentStyle={s.btn} scaleIn={0.98}>
           <Ionicons name="bookmark-outline" size={17} color={props.theme.colors.text} />
-          <Text style={s.btnText}>{props.t.savedSets ?? "Saved"}</Text>
+          <Text style={s.btnText}>{props.t.savedSets}</Text>
         </AnimatedPressable>
 
         <AnimatedPressable
@@ -259,7 +260,7 @@ export default function CompareCard(props: {
           <View style={s.emptyIcon}>
             <Ionicons name="git-compare-outline" size={24} color={props.theme.colors.primary} />
           </View>
-          <Text style={s.emptyTitle}>{props.t.compareEmpty ?? "Add countries to start comparing."}</Text>
+          <Text style={s.emptyTitle}>{props.t.compareEmpty}</Text>
           <Text style={s.emptyText}>{props.t.compareHint}</Text>
           <AnimatedPressable onPress={props.onAddPress} contentStyle={s.emptyCta} scaleIn={0.98}>
             <Ionicons name="add" size={18} color={props.theme.colors.primaryText} />
@@ -320,7 +321,7 @@ export default function CompareCard(props: {
                   {isBest ? (
                     <View style={s.bestPill}>
                       <Ionicons name="sparkles-outline" size={12} color={props.theme.colors.text} />
-                      <Text style={s.bestText}>{props.t.best ?? "Best"}</Text>
+                      <Text style={s.bestText}>{props.t.best}</Text>
                     </View>
                   ) : null}
                 </View>
@@ -338,36 +339,36 @@ export default function CompareCard(props: {
         <View style={s.modalBackdrop}>
           <View style={s.modalCard}>
             <View style={s.modalHeader}>
-              <Text style={s.modalTitle}>{props.t.compareSetsTitle ?? "Compare sets"}</Text>
+              <Text style={s.modalTitle}>{props.t.compareSetsTitle}</Text>
               <AnimatedPressable onPress={() => setSetsOpen(false)} contentStyle={s.modalCloseBtn} scaleIn={0.98}>
                 <Ionicons name="close" size={18} color={props.theme.colors.text} />
               </AnimatedPressable>
             </View>
 
             <View style={s.modalSection}>
-              <Text style={s.modalLabel}>{props.t.saveCurrentSet ?? "Save current set"}</Text>
+              <Text style={s.modalLabel}>{props.t.saveCurrentSet}</Text>
               <View style={s.modalRow}>
                 <TextInput
                   value={newSetName}
                   onChangeText={setNewSetName}
-                  placeholder={props.t.setNamePlaceholder ?? "Name"}
+                  placeholder={props.t.setNamePlaceholder}
                   placeholderTextColor={props.theme.colors.muted}
                   style={s.modalInput}
                 />
                 <AnimatedPressable onPress={onSaveCurrent} contentStyle={s.modalPrimaryBtn} scaleIn={0.98}>
                   <Ionicons name="save-outline" size={16} color={props.theme.colors.primaryText} />
-                  <Text style={s.modalPrimaryText}>{props.t.save ?? "Save"}</Text>
+                  <Text style={s.modalPrimaryText}>{props.t.save}</Text>
                 </AnimatedPressable>
               </View>
             </View>
 
             <View style={s.modalSection}>
-              <Text style={s.modalLabel}>{props.t.savedSets ?? "Saved"}</Text>
+              <Text style={s.modalLabel}>{props.t.savedSets}</Text>
 
               {sets.length === 0 ? (
                 <View style={s.modalEmpty}>
                   <Ionicons name="bookmark-outline" size={18} color={props.theme.colors.muted} />
-                  <Text style={s.modalEmptyText}>{props.t.noSavedSets ?? "No saved sets yet."}</Text>
+                  <Text style={s.modalEmptyText}>{props.t.noSavedSets}</Text>
                 </View>
               ) : (
                 <View style={{ gap: 10 }}>
@@ -396,7 +397,7 @@ export default function CompareCard(props: {
             <View style={s.modalFooter}>
               <AnimatedPressable onPress={() => applySet(props.compareCountries)} contentStyle={s.modalGhostBtn} scaleIn={0.98}>
                 <Ionicons name="refresh-outline" size={16} color={props.theme.colors.text} />
-                <Text style={s.modalGhostText}>{props.t.keepCurrent ?? "Keep current"}</Text>
+                <Text style={s.modalGhostText}>{props.t.keepCurrent}</Text>
               </AnimatedPressable>
             </View>
           </View>

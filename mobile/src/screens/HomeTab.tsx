@@ -353,10 +353,10 @@ export default function HomeTab() {
 
       <FavoritesQuickSheet
         theme={ctx.theme}
+        t={ctx.t}
         open={quickSheetOpen}
         currentCountry={ctx.country}
         favorites={ctx.favorites}
-        closeLabel={ctx.t.close}
         onSelect={(c) => {
           ctx.setCountryTracked(c);
           setQuickSheetOpen(false);
@@ -391,7 +391,7 @@ export default function HomeTab() {
           <View style={s.alertModal}>
             <View style={s.alertModalHeader}>
               <View>
-                <Text style={s.alertModalTitle}>Price alert</Text>
+                <Text style={s.alertModalTitle}>{ctx.t.priceAlert}</Text>
                 <Text style={s.alertModalSub}>{ctx.country} | {fuelLabel(ctx.fuelType, ctx.t)}</Text>
               </View>
               <AnimatedPressable onPress={() => setAlertOpen(false)} contentStyle={s.alertCloseBtn} scaleIn={0.98}>
@@ -434,7 +434,7 @@ export default function HomeTab() {
                   contentStyle={s.alertGhostBtn}
                   scaleIn={0.98}
                 >
-                  <Text style={s.alertGhostText}>Remove</Text>
+                  <Text style={s.alertGhostText}>{ctx.t.remove}</Text>
                 </AnimatedPressable>
               ) : null}
               <AnimatedPressable
@@ -448,7 +448,7 @@ export default function HomeTab() {
                 scaleIn={0.98}
               >
                 <Ionicons name="notifications-outline" size={17} color={ctx.theme.colors.primaryText} />
-                <Text style={s.alertPrimaryText}>Save alert</Text>
+                <Text style={s.alertPrimaryText}>{ctx.t.saveAlert}</Text>
               </AnimatedPressable>
             </View>
           </View>

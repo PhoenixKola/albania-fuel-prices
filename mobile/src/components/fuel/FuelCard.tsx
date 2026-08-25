@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import type { LatestEurope, CountryPrices, FuelType } from "../../types/fuel";
 import type { Theme } from "../../theme/theme";
+import type { TDict } from "../../i18n";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
 import { getCurrencyForCountry, convertEur } from "../../utils/currency";
 import { formatMoney, hasRate } from "../../utils/money";
@@ -40,7 +41,7 @@ function safeParseBaseline(raw: string | null): StoredBaseline | null {
 
 export default function FuelCard(props: {
   theme: Theme;
-  t: any;
+  t: TDict;
   data: LatestEurope | null;
   selected: CountryPrices | null;
   prevSelected: CountryPrices | null;
@@ -172,14 +173,14 @@ export default function FuelCard(props: {
 
   const modeLabel =
     mode === "eur"
-      ? props.t.currencyEUR ?? "EUR"
-      : props.t.currencyLocal ?? "Local";
+      ? props.t.currencyEUR
+      : props.t.currencyLocal;
 
   const statusText = props.loading
-    ? props.t.loading ?? "Loading"
+    ? props.t.loading
     : props.isFromCache
-      ? props.t.showingCached ?? "Cached"
-      : props.t.homeVerified ?? "Verified";
+      ? props.t.showingCached
+      : props.t.homeVerified;
 
   return (
     <View style={s.styles.card}>
@@ -197,7 +198,7 @@ export default function FuelCard(props: {
               {flag ? <Text style={s.styles.flag}>{flag}</Text> : null}
               <Text style={s.styles.subText} numberOfLines={1}>
                 {props.country} · {props.t.currency}: {modeLabel}
-                {!canLocal && currency !== "EUR" ? ` · ${props.t.fxUnavailable ?? "FX unavailable"}` : ""}
+                {!canLocal && currency !== "EUR" ? ` · ${props.t.fxUnavailable}` : ""}
               </Text>
             </View>
           </View>

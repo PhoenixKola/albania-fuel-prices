@@ -2,11 +2,12 @@ import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { Theme } from "../../theme/theme";
+import type { TDict } from "../../i18n";
 import AnimatedPressable from "../ui/AnimatedPressable";
 
 export default function RateAppModal(props: {
   theme: Theme;
-  t: any;
+  t: TDict;
   open: boolean;
   onClose: () => void;
   onRate: () => void;

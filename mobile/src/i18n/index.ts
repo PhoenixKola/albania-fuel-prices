@@ -200,6 +200,24 @@ export type TDict = {
   homeNearbyStationsWidget: string;
   homeSavedCountriesWidget: string;
   homeCompareCountriesWidget: string;
+
+  // Compare sets, alerts and quick-switch labels
+  best: string;
+  savedSets: string;
+  compareSetsTitle: string;
+  saveCurrentSet: string;
+  setNamePlaceholder: string;
+  save: string;
+  noSavedSets: string;
+  spread: string;
+  nearest: string;
+  current: string;
+  searchAllCountries: string;
+  priceAlert: string;
+  saveAlert: string;
+  keepCurrent: string;
+  loading: string;
+  fxUnavailable: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -403,6 +421,22 @@ export const i18n: Record<Lang, TDict> = {
     homeNearbyStationsWidget: "Nearby stations",
     homeSavedCountriesWidget: "Saved countries",
     homeCompareCountriesWidget: "Compare countries",
+    best: "Best",
+    savedSets: "Saved",
+    compareSetsTitle: "Compare sets",
+    saveCurrentSet: "Save current set",
+    setNamePlaceholder: "Name",
+    save: "Save",
+    noSavedSets: "No saved sets yet.",
+    spread: "Spread",
+    nearest: "Nearest",
+    current: "Current",
+    searchAllCountries: "Search all countries",
+    priceAlert: "Price alert",
+    saveAlert: "Save alert",
+    keepCurrent: "Keep current",
+    loading: "Loading…",
+    fxUnavailable: "FX unavailable",
   },
   sq: {
     title: "Karburanti Sot",
@@ -604,5 +638,21 @@ export const i18n: Record<Lang, TDict> = {
     homeNearbyStationsWidget: "Pika afer",
     homeSavedCountriesWidget: "Shtete te ruajtura",
     homeCompareCountriesWidget: "Krahaso shtetet",
+    best: "Më i miri",
+    savedSets: "Të ruajtura",
+    compareSetsTitle: "Grupet e krahasimit",
+    saveCurrentSet: "Ruaj grupin aktual",
+    setNamePlaceholder: "Emri",
+    save: "Ruaj",
+    noSavedSets: "Ende nuk ka grupe të ruajtura.",
+    spread: "Diferenca",
+    nearest: "Më e afërta",
+    current: "Aktual",
+    searchAllCountries: "Kërko të gjitha shtetet",
+    priceAlert: "Njoftim çmimi",
+    saveAlert: "Ruaj njoftimin",
+    keepCurrent: "Ruaj aktualin",
+    loading: "Po ngarkohet…",
+    fxUnavailable: "Kursi s'disponohet",
   },
 };

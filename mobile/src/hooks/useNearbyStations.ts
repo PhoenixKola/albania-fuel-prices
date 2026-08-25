@@ -61,6 +61,18 @@ function getOpenNow(openingHours?: string): boolean | null {
   }
 }
 
+/**
+ * Re-derives open/closed from the retained opening_hours string.
+ *
+ * isOpenNow is evaluated once when a station is fetched and then written to
+ * the cache with it. The failure fallback below reads that cache with no age
+ * limit, so without this a station could be shown as "Open now" hours after
+ * it closed — the worst possible error for a station finder.
+ */
+function withFreshOpenState(stations: Station[]): Station[] {
+  return stations.map((st) => ({ ...st, isOpenNow: getOpenNow(st.openingHours) }));
+}
+
 export function useNearbyStations(opts: { center: { lat: number; lon: number } | null; radiusM?: number }) {
   const radiusM = opts.radiusM ?? 5000;
   // Extract primitives so callbacks don't re-create when the center object reference changes
@@ -95,7 +107,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
 
     if (!nearSameCenter || !sameRadius) return null;
 
-    setStations(env.stations);
+    setStations(withFreshOpenState(env.stations));
     setFromCache(true);
     return env;
   }, [centerLat, centerLon, radiusM]);

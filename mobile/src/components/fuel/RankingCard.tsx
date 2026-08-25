@@ -224,7 +224,7 @@ export default function RankingCard(props: {
           </View>
 
           <View style={s.metricTile}>
-            <Text style={s.metricLabel}>{props.t.homeEuropeAverage ?? "Average"}</Text>
+            <Text style={s.metricLabel}>{props.t.homeEuropeAverage}</Text>
             <Text style={s.metricPrice} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
               {scopeStats ? formatMoney(scopeStats.avg, "EUR") : "—"}
             </Text>
