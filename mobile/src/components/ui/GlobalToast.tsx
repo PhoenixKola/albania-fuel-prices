@@ -41,13 +41,13 @@ export default function GlobalToast({ theme, message }: Props) {
           transform: [{ translateY }],
           backgroundColor: theme.colors.primary,
           borderRadius: 14,
-          paddingHorizontal: 14,
-          paddingVertical: 10,
+          paddingHorizontal: theme.m.s(14),
+          paddingVertical: theme.m.s(10),
           borderWidth: 1,
           borderColor: theme.colors.border,
         }}
       >
-        <Text style={{ color: theme.colors.primaryText, fontWeight: "800", fontSize: 13 }}>{visibleMessage}</Text>
+        <Text style={{ color: theme.colors.primaryText, fontWeight: "800", fontSize: theme.m.f(13) }}>{visibleMessage}</Text>
       </Animated.View>
     </View>
   );

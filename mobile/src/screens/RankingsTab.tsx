@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useApp } from "../context/AppContext";
+import { contentContainer } from "../theme/layout";
 import RankingCard from "../components/fuel/RankingCard";
 import { makeScreenHeaderStyles } from "./screenHeader.styles";
 
@@ -13,7 +14,7 @@ export default function RankingsTab() {
   return (
     <View style={{ flex: 1, backgroundColor: ctx.theme.colors.bg }}>
       <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        contentContainerStyle={contentContainer(ctx.theme)}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={ctx.refreshing} onRefresh={ctx.refreshAll} />}
       >

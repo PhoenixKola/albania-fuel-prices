@@ -10,13 +10,13 @@ export const makeSegmentedStyles = (theme: Theme) =>
       backgroundColor: theme.colors.card,
       borderRadius: 16,
       overflow: "hidden",
-      padding: 2
+      padding: theme.m.s(2)
     },
 
     item: {
       flex: 1,
-      paddingVertical: 12,
-      paddingHorizontal: 12,
+      paddingVertical: theme.m.s(12),
+      paddingHorizontal: theme.m.s(12),
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "row",
@@ -30,7 +30,7 @@ export const makeSegmentedStyles = (theme: Theme) =>
     text: {
       fontWeight: "900",
       color: theme.colors.muted,
-      fontSize: 13
+      fontSize: theme.m.f(13)
     },
 
     textActive: {

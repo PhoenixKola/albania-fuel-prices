@@ -25,7 +25,7 @@ export default function RateAppModal(props: {
         backgroundColor: "rgba(0,0,0,0.55)",
         justifyContent: "center" as const,
         alignItems: "center" as const,
-        padding: 18
+        padding: theme.m.s(18)
       },
       card: {
         width: "100%" as const,
@@ -34,40 +34,40 @@ export default function RateAppModal(props: {
         borderWidth: 1,
         borderColor: theme.colors.border,
         backgroundColor: theme.colors.card ?? theme.colors.tile,
-        padding: 14,
-        gap: 12
+        padding: theme.m.s(14),
+        gap: theme.m.s(12)
       },
       titleRow: { flexDirection: "row" as const, alignItems: "center" as const, justifyContent: "space-between" as const },
-      titleLeft: { flexDirection: "row" as const, alignItems: "center" as const, gap: 10 },
-      title: { fontSize: 16, fontWeight: "900" as const, color: theme.colors.text },
-      closeBtn: { paddingVertical: 8, paddingHorizontal: 10, borderRadius: 12 },
-      body: { gap: 10 },
-      text: { color: theme.colors.muted, fontSize: 13, fontWeight: "700" as const },
-      actions: { gap: 10, marginTop: 2 },
+      titleLeft: { flexDirection: "row" as const, alignItems: "center" as const, gap: theme.m.s(10) },
+      title: { fontSize: theme.m.f(16), fontWeight: "900" as const, color: theme.colors.text },
+      closeBtn: { paddingVertical: theme.m.s(8), paddingHorizontal: theme.m.s(10), borderRadius: 12 },
+      body: { gap: theme.m.s(10) },
+      text: { color: theme.colors.muted, fontSize: theme.m.f(13), fontWeight: "700" as const },
+      actions: { gap: theme.m.s(10), marginTop: theme.m.s(2) },
       primaryBtn: {
         borderRadius: 14,
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: theme.m.s(12),
+        paddingHorizontal: theme.m.s(12),
         flexDirection: "row" as const,
         alignItems: "center" as const,
         justifyContent: "center" as const,
-        gap: 10,
+        gap: theme.m.s(10),
         backgroundColor: theme.colors.primary
       },
-      primaryText: { color: theme.colors.primaryText, fontSize: 14, fontWeight: "900" as const },
+      primaryText: { color: theme.colors.primaryText, fontSize: theme.m.f(14), fontWeight: "900" as const },
       secondaryBtn: {
         borderRadius: 14,
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: theme.m.s(12),
+        paddingHorizontal: theme.m.s(12),
         flexDirection: "row" as const,
         alignItems: "center" as const,
         justifyContent: "center" as const,
-        gap: 10,
+        gap: theme.m.s(10),
         borderWidth: 1,
         borderColor: theme.colors.border,
         backgroundColor: "transparent"
       },
-      secondaryText: { color: theme.colors.text, fontSize: 14, fontWeight: "900" as const }
+      secondaryText: { color: theme.colors.text, fontSize: theme.m.f(14), fontWeight: "900" as const }
     }),
     [theme]
   );

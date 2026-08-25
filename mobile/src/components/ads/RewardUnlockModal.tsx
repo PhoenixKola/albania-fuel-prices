@@ -27,7 +27,7 @@ export default function RewardUnlockModal(props: {
         backgroundColor: "rgba(0,0,0,0.55)",
         justifyContent: "center" as const,
         alignItems: "center" as const,
-        padding: 18
+        padding: t.m.s(18)
       },
       card: {
         width: "100%" as const,
@@ -36,19 +36,19 @@ export default function RewardUnlockModal(props: {
         borderWidth: 1,
         borderColor: t.colors.border,
         backgroundColor: t.colors.card ?? t.colors.tile,
-        padding: 14,
-        gap: 12
+        padding: t.m.s(14),
+        gap: t.m.s(12)
       },
       titleRow: { flexDirection: "row" as const, alignItems: "center" as const, justifyContent: "space-between" as const },
-      titleLeft: { flexDirection: "row" as const, alignItems: "center" as const, gap: 10 },
-      title: { fontSize: 16, fontWeight: "900" as const, color: t.colors.text },
+      titleLeft: { flexDirection: "row" as const, alignItems: "center" as const, gap: t.m.s(10) },
+      title: { fontSize: t.m.f(16), fontWeight: "900" as const, color: t.colors.text },
       closeBtn: {
-        paddingVertical: 8,
-        paddingHorizontal: 10,
+        paddingVertical: t.m.s(8),
+        paddingHorizontal: t.m.s(10),
         borderRadius: 12
       },
-      body: { gap: 10 },
-      line: { flexDirection: "row" as const, alignItems: "center" as const, gap: 10 },
+      body: { gap: t.m.s(10) },
+      line: { flexDirection: "row" as const, alignItems: "center" as const, gap: t.m.s(10) },
       bullet: {
         width: 28,
         height: 28,
@@ -59,32 +59,32 @@ export default function RewardUnlockModal(props: {
         alignItems: "center" as const,
         justifyContent: "center" as const
       },
-      text: { color: t.colors.muted, fontSize: 13, fontWeight: "700" as const, flex: 1 },
-      actions: { gap: 10 },
+      text: { color: t.colors.muted, fontSize: t.m.f(13), fontWeight: "700" as const, flex: 1 },
+      actions: { gap: t.m.s(10) },
       primaryBtn: {
         borderRadius: 14,
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: t.m.s(12),
+        paddingHorizontal: t.m.s(12),
         flexDirection: "row" as const,
         alignItems: "center" as const,
         justifyContent: "center" as const,
-        gap: 10,
+        gap: t.m.s(10),
         backgroundColor: t.colors.primary
       },
-      primaryText: { color: t.colors.primaryText, fontSize: 14, fontWeight: "900" as const },
+      primaryText: { color: t.colors.primaryText, fontSize: t.m.f(14), fontWeight: "900" as const },
       secondaryBtn: {
         borderRadius: 14,
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: t.m.s(12),
+        paddingHorizontal: t.m.s(12),
         flexDirection: "row" as const,
         alignItems: "center" as const,
         justifyContent: "center" as const,
-        gap: 10,
+        gap: t.m.s(10),
         borderWidth: 1,
         borderColor: t.colors.border,
         backgroundColor: "transparent"
       },
-      secondaryText: { color: t.colors.text, fontSize: 14, fontWeight: "900" as const }
+      secondaryText: { color: t.colors.text, fontSize: t.m.f(14), fontWeight: "900" as const }
     }),
     [t]
   );

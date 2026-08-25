@@ -121,7 +121,7 @@ const makeStyles = (theme: Theme) => {
   return StyleSheet.create({
     card: {
       borderRadius: 26,
-      padding: 17,
+      padding: theme.m.s(17),
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -130,24 +130,24 @@ const makeStyles = (theme: Theme) => {
       shadowRadius: 18,
       shadowOffset: { width: 0, height: 12 },
       elevation: 3,
-      gap: 14
+      gap: theme.m.s(14)
     },
     headerRow: {
       flexDirection: "row",
       alignItems: "flex-start",
       justifyContent: "space-between",
-      gap: 12
+      gap: theme.m.s(12)
     },
     kicker: {
       color: light ? "#0F766E" : "#8DEDE1",
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "800",
       textTransform: "uppercase"
     },
     title: {
-      marginTop: 4,
+      marginTop: theme.m.s(4),
       color: theme.colors.text,
-      fontSize: 17,
+      fontSize: theme.m.f(17),
       lineHeight: 21,
       fontWeight: "800"
     },
@@ -156,8 +156,8 @@ const makeStyles = (theme: Theme) => {
       minHeight: 30,
       flexDirection: "row",
       alignItems: "center",
-      gap: 5,
-      paddingHorizontal: 10,
+      gap: theme.m.s(5),
+      paddingHorizontal: theme.m.s(10),
       borderRadius: 999,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
@@ -165,14 +165,14 @@ const makeStyles = (theme: Theme) => {
     },
     deltaText: {
       flexShrink: 1,
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "700"
     },
     chartRow: {
       height: 84,
       flexDirection: "row",
       alignItems: "flex-end",
-      gap: 4
+      gap: theme.m.s(4)
     },
     barSlot: {
       flex: 1,
@@ -190,16 +190,16 @@ const makeStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: 10
+      gap: theme.m.s(10)
     },
     footerText: {
       color: theme.colors.muted,
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "700"
     },
     footerCurrent: {
       color: theme.colors.text,
-      fontSize: 13,
+      fontSize: theme.m.f(13),
       fontWeight: "800"
     }
   });

@@ -1,6 +1,7 @@
-import { useColorScheme } from "react-native";
+import { useColorScheme, useWindowDimensions } from "react-native";
+import { useMemo } from "react";
 import { STORAGE_THEME_KEY } from "../constants/storage";
-import { themes, type ThemeName } from "../theme/theme";
+import { composeTheme, type ThemeName } from "../theme/theme";
 import { useAsyncStorageState } from "./useAsyncStorageState";
 
 export type ThemePreference = ThemeName;
@@ -19,5 +20,10 @@ export function useTheme() {
 
   const toggleTheme = () => setThemePreference(themeName === "light" ? "dark" : "light");
 
-  return { themeName, themePreference, setThemePreference, theme: themes[themeName], toggleTheme };
+  // Width/height are part of the theme so every style factory re-runs when the
+  // window changes — rotation, split screen, foldables, tablets.
+  const { width, height } = useWindowDimensions();
+  const theme = useMemo(() => composeTheme(themeName, width, height), [themeName, width, height]);
+
+  return { themeName, themePreference, setThemePreference, theme, toggleTheme };
 }

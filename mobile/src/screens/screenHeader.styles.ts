@@ -6,8 +6,8 @@ export const makeScreenHeaderStyles = (theme: Theme) =>
     header: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 12,
-      paddingBottom: 4,
+      gap: theme.m.s(12),
+      paddingBottom: theme.m.s(4),
     },
     iconWrap: {
       width: 40,
@@ -22,12 +22,12 @@ export const makeScreenHeaderStyles = (theme: Theme) =>
     title: {
       color: theme.colors.text,
       fontWeight: "900",
-      fontSize: 16,
+      fontSize: theme.m.f(16),
     },
     subtitle: {
       color: theme.colors.muted,
       fontWeight: "700",
-      fontSize: 12,
-      marginTop: 2,
+      fontSize: theme.m.f(12),
+      marginTop: theme.m.s(2),
     },
   });

@@ -6,16 +6,16 @@ export const makeErrorCardStyles = (theme: Theme) =>
     card: {
       backgroundColor: theme.colors.card,
       borderRadius: 18,
-      padding: 14,
+      padding: theme.m.s(14),
       borderWidth: 1,
       borderColor: theme.colors.border,
-      gap: 12
+      gap: theme.m.s(12)
     },
 
     head: {
       flexDirection: "row",
       alignItems: "flex-start",
-      gap: 12
+      gap: theme.m.s(12)
     },
 
     icon: {
@@ -30,13 +30,13 @@ export const makeErrorCardStyles = (theme: Theme) =>
     },
 
     title: {
-      fontSize: 15,
+      fontSize: theme.m.f(15),
       fontWeight: "900",
       color: theme.colors.danger
     },
 
     msg: {
-      marginTop: 6,
+      marginTop: theme.m.s(6),
       color: theme.colors.subText,
       lineHeight: 18,
       fontWeight: "700"
@@ -47,7 +47,7 @@ export const makeErrorCardStyles = (theme: Theme) =>
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.colors.primary,
-      paddingVertical: 12,
+      paddingVertical: theme.m.s(12),
       borderRadius: 16
     },
 

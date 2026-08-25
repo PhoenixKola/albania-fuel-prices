@@ -5,9 +5,9 @@ export const makeAdBarStyles = (theme: Theme) =>
   StyleSheet.create({
     wrap: {
       alignSelf: "stretch",
-      marginHorizontal: 16,
-      marginTop: 8,
-      marginBottom: 6,
+      marginHorizontal: theme.m.s(16),
+      marginTop: theme.m.s(8),
+      marginBottom: theme.m.s(6),
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.colors.bg,

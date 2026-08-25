@@ -107,16 +107,16 @@ const makeStyles = (theme: Theme) => {
   return StyleSheet.create({
     card: {
       borderRadius: 18,
-      padding: 14,
-      gap: 12,
+      padding: theme.m.s(14),
+      gap: theme.m.s(12),
       backgroundColor: light ? "#F3FBF9" : "rgba(45, 212, 191, 0.08)",
       borderWidth: 1,
       borderColor: theme.colors.border,
     },
-    headerRow: { flexDirection: "row", justifyContent: "space-between", gap: 12, alignItems: "center" },
-    kicker: { color: theme.colors.muted, fontSize: 11, fontWeight: "700", textTransform: "uppercase" },
-    title: { marginTop: 3, color: theme.colors.text, fontSize: 16, fontWeight: "800" },
-    range: { color: theme.colors.muted, fontSize: 12, fontWeight: "800" },
+    headerRow: { flexDirection: "row", justifyContent: "space-between", gap: theme.m.s(12), alignItems: "center" },
+    kicker: { color: theme.colors.muted, fontSize: theme.m.f(11), fontWeight: "700", textTransform: "uppercase" },
+    title: { marginTop: theme.m.s(3), color: theme.colors.text, fontSize: theme.m.f(16), fontWeight: "800" },
+    range: { color: theme.colors.muted, fontSize: theme.m.f(12), fontWeight: "800" },
     chart: {
       height: 104,
       borderRadius: 15,
@@ -126,10 +126,10 @@ const makeStyles = (theme: Theme) => {
       overflow: "hidden",
       position: "relative",
     },
-    legend: { gap: 8 },
-    legendItem: { flexDirection: "row", alignItems: "center", gap: 8 },
+    legend: { gap: theme.m.s(8) },
+    legendItem: { flexDirection: "row", alignItems: "center", gap: theme.m.s(8) },
     swatch: { width: 10, height: 10, borderRadius: 999 },
-    legendText: { flex: 1, color: theme.colors.text, fontSize: 12, fontWeight: "700" },
-    legendPrice: { color: theme.colors.muted, fontSize: 12, fontWeight: "800" },
+    legendText: { flex: 1, color: theme.colors.text, fontSize: theme.m.f(12), fontWeight: "700" },
+    legendPrice: { color: theme.colors.muted, fontSize: theme.m.f(12), fontWeight: "800" },
   });
 };

@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useApp } from "../context/AppContext";
+import { contentContainer } from "../theme/layout";
 import StationsCard from "../components/stations/StationsCard";
 import { makeScreenHeaderStyles } from "./screenHeader.styles";
 
@@ -13,7 +14,7 @@ export default function StationsTab() {
   return (
     <View style={{ flex: 1, backgroundColor: ctx.theme.colors.bg }}>
       <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        contentContainerStyle={contentContainer(ctx.theme)}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl

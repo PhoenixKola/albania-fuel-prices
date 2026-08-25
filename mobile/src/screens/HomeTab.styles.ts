@@ -20,15 +20,18 @@ export const makeHomeStyles = (theme: Theme) => {
       backgroundColor: theme.colors.bg
     },
     content: {
-      paddingHorizontal: 16,
-      paddingTop: 12,
-      paddingBottom: 28,
-      gap: 18
+      width: "100%",
+      maxWidth: theme.m.maxContentWidth,
+      alignSelf: "center",
+      paddingHorizontal: theme.m.s(16),
+      paddingTop: theme.m.s(12),
+      paddingBottom: theme.m.s(28),
+      gap: theme.m.s(18)
     },
     topChrome: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8
+      gap: theme.m.s(8)
     },
     avatarButton: {
       width: 46,
@@ -42,7 +45,7 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     avatarFlag: {
       color: text,
-      fontSize: 22,
+      fontSize: theme.m.f(22),
       fontWeight: "900"
     },
     searchPill: {
@@ -50,8 +53,8 @@ export const makeHomeStyles = (theme: Theme) => {
       minHeight: 46,
       flexDirection: "row",
       alignItems: "center",
-      gap: 9,
-      paddingHorizontal: 15,
+      gap: theme.m.s(9),
+      paddingHorizontal: theme.m.s(15),
       borderRadius: 999,
       backgroundColor: chromeBg,
       borderWidth: 1,
@@ -64,13 +67,13 @@ export const makeHomeStyles = (theme: Theme) => {
     searchText: {
       flex: 1,
       color: light ? "rgba(16,32,51,0.72)" : "rgba(255,255,255,0.80)",
-      fontSize: 14,
+      fontSize: theme.m.f(14),
       fontWeight: "800"
     },
     topIconCluster: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6
+      gap: theme.m.s(6)
     },
     topCircle: {
       width: 40,
@@ -95,7 +98,7 @@ export const makeHomeStyles = (theme: Theme) => {
       minHeight: 308,
       overflow: "hidden",
       borderRadius: 32,
-      padding: 18,
+      padding: theme.m.s(18),
       borderWidth: 1,
       borderColor: light ? "rgba(16,32,51,0.10)" : "rgba(255,255,255,0.16)",
       shadowColor: light ? "#8AA0B8" : "#000",
@@ -108,15 +111,15 @@ export const makeHomeStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: 12
+      gap: theme.m.s(12)
     },
     livePill: {
       maxWidth: "48%",
       minHeight: 32,
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
-      paddingHorizontal: 11,
+      gap: theme.m.s(6),
+      paddingHorizontal: theme.m.s(11),
       borderRadius: 999,
       backgroundColor: light ? "rgba(14, 116, 144, 0.09)" : "rgba(5, 8, 22, 0.34)",
       borderWidth: 1,
@@ -125,13 +128,13 @@ export const makeHomeStyles = (theme: Theme) => {
     livePillText: {
       flexShrink: 1,
       color: accent,
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "900"
     },
     heroUpdated: {
       flexShrink: 1,
       color: softText,
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "800",
       textAlign: "right"
     },
@@ -140,22 +143,22 @@ export const makeHomeStyles = (theme: Theme) => {
       minHeight: 182,
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 14
+      paddingVertical: theme.m.s(14)
     },
     heroPrice: {
       width: "100%",
       color: text,
-      fontSize: 56,
+      fontSize: theme.m.f(56),
       lineHeight: 64,
       fontWeight: "900",
       textAlign: "center"
     },
     accountPill: {
-      marginTop: 12,
+      marginTop: theme.m.s(12),
       maxWidth: "86%",
       minHeight: 36,
       justifyContent: "center",
-      paddingHorizontal: 14,
+      paddingHorizontal: theme.m.s(14),
       borderRadius: 999,
       backgroundColor: light ? "rgba(16,32,51,0.06)" : "rgba(255,255,255,0.14)",
       borderWidth: 1,
@@ -163,22 +166,22 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     accountPillText: {
       color: light ? "rgba(16,32,51,0.88)" : "rgba(255,255,255,0.94)",
-      fontSize: 13,
+      fontSize: theme.m.f(13),
       fontWeight: "900"
     },
     rankBadgeText: {
-      marginTop: 10,
+      marginTop: theme.m.s(10),
       maxWidth: "90%",
       color: softText,
-      fontSize: 12,
+      fontSize: theme.m.f(12),
       fontWeight: "800",
       textAlign: "center"
     },
     fuelSelector: {
       flexDirection: "row",
       alignItems: "stretch",
-      gap: 7,
-      padding: 5,
+      gap: theme.m.s(7),
+      padding: theme.m.s(5),
       borderRadius: 22,
       backgroundColor: light ? "rgba(16,32,51,0.05)" : "rgba(5, 8, 22, 0.38)",
       borderWidth: 1,
@@ -194,8 +197,8 @@ export const makeHomeStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: 6,
-      paddingHorizontal: 7,
+      gap: theme.m.s(6),
+      paddingHorizontal: theme.m.s(7),
       borderRadius: 17
     },
     fuelChipActive: {
@@ -204,7 +207,7 @@ export const makeHomeStyles = (theme: Theme) => {
     fuelChipText: {
       flexShrink: 1,
       color: light ? "rgba(16,32,51,0.62)" : "rgba(255,255,255,0.76)",
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "900",
       textAlign: "center"
     },
@@ -214,14 +217,14 @@ export const makeHomeStyles = (theme: Theme) => {
 
     actionSplitRow: {
       flexDirection: "row",
-      gap: 12
+      gap: theme.m.s(12)
     },
     actionGroup: {
       flex: 1,
       flexDirection: "row",
-      gap: 8,
-      paddingHorizontal: 8,
-      paddingVertical: 10,
+      gap: theme.m.s(8),
+      paddingHorizontal: theme.m.s(8),
+      paddingVertical: theme.m.s(10),
       borderRadius: 26,
       backgroundColor: light ? "rgba(255,252,247,0.82)" : "rgba(255,255,255,0.06)",
       borderWidth: 1,
@@ -232,7 +235,7 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     actionPressable: {
       alignItems: "center",
-      gap: 8
+      gap: theme.m.s(8)
     },
     actionCircle: {
       width: 52,
@@ -245,7 +248,7 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     actionLabel: {
       color: light ? "rgba(16,32,51,0.70)" : "rgba(255,255,255,0.78)",
-      fontSize: 10,
+      fontSize: theme.m.f(10),
       fontWeight: "900",
       textAlign: "center"
     },
@@ -264,7 +267,7 @@ export const makeHomeStyles = (theme: Theme) => {
 
     marketCard: {
       borderRadius: 26,
-      padding: 17,
+      padding: theme.m.s(17),
       backgroundColor: cardBg,
       borderWidth: 1,
       borderColor: cardBorder,
@@ -278,19 +281,19 @@ export const makeHomeStyles = (theme: Theme) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "flex-start",
-      gap: 12,
-      marginBottom: 12
+      gap: theme.m.s(12),
+      marginBottom: theme.m.s(12)
     },
     marketKicker: {
       color: accent,
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "900",
       textTransform: "uppercase"
     },
     marketTitle: {
-      marginTop: 4,
+      marginTop: theme.m.s(4),
       color: text,
-      fontSize: 19,
+      fontSize: theme.m.f(19),
       lineHeight: 23,
       fontWeight: "900"
     },
@@ -299,8 +302,8 @@ export const makeHomeStyles = (theme: Theme) => {
       minHeight: 30,
       flexDirection: "row",
       alignItems: "center",
-      gap: 5,
-      paddingHorizontal: 9,
+      gap: theme.m.s(5),
+      paddingHorizontal: theme.m.s(9),
       borderRadius: 999,
       backgroundColor: light ? "rgba(14, 116, 144, 0.09)" : "rgba(45, 212, 191, 0.10)",
       borderWidth: 1,
@@ -309,7 +312,7 @@ export const makeHomeStyles = (theme: Theme) => {
     sourcePillText: {
       flexShrink: 1,
       color: accent,
-      fontSize: 10,
+      fontSize: theme.m.f(10),
       fontWeight: "900"
     },
     pulseRow: {
@@ -317,7 +320,7 @@ export const makeHomeStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: 12,
+      gap: theme.m.s(12),
       borderTopWidth: 1,
       borderTopColor: light ? "rgba(16,32,51,0.08)" : "rgba(255,255,255,0.08)"
     },
@@ -327,19 +330,19 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     pulseLabel: {
       color: light ? "rgba(16,32,51,0.92)" : "rgba(255,255,255,0.94)",
-      fontSize: 13,
+      fontSize: theme.m.f(13),
       fontWeight: "900"
     },
     pulseDetail: {
-      marginTop: 3,
+      marginTop: theme.m.s(3),
       color: faintText,
-      fontSize: 11,
+      fontSize: theme.m.f(11),
       fontWeight: "800"
     },
     pulseValue: {
       maxWidth: 138,
       color: text,
-      fontSize: 15,
+      fontSize: theme.m.f(15),
       fontWeight: "900",
       textAlign: "right"
     },
@@ -355,14 +358,14 @@ export const makeHomeStyles = (theme: Theme) => {
       backgroundColor: "rgba(0,0,0,0.55)",
       alignItems: "center",
       justifyContent: "center",
-      padding: 18
+      padding: theme.m.s(18)
     },
     alertModal: {
       width: "100%",
       maxWidth: 520,
       borderRadius: 22,
-      padding: 16,
-      gap: 14,
+      padding: theme.m.s(16),
+      gap: theme.m.s(14),
       backgroundColor: theme.colors.card,
       borderWidth: 1,
       borderColor: theme.colors.border
@@ -371,17 +374,17 @@ export const makeHomeStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "flex-start",
       justifyContent: "space-between",
-      gap: 12
+      gap: theme.m.s(12)
     },
     alertModalTitle: {
       color: theme.colors.text,
-      fontSize: 18,
+      fontSize: theme.m.f(18),
       fontWeight: "800"
     },
     alertModalSub: {
-      marginTop: 4,
+      marginTop: theme.m.s(4),
       color: theme.colors.muted,
-      fontSize: 12,
+      fontSize: theme.m.f(12),
       fontWeight: "700"
     },
     alertCloseBtn: {
@@ -396,8 +399,8 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     alertSegment: {
       flexDirection: "row",
-      gap: 8,
-      padding: 3,
+      gap: theme.m.s(8),
+      padding: theme.m.s(3),
       borderRadius: 16,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
@@ -415,7 +418,7 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     alertSegmentText: {
       color: theme.colors.muted,
-      fontSize: 13,
+      fontSize: theme.m.f(13),
       fontWeight: "800"
     },
     alertSegmentTextActive: {
@@ -424,23 +427,23 @@ export const makeHomeStyles = (theme: Theme) => {
     alertInput: {
       minHeight: 50,
       borderRadius: 16,
-      paddingHorizontal: 14,
+      paddingHorizontal: theme.m.s(14),
       color: theme.colors.text,
       backgroundColor: theme.colors.tile,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      fontSize: 18,
+      fontSize: theme.m.f(18),
       fontWeight: "800"
     },
     alertActions: {
       flexDirection: "row",
       justifyContent: "flex-end",
-      gap: 10
+      gap: theme.m.s(10)
     },
     alertGhostBtn: {
       minHeight: 44,
       justifyContent: "center",
-      paddingHorizontal: 14,
+      paddingHorizontal: theme.m.s(14),
       borderRadius: 15,
       backgroundColor: theme.colors.pillBg,
       borderWidth: 1,
@@ -448,7 +451,7 @@ export const makeHomeStyles = (theme: Theme) => {
     },
     alertGhostText: {
       color: theme.colors.text,
-      fontSize: 13,
+      fontSize: theme.m.f(13),
       fontWeight: "800"
     },
     alertPrimaryBtn: {
@@ -456,14 +459,14 @@ export const makeHomeStyles = (theme: Theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: 8,
-      paddingHorizontal: 14,
+      gap: theme.m.s(8),
+      paddingHorizontal: theme.m.s(14),
       borderRadius: 15,
       backgroundColor: theme.colors.primary
     },
     alertPrimaryText: {
       color: theme.colors.primaryText,
-      fontSize: 13,
+      fontSize: theme.m.f(13),
       fontWeight: "800"
     }
   });
