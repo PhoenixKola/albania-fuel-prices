@@ -1,15 +1,15 @@
 {
   "region": "Europe",
-  "as_of": "2026-08-31",
+  "as_of": "2026-09-01",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-08-31T13:38:43.387Z",
+  "fetched_at_utc": "2026-09-01T11:34:34.690Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
       "country": "Albania",
       "gasoline95_eur": 2.052,
-      "diesel_eur": 2.236,
+      "diesel_eur": 2.237,
       "lpg_eur": 0.749
     },
     {
@@ -32,7 +32,7 @@
     },
     {
       "country": "Bosnia and Herzegovina",
-      "gasoline95_eur": 1.548,
+      "gasoline95_eur": 1.549,
       "diesel_eur": 1.739,
       "lpg_eur": 0.699
     },
@@ -51,12 +51,12 @@
     {
       "country": "Czechia",
       "gasoline95_eur": 1.734,
-      "diesel_eur": 1.866,
+      "diesel_eur": 1.867,
       "lpg_eur": 0.927
     },
     {
       "country": "Estonia",
-      "gasoline95_eur": 1.723,
+      "gasoline95_eur": 1.724,
       "diesel_eur": 1.779,
       "lpg_eur": 0.975
     },
@@ -68,15 +68,15 @@
     },
     {
       "country": "Germany",
-      "gasoline95_eur": 2.185,
+      "gasoline95_eur": 2.186,
       "diesel_eur": 2.279,
       "lpg_eur": 1.119
     },
     {
       "country": "Greece",
-      "gasoline95_eur": 2.041,
+      "gasoline95_eur": 2.042,
       "diesel_eur": 2.054,
-      "lpg_eur": 0.966
+      "lpg_eur": 0.967
     },
     {
       "country": "Hungary",
@@ -86,7 +86,7 @@
     },
     {
       "country": "Italy",
-      "gasoline95_eur": 2.03,
+      "gasoline95_eur": 2.031,
       "diesel_eur": 2.154,
       "lpg_eur": 0.76
     },
@@ -123,8 +123,8 @@
     {
       "country": "Poland",
       "gasoline95_eur": 1.492,
-      "diesel_eur": 1.698,
-      "lpg_eur": 0.697
+      "diesel_eur": 1.699,
+      "lpg_eur": 0.698
     },
     {
       "country": "Portugal",
@@ -135,7 +135,7 @@
     {
       "country": "Romania",
       "gasoline95_eur": 1.826,
-      "diesel_eur": 1.96,
+      "diesel_eur": 1.961,
       "lpg_eur": 0.889
     },
     {
@@ -182,7 +182,7 @@
     },
     {
       "country": "The Netherlands",
-      "gasoline95_eur": 2.342,
+      "gasoline95_eur": 2.343,
       "diesel_eur": 2.379,
       "lpg_eur": 0.945
     },
@@ -194,7 +194,7 @@
     },
     {
       "country": "Ukraine",
-      "gasoline95_eur": 1.572,
+      "gasoline95_eur": 1.573,
       "diesel_eur": 1.809,
       "lpg_eur": 0.844
     },
@@ -202,7 +202,7 @@
       "country": "United Kingdom",
       "gasoline95_eur": 1.902,
       "diesel_eur": 2.152,
-      "lpg_eur": 1.129
+      "lpg_eur": 1.13
     }
   ]
 }
