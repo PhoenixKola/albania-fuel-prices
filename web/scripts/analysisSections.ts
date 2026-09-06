@@ -24,7 +24,6 @@ import {
   FUEL_SHORT,
   type HistoryContext,
   type FuelKey,
-  type FuelStats,
 } from "./historyStats";
 import { renderLineChart, renderSparkline } from "./charts";
 import { isEuropeanCountry } from "../src/utils/regions";
@@ -256,60 +255,67 @@ export function renderMarketReport(
   });
 
   return `
-      <article class="contentPage">
+      <article class="contentPage marketReportArticle">
         <h1 class="contentPageTitle">European Fuel Market Report — ${hist.endLabel}</h1>
         <p class="contentBody">An automatically generated analysis of the European diesel market, recomputed every day from ${hist.daysObserved} days of price observations collected by Karburanti Sot since ${hist.startLabel}. Unlike the raw price snapshots published elsewhere, every figure below — ranges, 30-day moves, volatility and percentile positions — is derived from our own historical record.</p>
 
-        <section class="contentSection">
+        <section class="contentSection reportLeadSection" id="market-summary">
           <h2 class="contentHeading">Market summary</h2>
           <p class="contentBody">The average diesel price across the ${ranked.length} European markets we track is ${eur3(euAvg ?? 0)} per liter${euChange != null ? `, ${euChange >= 0 ? "up" : "down"} ${pct(Math.abs(euChange))} over the past 30 days` : ""}. ${slugLink(slugByCountry, cheapest.country)} is currently the cheapest market at ${eur3(cheapest.value)}, while ${slugLink(slugByCountry, dearest.country)} is the most expensive at ${eur3(dearest.value)} — a spread of ${eur3(dearest.value - cheapest.value)} per liter, or about ${eur((dearest.value - cheapest.value) * 50)} on a single 50-litre tank.</p>
           ${chart}
         </section>
 
-        <section class="contentSection">
-          <h2 class="contentHeading">Biggest fallers over 30 days</h2>
-          <div class="tableScroll">
-          <table class="contentTable">
-            <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Today</th></tr></thead>
-            <tbody>${fallers.map(moverRow).join("") || '<tr><td colspan="3">No market fell over the past 30 days.</td></tr>'}
-            </tbody>
-          </table>
+        <section class="contentSection" id="market-movers">
+          <h2 class="contentHeading">The markets moving now</h2>
+          <p class="contentBody">Thirty-day movement shows where the latest diesel reading has materially changed, with the exact value beside every direction.</p>
+          <div class="reportPairGrid">
+            <div class="reportPanel">
+              <h3>Biggest fallers</h3>
+              <div class="tableScroll">
+              <table class="contentTable">
+                <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Today</th></tr></thead>
+                <tbody>${fallers.map(moverRow).join("") || '<tr><td colspan="3">No market fell over the past 30 days.</td></tr>'}
+                </tbody>
+              </table>
+              </div>
+            </div>
+            <div class="reportPanel">
+              <h3>Biggest risers</h3>
+              <div class="tableScroll">
+              <table class="contentTable">
+                <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Today</th></tr></thead>
+                <tbody>${risers.map(moverRow).join("") || '<tr><td colspan="3">No market rose over the past 30 days.</td></tr>'}
+                </tbody>
+              </table>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section class="contentSection">
-          <h2 class="contentHeading">Biggest risers over 30 days</h2>
-          <div class="tableScroll">
-          <table class="contentTable">
-            <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Today</th></tr></thead>
-            <tbody>${risers.map(moverRow).join("") || '<tr><td colspan="3">No market rose over the past 30 days.</td></tr>'}
-            </tbody>
-          </table>
-          </div>
-        </section>
-
-        <section class="contentSection">
+        <section class="contentSection" id="market-volatility">
           <h2 class="contentHeading">Which markets move the most?</h2>
           <p class="contentBody">Volatility here is the standard deviation of daily percentage price moves across our full record — a measure of how unpredictable each market is from one day to the next. Stable markets are usually those with administered or slow-moving retail pricing; volatile ones tend to track wholesale costs closely.</p>
-          <div class="tableScroll">
-          <table class="contentTable">
-            <caption class="tableCaption">Most volatile diesel markets</caption>
-            <thead><tr><th scope="col">Country</th><th scope="col">Daily volatility</th><th scope="col">Trend</th></tr></thead>
-            <tbody>${mostVolatile.map(volRow).join("")}
-            </tbody>
-          </table>
-          </div>
-          <div class="tableScroll">
-          <table class="contentTable">
-            <caption class="tableCaption">Most stable diesel markets</caption>
-            <thead><tr><th scope="col">Country</th><th scope="col">Daily volatility</th><th scope="col">Trend</th></tr></thead>
-            <tbody>${leastVolatile.map(volRow).join("")}
-            </tbody>
-          </table>
+          <div class="reportPairGrid">
+            <div class="tableScroll">
+            <table class="contentTable">
+              <caption class="tableCaption">Most volatile diesel markets</caption>
+              <thead><tr><th scope="col">Country</th><th scope="col">Daily volatility</th><th scope="col">Trend</th></tr></thead>
+              <tbody>${mostVolatile.map(volRow).join("")}
+              </tbody>
+            </table>
+            </div>
+            <div class="tableScroll">
+            <table class="contentTable">
+              <caption class="tableCaption">Most stable diesel markets</caption>
+              <thead><tr><th scope="col">Country</th><th scope="col">Daily volatility</th><th scope="col">Trend</th></tr></thead>
+              <tbody>${leastVolatile.map(volRow).join("")}
+              </tbody>
+            </table>
+            </div>
           </div>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection" id="market-rankings">
           <h2 class="contentHeading">Full European diesel table</h2>
           <p class="contentBody">Every market we track, ranked cheapest first. "Position in range" shows where today's price sits within everything we have recorded for that country: 0% means it is at its cheapest observed level, 100% its most expensive.</p>
           <div class="tableScroll">
@@ -326,7 +332,7 @@ export function renderMarketReport(
           </div>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection" id="market-methodology">
           <h2 class="contentHeading">How this report is produced</h2>
           <p class="contentBody">Every figure is recomputed on each build from the daily price record this site has been appending to since ${hist.startLabel} — ${hist.daysObserved} consecutive readings with no gaps. Raw daily prices originate from public aggregators as described in our <a href="/methodology">methodology</a>, which also documents exactly how each figure here is calculated; the analysis, ranges, volatility measures and interpretations are our own.</p>
         </section>

@@ -78,6 +78,10 @@ export default function Navbar({
   const gamesRef = useRef<HTMLDivElement>(null);
   const guidesRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const toolsButtonRef = useRef<HTMLButtonElement>(null);
+  const gamesButtonRef = useRef<HTMLButtonElement>(null);
+  const guidesButtonRef = useRef<HTMLButtonElement>(null);
+  const aboutButtonRef = useRef<HTMLButtonElement>(null);
   const [lastPath, setLastPath] = useState(location.pathname);
 
   // Close everything on route change
@@ -132,7 +136,17 @@ export default function Navbar({
   useEffect(() => {
     if (!openDropdown) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpenDropdown(null);
+      if (e.key === "Escape") {
+        const buttons: Record<DropdownId, React.RefObject<HTMLButtonElement | null>> = {
+          tools: toolsButtonRef,
+          games: gamesButtonRef,
+          guides: guidesButtonRef,
+          about: aboutButtonRef,
+        };
+        const button = buttons[openDropdown].current;
+        setOpenDropdown(null);
+        button?.focus();
+      }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
@@ -189,24 +203,25 @@ export default function Navbar({
     label: string,
     links: { to: string; label: string }[],
     ref: React.RefObject<HTMLDivElement | null>,
+    buttonRef: React.RefObject<HTMLButtonElement | null>,
     ariaLabel: string
   ) => (
     <div className="navMenuWrap" ref={ref}>
       <button
+        ref={buttonRef}
         className={`navMenuBtn ${links.some((l) => isActive(l.to)) ? "navLinkActive" : ""}`}
         onClick={() => toggle(id)}
-        aria-haspopup="menu"
         aria-expanded={openDropdown === id}
+        aria-controls={`nav-${id}-links`}
       >
         {label}
       </button>
       {openDropdown === id && (
-        <div className="navMenu" role="menu" aria-label={ariaLabel}>
+        <div className="navMenu" id={`nav-${id}-links`} aria-label={ariaLabel}>
           {links.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              role="menuitem"
               className={`navMenuLink ${isActive(link.to) ? "navMenuLinkActive" : ""}`}
               onClick={() => setOpenDropdown(null)}
             >
@@ -244,10 +259,10 @@ export default function Navbar({
             </Link>
           ))}
 
-          {renderDropdown("tools", "Tools", toolLinks, toolsRef, "Tools menu")}
-          {renderDropdown("games", t.navGames, gamesLinks, gamesRef, "Games menu")}
-          {renderDropdown("guides", t.navGuides, guideLinks, guidesRef, "Guides menu")}
-          {renderDropdown("about", t.navAbout, aboutLinks, aboutRef, "About menu")}
+          {renderDropdown("tools", "Tools", toolLinks, toolsRef, toolsButtonRef, "Tools menu")}
+          {renderDropdown("games", t.navGames, gamesLinks, gamesRef, gamesButtonRef, "Games menu")}
+          {renderDropdown("guides", t.navGuides, guideLinks, guidesRef, guidesButtonRef, "Guides menu")}
+          {renderDropdown("about", t.navAbout, aboutLinks, aboutRef, aboutButtonRef, "About menu")}
         </div>
 
         {/* Desktop actions */}

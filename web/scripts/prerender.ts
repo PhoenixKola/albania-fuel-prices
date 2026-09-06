@@ -23,6 +23,7 @@ import { HOME_SUMMARY_HTML } from "../src/generated/homeSummary";
 import { MARKET_REPORT_HTML } from "../src/generated/marketReport";
 import { ANALYSIS_META } from "../src/generated/analysisMeta";
 import { isCountryIndexable } from "../src/generated/indexableCountries";
+import { editorialCopy, type EditorialTextSection } from "../src/config/editorialCopy";
 import {
   loadPriceContext,
   renderCountryPriceSection,
@@ -108,6 +109,44 @@ function freshnessNotice(): string {
   if (!ANALYSIS_META.stale) return "";
   return `
         <p class="staleNotice" role="status">Our price feed was last updated on ${ANALYSIS_META.asOf} (${ANALYSIS_META.dataAgeDays} days ago). Figures below may be out of date while we restore the daily update.</p>`;
+}
+
+function renderEditorialSections(sections: EditorialTextSection[]): string {
+  return sections.map((section, index) => `
+        <section class="contentSection editorialSection" id="${escapeHtml(section.id)}">
+          <p class="contentBodyMuted">${String(index + 1).padStart(2, "0")}</p>
+          <h2 class="contentHeading">${escapeHtml(section.title)}</h2>
+          ${section.paragraphs.map((paragraph) => `<p class="contentBody">${escapeHtml(paragraph)}</p>`).join("\n          ")}
+          ${section.bullets?.length ? `<ul class="contentList">${section.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+        </section>`).join("");
+}
+
+function redesignedStaticContent(route: RouteEntry): RouteEntry {
+  const copy = editorialCopy.en;
+  if (route.path === "/about") {
+    return { ...route, content: `
+      <article class="contentPage editorialExperience editorialExperience-dossier">
+        <header class="contentHero editorialHero"><p class="contentHeroBadge">${escapeHtml(copy.about.eyebrow)}</p><h1 class="contentHeroTitle">${escapeHtml(copy.about.title)}</h1><p class="contentHeroText">${escapeHtml(copy.about.lede)}</p><p class="contentBodyMuted">${ANALYSIS_META.countriesAnalysed} markets · ${ANALYSIS_META.daysObserved} days of history · independent</p></header>
+        ${renderEditorialSections(copy.about.sections)}
+      </article>` };
+  }
+  if (route.path === "/contact") {
+    return { ...route, content: `
+      <article class="contentPage editorialExperience editorialExperience-dossier">
+        <header class="contentHero editorialHero"><p class="contentHeroBadge">${escapeHtml(copy.contact.eyebrow)}</p><h1 class="contentHeroTitle">${escapeHtml(copy.contact.title)}</h1><p class="contentHeroText">${escapeHtml(copy.contact.lede)}</p><p><a class="heroCta heroCtaPrimary" href="mailto:fenixkola@gmail.com">${escapeHtml(copy.contact.emailAction)}</a></p></header>
+        ${renderEditorialSections(copy.contact.sections)}
+      </article>` };
+  }
+  const policyKey = route.path === "/privacy" ? "privacy" : route.path === "/terms" ? "terms" : route.path === "/editorial-policy" ? "editorial" : route.path === "/disclaimer" ? "disclaimer" : null;
+  if (policyKey) {
+    const document = copy.policies[policyKey];
+    return { ...route, content: `
+      <article class="contentPage editorialExperience editorialExperience-dossier">
+        <header class="contentHero editorialHero"><p class="contentHeroBadge">${escapeHtml(document.eyebrow)}</p><h1 class="contentHeroTitle">${escapeHtml(document.title)}</h1><p class="contentHeroText">${escapeHtml(document.lede)}</p><p class="contentBodyMuted">${escapeHtml(document.updated)}</p><div class="verdictBox"><strong>${escapeHtml(document.calloutLabel)}</strong><p class="contentBody">${escapeHtml(document.callout)}</p></div></header>
+        ${renderEditorialSections(document.sections)}
+      </article>` };
+  }
+  return route;
 }
 
 const STATIC_ROUTES: RouteEntry[] = [
@@ -614,44 +653,47 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
       priceBearing: true,
       noindex: !isCountryIndexable(c.slug),
       content: `
-      <article class="contentPage">
-        <h1 class="contentPageTitle">${escapeHtml(c.label)} fuel prices today</h1>
-        <p class="contentBody">This page provides a comprehensive overview of fuel prices in ${escapeHtml(c.label)}, with practical comparison context for Albanian drivers and travelers.</p>
+      <article class="contentPage editorialExperience editorialExperience-newsroom">
+        <header class="contentHero editorialHero">
+          <p class="contentHeroBadge">Country market briefing</p>
+          <h1 class="contentHeroTitle">${escapeHtml(c.label)} fuel prices, decoded.</h1>
+          <p class="contentHeroText">A live reference for petrol, diesel, and LPG in ${escapeHtml(c.label)}, placed against Europe and Albania with practical driving context.</p>
+        </header>
         ${freshnessNotice()}
-        ${renderCountryPriceSection(ctx, c)}
-        ${getCountryAnalysis(c.slug)}
-        <section class="contentSection">
+        <section id="country-prices">${renderCountryPriceSection(ctx, c)}</section>
+        <section id="country-history">${getCountryAnalysis(c.slug)}</section>
+        <section class="contentSection editorialSection" id="country-market">
           <h2 class="contentHeading">${escapeHtml(c.label)} fuel market overview</h2>
           <p class="contentBody">${escapeHtml(c.marketOverview)}</p>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection editorialSection" id="country-comparison">
           <h2 class="contentHeading">${c.dataCountryName === "Albania" ? "Albania as the reference market" : `How ${escapeHtml(c.label)} compares with Albania`}</h2>
           <p class="contentBody">${escapeHtml(c.albaniaContext)}</p>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection editorialSection" id="country-travel">
           <h2 class="contentHeading">Travel and driving context</h2>
           <p class="contentBody">${escapeHtml(c.travelRelevance)}</p>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection editorialSection" id="country-fuels">
           <h2 class="contentHeading">Understanding petrol, diesel, and LPG prices</h2>
           <p class="contentBody">${escapeHtml(c.fuelInterpretation)}</p>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection editorialSection" id="country-borders">
           <h2 class="contentHeading">Border crossings and refueling advice</h2>
           <p class="contentBody">${escapeHtml(c.borderAdvice)}</p>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection editorialSection" id="country-coverage">
           <h2 class="contentHeading">Data coverage and limitations</h2>
           <p class="contentBody">${escapeHtml(c.dataLimitations)}</p>
           <p class="contentBody">${escapeHtml(c.sourceTransparency)}</p>
         </section>
 
-        <section class="contentSection">
+        <section class="contentSection editorialSection" id="country-faq">
           <h2 class="contentHeading">Frequently asked questions</h2>
           ${faqItems}
         </section>
@@ -895,7 +937,7 @@ async function main() {
     process.exit(1);
   }
 
-  const routes = [...STATIC_ROUTES, ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
+  const routes = [...STATIC_ROUTES.map(redesignedStaticContent), ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
 
   let count = 0;
   for (const route of routes) {

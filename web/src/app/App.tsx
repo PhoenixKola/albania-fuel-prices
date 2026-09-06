@@ -48,32 +48,39 @@ const InsightsIndexPage = lazy(() => import("../pages/InsightsIndexPage"));
 const InsightArticlePage = lazy(() => import("../pages/InsightArticlePage"));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
 import RouteSeo from "./RouteSeo";
+import "../styles/editorial.css";
 
 import logo from "../assets/Logo.png";
 
 type CountryFuelRouteProps = {
   t: TDict;
+  lang: Lang;
   data: LatestEurope | null;
   trends: Trends | null;
   fuelType: FuelType;
   setFuelType: (v: FuelType) => void;
   loading: boolean;
   setCountry: (country: string) => void;
+  currency: Currency;
+  fxRates: ReturnType<typeof useFxRates>["rates"];
 };
 
-function CountryFuelRoute({ t, data, trends, fuelType, setFuelType, loading, setCountry }: CountryFuelRouteProps) {
+function CountryFuelRoute({ t, lang, data, trends, fuelType, setFuelType, loading, setCountry, currency, fxRates }: CountryFuelRouteProps) {
   const { countrySlug } = useParams<{ countrySlug: string }>();
 
   return (
     <CountryFuelPricesPage
       slug={countrySlug ?? ""}
       t={t}
+      lang={lang}
       data={data}
       trends={trends}
       fuelType={fuelType}
       setFuelType={setFuelType}
       loading={loading}
       setCountry={setCountry}
+      currency={currency}
+      fxRates={fxRates}
     />
   );
 }
@@ -246,12 +253,12 @@ export default function App() {
               />
             }
           />
-          <Route path="/about" element={<AboutPage t={t} />} />
-          <Route path="/contact" element={<ContactPage t={t} />} />
-          <Route path="/privacy" element={<PrivacyPage t={t} />} />
-          <Route path="/terms" element={<TermsPage t={t} />} />
-          <Route path="/editorial-policy" element={<EditorialPolicyPage t={t} />} />
-          <Route path="/disclaimer" element={<DisclaimerPage t={t} />} />
+          <Route path="/about" element={<AboutPage lang={lang} />} />
+          <Route path="/contact" element={<ContactPage lang={lang} />} />
+          <Route path="/privacy" element={<PrivacyPage lang={lang} />} />
+          <Route path="/terms" element={<TermsPage lang={lang} />} />
+          <Route path="/editorial-policy" element={<EditorialPolicyPage lang={lang} />} />
+          <Route path="/disclaimer" element={<DisclaimerPage lang={lang} />} />
           <Route
             path="/fuel-quiz"
             element={<FuelQuizPage data={data} loading={loading} />}
@@ -260,7 +267,7 @@ export default function App() {
             path="/daily-challenge"
             element={<DailyChallengePage data={data} loading={loading} />}
           />
-          <Route path="/market-report" element={<MarketReportPage />} />
+          <Route path="/market-report" element={<MarketReportPage lang={lang} data={data} />} />
           <Route path="/insights" element={<InsightsIndexPage />} />
           <Route path="/insights/:articleSlug" element={<InsightArticlePage />} />
           <Route path="/methodology" element={<MethodologyPage t={t} />} />
@@ -272,12 +279,15 @@ export default function App() {
             element={
               <CountryFuelRoute
                 t={t}
+                lang={lang}
                 data={data}
                 trends={trends}
                 fuelType={fuelType}
                 setFuelType={setFuelType}
                 loading={loading}
                 setCountry={setCountry}
+                currency={currency}
+                fxRates={fx.rates}
               />
             }
           />

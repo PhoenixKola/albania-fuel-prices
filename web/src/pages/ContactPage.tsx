@@ -1,76 +1,33 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import type { TDict } from "../locales";
+import type { Lang } from "../models/i18n";
+import { editorialCopy } from "../config/editorialCopy";
+import { EditorialCallout, EditorialSection, EditorialShell } from "../components/content/EditorialLayout";
 
-type Props = { t: TDict };
+const EMAIL = "fenixkola@gmail.com";
 
-export default function ContactPage({ t }: Props) {
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-
+export default function ContactPage({ lang }: { lang: Lang }) {
+  const copy = editorialCopy[lang];
+  const page = copy.contact;
   return (
-    <article className="contentPage">
-      <h1 className="contentPageTitle">{t.contactTitle}</h1>
-      <p className="contentBody">{t.contactIntro}</p>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">{t.contactEmailTitle}</h2>
-        <p className="contentBody">
-          <a href={`mailto:${t.contactEmailValue}`} className="inlineLink">
-            {t.contactEmailValue}
-          </a>
-        </p>
-        <p className="contentBody">{t.contactEmailNote}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">{t.contactTopicsTitle}</h2>
-        <ul className="contentList">
-          <li>{t.contactTopic1}</li>
-          <li>{t.contactTopic2}</li>
-          <li>{t.contactTopic3}</li>
-          <li>{t.contactTopic4}</li>
-          <li>{t.contactTopic5}</li>
-        </ul>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">{t.contactResponseTitle}</h2>
-        <p className="contentBody">{t.contactResponseP1}</p>
-        <p className="contentBody">{t.contactResponseP2}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Before you contact us</h2>
-        <p className="contentBody">
-          For methodology and data limitations, please read <Link to="/methodology" className="inlineLink">Methodology</Link>. For legal and data-use policy details, see <Link to="/privacy" className="inlineLink">Privacy Policy</Link> and <Link to="/terms" className="inlineLink">Terms of Use</Link>.
-        </p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">What to include in a correction request</h2>
-        <p className="contentBody">
-          If you are reporting a fuel-price discrepancy, please include as much of the following as possible:
-        </p>
-        <ul className="contentList">
-          <li>The country and fuel type (e.g., &quot;Albania — Diesel&quot;)</li>
-          <li>The value shown on our site and the value you believe is correct</li>
-          <li>A source link or reference for the correct value (official government publication, station receipt, etc.)</li>
-          <li>The date you observed the discrepancy</li>
-        </ul>
-        <p className="contentBody">
-          This information allows us to verify the report against upstream data sources quickly and apply corrections if warranted.
-        </p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Response expectations</h2>
-        <p className="contentBody">
-          We aim to respond to all messages within 2–3 business days. Data correction requests are prioritized — if a displayed price is clearly wrong, we will investigate within 24 hours of receiving the report.
-        </p>
-        <p className="contentBody">
-          For feature requests and general suggestions, we add them to an internal backlog and prioritize based on user demand and implementation feasibility. We may not reply individually to every suggestion, but we read them all.
-        </p>
-      </section>
-    </article>
+    <EditorialShell
+      variant="dossier"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lede={page.lede}
+      status={page.status}
+      sections={page.sections.map(({ id, title }) => ({ id, label: title }))}
+      contentsLabel={copy.contents}
+      heroAside={<div className="contactSignal"><span>{lang === "sq" ? "Adresa e kontaktit" : "Contact address"}</span><strong>{EMAIL}</strong><small>{lang === "sq" ? "Përgjigje tipike: 2–3 ditë pune" : "Typical response: 2–3 business days"}</small></div>}
+      actions={<><a className="editorialAction editorialActionPrimary" href={`mailto:${EMAIL}?subject=Karburanti%20Sot%20enquiry`}>{page.emailAction}<span aria-hidden="true">→</span></a><Link className="editorialAction" to="/methodology">{page.methodCta}</Link></>}
+    >
+      {page.sections.map((section, index) => (
+        <EditorialSection key={section.id} id={section.id} index={String(index + 1).padStart(2, "0")} title={section.title}>
+          {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          {section.bullets ? <ul>{section.bullets.map((item) => <li key={item}>{item}</li>)}</ul> : null}
+          {section.id === "correction" ? <EditorialCallout label={lang === "sq" ? "Minimumi i dobishëm" : "Useful minimum"}>{lang === "sq" ? "Shteti · karburanti · vlera e shfaqur · data · burimi" : "Country · fuel · displayed value · date · source"}</EditorialCallout> : null}
+          {section.id === "privacy" ? <p><Link to="/privacy">{page.privacyCta}</Link></p> : null}
+        </EditorialSection>
+      ))}
+    </EditorialShell>
   );
 }

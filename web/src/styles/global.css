@@ -93,6 +93,8 @@ input {
 }
 
 .container {
+  width: 100%;
+  min-width: 0;
   max-width: var(--container);
   margin: 0 auto;
   padding: 26px 18px 56px;
@@ -146,6 +148,9 @@ input {
 /* ─── Navbar ─── */
 
 .navbar {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   position: sticky;
   top: 14px;
   z-index: 100;
@@ -157,6 +162,7 @@ input {
 }
 
 .navbarInner {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -230,11 +236,17 @@ input {
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: linear-gradient(180deg, var(--card), var(--card-2));
+  background: #101918;
   box-shadow: var(--shadow-soft);
   display: grid;
   gap: 4px;
   z-index: 120;
+}
+
+:root[data-theme="light"] .navMenu {
+  border-color: rgba(15, 42, 34, 0.16);
+  background: #fffefa;
+  box-shadow: 0 20px 48px rgba(23, 48, 40, 0.18);
 }
 
 .navMenuLink {
@@ -267,6 +279,7 @@ input {
 }
 
 .hamburgerBtn {
+  flex: 0 0 auto;
   display: none;
   border: 1px solid var(--border);
   background: transparent;
@@ -440,6 +453,8 @@ input {
 }
 
 .brand {
+  flex: 1 1 auto;
+  overflow: hidden;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -464,6 +479,8 @@ input {
 /* Title and freshness badge sit inline; the badge is inline-flex, so spacing
    has to come from the container — it has no horizontal margin of its own. */
 .hgroup {
+  flex: 1 1 auto;
+  overflow: hidden;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -496,6 +513,9 @@ input {
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .subDot {
@@ -1241,6 +1261,12 @@ select {
 .segActive {
   border-color: rgba(20, 184, 166, 0.55);
   background: rgba(20, 184, 166, 0.16);
+}
+
+:root[data-theme="light"] .seg.segActive {
+  color: #ffffff;
+  border-color: #087b58;
+  background: #087b58;
 }
 
 .toolbarRow {

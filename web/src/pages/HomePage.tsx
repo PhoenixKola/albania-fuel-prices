@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
@@ -9,7 +9,7 @@ import type { Trends } from "../models/trends";
 import { getTrendSeries, getWeeklyDeltaEur } from "../models/trends";
 import { fuelLabel, getEurPrice } from "../utils/fuel";
 import { isEuropeanCountry } from "../utils/regions";
-import { STORAGE_ALL_RATE_KEY } from "../config/constants";
+import { ADS_ENABLED, STORAGE_ALL_RATE_KEY } from "../config/constants";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 
 import AdBar from "../components/ads/AdBar";
@@ -118,6 +118,7 @@ export default function HomePage({
   show,
   refresh,
 }: Props) {
+  const [ambientMotionPaused, setAmbientMotionPaused] = useState(false);
   const [allPerEurStored, setAllPerEur] = useLocalStorageState<number>(STORAGE_ALL_RATE_KEY, 0, {
     deserialize: (raw) => {
       const n = Number(raw);
@@ -208,9 +209,17 @@ export default function HomePage({
   }, [data, lang, t]);
 
   return (
-    <main className="homeExperience">
+    <main className={`homeExperience ${ambientMotionPaused ? "homeMotionPaused" : ""}`}>
       <ToastHost message={toast} />
-      <HeroIntro t={t} lang={lang} model={heroModel} currency={currency} fxRates={fxRates} />
+      <HeroIntro
+        t={t}
+        lang={lang}
+        model={heroModel}
+        currency={currency}
+        fxRates={fxRates}
+        ambientMotionPaused={ambientMotionPaused}
+        onToggleAmbientMotion={() => setAmbientMotionPaused((paused) => !paused)}
+      />
 
       {error ? <Notice t={t} message={error} onRetry={refresh} /> : null}
       {staleStatus ? <p className="homeStaleNotice" role="status">{staleStatus}</p> : null}
@@ -316,10 +325,12 @@ export default function HomePage({
         </div>
       </section>
 
-      <aside className="homeAdZone" aria-label={t.homeAdvertisement}>
-        <span>{t.homeAdvertisement}</span>
-        <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" enabled={canShowAds} />
-      </aside>
+      {ADS_ENABLED && canShowAds ? (
+        <aside className="homeAdZone" aria-label={t.homeAdvertisement}>
+          <span>{t.homeAdvertisement}</span>
+          <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" enabled />
+        </aside>
+      ) : null}
     </main>
   );
 }

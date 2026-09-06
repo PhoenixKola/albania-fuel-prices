@@ -1,209 +1,192 @@
 import { Link } from "react-router-dom";
-import type { FuelType, LatestEurope } from "../models/fuel";
+import type { Lang } from "../models/i18n";
+import type { Currency } from "../models/currency";
+import type { FuelType, LatestEurope, CountryPrices } from "../models/fuel";
 import type { Trends } from "../models/trends";
 import type { TDict } from "../locales";
+import type { FxRates } from "../utils/currency";
 import { getCountryEditorial } from "../config/countryContent";
+import { editorialCopy } from "../config/editorialCopy";
 import { getCountryAnalysis } from "../generated/countryAnalysis";
 import { ANALYSIS_META } from "../generated/analysisMeta";
-import AdBar from "../components/ads/AdBar";
+import { getTrendSeries } from "../models/trends";
+import { fuelLabel, getEurPrice } from "../utils/fuel";
+import { isEuropeanCountry } from "../utils/regions";
+import { convertEur, getCurrencyForCountry, hasRate } from "../utils/currency";
+import { formatMoney } from "../utils/money";
 import TrendCard from "../components/fuel/TrendCard";
+import { EditorialCallout, EditorialMetrics, EditorialSection, EditorialShell } from "../components/content/EditorialLayout";
 
 type Props = {
   slug: string;
   t: TDict;
+  lang: Lang;
   data: LatestEurope | null;
   trends: Trends | null;
   fuelType: FuelType;
   setFuelType: (v: FuelType) => void;
   loading: boolean;
   setCountry: (country: string) => void;
+  currency: Currency;
+  fxRates: FxRates | null;
 };
 
-function renderPrice(label: string, value: number | null) {
-  if (typeof value !== "number") return null;
+const FLAGS: Record<string, string> = {
+  Albania: "🇦🇱", Kosovo: "🇽🇰", Montenegro: "🇲🇪", "North Macedonia": "🇲🇰",
+  Greece: "🇬🇷", Italy: "🇮🇹", Croatia: "🇭🇷", Portugal: "🇵🇹", Switzerland: "🇨🇭", "United Kingdom": "🇬🇧",
+};
 
-  return (
-    <li>
-      <strong>{label}:</strong> {value.toFixed(3)} EUR/L
-    </li>
-  );
+const FUELS: FuelType[] = ["gasoline95", "diesel", "lpg"];
+
+function thirtyDayDelta(trends: Trends | null, country: string, fuel: FuelType) {
+  const series = getTrendSeries(trends, country, fuel);
+  if (!series) return null;
+  const values = series.map((value, index) => ({ value, index })).filter((point): point is { value: number; index: number } => typeof point.value === "number" && Number.isFinite(point.value));
+  if (values.length < 2) return null;
+  const latest = values[values.length - 1];
+  const targetIndex = Math.max(0, latest.index - 30);
+  const earlier = [...values].reverse().find((point) => point.index <= targetIndex) ?? values[0];
+  return latest.value - earlier.value;
 }
 
-function compareNote(albaniaPrice: number | null, countryPrice: number | null, label: string) {
-  if (typeof albaniaPrice !== "number" || typeof countryPrice !== "number") {
-    return `${label}: comparison unavailable because one of the values is missing.`;
-  }
-
-  const diff = countryPrice - albaniaPrice;
-  const absDiff = Math.abs(diff).toFixed(3);
-  if (Math.abs(diff) < 0.001) {
-    return `${label}: currently very close to Albania.`;
-  }
-
-  if (diff > 0) {
-    return `${label}: about ${absDiff} EUR/L higher than Albania.`;
-  }
-
-  return `${label}: about ${absDiff} EUR/L lower than Albania.`;
+function signed(value: number | null, suffix = "") {
+  if (value == null || !Number.isFinite(value)) return "—";
+  return `${value > 0 ? "+" : value < 0 ? "−" : ""}${Math.abs(value).toFixed(3)}${suffix}`;
 }
 
-export default function CountryFuelPricesPage({ slug, t, data, trends, fuelType, setFuelType, loading, setCountry }: Props) {
+function eurPrice(row: CountryPrices | null, fuel: FuelType) {
+  return getEurPrice(row, fuel);
+}
+
+export default function CountryFuelPricesPage({
+  slug, t, lang, data, trends, fuelType, setFuelType, loading, setCountry, currency, fxRates,
+}: Props) {
   const editorial = getCountryEditorial(slug);
+  const copy = editorialCopy[lang];
+  const c = copy.country;
 
   if (!editorial) {
     return (
-      <article className="contentPage">
-        <h1 className="contentPageTitle">Country page not found</h1>
-        <p className="contentBody">
-          We could not match this country slug. You can go back to the <Link className="inlineLink" to="/">homepage</Link>
-          , check the <Link className="inlineLink" to="/europe-fuel-comparison">Europe comparison guide</Link>, or read the <Link className="inlineLink" to="/methodology">methodology</Link>.
-        </p>
-      </article>
+      <EditorialShell variant="newsroom" eyebrow={c.eyebrow} title={c.notFoundTitle} lede={c.notFoundText} sections={[]} contentsLabel={copy.contents} actions={<Link className="editorialAction editorialActionPrimary" to="/">{c.dashboardCta}</Link>}>
+        <div />
+      </EditorialShell>
     );
   }
 
-  const row = data?.countries.find((country) => country.country === editorial.dataCountryName) ?? null;
-  const albania = data?.countries.find((country) => country.country === "Albania") ?? null;
-  const hasAnyPrice = !!row && [row.gasoline95_eur, row.diesel_eur, row.lpg_eur].some((value) => typeof value === "number");
+  const countryName = editorial.dataCountryName;
+  const row = data?.countries.find((item) => item.country === countryName) ?? null;
+  const albania = data?.countries.find((item) => item.country === "Albania") ?? null;
+  const hasAnyPrice = !!row && FUELS.some((fuel) => typeof eurPrice(row, fuel) === "number");
+  const selectedPrice = eurPrice(row, fuelType);
+  const markets = data?.countries
+    .filter((item) => isEuropeanCountry(item.country))
+    .map((item) => ({ country: item.country, price: eurPrice(item, fuelType) }))
+    .filter((item): item is { country: string; price: number } => typeof item.price === "number" && Number.isFinite(item.price))
+    .sort((a, b) => a.price - b.price) ?? [];
+  const average = markets.length ? markets.reduce((total, item) => total + item.price, 0) / markets.length : null;
+  const rank = selectedPrice == null ? null : markets.filter((item) => item.price < selectedPrice).length + 1;
+  const delta30 = thirtyDayDelta(trends, countryName, fuelType);
+  const localCurrency = getCurrencyForCountry(countryName);
+  const localValue = hasRate(localCurrency, fxRates) ? convertEur(selectedPrice, localCurrency, fxRates) : null;
+  const userValue = currency === "local" && localValue != null ? formatMoney(localValue, localCurrency) : formatMoney(selectedPrice, "EUR");
+  const updated = data?.fetched_at_utc
+    ? new Date(data.fetched_at_utc).toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", { dateStyle: "medium" })
+    : ANALYSIS_META.endLabel;
   const analysisHtml = getCountryAnalysis(slug);
 
+  const sections = [
+    { id: "country-prices", label: c.currentPrices(editorial.label) },
+    { id: "country-trend", label: c.trend(editorial.label) },
+    ...(analysisHtml ? [{ id: "country-history", label: lang === "sq" ? "Leximi historik" : "Historical reading" }] : []),
+    { id: "country-market", label: c.market(editorial.label) },
+    { id: "country-comparison", label: countryName === "Albania" ? c.albaniaReference : c.comparison(editorial.label) },
+    { id: "country-travel", label: c.travel },
+    { id: "country-coverage", label: c.limitations },
+    { id: "country-faq", label: c.faq(editorial.label) },
+  ];
+
+  const compareLine = (fuel: FuelType) => {
+    const label = fuelLabel(t, fuel);
+    const base = eurPrice(albania, fuel);
+    const value = eurPrice(row, fuel);
+    if (base == null || value == null) return c.comparisonMissing(label);
+    const diff = value - base;
+    if (Math.abs(diff) < 0.001) return c.close(label);
+    return diff > 0 ? c.higher(label, Math.abs(diff).toFixed(3)) : c.lower(label, Math.abs(diff).toFixed(3));
+  };
+
   return (
-    <article className="contentPage">
-      <h1 className="contentPageTitle">{editorial.label} fuel prices today</h1>
-      <p className="contentBody">
-        This page provides a comprehensive overview of fuel prices in {editorial.label}, with practical comparison context for Albanian drivers and travelers. It combines the latest available data with market analysis, border advice, and refueling strategies.
-      </p>
-
-      {ANALYSIS_META.stale ? (
-        <p className="staleNotice" role="status">
-          Our price feed was last updated on {ANALYSIS_META.asOf} ({ANALYSIS_META.dataAgeDays} days ago).
-          Figures may be out of date while we restore the daily update.
-        </p>
-      ) : null}
-
-      {data?.source ? (
-        <p className="contentBodyMuted">
-          Data source: {data.source} | Last fetched: {data.fetched_at_utc ? new Date(data.fetched_at_utc).toLocaleDateString("en-GB", { dateStyle: "medium" }) : "recently"}
-        </p>
-      ) : null}
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Current {editorial.label} fuel prices</h2>
-        {loading ? <p className="contentBody">Loading latest fuel data...</p> : null}
-        {!loading && !hasAnyPrice ? (
-          <p className="contentBody">
-            We currently do not have complete public price values for {editorial.label} in the latest dataset. Data coverage depends on upstream source publication and may change over time. The editorial content below remains relevant for understanding this market.
-          </p>
-        ) : null}
-        {!loading && hasAnyPrice ? (
-          <>
-            <ul className="contentList">
-              {renderPrice("Petrol (Gasoline 95)", row?.gasoline95_eur ?? null)}
-              {renderPrice("Diesel", row?.diesel_eur ?? null)}
-              {renderPrice("LPG (Autogas)", row?.lpg_eur ?? null)}
-            </ul>
-            <p className="contentBody">
-              All prices are expressed in EUR per liter for consistent cross-country comparison. These represent country-level reference values from public data sources, not guaranteed prices at any specific station.
-            </p>
-          </>
-        ) : null}
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">{editorial.label} 30-day fuel price trend</h2>
-        <p className="contentBody">
-          Follow the recent movement for petrol, diesel, and LPG in {editorial.label}. The chart uses the same daily
-          history file as the dashboard, so it updates automatically when new source data is published.
-        </p>
-        <div className="contentToolEmbed">
-          <TrendCard
-            t={t}
-            trends={trends}
-            country={editorial.dataCountryName}
-            fuelType={fuelType}
-            setFuelType={setFuelType}
-          />
+    <EditorialShell
+      variant="newsroom"
+      eyebrow={c.eyebrow}
+      title={c.title(editorial.label)}
+      lede={c.lede(editorial.label)}
+      status={ANALYSIS_META.stale ? c.stale : c.fresh}
+      updated={c.dataUpdated(updated)}
+      sections={sections}
+      contentsLabel={copy.contents}
+      heroAside={
+        <div className="countryHeroInstrument">
+          <span className="countryHeroFlag" aria-hidden="true">{FLAGS[countryName] ?? "◉"}</span>
+          <div><small>{c.priceNow} · {fuelLabel(t, fuelType)}</small><strong>{userValue}</strong><span>{selectedPrice == null ? copy.unavailable : `${selectedPrice.toFixed(3)} EUR/L`}</span></div>
+          <EditorialMetrics items={[
+            { label: c.europeRank, value: rank == null ? "—" : `#${rank}/${markets.length}` },
+            { label: c.versusAverage, value: selectedPrice == null || average == null ? "—" : signed(selectedPrice - average, " €") },
+            { label: c.thirtyDay, value: signed(delta30, " €") },
+            { label: c.localEstimate, value: localValue == null ? "—" : formatMoney(localValue, localCurrency) },
+          ]} />
         </div>
-      </section>
+      }
+      actions={<><Link className="editorialAction editorialActionPrimary" to="/" onClick={() => setCountry(countryName)}>{c.openDashboard(editorial.label)}</Link><Link className="editorialAction" to="/compare">{c.compareCta}</Link></>}
+    >
+      {ANALYSIS_META.stale ? <p className="editorialStaleNotice" role="status">{lang === "sq" ? `Leximi burimor është i datës ${ANALYSIS_META.asOf}; përdore si referencë.` : `The source reading is dated ${ANALYSIS_META.asOf}; use it as a reference while the next update arrives.`}</p> : null}
 
-      {analysisHtml ? <div dangerouslySetInnerHTML={{ __html: analysisHtml }} /> : null}
-
-      <section className="contentSection">
-        <h2 className="contentHeading">{editorial.label} fuel market overview</h2>
-        <p className="contentBody">{editorial.marketOverview}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">
-          {editorial.dataCountryName === "Albania"
-            ? "Albania as the reference market"
-            : `How ${editorial.label} compares with Albania`}
-        </h2>
+      <EditorialSection id="country-prices" index="01" title={c.currentPrices(editorial.label)} intro={c.currentIntro} tone="accent">
+        {loading ? <p role="status">{c.loading}</p> : null}
+        {!loading && !hasAnyPrice ? <EditorialCallout label={copy.unavailable} warning>{c.missing(editorial.label)}</EditorialCallout> : null}
         {!loading && hasAnyPrice ? (
-          <ul className="contentList">
-            <li>{compareNote(albania?.gasoline95_eur ?? null, row?.gasoline95_eur ?? null, "Petrol (95)")}</li>
-            <li>{compareNote(albania?.diesel_eur ?? null, row?.diesel_eur ?? null, "Diesel")}</li>
-            <li>{compareNote(albania?.lpg_eur ?? null, row?.lpg_eur ?? null, "LPG")}</li>
-          </ul>
-        ) : null}
-        <p className="contentBody">{editorial.albaniaContext}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Travel routes and relevance</h2>
-        <p className="contentBody">{editorial.travelRelevance}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Understanding petrol, diesel, and LPG in {editorial.label}</h2>
-        <p className="contentBody">{editorial.fuelInterpretation}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Border crossing and refueling advice</h2>
-        <p className="contentBody">{editorial.borderAdvice}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Data coverage and limitations</h2>
-        <p className="contentBody">{editorial.dataLimitations}</p>
-        <p className="contentBody">{editorial.sourceTransparency}</p>
-      </section>
-
-      <section className="contentSection">
-        <h2 className="contentHeading">Frequently asked questions about {editorial.label} fuel prices</h2>
-        {editorial.faqs.map((faq, i) => (
-          <div key={i}>
-            <h3 className="contentFaqQuestion">{faq.question}</h3>
-            <p className="contentFaqAnswer">{faq.answer}</p>
+          <div className="countryPriceGrid" role="group" aria-label={c.currentPrices(editorial.label)}>
+            {FUELS.map((fuel) => {
+              const value = eurPrice(row, fuel);
+              return (
+                <button key={fuel} type="button" className={`countryPriceTile ${fuelType === fuel ? "isSelected" : ""}`} aria-pressed={fuelType === fuel} onClick={() => setFuelType(fuel)} disabled={value == null}>
+                  <span>{fuelLabel(t, fuel)}</span><strong>{value == null ? "—" : `€${value.toFixed(3)}`}</strong><small>{c.eurReference}</small>
+                </button>
+              );
+            })}
           </div>
-        ))}
-      </section>
+        ) : null}
+      </EditorialSection>
 
-      <section className="contentSection">
-        <h2 className="contentHeading">Explore more</h2>
-        <p className="contentBody">
-          Use the interactive fuel comparison tools on this site to dig deeper into {editorial.label} pricing:
-        </p>
-        <ul className="contentList">
-          {editorial.relatedLinks.map((link) => (
-            <li key={link.to}>
-              <Link className="inlineLink" to={link.to}>{link.label}</Link>
-            </li>
-          ))}
-          <li>
-            <Link
-              className="inlineLink"
-              to="/"
-              onClick={() => setCountry(editorial.dataCountryName)}
-            >
-              View {editorial.label} on the interactive dashboard
-            </Link>
-          </li>
-        </ul>
-      </section>
+      <EditorialSection id="country-trend" index="02" title={c.trend(editorial.label)} intro={c.trendIntro(editorial.label)}>
+        <div className="contentToolEmbed"><TrendCard t={t} trends={trends} country={countryName} fuelType={fuelType} setFuelType={setFuelType} /></div>
+      </EditorialSection>
 
-      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
-    </article>
+      {analysisHtml ? <EditorialSection id="country-history" index="03" title={lang === "sq" ? "Çfarë tregon historiku" : "What the history says"}><div className="countryAnalysisHtml" dangerouslySetInnerHTML={{ __html: analysisHtml }} /></EditorialSection> : null}
+
+      <EditorialSection id="country-market" index={analysisHtml ? "04" : "03"} title={c.market(editorial.label)}><p>{editorial.marketOverview}</p></EditorialSection>
+
+      <EditorialSection id="country-comparison" index={analysisHtml ? "05" : "04"} title={countryName === "Albania" ? c.albaniaReference : c.comparison(editorial.label)}>
+        <div className="countryComparisonGrid">{FUELS.map((fuel) => <div className="editorialCard" key={fuel}><b>{fuelLabel(t, fuel)}</b><p>{compareLine(fuel)}</p></div>)}</div>
+        <p>{editorial.albaniaContext}</p>
+      </EditorialSection>
+
+      <EditorialSection id="country-travel" index={analysisHtml ? "06" : "05"} title={c.travel}>
+        <div className="editorialCardGrid"><div className="editorialCard"><b>{c.travel}</b><p>{editorial.travelRelevance}</p></div><div className="editorialCard"><b>{c.borders}</b><p>{editorial.borderAdvice}</p></div><div className="editorialCard"><b>{c.fuels(editorial.label)}</b><p>{editorial.fuelInterpretation}</p></div></div>
+      </EditorialSection>
+
+      <EditorialSection id="country-coverage" index={analysisHtml ? "07" : "06"} title={c.limitations}>
+        <p>{editorial.dataLimitations}</p><p>{editorial.sourceTransparency}</p>
+        {data?.source ? <EditorialCallout label={copy.source}>{data.source} · {c.dataUpdated(updated)}</EditorialCallout> : null}
+      </EditorialSection>
+
+      <EditorialSection id="country-faq" index={analysisHtml ? "08" : "07"} title={c.faq(editorial.label)}>
+        {editorial.faqs.map((faq) => <details className="editorialFaq" key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}
+      </EditorialSection>
+
+      <EditorialSection id="country-explore" title={c.explore} tone="accent">
+        <div className="editorialHeroActions"><Link className="editorialAction editorialActionPrimary" to="/" onClick={() => setCountry(countryName)}>{c.dashboardCta}</Link><Link className="editorialAction" to="/rankings">{c.rankingsCta}</Link><Link className="editorialAction" to="/compare">{c.compareCta}</Link></div>
+      </EditorialSection>
+    </EditorialShell>
   );
 }
