@@ -38,17 +38,13 @@ export function useUserLocation() {
 
         if (p.status === "granted") {
           setPermission("granted");
-          setLoading(true);
-          const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-          if (cancelled) return;
-          setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-          setLoading(false);
         } else if (p.status === "denied") {
           setPermission("denied");
         } else {
           setPermission("unknown");
         }
       } catch {
+        // Leave permission as unknown if the check fails.
       }
     })();
 

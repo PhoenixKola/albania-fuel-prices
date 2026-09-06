@@ -52,7 +52,12 @@ export default function StationsPage({ t, radiusM, setRadiusM }: Props) {
         <section className="contentSection">
           <h2 className="contentHeading">Privacy and location</h2>
           <p className="contentBody">
-            Your location data is used only in your browser to calculate distances to nearby stations. It is sent to the Overpass API (OpenStreetMap) to find stations in your area. Your location is never sent to our servers, stored in any database, or shared with advertisers.
+            Your location data is used only in your browser to calculate distances to nearby stations. It is sent to the Overpass API (OpenStreetMap) to find stations in your area.
+            Location is used only when you choose to use the nearby stations
+            feature. Your coordinates are sent securely to our station lookup
+            service and may be processed by OpenStreetMap/Overpass services to
+            find stations near you. We do not use your location for advertising
+            or to build a location history.
           </p>
           <p className="contentBody">
             If you deny location permission or your device does not support geolocation, this tool simply will not display results. It is entirely optional — the rest of the site (country comparisons, rankings, guides) works without any location data.
