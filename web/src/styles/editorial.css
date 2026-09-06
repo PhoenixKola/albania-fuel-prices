@@ -240,6 +240,13 @@
 #country-explore .editorialActionPrimary {
   color: var(--ed-accent-ink);
 }
+#country-explore .editorialHeroActions {
+  justify-content: flex-start;
+}
+
+#country-explore .editorialAction {
+  text-decoration: none;
+}
 .countryHeroInstrument .editorialMetric:last-child strong {
   font-size: clamp(16px, 1.55vw, 23px);
   white-space: normal;
