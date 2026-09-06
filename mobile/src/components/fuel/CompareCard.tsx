@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -7,38 +7,27 @@ import type { Theme } from "../../theme/theme";
 import type { TDict } from "../../i18n";
 import type { FuelType, LatestEurope } from "../../types/fuel";
 import type { Trends } from "../../hooks/useTrends";
+import { getWeeklyDeltaEur } from "../../hooks/useTrends";
 import { getFuelPrice, fuelLabel } from "../../utils/fuel";
 import { getCurrencyForCountry, convertEur } from "../../utils/currency";
 import { formatMoney, hasRate } from "../../utils/money";
-import AnimatedPressable from "../ui/AnimatedPressable";
-import { makeCompareStyles } from "./CompareCard.styles";
 import { getFlagForCountry } from "../../utils/countryFlag";
+import { isEuropeanCountry } from "../../utils/regions";
+import AnimatedPressable from "../ui/AnimatedPressable";
+import BottomSheet from "../ui/BottomSheet";
 import CompareTrendCard from "./CompareTrendCard";
+import { makeCompareStyles } from "./CompareCard.styles";
 
 type CurrencyMode = "eur" | "local";
-
-type CompareSet = {
-  id: string;
-  name: string;
-  countries: string[];
-  savedAtUtc: string;
-};
-
+type CompareSet = { id: string; name: string; countries: string[]; savedAtUtc: string };
 const STORAGE_COMPARE_SETS_KEY = "compare_saved_sets_v1";
 
-function safeParseSets(raw: string | null): CompareSet[] {
+function parseSets(raw: string | null): CompareSet[] {
   if (!raw) return [];
   try {
-    const j = JSON.parse(raw);
-    if (!Array.isArray(j)) return [];
-    return j
-      .map((x) => ({
-        id: String(x?.id ?? ""),
-        name: String(x?.name ?? ""),
-        countries: Array.isArray(x?.countries) ? x.countries.filter((c: any) => typeof c === "string") : [],
-        savedAtUtc: String(x?.savedAtUtc ?? "")
-      }))
-      .filter((x) => x.id && x.name && x.countries.length);
+    const value = JSON.parse(raw);
+    if (!Array.isArray(value)) return [];
+    return value.filter((set) => set?.id && set?.name && Array.isArray(set?.countries));
   } catch {
     return [];
   }
@@ -51,358 +40,164 @@ export default function CompareCard(props: {
   trends: Trends | null;
   fuelType: FuelType;
   compareCountries: string[];
-  onRemove: (c: string) => void;
+  onRemove: (country: string) => void;
   onAddPress: () => void;
   currencyMode: CurrencyMode;
   fxRates: Record<string, number> | null;
   maxCompare: number;
-
   onApplySet?: (countries: string[]) => void;
+  onUnlockPress?: () => void;
 }) {
   const s = useMemo(() => makeCompareStyles(props.theme), [props.theme]);
-
   const [setsOpen, setSetsOpen] = useState(false);
   const [sets, setSets] = useState<CompareSet[]>([]);
   const [newSetName, setNewSetName] = useState("");
 
   useEffect(() => {
-    (async () => {
-      const raw = await AsyncStorage.getItem(STORAGE_COMPARE_SETS_KEY);
-      setSets(safeParseSets(raw));
-    })();
+    if (!setsOpen) return;
+    AsyncStorage.getItem(STORAGE_COMPARE_SETS_KEY).then((raw) => setSets(parseSets(raw))).catch(() => {});
   }, [setsOpen]);
 
-  const saveSets = async (next: CompareSet[]) => {
+  const ranked = useMemo(() => {
+    if (!props.data) return [];
+    return props.data.countries
+      .filter((country) => isEuropeanCountry(country.country))
+      .map((country) => ({ country: country.country, price: getFuelPrice(country, props.fuelType) }))
+      .filter((row): row is { country: string; price: number } => typeof row.price === "number")
+      .sort((a, b) => a.price - b.price);
+  }, [props.data, props.fuelType]);
+  const rankMap = useMemo(() => new Map(ranked.map((row, index) => [row.country, index + 1])), [ranked]);
+
+  const rows = useMemo(() => {
+    const byName = new Map(props.data?.countries.map((country) => [country.country, country]) ?? []);
+    return props.compareCountries.map((country) => {
+      const eur = getFuelPrice(byName.get(country) ?? null, props.fuelType);
+      const currency = getCurrencyForCountry(country);
+      const local = hasRate(currency, props.fxRates) ? convertEur(eur, currency, props.fxRates) : null;
+      const primary = props.currencyMode === "local" && local != null ? formatMoney(local, currency) : formatMoney(eur, "EUR");
+      const secondary = props.currencyMode === "local" && local != null ? formatMoney(eur, "EUR") : local != null ? formatMoney(local, currency) : null;
+      return { country, eur, primary, secondary, rank: rankMap.get(country) ?? null, delta: getWeeklyDeltaEur(props.trends, country, props.fuelType) };
+    });
+  }, [props.compareCountries, props.data, props.fuelType, props.currencyMode, props.fxRates, props.trends, rankMap]);
+
+  const priced = rows.filter((row): row is typeof row & { eur: number } => typeof row.eur === "number");
+  const cheapest = priced.length ? priced.reduce((best, row) => row.eur < best.eur ? row : best, priced[0]) : null;
+  const highest = priced.length ? Math.max(...priced.map((row) => row.eur)) : null;
+  const spread = cheapest && highest != null ? highest - cheapest.eur : null;
+  const canAdd = props.compareCountries.length < props.maxCompare;
+  const atFreeLimit = props.maxCompare === 3 && props.compareCountries.length >= 3;
+  const canSave = props.compareCountries.length >= 2 && !!newSetName.trim();
+
+  const persistSets = async (next: CompareSet[]) => {
     setSets(next);
     await AsyncStorage.setItem(STORAGE_COMPARE_SETS_KEY, JSON.stringify(next));
   };
-
-  const onSaveCurrent = async () => {
-    const name = newSetName.trim();
-    if (!name) return;
-
-    const id = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-    const next: CompareSet = {
-      id,
-      name,
-      countries: props.compareCountries.slice(0, props.maxCompare),
-      savedAtUtc: new Date().toISOString()
-    };
-
-    const merged = [next, ...sets].slice(0, 30);
-    await saveSets(merged);
+  const saveCurrent = async () => {
+    if (!canSave) return;
+    const next = [{ id: `${Date.now()}`, name: newSetName.trim(), countries: props.compareCountries.slice(0, props.maxCompare), savedAtUtc: new Date().toISOString() }, ...sets].slice(0, 30);
+    await persistSets(next);
     setNewSetName("");
   };
 
-  const onDeleteSet = async (id: string) => {
-    const next = sets.filter((x) => x.id !== id);
-    await saveSets(next);
-  };
-
-  const sorted = useMemo(() => {
-    if (!props.data) return [];
-    return props.data.countries
-      .map((c) => ({ country: c.country, price: getFuelPrice(c, props.fuelType) }))
-      .filter((x) => x.price != null)
-      .sort((a, b) => (a.price! < b.price! ? -1 : 1));
-  }, [props.data, props.fuelType]);
-
-  const rankByCountry = useMemo(() => {
-    const m = new Map<string, number>();
-    sorted.forEach((x, i) => m.set(x.country, i + 1));
-    return m;
-  }, [sorted]);
-
-  const fuelName = fuelLabel(props.fuelType, props.t);
-  const canAddMore = props.compareCountries.length < props.maxCompare;
-
-  const rows = useMemo(() => {
-    const fallback = props.compareCountries.map((name) => ({
-      name,
-      rank: null as number | null,
-      eur: null as number | null,
-      right: "—",
-      sub: null as string | null,
-      diffEurText: null as string | null
-    }));
-
-    if (!props.data) return fallback;
-
-    const byName = new Map(props.data.countries.map((c) => [c.country, c]));
-
-    const computed = props.compareCountries.map((name) => {
-      const c = byName.get(name) ?? null;
-      const eur = getFuelPrice(c, props.fuelType);
-      const rank = rankByCountry.get(name) ?? null;
-
-      const currency = getCurrencyForCountry(name);
-      const eurText = formatMoney(eur, "EUR");
-
-      const localOk = hasRate(currency, props.fxRates);
-      const localText = localOk ? formatMoney(convertEur(eur, currency, props.fxRates), currency) : null;
-
-      const right = props.currencyMode === "local" && localText ? localText : eurText;
-      const sub = props.currencyMode === "local" && localText ? eurText : localText ? localText : null;
-
-      return { name, rank, eur: eur ?? null, right, sub };
-    });
-
-    const eurVals = computed.map((x) => x.eur).filter((x): x is number => typeof x === "number" && Number.isFinite(x));
-    const minEur = eurVals.length ? Math.min(...eurVals) : null;
-
-    return computed.map((r) => {
-      if (minEur == null || r.eur == null) return { ...r, diffEurText: null };
-
-      const diff = r.eur - minEur;
-      if (!Number.isFinite(diff) || diff <= 0.001) return { ...r, diffEurText: null };
-
-      return { ...r, diffEurText: `+${formatMoney(diff, "EUR")}` };
-    });
-  }, [props.data, props.compareCountries, props.fuelType, rankByCountry, props.currencyMode, props.fxRates]);
-
-  const minEurInSelection = useMemo(() => {
-    const eurVals = rows.map((x) => x.eur).filter((x): x is number => typeof x === "number" && Number.isFinite(x));
-    return eurVals.length ? Math.min(...eurVals) : null;
-  }, [rows]);
-
-  const comparisonSummary = useMemo(() => {
-    const priced = rows.filter((x) => x.eur != null) as Array<(typeof rows)[number] & { eur: number }>;
-    if (!priced.length) return null;
-
-    const cheapest = priced.reduce((best, row) => (row.eur < best.eur ? row : best), priced[0]);
-    const mostExpensive = priced.reduce((worst, row) => (row.eur > worst.eur ? row : worst), priced[0]);
-    const spread = mostExpensive.eur - cheapest.eur;
-
-    return {
-      cheapest,
-      spreadText: spread > 0.001 ? formatMoney(spread, "EUR") : "—",
-      count: rows.length
-    };
-  }, [rows]);
-
-  const modeLabel =
-    props.currencyMode === "eur"
-      ? props.t.currencyEUR
-      : props.t.currencyLocal;
-
-  const applySet = (countries: string[]) => {
-    props.onApplySet?.(countries.slice(0, props.maxCompare));
-    setSetsOpen(false);
-  };
-
   return (
-    <View style={s.card}>
-      <View style={s.hero}>
+    <View style={s.wrap}>
+      <View style={s.hero} accessible accessibilityLabel={`${props.t.compareOverview}. ${cheapest ? `${props.t.bestValue}: ${cheapest.country}` : props.t.compareEmpty}`}>
         <View style={s.heroTop}>
-          <View style={s.headerIcon}>
-            <Ionicons name="git-compare-outline" size={20} color={props.theme.colors.primary} />
+          <View style={s.heroCopy}>
+            <Text style={s.kicker}>{props.t.compareOverview}</Text>
+            <Text style={s.heroTitle} numberOfLines={2}>{cheapest?.country ?? props.t.compareTitle}</Text>
+            <Text style={s.heroSubtitle}>{cheapest ? `${props.t.bestValue} · ${fuelLabel(props.fuelType, props.t)}${props.data?.as_of ? ` · ${props.t.lastUpdated} ${props.data.as_of}` : ""}` : props.t.compareHint}</Text>
           </View>
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={s.heroLabel}>{fuelName}</Text>
-            <Text style={s.heroTitle} numberOfLines={1}>
-              {comparisonSummary?.cheapest?.name ?? props.t.compareTitle}
-            </Text>
-            <Text style={s.heroSub} numberOfLines={1}>
-              {comparisonSummary ? `${props.t.best} value` : props.t.compareHint}
-            </Text>
-          </View>
+          <View style={s.heroIcon}><Ionicons name="speedometer-outline" size={31} color={props.theme.colors.primary} /></View>
         </View>
-
-        <View style={s.metricGrid}>
-          <View style={s.metricTile}>
-            <Text style={s.metricLabel}>{props.t.selected}</Text>
-            <Text style={s.metricValue}>{props.compareCountries.length}/{props.maxCompare}</Text>
-          </View>
-          <View style={s.metricTile}>
-            <Text style={s.metricLabel}>{props.t.spread}</Text>
-            <Text style={s.metricValue}>{comparisonSummary?.spreadText ?? "—"}</Text>
-          </View>
-          <View style={s.metricTile}>
-            <Text style={s.metricLabel}>{props.t.currency}</Text>
-            <Text style={s.metricValue}>{modeLabel}</Text>
-          </View>
+        <View style={s.metrics}>
+          <Metric label={props.t.selectedCountries} value={`${props.compareCountries.length}/${props.maxCompare}`} />
+          <Metric label={props.t.spread} value={spread != null ? formatMoney(spread, "EUR") : "—"} />
+          <Metric label={props.t.currency} value={props.currencyMode === "local" ? props.t.currencyLocal : "EUR"} />
         </View>
       </View>
 
       <View style={s.actionRow}>
-        <AnimatedPressable onPress={() => setSetsOpen(true)} contentStyle={s.btn} scaleIn={0.98}>
-          <Ionicons name="bookmark-outline" size={17} color={props.theme.colors.text} />
-          <Text style={s.btnText}>{props.t.savedSets}</Text>
+        <AnimatedPressable onPress={() => setSetsOpen(true)} contentStyle={s.secondaryButton} accessibilityLabel={props.t.savedSets} reduceMotion={props.theme.motion.reduced}>
+          <Ionicons name="bookmark-outline" size={18} color={props.theme.colors.text} /><Text style={s.secondaryButtonText}>{props.t.savedSets}</Text>
         </AnimatedPressable>
-
-        <AnimatedPressable
-          onPress={props.onAddPress}
-          disabled={!canAddMore}
-          contentStyle={[s.btnPrimary, !canAddMore ? s.btnDisabled : null]}
-          scaleIn={0.98}
-        >
-          <Ionicons name="add" size={18} color={props.theme.colors.primaryText} />
-          <Text style={s.btnPrimaryText}>{props.t.addCountry}</Text>
+        <AnimatedPressable onPress={atFreeLimit ? props.onUnlockPress : props.onAddPress} disabled={!canAdd && !atFreeLimit} contentStyle={[s.primaryButton, !canAdd && !atFreeLimit ? s.disabled : null]} accessibilityLabel={atFreeLimit ? props.t.unlockCompare : props.t.addCountry} accessibilityState={{ disabled: !canAdd && !atFreeLimit }} reduceMotion={props.theme.motion.reduced}>
+          <Ionicons name={atFreeLimit ? "lock-closed-outline" : "add"} size={19} color={props.theme.colors.primaryText} /><Text style={s.primaryButtonText}>{atFreeLimit ? props.t.unlockCompare : props.t.addCountry}</Text>
         </AnimatedPressable>
       </View>
 
-      {props.compareCountries.length < 2 ? (
-        <View style={s.notice}>
-          <Ionicons name="information-circle-outline" size={16} color={props.theme.colors.muted} />
-          <Text style={s.noticeText}>{props.t.compareHint}</Text>
-        </View>
-      ) : null}
+      <View style={s.limitNote}>
+        <Ionicons name={canAdd ? "information-circle-outline" : "lock-closed-outline"} size={17} color={props.theme.colors.muted} />
+        <Text style={s.limitText}>{atFreeLimit ? props.t.unlockCompare : canAdd ? props.t.compareLimitHint(props.maxCompare) : props.t.maxCompareReachedN(props.maxCompare)}</Text>
+      </View>
 
-      {!canAddMore ? (
-        <View style={s.notice}>
-          <Ionicons name="lock-closed-outline" size={16} color={props.theme.colors.muted} />
-          <Text style={s.noticeText}>{props.t.maxCompareReachedN(props.maxCompare)}</Text>
-        </View>
-      ) : null}
-
-      {props.compareCountries.length === 0 ? (
-        <View style={s.emptyState}>
-          <View style={s.emptyIcon}>
-            <Ionicons name="git-compare-outline" size={24} color={props.theme.colors.primary} />
+      {props.compareCountries.length ? (
+        <View>
+          <Text style={s.sectionTitle}>{props.t.selectedCountries}</Text>
+          <View style={s.chips}>
+            {props.compareCountries.map((country) => (
+              <AnimatedPressable key={country} onPress={() => props.onRemove(country)} contentStyle={s.countryChip} accessibilityLabel={`${props.t.remove} ${country}`}>
+                <Text style={s.chipFlag}>{getFlagForCountry(country)}</Text><Text style={s.chipText} numberOfLines={1}>{country}</Text><Ionicons name="close" size={15} color={props.theme.colors.muted} />
+              </AnimatedPressable>
+            ))}
           </View>
-          <Text style={s.emptyTitle}>{props.t.compareEmpty}</Text>
-          <Text style={s.emptyText}>{props.t.compareHint}</Text>
-          <AnimatedPressable onPress={props.onAddPress} contentStyle={s.emptyCta} scaleIn={0.98}>
-            <Ionicons name="add" size={18} color={props.theme.colors.primaryText} />
-            <Text style={s.emptyCtaText}>{props.t.addCountry}</Text>
+        </View>
+      ) : (
+        <View style={s.empty}>
+          <View style={s.emptyIcon}><Ionicons name="git-compare-outline" size={28} color={props.theme.colors.primary} /></View>
+          <Text style={s.emptyTitle}>{props.t.compareEmpty}</Text><Text style={s.emptyText}>{props.t.compareHint}</Text>
+          <AnimatedPressable onPress={props.onAddPress} contentStyle={s.emptyButton} accessibilityLabel={props.t.addCountry}>
+            <Ionicons name="add" size={19} color={props.theme.colors.primaryText} /><Text style={s.primaryButtonText}>{props.t.addCountry}</Text>
           </AnimatedPressable>
         </View>
+      )}
+
+      {rows.length ? (
+        <View style={s.rows}>
+          {rows.map((row) => {
+            const difference = cheapest && row.eur != null ? Math.max(0, row.eur - cheapest.eur) : null;
+            const fill = spread && difference != null ? Math.max(4, (difference / spread) * 100) : 4;
+            const isBest = difference != null && difference < 0.001;
+            return (
+              <View key={row.country} style={[s.row, isBest ? s.bestRow : null]} accessible accessibilityLabel={`${row.country}, ${row.primary}, ${isBest ? props.t.bestValue : `${props.t.differenceFromBest} ${formatMoney(difference, "EUR")}`}`}>
+                <View style={s.rowTop}>
+                  <View style={[s.rank, isBest ? s.bestRank : null]}><Text style={s.rankText}>{row.rank ? `#${row.rank}` : "—"}</Text></View>
+                  <View style={s.rowCopy}><Text style={s.country} numberOfLines={1}>{getFlagForCountry(row.country)} {row.country}</Text><Text style={s.secondary}>{row.secondary ?? props.t.fxUnavailable}</Text></View>
+                  <View style={s.priceCopy}><Text style={s.price}>{row.primary}</Text>{isBest ? <Text style={s.bestText}>{props.t.bestValue}</Text> : difference != null ? <Text style={s.diffText}>+{formatMoney(difference, "EUR")}</Text> : null}</View>
+                </View>
+                <View style={s.track}><View style={[s.trackFill, { width: `${fill}%` }]} /></View>
+                <View style={s.deltaRow}><Text style={s.deltaLabel}>{props.t.trendVsLastWeek}</Text><Text style={[s.delta, row.delta != null && row.delta > 0 ? s.deltaUp : row.delta != null && row.delta < 0 ? s.deltaDown : null]}>{row.delta == null ? "—" : `${row.delta > 0 ? "+" : ""}${formatMoney(row.delta, "EUR")}`}</Text></View>
+              </View>
+            );
+          })}
+        </View>
       ) : null}
 
-      <CompareTrendCard
-        theme={props.theme}
-        t={props.t}
-        trends={props.trends}
-        countries={props.compareCountries}
-        fuelType={props.fuelType}
-      />
+      <CompareTrendCard theme={props.theme} t={props.t} trends={props.trends} countries={props.compareCountries} fuelType={props.fuelType} />
 
-      <View style={s.rows}>
-        {rows.map((r) => {
-          const isBest =
-            minEurInSelection != null &&
-            r.eur != null &&
-            Math.abs(r.eur - minEurInSelection) < 0.001;
-
-          const medalIcon =
-            r.rank === 1 ? "trophy-outline" : r.rank === 2 ? "medal-outline" : r.rank === 3 ? "ribbon-outline" : null;
-
-          return (
-            <View key={r.name} style={[s.rowCard, isBest ? s.rowBest : null]}>
-              <View style={s.rowLeft}>
-                <View style={[s.rankBubble, r.rank === 1 ? s.rank1 : null, r.rank === 2 ? s.rank2 : null, r.rank === 3 ? s.rank3 : null]}>
-                  {medalIcon ? <Ionicons name={medalIcon as any} size={14} color={props.theme.colors.text} /> : null}
-                  <Text style={s.rankText}>{r.rank ?? "—"}</Text>
-                </View>
-
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={s.country} numberOfLines={1}>
-                    {getFlagForCountry(r.name) ? `${getFlagForCountry(r.name)} ${r.name}` : r.name}
-                  </Text>
-
-                  <View style={s.subRow}>
-                    {r.sub ? <Text style={s.sub} numberOfLines={1}>{r.sub}</Text> : null}
-                    {r.diffEurText ? (
-                      <View style={s.diffPill}>
-                        <Ionicons name="arrow-up" size={12} color={props.theme.colors.muted} />
-                        <Text style={s.diffText} numberOfLines={1}>
-                          {r.diffEurText}
-                        </Text>
-                      </View>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={s.rowRight}>
-                <View style={s.priceStack}>
-                  <Text style={s.price}>{r.right}</Text>
-
-                  {isBest ? (
-                    <View style={s.bestPill}>
-                      <Ionicons name="sparkles-outline" size={12} color={props.theme.colors.text} />
-                      <Text style={s.bestText}>{props.t.best}</Text>
-                    </View>
-                  ) : null}
-                </View>
-
-                <AnimatedPressable onPress={() => props.onRemove(r.name)} contentStyle={s.removeIconBtn} scaleIn={0.98}>
-                  <Ionicons name="trash-outline" size={16} color={props.theme.colors.muted} />
-                </AnimatedPressable>
-              </View>
+      <BottomSheet theme={props.theme} open={setsOpen} title={props.t.compareSetsTitle} closeLabel={props.t.close} onClose={() => setSetsOpen(false)}>
+        <View style={s.sheetContent}>
+          <Text style={s.sheetLabel}>{props.t.saveCurrentSet}</Text>
+          <TextInput value={newSetName} onChangeText={setNewSetName} placeholder={props.t.setNamePlaceholder} placeholderTextColor={props.theme.colors.muted} style={s.input} accessibilityLabel={props.t.setNamePlaceholder} />
+          {props.compareCountries.length < 2 ? <Text style={s.validation}>{props.t.saveTwoCountries}</Text> : null}
+          <AnimatedPressable onPress={saveCurrent} disabled={!canSave} contentStyle={[s.saveButton, !canSave ? s.disabled : null]} accessibilityLabel={props.t.save} accessibilityState={{ disabled: !canSave }}>
+            <Ionicons name="save-outline" size={18} color={props.theme.colors.primaryText} /><Text style={s.primaryButtonText}>{props.t.save}</Text>
+          </AnimatedPressable>
+          <View style={s.sheetDivider} />
+          <Text style={s.sheetLabel}>{props.t.savedSets}</Text>
+          {sets.length ? sets.map((set) => (
+            <View key={set.id} style={s.setRow}>
+              <View style={s.setCopy}><Text style={s.setName} numberOfLines={1}>{set.name}</Text><Text style={s.setCountries} numberOfLines={2}>{set.countries.join(" · ")}</Text></View>
+              <AnimatedPressable onPress={() => { props.onApplySet?.(set.countries.slice(0, props.maxCompare)); setSetsOpen(false); }} contentStyle={s.setAction} accessibilityLabel={`${props.t.open} ${set.name}`}><Ionicons name="play" size={17} color={props.theme.colors.primary} /></AnimatedPressable>
+              <AnimatedPressable onPress={() => persistSets(sets.filter((item) => item.id !== set.id))} contentStyle={s.setAction} accessibilityLabel={`${props.t.remove} ${set.name}`}><Ionicons name="trash-outline" size={17} color={props.theme.colors.danger} /></AnimatedPressable>
             </View>
-          );
-        })}
-      </View>
-
-      <Modal visible={setsOpen} transparent animationType="fade" onRequestClose={() => setSetsOpen(false)}>
-        <View style={s.modalBackdrop}>
-          <View style={s.modalCard}>
-            <View style={s.modalHeader}>
-              <Text style={s.modalTitle}>{props.t.compareSetsTitle}</Text>
-              <AnimatedPressable onPress={() => setSetsOpen(false)} contentStyle={s.modalCloseBtn} scaleIn={0.98}>
-                <Ionicons name="close" size={18} color={props.theme.colors.text} />
-              </AnimatedPressable>
-            </View>
-
-            <View style={s.modalSection}>
-              <Text style={s.modalLabel}>{props.t.saveCurrentSet}</Text>
-              <View style={s.modalRow}>
-                <TextInput
-                  value={newSetName}
-                  onChangeText={setNewSetName}
-                  placeholder={props.t.setNamePlaceholder}
-                  placeholderTextColor={props.theme.colors.muted}
-                  style={s.modalInput}
-                />
-                <AnimatedPressable onPress={onSaveCurrent} contentStyle={s.modalPrimaryBtn} scaleIn={0.98}>
-                  <Ionicons name="save-outline" size={16} color={props.theme.colors.primaryText} />
-                  <Text style={s.modalPrimaryText}>{props.t.save}</Text>
-                </AnimatedPressable>
-              </View>
-            </View>
-
-            <View style={s.modalSection}>
-              <Text style={s.modalLabel}>{props.t.savedSets}</Text>
-
-              {sets.length === 0 ? (
-                <View style={s.modalEmpty}>
-                  <Ionicons name="bookmark-outline" size={18} color={props.theme.colors.muted} />
-                  <Text style={s.modalEmptyText}>{props.t.noSavedSets}</Text>
-                </View>
-              ) : (
-                <View style={{ gap: 10 }}>
-                  {sets.map((x) => (
-                    <View key={x.id} style={s.setRow}>
-                      <View style={{ flex: 1, minWidth: 0 }}>
-                        <Text style={s.setName} numberOfLines={1}>{x.name}</Text>
-                        <Text style={s.setSub} numberOfLines={1}>{x.countries.join(" · ")}</Text>
-                      </View>
-
-                      <View style={{ flexDirection: "row", gap: 8 }}>
-                        <AnimatedPressable onPress={() => applySet(x.countries)} contentStyle={s.setBtn} scaleIn={0.98}>
-                          <Ionicons name="play-outline" size={16} color={props.theme.colors.text} />
-                        </AnimatedPressable>
-
-                        <AnimatedPressable onPress={() => onDeleteSet(x.id)} contentStyle={s.setBtn} scaleIn={0.98}>
-                          <Ionicons name="trash-outline" size={16} color={props.theme.colors.muted} />
-                        </AnimatedPressable>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-
-            <View style={s.modalFooter}>
-              <AnimatedPressable onPress={() => applySet(props.compareCountries)} contentStyle={s.modalGhostBtn} scaleIn={0.98}>
-                <Ionicons name="refresh-outline" size={16} color={props.theme.colors.text} />
-                <Text style={s.modalGhostText}>{props.t.keepCurrent}</Text>
-              </AnimatedPressable>
-            </View>
-          </View>
+          )) : <Text style={s.emptySets}>{props.t.noSavedSets}</Text>}
         </View>
-      </Modal>
+      </BottomSheet>
     </View>
   );
+
+  function Metric({ label, value }: { label: string; value: string }) {
+    return <View style={s.metric}><Text style={s.metricValue} numberOfLines={1} adjustsFontSizeToFit>{value}</Text><Text style={s.metricLabel} numberOfLines={2}>{label}</Text></View>;
+  }
 }

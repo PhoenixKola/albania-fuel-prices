@@ -20,6 +20,10 @@ export default function CountrySearchModal(props: {
   const s = useMemo(() => makeCountryModalStyles(props.theme), [props.theme]);
   const [q, setQ] = useState("");
 
+  React.useEffect(() => {
+    if (props.open) setQ("");
+  }, [props.open]);
+
   const favSet = useMemo(() => new Set(props.favorites ?? []), [props.favorites]);
 
   const items = useMemo(() => {
@@ -31,12 +35,23 @@ export default function CountrySearchModal(props: {
   }, [q, props.countries, favSet]);
 
   return (
-    <Modal visible={props.open} transparent animationType="slide" onRequestClose={props.onClose}>
+    <Modal
+      visible={props.open}
+      transparent
+      animationType={props.theme.motion.reduced ? "none" : "slide"}
+      statusBarTranslucent
+      onRequestClose={props.onClose}
+    >
       <Pressable style={s.overlay} onPress={props.onClose}>
-        <Pressable style={s.sheet} onPress={() => {}}>
+        <Pressable style={s.sheet} onPress={() => {}} accessibilityViewIsModal>
           <View style={s.headerRow}>
-            <Text style={s.title}>{props.title}</Text>
-            <Pressable onPress={props.onClose} style={s.closeBtn}>
+            <Text style={s.title} accessibilityRole="header">{props.title}</Text>
+            <Pressable
+              onPress={props.onClose}
+              style={s.closeBtn}
+              accessibilityRole="button"
+              accessibilityLabel={props.closeLabel}
+            >
               <Text style={s.closeText}>{props.closeLabel}</Text>
             </Pressable>
           </View>
@@ -49,6 +64,7 @@ export default function CountrySearchModal(props: {
             style={s.input}
             autoCorrect={false}
             autoCapitalize="none"
+            accessibilityLabel={props.placeholder}
           />
 
           <View style={s.list}>
@@ -65,6 +81,9 @@ export default function CountrySearchModal(props: {
                 return (
                   <Pressable
                     onPress={() => props.onSelect(item)}
+                    accessibilityRole="button"
+                    accessibilityLabel={active ? `${item}, ${props.selectedLabel}` : item}
+                    accessibilityState={{ selected: active }}
                     style={[
                       s.row,
                       isLast ? { borderBottomWidth: 0 } : null,
@@ -75,7 +94,17 @@ export default function CountrySearchModal(props: {
 
                     <View style={s.right}>
                       {props.onToggleFavorite ? (
-                        <Pressable onPress={() => props.onToggleFavorite?.(item)} style={s.starBtn}>
+                        <Pressable
+                          onPress={(event) => {
+                            event.stopPropagation();
+                            props.onToggleFavorite?.(item);
+                          }}
+                          style={s.starBtn}
+                          accessibilityRole="button"
+                          accessibilityLabel={item}
+                          accessibilityState={{ selected: isFav }}
+                          hitSlop={6}
+                        >
                           <Text style={[s.starText, isFav ? s.starOn : s.starOff]}>{isFav ? "★" : "☆"}</Text>
                         </Pressable>
                       ) : null}

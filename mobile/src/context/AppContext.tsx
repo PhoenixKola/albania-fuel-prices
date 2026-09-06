@@ -145,7 +145,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { value: radiusM, setValue: setRadiusM } = useAsyncStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
     deserialize: (raw) => {
       const n = Number(raw);
-      return n === 2000 || n === 5000 || n === 10000 ? n : 5000;
+      return n === 2000 || n === 5000 || n === 10000 || n === 30000 || n === 50000 ? n : 5000;
     },
     serialize: (v) => String(v),
   });
@@ -330,14 +330,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const onRewardContinue = useCallback(() => {
-    const act = pendingActionRef.current;
     closeRewardModal(true);
     showToast(t.toastRewardsLater);
-    act?.();
   }, [closeRewardModal, showToast, t]);
 
   const onRewardWatch = useCallback(async () => {
-    await reward.showRewardedAndUnlock();
+    const unlocked = await reward.showRewardedAndUnlock();
+    if (!unlocked) {
+      showToast(t.toastRewardsLater);
+      return;
+    }
     const act = pendingActionRef.current;
     closeRewardModal(false);
     hapticSuccess();

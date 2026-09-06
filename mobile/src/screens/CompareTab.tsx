@@ -1,18 +1,21 @@
 import React, { useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import { useApp } from "../context/AppContext";
 import { contentContainer } from "../theme/layout";
 import CompareCard from "../components/fuel/CompareCard";
 import CountrySearchModal from "../components/country/CountrySearchModal";
-import { makeScreenHeaderStyles } from "./screenHeader.styles";
+import PremiumHeader from "../components/ui/PremiumHeader";
+import SegmentedControl from "../components/ui/SegmentedControl";
 
 export default function CompareTab() {
   const ctx = useApp();
-  const hs = useMemo(() => makeScreenHeaderStyles(ctx.theme), [ctx.theme]);
-
   const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const fuelItems = useMemo(() => [
+    { value: "diesel" as const, label: ctx.t.diesel },
+    { value: "gasoline95" as const, label: ctx.t.gasoline95 },
+    { value: "lpg" as const, label: ctx.t.lpg },
+  ], [ctx.t]);
 
   return (
     <View style={{ flex: 1, backgroundColor: ctx.theme.colors.bg }}>
@@ -21,15 +24,15 @@ export default function CompareTab() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={ctx.refreshing} onRefresh={ctx.refreshAll} />}
       >
-        <View style={hs.header}>
-          <View style={hs.iconWrap}>
-            <Ionicons name="git-compare-outline" size={18} color={ctx.theme.colors.primary} />
-          </View>
-          <View>
-            <Text style={hs.title}>{ctx.t.compareTitle}</Text>
-            <Text style={hs.subtitle}>{ctx.t.compareSubtitle(ctx.t[ctx.fuelType] ?? ctx.fuelType)}</Text>
-          </View>
-        </View>
+        <PremiumHeader
+          theme={ctx.theme}
+          eyebrow={ctx.t.premiumInsights}
+          title={ctx.t.compareTitle}
+          subtitle={ctx.t.compareSubtitle(ctx.t[ctx.fuelType] ?? ctx.fuelType)}
+          icon="git-compare-outline"
+        />
+
+        <SegmentedControl theme={ctx.theme} value={ctx.fuelType} items={fuelItems} onChange={ctx.setFuelType} />
 
         <CompareCard
           theme={ctx.theme}
@@ -47,6 +50,7 @@ export default function CompareTab() {
           fxRates={ctx.fxRates}
           maxCompare={ctx.maxCompare}
           onApplySet={ctx.applyCompareSet}
+          onUnlockPress={() => ctx.openRewardModal()}
         />
       </ScrollView>
 

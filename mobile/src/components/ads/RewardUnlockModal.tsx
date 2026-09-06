@@ -130,7 +130,7 @@ export default function RewardUnlockModal(props: {
         </View>
 
         <View style={s.actions}>
-          <AnimatedPressable onPress={props.onWatch} contentStyle={s.primaryBtn} scaleIn={0.98}>
+          <AnimatedPressable onPress={props.onWatch} disabled={props.loadingAd} contentStyle={[s.primaryBtn, props.loadingAd ? { opacity: 0.55 } : null]} scaleIn={0.98} accessibilityLabel={props.t.watchVideo} accessibilityState={{ disabled: props.loadingAd }} reduceMotion={props.theme.motion.reduced}>
             {props.loadingAd ? (
               <ActivityIndicator color={t.colors.primaryText} />
             ) : (

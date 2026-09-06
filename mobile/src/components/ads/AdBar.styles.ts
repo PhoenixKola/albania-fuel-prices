@@ -16,5 +16,6 @@ export const makeAdBarStyles = (theme: Theme) =>
       borderRadius: 14,
       overflow: "hidden",
       paddingBottom: Platform.OS === "android" ? 3 : 0,
+      minHeight: 50,
     },
   });

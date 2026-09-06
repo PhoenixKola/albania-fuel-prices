@@ -29,9 +29,17 @@ export function useRewardUnlock(opts: Options) {
 
   const durationMs = opts.durationMinutes * 60 * 1000;
   const earningRef = useRef(false);
+  const pendingResultRef = useRef<((earned: boolean) => void) | null>(null);
 
   const unlocked = unlockUntilMs > Date.now();
   const minutesLeft = unlocked ? Math.max(0, Math.ceil((unlockUntilMs - Date.now()) / (60 * 1000))) : 0;
+
+  useEffect(() => {
+    const remaining = unlockUntilMs - Date.now();
+    if (remaining <= 0) return;
+    const timer = setTimeout(() => setUnlockUntilMs(0), Math.min(remaining, 2_147_000_000));
+    return () => clearTimeout(timer);
+  }, [unlockUntilMs]);
 
   const loadStored = useCallback(async () => {
     const raw = await AsyncStorage.getItem(STORAGE_REWARD_UNTIL_UTC);
@@ -62,10 +70,14 @@ export function useRewardUnlock(opts: Options) {
 
     const unsubError = ad.addAdEventListener(AdEventType.ERROR, () => {
       if (!cancelled) setLoaded(false);
+      pendingResultRef.current?.(false);
+      pendingResultRef.current = null;
     });
 
     const unsubClosed = ad.addAdEventListener(AdEventType.CLOSED, () => {
       if (!cancelled) setLoaded(false);
+      pendingResultRef.current?.(false);
+      pendingResultRef.current = null;
       earningRef.current = false;
       ad.load();
     });
@@ -73,9 +85,14 @@ export function useRewardUnlock(opts: Options) {
     const unsubEarned = ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, async () => {
       if (earningRef.current) return;
       earningRef.current = true;
+      const resolveResult = pendingResultRef.current;
+      pendingResultRef.current = null;
       try {
         await setUnlockForDuration();
-      } catch {}
+        resolveResult?.(true);
+      } catch {
+        resolveResult?.(false);
+      }
     });
 
     (async () => {
@@ -86,6 +103,8 @@ export function useRewardUnlock(opts: Options) {
 
     return () => {
       cancelled = true;
+      pendingResultRef.current?.(false);
+      pendingResultRef.current = null;
       unsubLoaded();
       unsubError();
       unsubClosed();
@@ -99,13 +118,16 @@ export function useRewardUnlock(opts: Options) {
       ad.load();
       return false;
     }
-    try {
+    return new Promise<boolean>((resolve) => {
       earningRef.current = false;
-      await ad.show();
-      return true;
-    } catch {
-      return false;
-    }
+      pendingResultRef.current = resolve;
+      ad.show().catch(() => {
+        if (pendingResultRef.current === resolve) {
+          pendingResultRef.current = null;
+          resolve(false);
+        }
+      });
+    });
   }, [ad, enabled, loaded]);
 
   const refreshStored = useCallback(async () => {

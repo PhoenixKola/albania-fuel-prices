@@ -1,6 +1,7 @@
 import React from "react";
+import { View } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -9,6 +10,8 @@ import BottomTabBar from "../components/layout/BottomTabBar";
 import RewardUnlockModal from "../components/ads/RewardUnlockModal";
 import RateAppModal from "../components/feedback/RateAppModal";
 import GlobalToast from "../components/ui/GlobalToast";
+import AdBar from "../components/ads/AdBar";
+import { ADS_ENABLED } from "../constants/ads";
 
 import HomeTab from "../screens/HomeTab";
 import StationsTab from "../screens/StationsTab";
@@ -20,6 +23,7 @@ const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
   const ctx = useApp();
+  const insets = useSafeAreaInsets();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: ctx.theme.colors.bg }} edges={["top", "left", "right"]}>
@@ -27,7 +31,10 @@ export default function TabNavigator() {
 
       <NavigationContainer>
         <Tab.Navigator
-          screenOptions={{ headerShown: false }}
+          screenOptions={{
+            headerShown: false,
+            tabBarPosition: ctx.theme.m.isTablet ? "left" : "bottom",
+          }}
           tabBar={(props) => <BottomTabBar {...props} />}
         >
           <Tab.Screen name="Home" component={HomeTab} />
@@ -37,6 +44,13 @@ export default function TabNavigator() {
           <Tab.Screen name="Settings" component={SettingsTab} />
         </Tab.Navigator>
       </NavigationContainer>
+
+      {ADS_ENABLED && ctx.theme.m.isTablet ? (
+        <SafeAreaView style={{ backgroundColor: ctx.theme.colors.bg, paddingBottom: insets.bottom }} edges={["left", "right"]}>
+          <View pointerEvents="none" style={{ height: 10, marginHorizontal: 16, borderTopWidth: 1, borderTopColor: ctx.theme.colors.border }} />
+          <AdBar theme={ctx.theme} unitId={ctx.adUnitId} />
+        </SafeAreaView>
+      ) : null}
 
       <RewardUnlockModal
         theme={ctx.theme}

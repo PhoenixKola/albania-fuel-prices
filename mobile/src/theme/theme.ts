@@ -16,6 +16,12 @@ export type Palette = {
     linkBg: string;
     linkText: string;
     danger: string;
+    success: string;
+    warning: string;
+    info: string;
+    surfaceRaised: string;
+    surfaceMuted: string;
+    accentSoft: string;
     overlay: string;
   };
 };
@@ -37,6 +43,12 @@ export const themes: Record<ThemeName, Palette> = {
       linkBg: "rgba(14, 116, 144, 0.10)",
       linkText: "#0E7490",
       danger: "#D14343",
+      success: "#087F5B",
+      warning: "#B45309",
+      info: "#0369A1",
+      surfaceRaised: "#FFFFFF",
+      surfaceMuted: "#F1EEE7",
+      accentSoft: "rgba(15,118,110,0.11)",
       overlay: "rgba(0,0,0,0.45)",
     },
   },
@@ -56,6 +68,12 @@ export const themes: Record<ThemeName, Palette> = {
       linkBg: "rgba(45, 212, 191, 0.14)",
       linkText: "#8DEDE1",
       danger: "#FB7185",
+      success: "#5EEAD4",
+      warning: "#FBBF24",
+      info: "#7DD3FC",
+      surfaceRaised: "#12243B",
+      surfaceMuted: "#101E31",
+      accentSoft: "rgba(45,212,191,0.13)",
       overlay: "rgba(0,0,0,0.55)",
     },
   },
@@ -87,11 +105,13 @@ export type Metrics = {
   gutter: number;
   /** Cap for the readable content column on wide screens. */
   maxContentWidth: number;
+  fontScale: number;
+  isLargeText: boolean;
 };
 
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 
-export function makeMetrics(width: number, height: number): Metrics {
+export function makeMetrics(width: number, height: number, fontScale = 1): Metrics {
   const isTablet = Math.min(width, height) >= 600;
   const isSmall = width < 360;
   const isLandscape = width > height;
@@ -116,6 +136,8 @@ export function makeMetrics(width: number, height: number): Metrics {
     isLandscape,
     gutter: Math.round((isSmall ? 12 : 16) * spaceRatio),
     maxContentWidth,
+    fontScale,
+    isLargeText: fontScale >= 1.3,
   };
 }
 
@@ -124,8 +146,23 @@ export const defaultMetrics = makeMetrics(DESIGN_WIDTH, 844);
 
 
 /** A palette plus the responsive metrics for the current window. */
-export type Theme = Palette & { m: Metrics };
+export type Theme = Palette & {
+  m: Metrics;
+  radius: { sm: number; md: number; lg: number; xl: number; pill: number };
+  motion: { reduced: boolean; fast: number; normal: number };
+};
 
-export function composeTheme(name: ThemeName, width: number, height: number): Theme {
-  return { ...themes[name], m: makeMetrics(width, height) };
+export function composeTheme(
+  name: ThemeName,
+  width: number,
+  height: number,
+  fontScale = 1,
+  reducedMotion = false
+): Theme {
+  return {
+    ...themes[name],
+    m: makeMetrics(width, height, fontScale),
+    radius: { sm: 12, md: 16, lg: 22, xl: 30, pill: 999 },
+    motion: { reduced: reducedMotion, fast: reducedMotion ? 0 : 110, normal: reducedMotion ? 0 : 220 },
+  };
 }

@@ -24,7 +24,7 @@ export default function BottomTabBar({ state, descriptors, navigation }: BottomT
   const { theme, t, adUnitId } = useApp();
   const s = useMemo(() => makeBottomTabBarStyles(theme), [theme]);
   const insets = useSafeAreaInsets();
-  const showAdBar = ADS_ENABLED;
+  const showAdBar = ADS_ENABLED && !theme.m.isTablet;
 
   const tabLabels: Record<string, string> = {
     Home: t.homeTitle,
@@ -37,6 +37,7 @@ export default function BottomTabBar({ state, descriptors, navigation }: BottomT
   return (
     <View style={s.container}>
       {showAdBar ? <AdBar theme={theme} unitId={adUnitId} /> : null}
+      {showAdBar ? <View style={s.adBuffer} pointerEvents="none" /> : null}
       <View style={[s.tabRow, { paddingBottom: Math.max(insets.bottom, 6) }]}>
         {state.routes.map((route, index) => {
           const focused = state.index === index;
@@ -55,6 +56,7 @@ export default function BottomTabBar({ state, descriptors, navigation }: BottomT
               color={color}
               navigation={navigation}
               styles={s}
+              reducedMotion={theme.motion.reduced}
             />
           );
         })}
@@ -71,6 +73,7 @@ function TabBarButton(props: {
   color: string;
   navigation: BottomTabBarProps["navigation"];
   styles: ReturnType<typeof makeBottomTabBarStyles>;
+  reducedMotion: boolean;
 }) {
   const progress = useRef(new Animated.Value(props.focused ? 1 : 0)).current;
   const s = props.styles;
@@ -78,11 +81,11 @@ function TabBarButton(props: {
   useEffect(() => {
     Animated.timing(progress, {
       toValue: props.focused ? 1 : 0,
-      duration: 230,
+      duration: props.reducedMotion ? 0 : 230,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true
     }).start();
-  }, [props.focused, progress]);
+  }, [props.focused, props.reducedMotion, progress]);
 
   const activeScale = progress.interpolate({
     inputRange: [0, 1],
@@ -114,6 +117,7 @@ function TabBarButton(props: {
           props.navigation.navigate(props.route.name);
         }
       }}
+      onLongPress={() => props.navigation.emit({ type: "tabLongPress", target: props.route.key })}
       accessibilityRole="button"
       accessibilityState={props.focused ? { selected: true } : {}}
       accessibilityLabel={props.label}
@@ -152,6 +156,7 @@ function TabBarButton(props: {
           }
         ]}
         numberOfLines={1}
+        maxFontSizeMultiplier={1.4}
       >
         {props.label}
       </Animated.Text>

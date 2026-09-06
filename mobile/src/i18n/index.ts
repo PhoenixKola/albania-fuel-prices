@@ -218,6 +218,56 @@ export type TDict = {
   keepCurrent: string;
   loading: string;
   fxUnavailable: string;
+  premiumInsights: string;
+  searchStations: string;
+  stationSearchPlaceholder: string;
+  filters: string;
+  openNowOnly: string;
+  favoriteOnly: string;
+  allStations: string;
+  directions: string;
+  withinRadius: (radius: number) => string;
+  noStationMatches: string;
+  clearFilters: string;
+  locationAccess: string;
+  compareOverview: string;
+  bestValue: string;
+  selectedCountries: string;
+  differenceFromBest: string;
+  sevenDays: string;
+  thirtyDays: string;
+  trendComparison: string;
+  trendMovedUp: (country: string) => string;
+  trendMovedDown: (country: string) => string;
+  trendHeldSteady: string;
+  saveTwoCountries: string;
+  compareLimitHint: (n: number) => string;
+  leaderboard: string;
+  cheapestMode: string;
+  expensiveMode: string;
+  yourPosition: string;
+  manageFavorites: string;
+  toastCountrySelected: (country: string) => string;
+  preferences: string;
+  dataHealth: string;
+  liveData: string;
+  cachedData: string;
+  themeSystem: string;
+  followDeviceTheme: string;
+  chooseLanguage: string;
+  chooseCurrency: string;
+  lastSync: string;
+  openSource: string;
+  appSupport: string;
+  openSettings: string;
+  locationPermissionDenied: string;
+  locationPermissionDeniedHint: string;
+  locationUnavailable: string;
+  locationUnavailableHint: string;
+  stationsLoadError: string;
+  stationsTimeoutCached: string;
+  linkUnavailable: string;
+  dataUnavailable: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -437,6 +487,56 @@ export const i18n: Record<Lang, TDict> = {
     keepCurrent: "Keep current",
     loading: "Loading…",
     fxUnavailable: "FX unavailable",
+    premiumInsights: "Live market intelligence",
+    searchStations: "Search stations",
+    stationSearchPlaceholder: "Search name or brand",
+    filters: "Filters",
+    openNowOnly: "Open now",
+    favoriteOnly: "Favorites",
+    allStations: "All stations",
+    directions: "Directions",
+    withinRadius: (radius: number) => `Within ${radius} km`,
+    noStationMatches: "No stations match these filters.",
+    clearFilters: "Clear filters",
+    locationAccess: "Location access",
+    compareOverview: "Comparison overview",
+    bestValue: "Best value",
+    selectedCountries: "Selected countries",
+    differenceFromBest: "Extra vs best",
+    sevenDays: "7 days",
+    thirtyDays: "30 days",
+    trendComparison: "Price movement",
+    trendMovedUp: (country: string) => `${country} rose the most in this period.`,
+    trendMovedDown: (country: string) => `${country} fell the most in this period.`,
+    trendHeldSteady: "Prices were broadly stable in this period.",
+    saveTwoCountries: "Select at least two countries to save this set.",
+    compareLimitHint: (n: number) => `Compare up to ${n} countries in this session.`,
+    leaderboard: "European leaderboard",
+    cheapestMode: "Cheapest",
+    expensiveMode: "Most expensive",
+    yourPosition: "Your position",
+    manageFavorites: "Manage favorites",
+    toastCountrySelected: (country: string) => `${country} selected`,
+    preferences: "Preferences",
+    dataHealth: "Data health",
+    liveData: "Live data",
+    cachedData: "Cached data",
+    themeSystem: "System",
+    followDeviceTheme: "Follow device appearance",
+    chooseLanguage: "Choose language",
+    chooseCurrency: "Choose currency",
+    lastSync: "Last sync",
+    openSource: "Open source",
+    appSupport: "Support & sharing",
+    openSettings: "Open settings",
+    locationPermissionDenied: "Location access is off",
+    locationPermissionDeniedHint: "Enable location in device settings to find stations near you.",
+    locationUnavailable: "Location unavailable",
+    locationUnavailableHint: "We could not determine your location. Check your connection and try again.",
+    stationsLoadError: "Stations could not be loaded. Pull to refresh or try again.",
+    stationsTimeoutCached: "The station service timed out. Cached results are shown.",
+    linkUnavailable: "This link is unavailable right now.",
+    dataUnavailable: "Data unavailable",
   },
   sq: {
     title: "Karburanti Sot",
@@ -654,5 +754,55 @@ export const i18n: Record<Lang, TDict> = {
     keepCurrent: "Ruaj aktualin",
     loading: "Po ngarkohet…",
     fxUnavailable: "Kursi s'disponohet",
+    premiumInsights: "Inteligjencë e tregut në kohë reale",
+    searchStations: "Kërko pika",
+    stationSearchPlaceholder: "Kërko emër ose markë",
+    filters: "Filtrat",
+    openNowOnly: "Hapur tani",
+    favoriteOnly: "Të preferuarat",
+    allStations: "Të gjitha pikat",
+    directions: "Udhëzimet",
+    withinRadius: (radius: number) => `Brenda ${radius} km`,
+    noStationMatches: "Asnjë pikë nuk përputhet me filtrat.",
+    clearFilters: "Pastro filtrat",
+    locationAccess: "Qasja në vendndodhje",
+    compareOverview: "Përmbledhja e krahasimit",
+    bestValue: "Vlera më e mirë",
+    selectedCountries: "Shtetet e zgjedhura",
+    differenceFromBest: "Mbi më të mirën",
+    sevenDays: "7 ditë",
+    thirtyDays: "30 ditë",
+    trendComparison: "Lëvizja e çmimeve",
+    trendMovedUp: (country: string) => `${country} u rrit më shumë në këtë periudhë.`,
+    trendMovedDown: (country: string) => `${country} u ul më shumë në këtë periudhë.`,
+    trendHeldSteady: "Çmimet mbetën përgjithësisht të qëndrueshme.",
+    saveTwoCountries: "Zgjidh të paktën dy shtete për ta ruajtur grupin.",
+    compareLimitHint: (n: number) => `Krahaso deri në ${n} shtete në këtë sesion.`,
+    leaderboard: "Renditja evropiane",
+    cheapestMode: "Më të lirat",
+    expensiveMode: "Më të shtrenjtat",
+    yourPosition: "Pozicioni yt",
+    manageFavorites: "Menaxho të preferuarat",
+    toastCountrySelected: (country: string) => `${country} u zgjodh`,
+    preferences: "Preferencat",
+    dataHealth: "Gjendja e të dhënave",
+    liveData: "Të dhëna live",
+    cachedData: "Të dhëna nga memoria",
+    themeSystem: "Sistemi",
+    followDeviceTheme: "Ndiq pamjen e pajisjes",
+    chooseLanguage: "Zgjidh gjuhën",
+    chooseCurrency: "Zgjidh monedhën",
+    lastSync: "Sinkronizimi i fundit",
+    openSource: "Hap burimin",
+    appSupport: "Mbështetje & ndarje",
+    openSettings: "Hap cilësimet",
+    locationPermissionDenied: "Qasja në vendndodhje është çaktivizuar",
+    locationPermissionDeniedHint: "Aktivizo vendndodhjen te cilësimet e pajisjes për të gjetur pikat pranë teje.",
+    locationUnavailable: "Vendndodhja nuk disponohet",
+    locationUnavailableHint: "Nuk mundëm ta përcaktonim vendndodhjen. Kontrollo lidhjen dhe provo përsëri.",
+    stationsLoadError: "Pikat nuk mund të ngarkoheshin. Tërhiq për të rifreskuar ose provo përsëri.",
+    stationsTimeoutCached: "Shërbimi i pikave nuk u përgjigj në kohë. Po shfaqen rezultatet e ruajtura.",
+    linkUnavailable: "Kjo lidhje nuk është e disponueshme tani.",
+    dataUnavailable: "Të dhënat nuk disponohen",
   },
 };

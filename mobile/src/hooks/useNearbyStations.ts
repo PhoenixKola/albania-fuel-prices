@@ -83,6 +83,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  const [cacheSavedAtUtc, setCacheSavedAtUtc] = useState<string | null>(null);
 
   // Tracks the AbortController of the current in-flight request
   const abortRef = useRef<AbortController | null>(null);
@@ -109,6 +110,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
 
     setStations(withFreshOpenState(env.stations));
     setFromCache(true);
+    setCacheSavedAtUtc(env.savedAtUtc);
     return env;
   }, [centerLat, centerLon, radiusM]);
 
@@ -166,6 +168,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
 
       setStations(parsed);
       setFromCache(false);
+      setCacheSavedAtUtc(new Date().toISOString());
 
       const env: CacheEnvelope = {
         savedAtUtc: new Date().toISOString(),
@@ -208,5 +211,5 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
   }, [centerLat, centerLon, radiusM, loadCache, refresh]);
 
   const top = useMemo(() => stations.slice(0, 100), [stations]);
-  return { stations: top, totalCount: stations.length, loading, error, refresh, fromCache };
+  return { stations: top, totalCount: stations.length, loading, error, refresh, fromCache, cacheSavedAtUtc };
 }
