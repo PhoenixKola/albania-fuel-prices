@@ -51,7 +51,11 @@ function thirtyDayDelta(trends: Trends | null, country: string, fuel: FuelType) 
 
 function signed(value: number | null, suffix = "") {
   if (value == null || !Number.isFinite(value)) return "—";
-  return `${value > 0 ? "+" : value < 0 ? "−" : ""}${Math.abs(value).toFixed(3)}${suffix}`;
+  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+  // Currency leads the number ("+€0.513") so a trailing symbol can never wrap
+  // onto its own line inside a narrow metric tile.
+  if (suffix.trim() === "€") return `${sign}€${Math.abs(value).toFixed(3)}`;
+  return `${sign}${Math.abs(value).toFixed(3)}${suffix}`;
 }
 
 function eurPrice(row: CountryPrices | null, fuel: FuelType) {

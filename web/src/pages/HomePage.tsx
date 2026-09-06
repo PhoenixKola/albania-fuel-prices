@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { Link } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
@@ -118,7 +118,6 @@ export default function HomePage({
   show,
   refresh,
 }: Props) {
-  const [ambientMotionPaused, setAmbientMotionPaused] = useState(false);
   const [allPerEurStored, setAllPerEur] = useLocalStorageState<number>(STORAGE_ALL_RATE_KEY, 0, {
     deserialize: (raw) => {
       const n = Number(raw);
@@ -209,7 +208,7 @@ export default function HomePage({
   }, [data, lang, t]);
 
   return (
-    <main className={`homeExperience ${ambientMotionPaused ? "homeMotionPaused" : ""}`}>
+    <main className="homeExperience">
       <ToastHost message={toast} />
       <HeroIntro
         t={t}
@@ -217,8 +216,6 @@ export default function HomePage({
         model={heroModel}
         currency={currency}
         fxRates={fxRates}
-        ambientMotionPaused={ambientMotionPaused}
-        onToggleAmbientMotion={() => setAmbientMotionPaused((paused) => !paused)}
       />
 
       {error ? <Notice t={t} message={error} onRetry={refresh} /> : null}

@@ -26,8 +26,6 @@ type HeroIntroProps = {
   model: HomeHeroModel;
   currency: Currency;
   fxRates: FxRates | null;
-  ambientMotionPaused: boolean;
-  onToggleAmbientMotion: () => void;
 };
 
 function formatUpdatedAt(value: string | null, t: TDict, lang: Lang) {
@@ -55,8 +53,6 @@ export default function HeroIntro({
   model,
   currency,
   fxRates,
-  ambientMotionPaused,
-  onToggleAmbientMotion,
 }: HeroIntroProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | null>(null);
@@ -121,15 +117,6 @@ export default function HeroIntro({
             <span><i aria-hidden="true" />{t.heroShowcaseTrust2}</span>
             <span><i aria-hidden="true" />{updated}</span>
           </div>
-          <button
-            type="button"
-            className="homeMotionControl"
-            aria-pressed={ambientMotionPaused}
-            onClick={onToggleAmbientMotion}
-          >
-            <span className="homeMotionControlIcon" aria-hidden="true">{ambientMotionPaused ? "▶" : "Ⅱ"}</span>
-            {ambientMotionPaused ? t.homeMotionResume : t.homeMotionPause}
-          </button>
         </div>
 
         <div

@@ -125,15 +125,15 @@ function redesignedStaticContent(route: RouteEntry): RouteEntry {
   const copy = editorialCopy.en;
   if (route.path === "/about") {
     return { ...route, content: `
-      <article class="contentPage editorialExperience editorialExperience-dossier">
-        <header class="contentHero editorialHero"><p class="contentHeroBadge">${escapeHtml(copy.about.eyebrow)}</p><h1 class="contentHeroTitle">${escapeHtml(copy.about.title)}</h1><p class="contentHeroText">${escapeHtml(copy.about.lede)}</p><p class="contentBodyMuted">${ANALYSIS_META.countriesAnalysed} markets · ${ANALYSIS_META.daysObserved} days of history · independent</p></header>
+      <article class="contentPage aboutPage">
+        <header class="aboutHero"><p class="aboutEyebrow">${escapeHtml(copy.about.eyebrow)}</p><h1>${escapeHtml(copy.about.title)}</h1><p class="aboutLede">${escapeHtml(copy.about.lede)}</p><p class="aboutStatus">${escapeHtml(copy.about.status)}</p><dl class="aboutFigures"><div><dt>${escapeHtml(copy.about.metrics[0])}</dt><dd>${ANALYSIS_META.countriesAnalysed}</dd><p>European markets</p></div><div><dt>${escapeHtml(copy.about.metrics[1])}</dt><dd>${ANALYSIS_META.daysObserved}</dd><p>consecutive days recorded</p></div><div><dt>${escapeHtml(copy.about.metrics[2])}</dt><dd>None</dd><p>over rankings or conclusions</p></div></dl></header>
         ${renderEditorialSections(copy.about.sections)}
       </article>` };
   }
   if (route.path === "/contact") {
     return { ...route, content: `
-      <article class="contentPage editorialExperience editorialExperience-dossier">
-        <header class="contentHero editorialHero"><p class="contentHeroBadge">${escapeHtml(copy.contact.eyebrow)}</p><h1 class="contentHeroTitle">${escapeHtml(copy.contact.title)}</h1><p class="contentHeroText">${escapeHtml(copy.contact.lede)}</p><p><a class="heroCta heroCtaPrimary" href="mailto:fenixkola@gmail.com">${escapeHtml(copy.contact.emailAction)}</a></p></header>
+      <article class="contentPage contactPage">
+        <header class="contactHero"><div class="contactHeroCopy"><p class="contactEyebrow">${escapeHtml(copy.contact.eyebrow)}</p><h1>${escapeHtml(copy.contact.title)}</h1><p class="contactLede">${escapeHtml(copy.contact.lede)}</p></div><div class="contactCard"><span class="contactCardLabel">Write to us directly</span><a class="contactEmail" href="mailto:fenixkola@gmail.com">fenixkola@gmail.com</a><a class="contactMailButton" href="mailto:fenixkola@gmail.com?subject=Karburanti%20Sot%20enquiry">${escapeHtml(copy.contact.emailAction)}</a></div></header>
         ${renderEditorialSections(copy.contact.sections)}
       </article>` };
   }
@@ -572,7 +572,7 @@ const STATIC_ROUTES: RouteEntry[] = [
     jsonLdType: "Article",
     datePublished: "2026-08-05",
     priceBearing: true,
-    content: `${freshnessNotice()}${MARKET_REPORT_HTML}`,
+    content: `<article class="contentPage reportPage">${freshnessNotice()}<div class="reportBody marketReportHtml">${MARKET_REPORT_HTML}</div></article>`,
   },
   {
     path: "/daily-challenge",

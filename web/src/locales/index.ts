@@ -172,8 +172,6 @@ export type TDict = {
   homeTransparencyTitle: string;
   homeTransparencySubtitle: string;
   homeAdvertisement: string;
-  homeMotionPause: string;
-  homeMotionResume: string;
   homeStaleNotice: (date: string, days: number) => string;
   homeTrendUnavailableTitle: string;
   homeTrendUnavailableText: string;

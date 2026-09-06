@@ -173,8 +173,6 @@ export const sq = {
   homeTransparencyTitle: "Shiko saktësisht çfarë fshihet pas leximit.",
   homeTransparencySubtitle: "Burimet, logjika e përditësimit, metodologjia dhe udhëzuesi i plotë janë vetëm një prekje larg.",
   homeAdvertisement: "Reklamë",
-  homeMotionPause: "Ndalo lëvizjen e sfondit",
-  homeMotionResume: "Rinis lëvizjen e sfondit",
   homeStaleNotice: (date: string, days: number) =>
     `Të dhënat e tregut u përditësuan për herë të fundit më ${date}, ${days} ditë më parë. Lexoji këto shifra si referencë deri në përditësimin tjetër.`,
   homeTrendUnavailableTitle: "Sinjali i trendit nuk është i disponueshëm",

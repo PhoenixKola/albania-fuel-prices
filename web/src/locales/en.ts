@@ -173,8 +173,6 @@ export const en = {
   homeTransparencyTitle: "See exactly what sits behind the reading.",
   homeTransparencySubtitle: "Sources, update logic, methodology, and the long-form guide remain one tap away.",
   homeAdvertisement: "Advertisement",
-  homeMotionPause: "Pause ambient motion",
-  homeMotionResume: "Resume ambient motion",
   homeStaleNotice: (date: string, days: number) =>
     `The market feed was last updated on ${date}, ${days} days ago. Treat these readings as reference values while the next update arrives.`,
   homeTrendUnavailableTitle: "Trend signal unavailable",
