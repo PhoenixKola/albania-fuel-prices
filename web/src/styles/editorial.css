@@ -224,6 +224,27 @@
   font-weight: 850;
   letter-spacing: 0.08em;
 }
+#country-explore .editorialSectionHeading {
+  grid-template-columns: 1fr;
+}
+
+#country-explore .editorialSectionBody {
+  margin-top: 22px;
+  max-width: none;
+}
+
+#country-explore .editorialHeroActions {
+  margin-top: 0;
+}
+
+#country-explore .editorialActionPrimary {
+  color: var(--ed-accent-ink);
+}
+.countryHeroInstrument .editorialMetric:last-child strong {
+  font-size: clamp(16px, 1.55vw, 23px);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .editorialSection h2 { margin: 0; color: var(--ed-ink); font-size: clamp(28px, 3.3vw, 44px); line-height: 1.04; letter-spacing: -0.046em; }
 .editorialSectionHeading p { max-width: 690px; margin: 13px 0 0; color: var(--ed-muted); font-size: 15px; line-height: 1.7; }
 .editorialSectionBody { max-width: 790px; margin: 26px 0 0 70px; color: var(--ed-muted); }
