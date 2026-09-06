@@ -1,115 +1,159 @@
-import type { Lang } from "../../models/i18n";
-import type { Currency } from "../../models/currency";
-import type { CountryPrices, FuelType, LatestEurope } from "../../models/fuel";
-import type { TDict } from "../../locales";
+import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
 import { Link } from "react-router-dom";
+import type { Lang } from "../../models/i18n";
+import type { FuelType } from "../../models/fuel";
+import type { TDict } from "../../locales";
+import type { Currency } from "../../models/currency";
 import type { FxRates } from "../../utils/currency";
-import { fuelLabel, getEurPrice } from "../../utils/fuel";
+import { fuelLabel } from "../../utils/fuel";
 import { formatFuelPrice } from "../../utils/priceDisplay";
-import { isEuropeanCountry } from "../../utils/regions";
+
+export type HomeHeroModel = {
+  selectedPrice: number | null;
+  country: string;
+  fuelType: FuelType;
+  rank: number | null;
+  marketTotal: number;
+  europeanAverage: number | null;
+  averageDifference: number | null;
+  weeklyDelta: number | null;
+  updatedAt: string | null;
+};
 
 type HeroIntroProps = {
   t: TDict;
   lang: Lang;
-  updatedAt?: string | Date | null;
-  data: LatestEurope | null;
-  country: string;
-  selected: CountryPrices | null;
-  fuelType: FuelType;
+  model: HomeHeroModel;
   currency: Currency;
   fxRates: FxRates | null;
 };
 
-function formatUpdatedAt(value: string | Date | null | undefined, t: TDict, lang: Lang) {
+function formatUpdatedAt(value: string | null, t: TDict, lang: Lang) {
   if (!value) return t.heroLiveFallback;
-
-  const date = typeof value === "string" ? new Date(value) : value;
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) return t.heroLiveFallback;
 
-  const locale = lang === "sq" ? "sq-AL" : "en-GB";
   return t.heroUpdatedAt(
-    date.toLocaleString(locale, {
+    date.toLocaleString(lang === "sq" ? "sq-AL" : "en-GB", {
       dateStyle: "medium",
       timeStyle: "short",
     })
   );
 }
 
-export default function HeroIntro({ t, lang, updatedAt, data, country, selected, fuelType, currency, fxRates }: HeroIntroProps) {
-  const selectedPrice = getEurPrice(selected, fuelType);
-  const heroPrice = formatFuelPrice(country, selectedPrice, currency, fxRates);
-  const heroFuel = fuelLabel(t, fuelType);
-  const pricedCountries =
-    data?.countries
-      ?.filter((item) => isEuropeanCountry(item.country))
-      .map((item) => ({ country: item.country, price: getEurPrice(item, fuelType) }))
-      .filter((item): item is { country: string; price: number } => typeof item.price === "number" && Number.isFinite(item.price))
-      .sort((a, b) => a.price - b.price) ?? [];
-  const rank =
-    selectedPrice != null && isEuropeanCountry(country) && pricedCountries.length
-      ? pricedCountries.filter((item) => item.price < selectedPrice).length + 1
-      : null;
-  const average = pricedCountries.length
-    ? pricedCountries.reduce((sum, item) => sum + item.price, 0) / pricedCountries.length
-    : null;
-  const averageLabel =
-    selectedPrice == null || average == null
-      ? t.heroShowcaseMockupRow2
-      : selectedPrice <= average
-        ? t.heroShowcaseBelowAverage
-        : t.heroShowcaseAboveAverage;
+function signed(value: number | null) {
+  if (value == null || !Number.isFinite(value)) return null;
+  if (Math.abs(value) < 0.0005) return "0.000";
+  return `${value > 0 ? "+" : "−"}${Math.abs(value).toFixed(3)}`;
+}
+
+export default function HeroIntro({ t, lang, model, currency, fxRates }: HeroIntroProps) {
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number | null>(null);
+  const selectedPrice = formatFuelPrice(model.country, model.selectedPrice, currency, fxRates);
+  const fuel = fuelLabel(t, model.fuelType);
+  const rank = model.rank == null ? t.notAvailable : t.homeGaugeRankValue(model.rank, model.marketTotal);
+  const averageValue = signed(model.averageDifference);
+  const average = averageValue == null ? t.notAvailable : t.homeGaugeAverageValue(averageValue);
+  const weeklyValue = signed(model.weeklyDelta);
+  const week = weeklyValue == null ? t.notAvailable : weeklyValue === "0.000" ? t.homeGaugeWeekFlat : t.homeGaugeWeekValue(weeklyValue);
+  const updated = formatUpdatedAt(model.updatedAt, t, lang);
+  const gaugeProgress = model.rank && model.marketTotal > 1
+    ? Math.max(10, Math.min(92, 100 - ((model.rank - 1) / (model.marketTotal - 1)) * 78))
+    : 58;
+  const sceneStyle = { "--gauge-progress": `${gaugeProgress}%` } as CSSProperties;
+
+  useEffect(() => () => {
+    if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
+  }, []);
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!window.matchMedia("(pointer: fine)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const element = sceneRef.current;
+    if (!element) return;
+    const bounds = element.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width;
+    const y = (event.clientY - bounds.top) / bounds.height;
+    if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
+    frameRef.current = requestAnimationFrame(() => {
+      element.style.setProperty("--scene-rx", `${(0.5 - y) * 8}deg`);
+      element.style.setProperty("--scene-ry", `${(x - 0.5) * 10}deg`);
+      element.style.setProperty("--light-x", `${x * 100}%`);
+      element.style.setProperty("--light-y", `${y * 100}%`);
+    });
+  };
+
+  const resetPointer = () => {
+    const element = sceneRef.current;
+    if (!element) return;
+    element.style.setProperty("--scene-rx", "0deg");
+    element.style.setProperty("--scene-ry", "0deg");
+    element.style.setProperty("--light-x", "50%");
+    element.style.setProperty("--light-y", "42%");
+  };
 
   return (
-    <section className="contentHero" aria-labelledby="home-hero-title">
-      <div className="contentHeroCopy">
-        <div className="contentHeroBadge">{t.heroShowcaseBadge}</div>
-        <h1 id="home-hero-title" className="contentHeroTitle">{t.heroShowcaseTitle}</h1>
-        <p className="contentHeroText">{t.heroShowcaseSubtitle}</p>
-
-        <div className="contentHeroActions">
-          <a className="heroCta heroCtaPrimary" href="#price-tool" aria-label={t.heroShowcasePrimaryCta}>
-            {t.heroShowcasePrimaryCta}
-          </a>
-          <Link className="heroCta heroCtaSecondary" to="/stations" aria-label={t.heroShowcaseSecondaryCta}>
-            {t.heroShowcaseSecondaryCta}
-          </Link>
-        </div>
-
-        <div className="heroTrustRow" aria-label={formatUpdatedAt(updatedAt, t, lang)}>
-          <span>{t.heroShowcaseTrust1}</span>
-          <span>{t.heroShowcaseTrust2}</span>
-          <span>{t.heroShowcaseTrust3}</span>
-        </div>
-      </div>
-
-      <div className="contentHeroVisual" aria-hidden="true">
-        <div className="heroFloatCard heroFloatCardTop">{t.heroShowcaseFloat1(data?.countries.length ?? 0)}</div>
-        <div className="heroFloatCard heroFloatCardBottom">{t.heroShowcaseFloat2}</div>
-
-        <div className="heroPhone">
-          <div className="heroPhoneSpeaker" />
-          <div className="heroPhoneScreen">
-            <div className="heroPhoneStatus">
-              <span>{t.heroShowcaseMockupStatus}</span>
-              <span>•••</span>
-            </div>
-            <div className="heroPhoneBalance">
-              <span className="heroPhoneAmount">{heroPrice}</span>
-              <span className="heroPhoneUnit">/L</span>
-            </div>
-            <div className="heroPhonePill">{country}<span aria-hidden="true"> · </span>{heroFuel}</div>
-            <div className="heroPhoneActions">
-              <span />
-              <span />
-              <span />
-            </div>
-            <div className="heroPhonePulse">
-              <strong>{t.heroShowcaseMockupCardTitle}</strong>
-              <span>{rank ? t.heroShowcaseRank(rank) : t.heroShowcaseMockupRow1}</span>
-              <span>{averageLabel}</span>
-              <span>{t.heroShowcaseMockupRow3}</span>
-            </div>
+    <section className="homeCockpitHero" aria-labelledby="home-hero-title">
+      <div className="homeHeroGrid">
+        <div className="homeHeroCopy">
+          <div className="homeEyebrow homeHeroEyebrow">
+            <span className="homeLiveDot" aria-hidden="true" />
+            {t.homeCockpitKicker}
           </div>
+          <h1 id="home-hero-title" className="homeHeroTitle">{t.homeCockpitTitle}</h1>
+          <p className="homeHeroText">{t.homeCockpitSubtitle}</p>
+          <div className="homeHeroActions">
+            <a className="homeButton homeButtonPrimary" href="#price-tool">{t.homeCockpitPrimaryCta}</a>
+            <Link className="homeButton homeButtonGhost" to="/stations">{t.homeCockpitSecondaryCta}</Link>
+          </div>
+          <div className="homeTrustRail" aria-label={updated}>
+            <span><i aria-hidden="true" />{t.heroShowcaseTrust1}</span>
+            <span><i aria-hidden="true" />{t.heroShowcaseTrust2}</span>
+            <span><i aria-hidden="true" />{updated}</span>
+          </div>
+        </div>
+
+        <div
+          ref={sceneRef}
+          className="homeCockpitScene"
+          style={sceneStyle}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={resetPointer}
+          role="img"
+          aria-label={t.homeGaugeA11y(model.country, fuel, selectedPrice, rank, average, week)}
+        >
+          <div className="homeCockpitGlow" aria-hidden="true" />
+          <div className="homeClusterShell">
+            <div className="homeClusterTopline">
+              <span><b aria-hidden="true" />{t.homeLiveStatus}</span>
+              <span>{updated}</span>
+            </div>
+            <div className="homeGauge" aria-hidden="true">
+              <div className="homeGaugeTicks" />
+              <div className="homeGaugeCore">
+                <span className="homeGaugeLabel">{t.homeGaugePriceLabel}</span>
+                <strong className="homeGaugePrice">{model.selectedPrice == null ? "—" : selectedPrice}</strong>
+                <span className="homeGaugeUnit">{model.country} <i>·</i> {fuel}</span>
+              </div>
+            </div>
+            <div className="homeClusterStats">
+              <div>
+                <span>{t.homeGaugeRank}</span>
+                <strong>{rank}</strong>
+              </div>
+              <div>
+                <span>{t.homeGaugeAverage}</span>
+                <strong className={model.averageDifference != null && model.averageDifference <= 0 ? "isGood" : "isWarm"}>{average}</strong>
+              </div>
+              <div>
+                <span>{t.homeGaugeWeek}</span>
+                <strong className={model.weeklyDelta != null && model.weeklyDelta <= 0 ? "isGood" : "isWarm"}>{week}</strong>
+              </div>
+            </div>
+            <div className="homeClusterReflection" aria-hidden="true" />
+          </div>
+          <span className="homeOrbitLabel homeOrbitLabelTop" aria-hidden="true">{String(model.marketTotal).padStart(2, "0")} / EU</span>
+          <span className="homeOrbitLabel homeOrbitLabelBottom" aria-hidden="true">EUR · LITER · LIVE</span>
         </div>
       </div>
     </section>

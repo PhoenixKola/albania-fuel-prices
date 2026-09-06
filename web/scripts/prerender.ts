@@ -119,16 +119,26 @@ const STATIC_ROUTES: RouteEntry[] = [
     datePublished: "2026-02-14",
     priceBearing: true,
     content: (ctx) => `
-      <header class="contentHero">
-        <h1 class="contentHeroTitle">Fuel prices in Albania and Europe, explained clearly</h1>
-        <p class="contentHeroText">Karburanti Sot helps drivers compare fuel prices, estimate trip costs, and understand how pricing changes across countries. Instead of showing only raw numbers, the site adds context around price rankings, likely cost differences, exchange-rate effects, and practical travel use cases.</p>
+      <header class="contentHero" aria-labelledby="prerender-home-title">
+        <p class="contentHeroBadge">Europe / fuel intelligence</p>
+        <h1 id="prerender-home-title" class="contentHeroTitle">Read the road before you drive it.</h1>
+        <p class="contentHeroText">A live cockpit for fuel prices across Europe—built to reveal the smarter place to fill, the true cost of a route, and the movement behind today's number.</p>
+        <nav class="contentHeroActions" aria-label="Homepage tools">
+          <a class="heroCta heroCtaPrimary" href="#price-tool">Enter the cockpit</a>
+          <a class="heroCta heroCtaSecondary" href="/stations">Find fuel nearby</a>
+        </nav>
+        <p class="heroTrustRow">Daily market updates · Europe-wide comparison · Transparent public sources</p>
       </header>
       <article class="contentPage">
         ${freshnessNotice()}
+        <section class="contentSection" id="price-tool">
+          <h2 class="contentHeading">Live fuel telemetry for Albania and Europe</h2>
+          <p class="contentBody">Inspect today's petrol, diesel, and LPG reference prices, then use the live snapshot to compare the selected market with the European range.</p>
+        </section>
         ${renderHomeSnapshot(ctx)}
         ${HOME_SUMMARY_HTML}
         <section class="contentSection">
-          <h2 class="contentHeading">What this site does</h2>
+          <h2 class="contentHeading">One market. Every signal.</h2>
           <p class="contentBody">Fuel Today (Karburanti Sot) is an independent fuel price comparison website for Albania and Europe. It collects public country-level fuel price data, converts it into a consistent EUR-per-liter format, and presents it with editorial context so drivers can make informed decisions about where and when to refuel.</p>
           <p class="contentBody">The site tracks petrol (gasoline 95), diesel, and LPG across 33 European markets, with dedicated pages for Albania, Kosovo, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom. Data is sourced from public fuel price aggregators and updated daily. Where our source publishes no prices for a country, we say so rather than estimating.</p>
         </section>
@@ -142,7 +152,7 @@ const STATIC_ROUTES: RouteEntry[] = [
           <p class="contentBody">Albania sits at the center of several busy cross-border driving corridors: Tirana–Pristina (Kosovo), Tirana–Podgorica (Montenegro), and Tirana–Ioannina (Greece). The price differences at those borders are large enough to be worth planning around, and they change: the Kosovo gap has widened substantially during 2026, while Greece and Italy have moved from being more expensive than Albania to slightly cheaper on diesel. Rather than quoting a fixed figure that will date, we publish the current gaps on the <a href="/compare">comparison page</a> and explain what they mean for a tank of fuel in our <a href="/insights/cross-border-fill-up-math">cross-border fill-up guide</a>.</p>
         </section>
         <section class="contentSection">
-          <h2 class="contentHeading">Tools and guides</h2>
+          <h2 class="contentHeading">Drive with context</h2>
           <ul class="contentList">
             <li><a href="/methodology">Methodology</a> — how data is collected and processed</li>
             <li><a href="/europe-fuel-comparison">Europe fuel comparison</a> — why prices vary across the continent</li>
