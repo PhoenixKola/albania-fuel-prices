@@ -37,10 +37,6 @@ export default function ComparePage({
 }: Props) {
   return (
     <>
-      <div className="pageHeader">
-        <h1 className="pageHeaderTitle">{t.navCompare}</h1>
-        <p className="pageHeaderSub">{t.watchlistGuidance}</p>
-      </div>
       <WatchlistCard
         t={t}
         data={data}

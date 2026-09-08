@@ -89,5 +89,7 @@ export function getIso2ForCountry(country: string): string | null {
 }
 
 export function getFlagImgUrl(iso2: string): string {
-  return `https://flagcdn.com/20x15/${iso2.toLowerCase()}.png`;
+  // SVG stays crisp in the 34px game cards and on high-density displays,
+  // while still scaling down cleanly for compact rows and chips.
+  return `https://flagcdn.com/${iso2.toLowerCase()}.svg`;
 }

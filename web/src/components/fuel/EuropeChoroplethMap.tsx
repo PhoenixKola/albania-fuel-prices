@@ -37,7 +37,7 @@ const ATLAS_TO_DATA: Record<string, string> = {
 };
 
 function colorFor(value: number | null, min: number, max: number) {
-  if (value == null) return "rgba(148, 163, 184, 0.20)";
+  if (value == null) return "rgba(129, 173, 153, 0.20)";
   const t = Math.max(0, Math.min(1, (value - min) / (max - min || 1)));
   if (t < 0.25) return "#99f6e4";
   if (t < 0.5) return "#2dd4bf";
