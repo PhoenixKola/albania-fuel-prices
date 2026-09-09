@@ -19,16 +19,16 @@ export type AnalysisMeta = {
 };
 
 export const ANALYSIS_META: AnalysisMeta = {
-  "asOf": "2026-09-05",
-  "dataAgeDays": 1,
+  "asOf": "2026-09-09",
+  "dataAgeDays": 0,
   "stale": false,
   "staleAfterDays": 3,
   "historyOk": true,
   "startDate": "2026-02-14",
-  "endDate": "2026-09-05",
+  "endDate": "2026-09-09",
   "startLabel": "14 February 2026",
-  "endLabel": "5 September 2026",
-  "daysObserved": 204,
+  "endLabel": "9 September 2026",
+  "daysObserved": 208,
   "countriesAnalysed": 33,
-  "generatedAt": "2026-09-06T14:52:57.600Z"
+  "generatedAt": "2026-09-09T19:37:58.927Z"
 };

@@ -8,10 +8,12 @@
     "build": "npm run generate && tsc -b && vite build && npm run prerender && npm run sitemap",
     "build:vite": "tsc -b && vite build",
     "generate": "tsx scripts/generateAnalysis.ts",
-    "prerender": "tsx scripts/prerender.ts",
+    "prerender": "tsx --tsconfig tsconfig.app.json scripts/prerender.ts",
     "sitemap": "tsx scripts/generate-sitemap.ts",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "tsx --tsconfig tsconfig.app.json --test tests/*.test.ts",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@types/d3-geo": "^3.1.0",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

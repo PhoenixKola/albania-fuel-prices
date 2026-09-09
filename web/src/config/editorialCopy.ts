@@ -1,3 +1,4 @@
+import { commercialCopy } from "./commercialCopy";
 import type { Lang } from "../models/i18n";
 
 export type EditorialTextSection = {
@@ -119,7 +120,7 @@ const en: EditorialCopy = {
       { id: "process", title: "From public data to a useful signal", paragraphs: ["We collect country-level values from established public sources, normalise them to EUR per litre, preserve a daily historical record, and calculate rankings, spreads, movement, and volatility from that record.", "Country-level figures are references—not promises about the price at a particular pump. When a value is missing, stale, or too thin for a reliable calculation, we say so instead of filling the gap with an estimate."] },
       { id: "principles", title: "The standards behind every number", paragraphs: ["Our editorial and data work follows four practical rules."], bullets: ["Accuracy before speed: never manufacture a missing value.", "Transparent sourcing: show where the data came from and when it was refreshed.", "Independent interpretation: commentary comes from the displayed evidence, never a commercial brief.", "Useful uncertainty: distinguish national references from station-level reality."] },
       { id: "corrections", title: "Corrections are part of the product", paragraphs: ["Reports are checked against the upstream source first. If our processing or presentation is wrong, we correct it. If the source itself appears wrong, we document the discrepancy and may suppress the affected value until it becomes trustworthy again.", "We do not change a number simply because it feels unexpected. Evidence—not expectation—drives corrections."] },
-      { id: "independence", title: "A small, independent project", paragraphs: ["Karburanti Sot is maintained independently in Tirana and is not affiliated with a fuel retailer, government agency, or advertising network. Advertising may support the service in the future, but all visible ad placements are currently switched off.", "Questions, source concerns, and correction requests go directly to the project through the contact page."] },
+      { id: "independence", title: "A small, independent project", paragraphs: [commercialCopy.en.about] },
     ],
   },
   contact: {
@@ -142,9 +143,9 @@ const en: EditorialCopy = {
       eyebrow: "Privacy dossier",
       title: "Privacy, in plain language.",
       lede: "Karburanti Sot works without an account and is designed to keep personal-data collection to a minimum.",
-      updated: "Effective 6 September 2026",
+      updated: "Effective 9 September 2026",
       calloutLabel: "Current advertising status",
-      callout: "Visible advertising is currently disabled. AdSense verification code remains installed so advertising can be enabled later under this policy and applicable consent requirements.",
+      callout: commercialCopy.en.status,
       sections: [
         { id: "collection", title: "Information we collect", paragraphs: ["We do not ask for your name, phone number, account credentials, or payment information. The service can be used without registration.", "Standard technical requests may expose information such as IP address, browser type, device type, and requested URL to hosting and data providers as part of delivering the website and preventing abuse."] },
         { id: "local-storage", title: "Settings stored on your device", paragraphs: ["Country, fuel, currency, theme, watchlist, game progress, and similar preferences are stored in your browser. They are not an account and normally remain on that device until you clear site data."] },
@@ -155,7 +156,9 @@ const en: EditorialCopy = {
             "The station finder requests device location only after you choose to use it. Your coordinates are sent to our station lookup service and may be processed by OpenStreetMap/Overpass services to retrieve nearby stations and calculate distance. Location is not used to build a profile or for advertising. Permission can be denied or withdrawn; the rest of the service remains available."
           ]
         },{ id: "external-data", title: "External data services", paragraphs: ["The website fetches fuel, exchange-rate, map, and related public data from third-party services. Those providers receive the network information required to answer the request and apply their own privacy terms."] },
-        { id: "advertising", title: "Advertising and consent", paragraphs: ["No ad slots are currently displayed. Google AdSense verification metadata and a script remain present so the publisher identity can be verified and advertising can be restored later.", "If advertising is enabled, Google and its partners may use cookies or device identifiers. Where consent is required—including the EEA, United Kingdom, and Switzerland—an appropriate consent mechanism must be shown before optional advertising storage is used."] },
+        { id: "advertising", title: "Advertising and consent", paragraphs: [commercialCopy.en.ads] },
+        { id: "analytics", title: "Cloudflare Web Analytics", paragraphs: [commercialCopy.en.analytics] },
+        { id: "affiliate-links", title: "DiscoverCars", paragraphs: [commercialCopy.en.affiliate] },
         { id: "sharing", title: "Sharing, security, and retention", paragraphs: ["We do not sell personal information. Technical providers process the minimum information needed to operate the service. Reasonable safeguards are used, but no internet service can guarantee absolute security.", "Local preferences remain until you remove them. Support emails are retained only as long as reasonably needed to resolve the request and maintain a correction record."] },
         { id: "rights", title: "Choices, children, and changes", paragraphs: ["You can clear local storage, refuse location access, and use browser controls for cookies. The service is not directed at children under 13 and does not knowingly collect their personal information.", "Material policy changes will be reflected by revising the effective date. Questions or requests can be sent to fenixkola@gmail.com."] },
       ],
@@ -164,7 +167,7 @@ const en: EditorialCopy = {
       eyebrow: "Service terms",
       title: "Use the signal. Verify the stop.",
       lede: "These terms define the limits of a free, country-level fuel information and planning service.",
-      updated: "Effective 6 September 2026",
+      updated: "Effective 9 September 2026",
       calloutLabel: "Essential limitation",
       callout: "Displayed prices are informational country references, not binding station quotes. Verify the current local price before making a purchase or route decision.",
       sections: [
@@ -172,7 +175,7 @@ const en: EditorialCopy = {
         { id: "accuracy", title: "Accuracy and availability", paragraphs: ["We work to keep information accurate and current but cannot guarantee completeness, uninterrupted access, or an exact station-level price. Sources can publish late, change format, or contain errors.", "Converted currency values and trip calculations are estimates. They may differ from card rates, cash rates, vehicle performance, route conditions, and the final amount paid."] },
         { id: "acceptable-use", title: "Acceptable use", paragraphs: ["You may use the service for personal and ordinary business planning. You may not disrupt the service, bypass security, misrepresent its data as guaranteed, or systematically extract and republish substantial parts without permission."] },
         { id: "ownership", title: "Content and third parties", paragraphs: ["Original design, commentary, and software remain protected by applicable intellectual-property law. Source data belongs to its respective providers.", "External links and services are provided for convenience. We do not control their availability, accuracy, terms, or privacy practices."] },
-        { id: "advertising", title: "Advertising", paragraphs: ["Visible advertising is currently disabled. If enabled later, advertising will be visually separated from editorial content and will not determine coverage, ranking, or conclusions."] },
+        { id: "advertising", title: "Advertising", paragraphs: [commercialCopy.en.terms] },
         { id: "liability", title: "No warranty and limitation of liability", paragraphs: ["The service is provided “as is” and “as available.” To the fullest extent permitted by law, Karburanti Sot and its operator are not liable for loss resulting from reliance on displayed prices, estimates, route decisions, service interruption, or third-party information."] },
         { id: "changes", title: "Changes and contact", paragraphs: ["These terms may be revised as the service changes. Continued use after an update means the revised terms apply.", "Questions about these terms can be sent to fenixkola@gmail.com or through the contact page."] },
       ],
@@ -181,14 +184,14 @@ const en: EditorialCopy = {
       eyebrow: "Editorial standards",
       title: "Evidence first. Context second. Influence never.",
       lede: "This policy explains how price data, generated analysis, guides, and corrections are produced and maintained.",
-      updated: "Reviewed 6 September 2026",
+      updated: "Reviewed 9 September 2026",
       calloutLabel: "Independence pledge",
       callout: "No fuel retailer, government agency, data provider, or advertiser can purchase favourable coverage, ranking, or interpretation.",
       sections: [
         { id: "mission", title: "Editorial mission", paragraphs: ["We turn public fuel data into accurate, transparent, and practical information for drivers. Commentary must help a real decision and remain understandable to a general audience."] },
         { id: "sources", title: "Source standards", paragraphs: ["Fuel values come from identified public third-party sources and are normalised consistently. We do not invent prices, accept sponsored values, or conceal a missing reading.", "Exchange-rate conversions use public indicative rates and are labelled as estimates. The Methodology page documents the processing and calculations."] },
         { id: "analysis", title: "Analysis and automation", paragraphs: ["Rankings, ranges, movement, spread, and volatility are calculated from the stored daily record. Generated narrative must be traceable to those figures and is reviewed through build-time checks.", "We distinguish measured observations from interpretation and do not present a trend as a forecast."] },
-        { id: "independence", title: "Commercial independence", paragraphs: ["Visible advertising is currently disabled. If it returns, it will remain separated from editorial material and cannot influence which countries appear or what the data says.", "We do not accept sponsored articles, paid placement, or native advertising disguised as analysis."] },
+        { id: "independence", title: "Commercial independence", paragraphs: [commercialCopy.en.independence] },
         { id: "accuracy", title: "Accuracy and proportion", paragraphs: ["Country values are described as reference figures, never guaranteed pump prices. Claims must be supported by the displayed data or a reliable public source, and uncertainty must be made clear."] },
         { id: "updates", title: "Updates and corrections", paragraphs: ["Data refreshes when upstream information becomes available. Time-sensitive guides are reviewed when market conditions, law, or source coverage materially changes.", "Correction reports are verified against evidence. Confirmed errors are fixed; material editorial corrections are not silently erased."] },
         { id: "scope", title: "Coverage and contact", paragraphs: ["Coverage focuses on petrol, diesel, LPG, transport costs, and practical travel context for Albania, the Balkans, and Europe. Country availability follows trustworthy public data, not commercial relationships.", "Questions about accuracy or this policy can be sent to fenixkola@gmail.com."] },
@@ -198,7 +201,7 @@ const en: EditorialCopy = {
       eyebrow: "Important limitations",
       title: "A reference for planning—not a promise at the pump.",
       lede: "Understand where the numbers are useful, where they can differ, and what you should verify independently.",
-      updated: "Reviewed 6 September 2026",
+      updated: "Reviewed 9 September 2026",
       calloutLabel: "Before you act",
       callout: "Check the station’s current price, opening status, route conditions, and applicable payment or exchange rate before relying on a calculation.",
       sections: [
@@ -206,7 +209,7 @@ const en: EditorialCopy = {
         { id: "advice", title: "No financial or commercial advice", paragraphs: ["Nothing on this website is financial, investment, or commercial advice. Currency conversions are indicative and are not bank or trading rates. Calculators are planning estimates based on the information supplied."] },
         { id: "timeliness", title: "Accuracy and timeliness", paragraphs: ["We make reasonable efforts to maintain the data but cannot guarantee accuracy, completeness, or timeliness. The displayed update time reflects the dataset, not verification at every pump.", "Fuel markets can move rapidly. Confirm current conditions before a long or cross-border journey."] },
         { id: "liability", title: "Limitation of liability", paragraphs: ["To the fullest extent permitted by law, Karburanti Sot, its operator, and contributors are not liable for loss, damage, injury, or expense arising from reliance on prices, comparisons, calculations, station information, route decisions, data errors, or interrupted availability.", "The service is supplied “as is” and “as available,” without express or implied warranty."] },
-        { id: "third-parties", title: "Third-party services", paragraphs: ["Links, public data, maps, exchange rates, and future advertising may be supplied by third parties. We do not control or endorse their content, availability, or practices. Visible ads are currently disabled, although publisher-verification technology remains installed."] },
+        { id: "third-parties", title: "Third-party services", paragraphs: [commercialCopy.en.thirdParties] },
         { id: "stations", title: "Nearby station information", paragraphs: ["Station names, locations, hours, and availability can be incomplete or outdated. Location is used only after permission. Never rely solely on the finder to determine whether a station is open or stocks a particular fuel."] },
         { id: "changes", title: "Changes and contact", paragraphs: ["This disclaimer may change with the service. The reviewed date records the latest revision.", "Questions can be sent to fenixkola@gmail.com or through the contact page."] },
       ],
@@ -288,7 +291,7 @@ const sq: EditorialCopy = {
       { id: "process", title: "Nga të dhënat publike te sinjali i dobishëm", paragraphs: ["Mbledhim vlera në nivel shteti nga burime publike, i normalizojmë në EUR për litër, ruajmë historikun ditor dhe llogarisim renditjet, diferencat, lëvizjen dhe paqëndrueshmërinë.", "Shifrat kombëtare janë referenca—jo premtime për një pompë të caktuar. Kur një vlerë mungon, është e vjetruar ose e pamjaftueshme, e themi qartë në vend që ta sajojmë."] },
       { id: "principles", title: "Standardet pas çdo shifre", paragraphs: ["Puna jonë ndjek katër rregulla praktike."], bullets: ["Saktësia para shpejtësisë: asnjë vlerë e munguar nuk sajohet.", "Burime transparente: tregojmë origjinën dhe kohën e përditësimit.", "Interpretim i pavarur: komentet bazohen në provat e paraqitura, jo në porosi tregtare.", "Pasiguri e dobishme: dallojmë referencën kombëtare nga realiteti i pikës së karburantit."] },
       { id: "corrections", title: "Korrigjimet janë pjesë e produktit", paragraphs: ["Raportimet verifikohen fillimisht me burimin. Nëse gabimi është në përpunimin ose paraqitjen tonë, e korrigjojmë. Nëse burimi duket i pasaktë, dokumentojmë mospërputhjen dhe mund ta fshehim vlerën derisa të bëhet e besueshme.", "Nuk ndryshojmë një numër vetëm sepse duket i pazakontë. Korrigjimin e drejton prova, jo pritshmëria."] },
-      { id: "independence", title: "Një projekt i vogël dhe i pavarur", paragraphs: ["Karburanti Sot mirëmbahet në mënyrë të pavarur në Tiranë dhe nuk është i lidhur me kompani karburanti, agjenci qeveritare apo rrjet reklamash. Reklamat mund ta mbështesin shërbimin në të ardhmen, por aktualisht të gjitha hapësirat e dukshme janë çaktivizuar.", "Pyetjet, shqetësimet për burimet dhe kërkesat për korrigjim shkojnë drejtpërdrejt te projekti përmes faqes së kontaktit."] },
+      { id: "independence", title: "Një projekt i vogël dhe i pavarur", paragraphs: [commercialCopy.sq.about] },
     ],
   },
   contact: {
@@ -308,49 +311,51 @@ const sq: EditorialCopy = {
   },
   policies: {
     privacy: {
-      eyebrow: "Dosja e privatësisë", title: "Privatësia, me fjalë të qarta.", lede: "Karburanti Sot funksionon pa llogari dhe është projektuar të mbledhë sa më pak të dhëna personale.", updated: "Në fuqi nga 6 shtator 2026", calloutLabel: "Statusi aktual i reklamave", callout: "Reklamat e dukshme janë të çaktivizuara. Kodi i verifikimit AdSense mbetet i instaluar që reklamat të mund të aktivizohen më vonë vetëm sipas kësaj politike dhe kërkesave për pëlqim.",
+      eyebrow: "Dosja e privatësisë", title: "Privatësia, me fjalë të qarta.", lede: "Karburanti Sot funksionon pa llogari dhe është projektuar të mbledhë sa më pak të dhëna personale.", updated: "Në fuqi nga 9 shtator 2026", calloutLabel: "Statusi aktual i reklamave", callout: commercialCopy.sq.status,
       sections: [
         { id: "collection", title: "Informacioni që mbledhim", paragraphs: ["Nuk kërkojmë emër, numër telefoni, kredenciale llogarie apo informacion pagese. Shërbimi përdoret pa regjistrim.", "Kërkesat teknike standarde mund t’u ekspozojnë ofruesve të hostimit dhe të dhënave adresën IP, llojin e shfletuesit, pajisjen dhe URL-në e kërkuar për të ofruar shërbimin dhe parandaluar abuzimin."] },
         { id: "local-storage", title: "Preferencat në pajisjen tënde", paragraphs: ["Shteti, karburanti, monedha, tema, lista e ndjekjes dhe progresi i lojërave ruhen në shfletues. Ato nuk janë llogari dhe zakonisht mbeten në atë pajisje derisa të pastrosh të dhënat."] },
         { id: "location", title: "Vendndodhja dhe pikat afër", paragraphs: ["Gjetësi i pikave kërkon vendndodhjen vetëm pasi zgjedh ta përdorësh. Koordinatat përdoren për të kërkuar të dhëna harte dhe llogaritur largësinë. Leja mund të refuzohet ose hiqet; pjesa tjetër vazhdon të punojë."] },
         { id: "external-data", title: "Shërbimet e jashtme të të dhënave", paragraphs: ["Faqja merr të dhëna publike për karburantin, kursin e këmbimit, hartat dhe shërbime të lidhura. Ofruesit marrin informacionin e rrjetit që nevojitet për t’iu përgjigjur kërkesës dhe zbatojnë politikat e tyre."] },
-        { id: "advertising", title: "Reklamat dhe pëlqimi", paragraphs: ["Aktualisht nuk shfaqet asnjë hapësirë reklame. Metadata dhe skripti i verifikimit Google AdSense mbeten që identiteti i publikuesit të verifikohet dhe reklamat të rikthehen më vonë.", "Nëse reklamat aktivizohen, Google dhe partnerët mund të përdorin cookie ose identifikues pajisjeje. Aty ku kërkohet pëlqim, mekanizmi përkatës duhet të shfaqet para ruajtjes opsionale reklamuese."] },
+        { id: "advertising", title: "Reklamat dhe pëlqimi", paragraphs: [commercialCopy.sq.ads] },
+        { id: "analytics", title: "Cloudflare Web Analytics", paragraphs: [commercialCopy.sq.analytics] },
+        { id: "affiliate-links", title: "DiscoverCars", paragraphs: [commercialCopy.sq.affiliate] },
         { id: "sharing", title: "Ndarja, siguria dhe ruajtja", paragraphs: ["Nuk shesim informacion personal. Ofruesit teknikë përpunojnë minimumin e nevojshëm. Përdorim masa të arsyeshme sigurie, por asnjë shërbim online nuk garanton siguri absolute.", "Preferencat lokale mbeten derisa t’i heqësh. Email-et e mbështetjes ruhen vetëm për aq kohë sa duhet për zgjidhjen dhe regjistrin e korrigjimeve."] },
         { id: "rights", title: "Zgjedhjet, fëmijët dhe ndryshimet", paragraphs: ["Mund të pastrosh ruajtjen lokale, të refuzosh vendndodhjen dhe të përdorësh kontrollet e shfletuesit për cookie-t. Shërbimi nuk u drejtohet fëmijëve nën 13 vjeç dhe nuk mbledh me vetëdije të dhënat e tyre.", "Ndryshimet materiale pasqyrohen duke rishikuar datën e hyrjes në fuqi. Pyetjet mund të dërgohen në fenixkola@gmail.com."] },
       ],
     },
     terms: {
-      eyebrow: "Kushtet e shërbimit", title: "Përdor sinjalin. Verifiko ndalesën.", lede: "Këto kushte përcaktojnë kufijtë e një shërbimi falas për informacion dhe planifikim karburanti në nivel shteti.", updated: "Në fuqi nga 6 shtator 2026", calloutLabel: "Kufizim thelbësor", callout: "Çmimet janë referenca informuese kombëtare, jo oferta detyruese të pikave. Verifiko çmimin lokal para blerjes ose vendimit për rrugën.",
+      eyebrow: "Kushtet e shërbimit", title: "Përdor sinjalin. Verifiko ndalesën.", lede: "Këto kushte përcaktojnë kufijtë e një shërbimi falas për informacion dhe planifikim karburanti në nivel shteti.", updated: "Në fuqi nga 9 shtator 2026", calloutLabel: "Kufizim thelbësor", callout: "Çmimet janë referenca informuese kombëtare, jo oferta detyruese të pikave. Verifiko çmimin lokal para blerjes ose vendimit për rrugën.",
       sections: [
         { id: "service", title: "Shërbimi", paragraphs: ["Karburanti Sot mbledh të dhëna publike, paraqet krahasime dhe histori, ndihmon në gjetjen e pikave dhe ofron llogaritës planifikimi. Përdorimi është falas dhe pa llogari."] },
         { id: "accuracy", title: "Saktësia dhe disponueshmëria", paragraphs: ["Përpiqemi ta mbajmë informacionin të saktë, por nuk garantojmë plotësi, akses të pandërprerë apo çmim të saktë për një pikë. Burimet mund të vonohen, ndryshojnë format ose gabojnë.", "Konvertimet dhe llogaritjet e udhëtimit janë vlerësime dhe mund të ndryshojnë nga kursi real, konsumi i mjetit, rruga dhe shuma e paguar."] },
         { id: "acceptable-use", title: "Përdorimi i pranueshëm", paragraphs: ["Shërbimin mund ta përdorësh për planifikim personal dhe të zakonshëm biznesi. Nuk lejohet ndërprerja e shërbimit, anashkalimi i sigurisë, paraqitja e të dhënave si të garantuara apo ripublikimi sistematik i pjesëve të mëdha pa leje."] },
         { id: "ownership", title: "Përmbajtja dhe palët e treta", paragraphs: ["Dizajni, komentet dhe programi origjinal mbrohen nga ligji. Të dhënat burimore u përkasin ofruesve përkatës.", "Lidhjet dhe shërbimet e jashtme ofrohen për lehtësi; nuk kontrollojmë saktësinë, kushtet apo privatësinë e tyre."] },
-        { id: "advertising", title: "Reklamat", paragraphs: ["Reklamat e dukshme janë të çaktivizuara. Nëse aktivizohen më vonë, do të ndahen qartë nga përmbajtja dhe nuk do të ndikojnë mbulimin, renditjen apo përfundimet."] },
+        { id: "advertising", title: "Reklamat", paragraphs: [commercialCopy.sq.terms] },
         { id: "liability", title: "Pa garanci dhe kufizim përgjegjësie", paragraphs: ["Shërbimi ofrohet “siç është” dhe “sipas disponueshmërisë”. Në masën e lejuar nga ligji, Karburanti Sot dhe operatori nuk përgjigjen për humbje nga mbështetja te çmimet, llogaritjet, vendimet e rrugës, ndërprerjet apo të dhënat e palëve të treta."] },
         { id: "changes", title: "Ndryshimet dhe kontakti", paragraphs: ["Kushtet mund të rishikohen bashkë me shërbimin. Përdorimi pas përditësimit nënkupton zbatimin e versionit të ri.", "Pyetjet mund të dërgohen në fenixkola@gmail.com ose përmes faqes së kontaktit."] },
       ],
     },
     editorial: {
-      eyebrow: "Standardet editoriale", title: "Prova e para. Konteksti më pas. Ndikimi kurrë.", lede: "Kjo politikë shpjegon si prodhohen dhe mirëmbahen të dhënat, analizat e gjeneruara, udhëzuesit dhe korrigjimet.", updated: "Rishikuar më 6 shtator 2026", calloutLabel: "Premtimi i pavarësisë", callout: "Asnjë kompani karburanti, agjenci, ofrues të dhënash apo reklamues nuk mund të blejë trajtim, renditje ose interpretim të favorshëm.",
+      eyebrow: "Standardet editoriale", title: "Prova e para. Konteksti më pas. Ndikimi kurrë.", lede: "Kjo politikë shpjegon si prodhohen dhe mirëmbahen të dhënat, analizat e gjeneruara, udhëzuesit dhe korrigjimet.", updated: "Rishikuar më 9 shtator 2026", calloutLabel: "Premtimi i pavarësisë", callout: "Asnjë kompani karburanti, agjenci, ofrues të dhënash apo reklamues nuk mund të blejë trajtim, renditje ose interpretim të favorshëm.",
       sections: [
         { id: "mission", title: "Misioni editorial", paragraphs: ["I kthejmë të dhënat publike në informacion të saktë, transparent dhe praktik për shoferët. Komenti duhet të ndihmojë një vendim real dhe të kuptohet nga publiku i gjerë."] },
         { id: "sources", title: "Standardet e burimeve", paragraphs: ["Vlerat vijnë nga burime publike të identifikuara dhe normalizohen njësoj. Nuk sajojmë çmime, nuk pranojmë vlera të sponsorizuara dhe nuk fshehim mungesat.", "Konvertimet përdorin kurse publike orientuese dhe etiketohen si vlerësime. Metodologjia dokumenton përpunimin."] },
         { id: "analysis", title: "Analiza dhe automatizimi", paragraphs: ["Renditjet, intervalet, lëvizja dhe paqëndrueshmëria llogariten nga historiku ditor. Teksti i gjeneruar duhet të jetë i gjurmueshëm te këto shifra dhe kontrollohet gjatë ndërtimit.", "Dallojmë matjen nga interpretimi dhe nuk e paraqesim trendin si parashikim."] },
-        { id: "independence", title: "Pavarësia tregtare", paragraphs: ["Reklamat e dukshme janë të çaktivizuara. Nëse rikthehen, mbeten të ndara dhe nuk ndikojnë vendet apo përfundimet.", "Nuk pranojmë artikuj të sponsorizuar, vendosje me pagesë apo reklama të maskuara si analizë."] },
+        { id: "independence", title: "Pavarësia tregtare", paragraphs: [commercialCopy.sq.independence] },
         { id: "accuracy", title: "Saktësia dhe proporcioni", paragraphs: ["Vlerat kombëtare quhen referenca, jo çmime të garantuara. Pretendimet duhet të mbështeten nga të dhënat ose një burim publik i besueshëm dhe pasiguria duhet të jetë e qartë."] },
         { id: "updates", title: "Përditësimet dhe korrigjimet", paragraphs: ["Të dhënat rifreskohen kur burimi publikon. Udhëzuesit rishikohen kur tregu, ligji apo mbulimi ndryshon ndjeshëm.", "Raportet e gabimeve verifikohen. Gabimet e konfirmuara ndreqen dhe korrigjimet materiale nuk fshihen në heshtje."] },
         { id: "scope", title: "Fusha dhe kontakti", paragraphs: ["Mbulimi fokusohet te benzina, nafta, LPG-ja, kostot e transportit dhe konteksti praktik për Shqipërinë, Ballkanin dhe Evropën. Disponueshmëria varet nga të dhëna publike të besueshme.", "Pyetjet mund të dërgohen në fenixkola@gmail.com."] },
       ],
     },
     disclaimer: {
-      eyebrow: "Kufizime të rëndësishme", title: "Referencë për planifikim—jo premtim në pompë.", lede: "Kupto ku vlejnë shifrat, ku mund të ndryshojnë dhe çfarë duhet të verifikosh vetë.", updated: "Rishikuar më 6 shtator 2026", calloutLabel: "Para se të veprosh", callout: "Kontrollo çmimin aktual të pikës, orarin, kushtet e rrugës dhe kursin apo mënyrën e pagesës para se të mbështetesh te një llogaritje.",
+      eyebrow: "Kufizime të rëndësishme", title: "Referencë për planifikim—jo premtim në pompë.", lede: "Kupto ku vlejnë shifrat, ku mund të ndryshojnë dhe çfarë duhet të verifikosh vetë.", updated: "Rishikuar më 9 shtator 2026", calloutLabel: "Para se të veprosh", callout: "Kontrollo çmimin aktual të pikës, orarin, kushtet e rrugës dhe kursin apo mënyrën e pagesës para se të mbështetesh te një llogaritje.",
       sections: [
         { id: "prices", title: "Çmimet janë informuese", paragraphs: ["Vlerat janë referenca publike në nivel shteti. Nuk janë çmimi i saktë në çdo pikë apo orë. Marka, konkurrenca, promocioni, taksat, furnizimi dhe vendndodhja mund të krijojnë diferenca."] },
         { id: "advice", title: "Jo këshillë financiare apo tregtare", paragraphs: ["Asgjë në këtë faqe nuk është këshillë financiare, investimi apo tregtare. Konvertimet janë orientuese dhe llogaritësit janë vlerësime planifikimi sipas të dhënave të dhëna."] },
         { id: "timeliness", title: "Saktësia dhe koha", paragraphs: ["Bëjmë përpjekje të arsyeshme, por nuk garantojmë saktësi, plotësi apo aktualitet. Koha e përditësimit i përket dataset-it, jo kontrollit në çdo pompë.", "Tregjet mund të lëvizin shpejt. Konfirmo kushtet para një udhëtimi të gjatë ose ndërkufitar."] },
         { id: "liability", title: "Kufizimi i përgjegjësisë", paragraphs: ["Në masën e lejuar nga ligji, Karburanti Sot, operatori dhe kontribuesit nuk përgjigjen për humbje, dëm, lëndim apo shpenzim nga mbështetja te çmimet, krahasimet, pikat, rrugët, gabimet apo ndërprerjet.", "Shërbimi jepet “siç është” dhe “sipas disponueshmërisë”, pa garanci të shprehur ose të nënkuptuar."] },
-        { id: "third-parties", title: "Shërbimet e palëve të treta", paragraphs: ["Lidhjet, të dhënat publike, hartat, kurset dhe reklamat e ardhshme mund të ofrohen nga palë të treta. Nuk kontrollojmë përmbajtjen apo praktikat e tyre. Reklamat e dukshme janë të çaktivizuara, por teknologjia e verifikimit mbetet."] },
+        { id: "third-parties", title: "Shërbimet e palëve të treta", paragraphs: [commercialCopy.sq.thirdParties] },
         { id: "stations", title: "Informacioni për pikat afër", paragraphs: ["Emrat, vendet, oraret dhe disponueshmëria mund të jenë të paplota ose të vjetruara. Vendndodhja përdoret vetëm me leje. Mos u mbështet vetëm te gjetësi për të vendosur nëse një pikë është hapur apo ka një karburant."] },
         { id: "changes", title: "Ndryshimet dhe kontakti", paragraphs: ["Ky mohim mund të ndryshojë bashkë me shërbimin. Data e rishikimit tregon versionin e fundit.", "Pyetjet mund të dërgohen në fenixkola@gmail.com ose përmes faqes së kontaktit."] },
       ],

@@ -9,10 +9,11 @@ import type { Trends } from "../models/trends";
 import { getTrendSeries, getWeeklyDeltaEur } from "../models/trends";
 import { fuelLabel, getEurPrice } from "../utils/fuel";
 import { isEuropeanCountry } from "../utils/regions";
-import { ADS_ENABLED, STORAGE_ALL_RATE_KEY } from "../config/constants";
+import { STORAGE_ALL_RATE_KEY } from "../config/constants";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 
 import AdBar from "../components/ads/AdBar";
+import { TravelLinks } from "../components/content/TravelLinks";
 import FuelCard from "../components/fuel/FuelCard";
 import TrendCard from "../components/fuel/TrendCard";
 import QuickCalcCard from "../components/fuel/QuickCalcCard";
@@ -261,6 +262,9 @@ export default function HomePage({
         </div>
       </section>
 
+      <AdBar placement="home" enabled={canShowAds} />
+      <TravelLinks lang={lang} />
+
       <section className="homeDashboardSection" aria-labelledby="home-routes-title">
         <SectionIntro kicker={t.homeRoutesKicker} title={t.homeRoutesTitle} text={t.homeRoutesSubtitle} id="home-routes-title" />
         <div className="homeRouteGrid">
@@ -322,12 +326,7 @@ export default function HomePage({
         </div>
       </section>
 
-      {ADS_ENABLED && canShowAds ? (
-        <aside className="homeAdZone" aria-label={t.homeAdvertisement}>
-          <span>{t.homeAdvertisement}</span>
-          <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" enabled />
-        </aside>
-      ) : null}
+
     </main>
   );
 }

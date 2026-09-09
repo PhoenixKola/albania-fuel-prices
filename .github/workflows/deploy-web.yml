@@ -50,10 +50,27 @@ jobs:
         working-directory: web
         run: npm ci
 
+      - name: Verify calculations and monetization guards
+        working-directory: web
+        run: npm test
+
       # Regenerates the analysis from data/history.json, then builds and
       # prerenders. This is what bakes today's prices into the static HTML.
       - name: Build site
         working-directory: web
+        env:
+          VITE_DEPLOY_ENV: production
+          VITE_ADS_ENABLED: ${{ vars.VITE_ADS_ENABLED }}
+          VITE_ADS_CMP_PUBLISHED: ${{ vars.VITE_ADS_CMP_PUBLISHED }}
+          VITE_AD_SLOT_HOME: ${{ vars.VITE_AD_SLOT_HOME }}
+          VITE_AD_SLOT_CONTENT: ${{ vars.VITE_AD_SLOT_CONTENT }}
+          VITE_AD_SLOT_ARTICLE_END: ${{ vars.VITE_AD_SLOT_ARTICLE_END }}
+          VITE_RENTAL_URL: ${{ vars.VITE_RENTAL_URL }}
+          VITE_RENTAL_URL_CALCULATOR: ${{ vars.VITE_RENTAL_URL_CALCULATOR }}
+          VITE_RENTAL_URL_GUIDE: ${{ vars.VITE_RENTAL_URL_GUIDE }}
+          VITE_RENTAL_URL_ROAD_TRIP: ${{ vars.VITE_RENTAL_URL_ROAD_TRIP }}
+          VITE_RENTAL_URL_ALBANIA: ${{ vars.VITE_RENTAL_URL_ALBANIA }}
+          VITE_CF_ANALYTICS_TOKEN: ${{ vars.VITE_CF_ANALYTICS_TOKEN }}
         run: npm run build
 
       # Guards against silently shipping an old build: if the HTML we are about

@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 import { ANALYSIS_META } from "../generated/analysisMeta";
-import AdBar from "../components/ads/AdBar";
 
 type Props = { t: TDict };
 
@@ -113,7 +112,7 @@ export default function MethodologyPage({ t }: Props) {
         </p>
       </section>
 
-      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
+
     </article>
   );
 }

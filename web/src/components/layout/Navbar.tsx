@@ -1,3 +1,6 @@
+import { layoutCopy } from "../../config/layoutCopy";
+import { ALBANIAN_ENABLED } from "../../config/features";
+import { travelLabels } from "../../config/travelLabels";
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { Lang } from "../../models/i18n";
@@ -61,6 +64,8 @@ function CloseIcon() {
 
 export default function Navbar({
   t,
+  lang,
+  onToggleLang,
   logoSrc,
   subtitle,
   theme,
@@ -70,6 +75,7 @@ export default function Navbar({
   onRefresh,
   onToggleTheme,
 }: Props) {
+  const c = layoutCopy[lang];
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<DropdownId | null>(null);
   const location = useLocation();
@@ -159,10 +165,11 @@ export default function Navbar({
   // the bar cannot overflow onto a second line as items are added.
   const navLinks = [
     { to: "/", label: t.navHome },
-    { to: "/market-report", label: "Market report" },
+    { to: "/market-report", label: c.marketReport },
   ];
 
   const toolLinks = [
+    { to: "/trip-cost-calculator", label: travelLabels[lang].calculator },
     { to: "/compare", label: t.navCompare },
     { to: "/rankings", label: t.navRankings },
     { to: "/stations", label: t.navStations },
@@ -174,7 +181,8 @@ export default function Navbar({
   ];
 
   const guideLinks = [
-    { to: "/insights", label: "Insights" },
+    { to: "/albania-car-rental-guide", label: travelLabels[lang].guide },
+    { to: "/insights", label: c.insights },
     { to: "/methodology", label: t.navMethodology },
     { to: "/how-fuel-prices-work", label: t.navHowPricesWork },
     { to: "/europe-fuel-comparison", label: t.navEuropeComparison },
@@ -189,7 +197,7 @@ export default function Navbar({
   // Grouped rather than one long flat list, so the drawer stays scannable.
   const mobileGroups = [
     { title: null, links: navLinks },
-    { title: "Tools", links: toolLinks },
+    { title: c.tools, links: toolLinks },
     { title: t.navGames, links: gamesLinks },
     { title: t.navGuides, links: guideLinks },
     { title: t.navAbout, links: aboutLinks },
@@ -259,10 +267,10 @@ export default function Navbar({
             </Link>
           ))}
 
-          {renderDropdown("tools", "Tools", toolLinks, toolsRef, toolsButtonRef, "Tools menu")}
-          {renderDropdown("games", t.navGames, gamesLinks, gamesRef, gamesButtonRef, "Games menu")}
-          {renderDropdown("guides", t.navGuides, guideLinks, guidesRef, guidesButtonRef, "Guides menu")}
-          {renderDropdown("about", t.navAbout, aboutLinks, aboutRef, aboutButtonRef, "About menu")}
+          {renderDropdown("tools", c.tools, toolLinks, toolsRef, toolsButtonRef, c.toolsMenu)}
+          {renderDropdown("games", t.navGames, gamesLinks, gamesRef, gamesButtonRef, c.gamesMenu)}
+          {renderDropdown("guides", t.navGuides, guideLinks, guidesRef, guidesButtonRef, c.guidesMenu)}
+          {renderDropdown("about", t.navAbout, aboutLinks, aboutRef, aboutButtonRef, c.aboutMenu)}
         </div>
 
         {/* Desktop actions */}
@@ -291,28 +299,26 @@ export default function Navbar({
           <button
             className="btn btn-ghost"
             onClick={onToggleTheme}
-            aria-label="Toggle theme"
-            title="Toggle theme"
+            aria-label={c.toggleTheme}
+            title={c.toggleTheme}
           >
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
-
-          {/* Language toggle disabled until AdSense approval — Albanian not monetizable */}
-          {/* <button
+          {ALBANIAN_ENABLED && <button
             className="btn btn-ghost"
             onClick={onToggleLang}
             aria-label={lang === "en" ? "Switch to Albanian" : "Switch to English"}
             title={lang === "en" ? "Switch to Albanian" : "Switch to English"}
           >
             {lang === "en" ? t.langSQ : t.langEN}
-          </button> */}
+          </button>}
         </div>
 
         {/* Hamburger (mobile only) */}
         <button
           className="hamburgerBtn"
           onClick={() => setMenuOpen((p) => !p)}
-          aria-label="Toggle menu"
+          aria-label={c.toggleMenu}
           aria-expanded={menuOpen}
         >
           {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
@@ -353,15 +359,15 @@ export default function Navbar({
               onClick={() => { onToggleTheme(); setMenuOpen(false); }}
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+              <span>{theme === "dark" ? c.light : c.dark}</span>
             </button>
 
-            {/* <button
+            {ALBANIAN_ENABLED && <button
               className="btn btn-ghost mobileMenuBtn"
               onClick={() => { onToggleLang(); setMenuOpen(false); }}
             >
               {lang === "en" ? t.langSQ : t.langEN}
-            </button> */}
+            </button>}
           </div>
 
           <div className="mobileMenuDivider" />

@@ -1,3 +1,6 @@
+import { loadEnv } from "vite";
+import { readMonetizationConfig } from "../src/config/monetization";
+import { travelStaticContent, travelStaticLinks } from "./travelPrerender";
 /**
  * Prerender script: generates static HTML for all public routes after `vite build`.
  *
@@ -149,7 +152,13 @@ function redesignedStaticContent(route: RouteEntry): RouteEntry {
   return route;
 }
 
+const revenueConfig = readMonetizationConfig({ ...loadEnv("production", resolve(__dirname, ".."), "VITE_"), ...process.env });
 const STATIC_ROUTES: RouteEntry[] = [
+  ...ROUTE_CONFIGS.filter((route) => ["/trip-cost-calculator", "/albania-car-rental-guide"].includes(route.path)).map((route): RouteEntry => ({
+    path: route.path, title: route.title, description: route.description, jsonLdType: route.jsonLdType,
+    priceBearing: true, datePublished: "2026-09-09", dateModified: "2026-09-09",
+    content: (ctx) => travelStaticContent(route.path, ctx, revenueConfig),
+  })),
   {
     path: "/",
     title: "Fuel Today Albania & Europe | Petrol, Diesel and LPG Prices",
@@ -779,8 +788,8 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
     url: SITE_URL,
   };
 
-  const dateModified =
-    route.priceBearing && ctx.ok ? ctx.asOf : route.dateModified ?? route.datePublished;
+  const dateModified = [route.dateModified, route.datePublished, route.priceBearing && ctx.ok ? ctx.asOf : undefined]
+    .filter((date): date is string => typeof date === "string").sort().pop();
 
   const commonDates = {
     datePublished: route.datePublished,
@@ -937,13 +946,16 @@ async function main() {
     process.exit(1);
   }
 
-  const routes = [...STATIC_ROUTES.map(redesignedStaticContent), ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
+  const routes = [...STATIC_ROUTES.map(redesignedStaticContent).map((route) => ({ ...route, dateModified: ROUTE_CONFIGS.find((config) => config.path === route.path)?.lastmod ?? route.dateModified })), ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
 
   let count = 0;
   for (const route of routes) {
     const description =
       typeof route.description === "function" ? route.description(ctx) : route.description;
-    const content = typeof route.content === "function" ? route.content(ctx) : route.content;
+    let content = typeof route.content === "function" ? route.content(ctx) : route.content;
+    if (["/", "/road-trip-fuel-guide", "/fuel-prices/albania"].includes(route.path)) {
+      content += travelStaticLinks(route.path === "/" ? null : route.path === "/fuel-prices/albania" ? "albania" : "roadTrip", revenueConfig);
+    }
     const head = generateHead(route, description, ctx);
 
     let html = template.replace("</head>", `${head}\n  </head>`);

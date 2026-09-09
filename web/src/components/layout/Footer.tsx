@@ -1,3 +1,8 @@
+import { layoutCopy } from "../../config/layoutCopy";
+import { countryLabel } from "../../utils/countryLabel";
+import { travelLabels } from "../../config/travelLabels";
+import type { Lang } from "../../models/i18n";
+import { PrivacyChoices } from "../ads/MonetizationProvider";
 import { Link } from "react-router-dom";
 import type { TDict } from "../../locales";
 import { COUNTRY_EDITORIAL } from "../../config/countryContent";
@@ -8,6 +13,7 @@ import logo from "../../assets/Logo.png";
 
 type Props = {
   t: TDict;
+  lang: Lang;
   /** as_of from the live feed. Falls back to the build-time value until loaded. */
   dataAsOf?: string | null;
 };
@@ -42,7 +48,8 @@ function PlayIcon() {
   );
 }
 
-export default function Footer({ t, dataAsOf }: Props) {
+export default function Footer({ t, lang, dataAsOf }: Props) {
+  const c = layoutCopy[lang];
   const year = new Date().getFullYear();
 
   // Prefer the live feed date so the footer never contradicts the header.
@@ -58,7 +65,7 @@ export default function Footer({ t, dataAsOf }: Props) {
     if (!asOf) return null;
     const d = new Date(`${asOf}T00:00:00Z`);
     if (Number.isNaN(d.getTime())) return asOf;
-    return d.toLocaleDateString("en-GB", {
+    return d.toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -68,10 +75,10 @@ export default function Footer({ t, dataAsOf }: Props) {
 
   const columns = [
     {
-      heading: "Explore",
+      heading: c.explore,
       links: [
         { to: "/", label: t.navHome },
-        { to: "/market-report", label: "Market report" },
+        { to: "/market-report", label: c.marketReport },
         { to: "/rankings", label: t.navRankings },
         { to: "/compare", label: t.navCompare },
         { to: "/stations", label: t.navStations },
@@ -80,7 +87,9 @@ export default function Footer({ t, dataAsOf }: Props) {
     {
       heading: t.footerGuidesHeading,
       links: [
-        { to: "/insights", label: "Insights" },
+        { to: "/trip-cost-calculator", label: travelLabels[lang].calculator },
+        { to: "/albania-car-rental-guide", label: travelLabels[lang].guide },
+        { to: "/insights", label: c.insights },
         { to: "/methodology", label: t.navMethodology },
         { to: "/how-fuel-prices-work", label: t.navHowPricesWork },
         { to: "/europe-fuel-comparison", label: t.navEuropeComparison },
@@ -88,17 +97,17 @@ export default function Footer({ t, dataAsOf }: Props) {
       ],
     },
     {
-      heading: "Countries",
+      heading: c.countries,
       links: [
         ...countryLinks.map((c) => ({
           to: `/fuel-prices/${c.slug}`,
-          label: c.label,
+          label: countryLabel(c.label, lang),
         })),
-        { to: "/rankings", label: "All countries →" },
+        { to: "/rankings", label: c.allCountries },
       ],
     },
     {
-      heading: "More",
+      heading: c.more,
       links: [
         { to: "/fuel-quiz", label: t.navFuelQuiz },
         { to: "/daily-challenge", label: t.navDailyChallenge },
@@ -134,12 +143,12 @@ export default function Footer({ t, dataAsOf }: Props) {
                 <span className="footerStatusDot" aria-hidden="true" />
                 <span className="footerStatusText">
                   <strong>
-                    {isStale ? "Update delayed" : "Data updated"} {updatedLabel}
+                    {isStale ? c.delayed : c.updated} {updatedLabel}
                   </strong>
                   {ANALYSIS_META.historyOk ? (
                     <span className="footerStatusMeta">
-                      {ANALYSIS_META.countriesAnalysed} markets tracked ·{" "}
-                      {ANALYSIS_META.daysObserved} days of history
+                      {ANALYSIS_META.countriesAnalysed} {c.markets} ·{" "}
+                      {ANALYSIS_META.daysObserved} {c.history}
                     </span>
                   ) : null}
                 </span>
@@ -149,7 +158,7 @@ export default function Footer({ t, dataAsOf }: Props) {
             <div className="footerActions">
               <Link className="footerChip" to="/methodology">
                 <ChartIcon />
-                <span>How we collect data</span>
+                <span>{c.data}</span>
               </Link>
               <a
                 className="footerChip"
@@ -158,7 +167,7 @@ export default function Footer({ t, dataAsOf }: Props) {
                 rel="noopener noreferrer"
               >
                 <PlayIcon />
-                <span>Android app</span>
+                <span>{c.android}</span>
               </a>
             </div>
           </div>
@@ -182,7 +191,8 @@ export default function Footer({ t, dataAsOf }: Props) {
         <div className="footerBottom">
           <p className="footerCopyright">{t.footerCopyright(year)}</p>
 
-          <nav className="footerLegal" aria-label="Legal">
+          <nav className="footerLegal" aria-label={c.legal}>
+            <PrivacyChoices />
             {legalLinks.map((link) => (
               <Link key={link.to} to={link.to} className="footerLegalLink">
                 {link.label}
@@ -192,11 +202,9 @@ export default function Footer({ t, dataAsOf }: Props) {
         </div>
 
         <p className="footerFinePrint">
-          Prices are country-level reference values compiled from public sources and are not
-          guaranteed pump prices. Historical ranges, volatility and percentile figures are
-          calculated by Karburanti Sot from its own daily record — see our{" "}
+          {c.finePrint}{" "}
           <Link to="/methodology" className="footerInlineLink">
-            methodology
+            {c.methodology}
           </Link>
           .
         </p>

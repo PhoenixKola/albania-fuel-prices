@@ -46,3 +46,7 @@ desktop.ini
 # ===== Misc =====
 coverage/
 *.log
+# Web verification artifacts
+web/.test-dist/
+web/test-results/
+web/playwright-report/

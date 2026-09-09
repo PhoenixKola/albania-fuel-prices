@@ -39,7 +39,7 @@ async function main() {
       path: r.path,
       priority: r.priority,
       changefreq: r.changefreq,
-      lastmod: r.priceBearing ? dataLastmod : r.lastmod ?? dataLastmod,
+      lastmod: r.priceBearing && dataLastmod > (r.lastmod ?? "") ? dataLastmod : r.lastmod ?? dataLastmod,
     })),
     // Countries with no upstream price data are noindexed — keep them out.
     ...COUNTRY_EDITORIAL.filter((c) => isCountryIndexable(c.slug)).map((c) => ({

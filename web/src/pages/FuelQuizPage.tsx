@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import type { LatestEurope, CountryPrices } from "../models/fuel";
-import AdBar from "../components/ads/AdBar";
 import { getIso2ForCountry, getFlagImgUrl } from "../utils/countryFlag";
 import { isEuropeanCountry } from "../utils/regions";
 
@@ -236,7 +235,7 @@ export default function FuelQuizPage({ data, loading }: Props) {
         </div>
       )}
 
-      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
+
 
       <article className="contentPage">
         <section className="contentSection">

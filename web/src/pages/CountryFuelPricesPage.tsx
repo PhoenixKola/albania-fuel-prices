@@ -1,3 +1,6 @@
+import AdBar from "../components/ads/AdBar";
+import RentalReferral from "../components/ads/RentalReferral";
+import { TravelLinks } from "../components/content/TravelLinks";
 import { Link } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
@@ -162,6 +165,7 @@ export default function CountryFuelPricesPage({
         ) : null}
       </EditorialSection>
 
+      <AdBar placement="content" enabled={hasAnyPrice && !loading} />
       <EditorialSection id="country-trend" index="02" title={c.trend(editorial.label)} intro={c.trendIntro(editorial.label)}>
         <div className="contentToolEmbed"><TrendCard t={t} trends={trends} country={countryName} fuelType={fuelType} setFuelType={setFuelType} /></div>
       </EditorialSection>
@@ -179,6 +183,8 @@ export default function CountryFuelPricesPage({
         <div className="editorialCardGrid"><div className="editorialCard"><b>{c.travel}</b><p>{editorial.travelRelevance}</p></div><div className="editorialCard"><b>{c.borders}</b><p>{editorial.borderAdvice}</p></div><div className="editorialCard"><b>{c.fuels(editorial.label)}</b><p>{editorial.fuelInterpretation}</p></div></div>
       </EditorialSection>
 
+      {countryName === "Albania" ? <><TravelLinks lang={lang} /><RentalReferral lang={lang} placement="albania" /></> : null}
+      <AdBar placement="articleEnd" enabled={hasAnyPrice && !loading} />
       <EditorialSection id="country-coverage" index={analysisHtml ? "07" : "06"} title={c.limitations}>
         <p>{editorial.dataLimitations}</p><p>{editorial.sourceTransparency}</p>
         {data?.source ? <EditorialCallout label={copy.source}>{data.source} · {c.dataUpdated(updated)}</EditorialCallout> : null}

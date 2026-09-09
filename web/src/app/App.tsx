@@ -1,3 +1,4 @@
+import { ALBANIAN_ENABLED } from "../config/features";
 import { useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { Routes, Route, useLocation, useParams } from "react-router-dom";
 import type { Lang } from "../models/i18n";
@@ -48,6 +49,10 @@ const InsightsIndexPage = lazy(() => import("../pages/InsightsIndexPage"));
 const InsightArticlePage = lazy(() => import("../pages/InsightArticlePage"));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
 import RouteSeo from "./RouteSeo";
+import { MonetizationProvider } from "../components/ads/MonetizationProvider";
+const TripCostCalculatorPage = lazy(() => import("../pages/TripCostCalculatorPage"));
+const AlbaniaCarRentalGuidePage = lazy(() => import("../pages/AlbaniaCarRentalGuidePage"));
+import "../styles/travel.css";
 import "../styles/editorial.css";
 
 import logo from "../assets/Logo.png";
@@ -94,9 +99,11 @@ export default function App() {
     document.body.scrollTop = 0;
   }, [pathname]);
 
-  const [lang, setLang] = useLocalStorageState<Lang>(STORAGE_LANG_KEY, "en", {
+  const [preferredLang, setLang] = useLocalStorageState<Lang>(STORAGE_LANG_KEY, "en", {
     deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
   });
+
+  const lang: Lang = ALBANIAN_ENABLED ? preferredLang : "en";
 
   useEffect(() => {
     document.documentElement.lang = lang === "sq" ? "sq" : "en";
@@ -155,7 +162,7 @@ export default function App() {
   }, [refresh]);
 
   return (
-    <div className="page">
+    <MonetizationProvider lang={lang}><div className="page">
       <div className="container">
         <Navbar
           t={t}
@@ -273,7 +280,9 @@ export default function App() {
           <Route path="/methodology" element={<MethodologyPage t={t} />} />
           <Route path="/how-fuel-prices-work" element={<HowFuelPricesWorkPage t={t} />} />
           <Route path="/europe-fuel-comparison" element={<EuropeFuelComparisonPage t={t} />} />
-          <Route path="/road-trip-fuel-guide" element={<RoadTripFuelGuidePage t={t} />} />
+          <Route path="/trip-cost-calculator" element={<TripCostCalculatorPage lang={lang} data={data} fxRates={fx.rates} loading={loading} />} />
+          <Route path="/albania-car-rental-guide" element={<AlbaniaCarRentalGuidePage lang={lang} data={data} />} />
+          <Route path="/road-trip-fuel-guide" element={<RoadTripFuelGuidePage t={t} lang={lang} />} />
           <Route
             path="/fuel-prices/:countrySlug"
             element={
@@ -295,8 +304,8 @@ export default function App() {
         </Routes>
         </Suspense>
 
-        <Footer t={t} dataAsOf={data?.as_of ?? null} />
+        <Footer t={t} lang={lang} dataAsOf={data?.as_of ?? null} />
       </div>
-    </div>
+    </div></MonetizationProvider>
   );
 }

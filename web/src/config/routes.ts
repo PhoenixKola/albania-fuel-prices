@@ -23,6 +23,18 @@ export const PUBLISHER_ID = "ca-pub-2653462201538649";
 
 export const STATIC_ROUTES: RouteConfig[] = [
   {
+    path: "/trip-cost-calculator",
+    title: "Trip Fuel Cost Calculator | Albania & Europe | Fuel Today",
+    description: "Calculate road-trip fuel costs across Albania and Europe. Add country distances, compare petrol, diesel and LPG, and share an estimate in EUR and ALL.",
+    priority: 0.9, changefreq: "daily", jsonLdType: "WebPage", priceBearing: true, lastmod: "2026-09-09",
+  },
+  {
+    path: "/albania-car-rental-guide",
+    title: "Renting a Car in Albania: Fuel Budget & Rental Checklist | Fuel Today",
+    description: "Plan an Albania car rental with a dated fuel-budget example and practical questions about fuel policies, deposits, protection and cross-border journeys.",
+    priority: 0.8, changefreq: "daily", jsonLdType: "Article", priceBearing: true, lastmod: "2026-09-09",
+  },
+  {
     path: "/",
     title: "Fuel Today Albania & Europe | Petrol, Diesel and LPG Prices",
     description:
@@ -70,7 +82,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.8,
     changefreq: "monthly",
     jsonLdType: "WebPage",
-    lastmod: "2026-07-10",
+    lastmod: "2026-09-09",
   },
   {
     path: "/contact",
@@ -120,7 +132,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.9,
     changefreq: "monthly",
     jsonLdType: "Article",
-    lastmod: "2026-04-12",
+    lastmod: "2026-09-09",
   },
   {
     path: "/privacy",
@@ -130,7 +142,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.4,
     changefreq: "yearly",
     jsonLdType: "WebPage",
-    lastmod: "2026-03-31",
+    lastmod: "2026-09-09",
   },
   {
     path: "/terms",
@@ -140,7 +152,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.4,
     changefreq: "yearly",
     jsonLdType: "WebPage",
-    lastmod: "2026-03-31",
+    lastmod: "2026-09-09",
   },
   {
     path: "/daily-challenge",
@@ -190,7 +202,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.5,
     changefreq: "yearly",
     jsonLdType: "WebPage",
-    lastmod: "2026-06-05",
+    lastmod: "2026-09-09",
   },
   {
     path: "/disclaimer",
@@ -200,7 +212,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.4,
     changefreq: "yearly",
     jsonLdType: "WebPage",
-    lastmod: "2026-06-05",
+    lastmod: "2026-09-09",
   },
 ];
 

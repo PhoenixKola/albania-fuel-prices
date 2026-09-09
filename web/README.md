@@ -1,3 +1,8 @@
+# Fuel Today web
+
+Revenue configuration, activation, testing and reporting: [MONETIZATION.md](MONETIZATION.md).
+Organic distribution experiments, other revenue ideas and current AdSense alternatives: [GROWTH.md](GROWTH.md).
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

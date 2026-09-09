@@ -24,6 +24,7 @@ export function useFxRates() {
     setLoading(true);
     try {
       const r = await fetch(FX_URL);
+      if (!r.ok) throw new Error("Exchange rates unavailable");
       const json = await r.json();
       const next: FxCache = {
         fetchedAtUtc: new Date().toISOString(),
@@ -31,6 +32,8 @@ export function useFxRates() {
         rates: normalizeRatesToUpper(json?.eur ?? {}),
       };
       setCache(next);
+    } catch {
+      // A blocked/offline FX request must not break the EUR fuel tools.
     } finally {
       setLoading(false);
     }

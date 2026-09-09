@@ -19,9 +19,6 @@ import { isEuropeanCountry } from "../src/utils/regions";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "../../data");
 
-/** Used for the indicative ALL/L column when the FX fetch fails. */
-const FALLBACK_ALL_PER_EUR = 98;
-
 export type FuelPrices = {
   petrol: number | null;
   diesel: number | null;
@@ -116,24 +113,25 @@ export async function loadPriceContext(): Promise<PriceContext> {
   };
 }
 
-/** Indicative ALL/EUR rate; falls back to a committed constant offline. */
-async function fetchAllPerEur(): Promise<number> {
+/** Omit ALL conversion when the current indicative rate cannot be fetched. */
+async function fetchAllPerEur(): Promise<number | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
     const r = await fetch(
       "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json",
       { signal: controller.signal }
     );
-    clearTimeout(timer);
     if (!r.ok) throw new Error(`${r.status}`);
     const json = (await r.json()) as { eur?: { all?: number } };
     const rate = json.eur?.all;
     if (typeof rate === "number" && rate > 50 && rate < 250) return rate;
     throw new Error("rate out of plausible range");
   } catch {
-    console.warn(`⚠ priceData: FX fetch failed — using fallback ${FALLBACK_ALL_PER_EUR} ALL/EUR.`);
-    return FALLBACK_ALL_PER_EUR;
+    console.warn("FX fetch failed; ALL conversion unavailable.");
+    return null;
+  } finally {
+    clearTimeout(timer);
   }
 }
 

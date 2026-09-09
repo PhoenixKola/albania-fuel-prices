@@ -79,7 +79,7 @@ export default function HowFuelPricesWorkPage({ t }: Props) {
         </p>
       </section>
 
-      <AdBar adClient="ca-pub-2653462201538649" adSlot="5789581249" />
+      <AdBar placement="articleEnd" />
     </article>
   );
 }
