@@ -266,6 +266,28 @@ for (const choice of ["consent", "decline"]) test(`ads wait for ${choice} decisi
   expect(counters.errors).toEqual([]);
 });
 
+test("ads disabled keeps the privacy control and advertising warning out of the footer", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto("http://127.0.0.1:4175/trip-cost-calculator");
+  await expect(page.getByRole("button", { name: "Privacy and cookie settings" })).toHaveCount(0);
+  await expect(page.getByText(/Advertising settings are unavailable/)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Privacy Policy", exact: true })).toBeVisible();
+  expect(counters.errors).toEqual([]);
+});
+
+test("ads enabled shows the fallback only when the Google consent service is unavailable", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto(`${origin}/trip-cost-calculator`);
+  const control = page.getByRole("button", { name: "Privacy and cookie settings" });
+  await expect(control).toBeVisible();
+  await expect(page.getByText(/Advertising settings are unavailable/)).toHaveCount(0);
+  await page.waitForFunction(() => typeof window.googlefc?.showRevocationMessage === "function");
+  await page.evaluate(() => { if (window.googlefc) window.googlefc.showRevocationMessage = undefined; });
+  await control.click();
+  await expect(page.getByRole("status")).toContainText("Advertising settings are unavailable");
+  expect(counters.errors).toEqual([]);
+});
+
 test("blocked ads and unfilled slots leave the calculator usable", async ({ page }) => {
   const counters = await isolate(page, { blockedAds: true });
   await page.goto(`${origin}/trip-cost-calculator`);

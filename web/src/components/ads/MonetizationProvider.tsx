@@ -20,9 +20,10 @@ export function MonetizationProvider({ lang, children }: { lang: Lang; children:
   return <AdContext.Provider value={{ lang, enabled, pathname }}>{children}</AdContext.Provider>;
 }
 export function PrivacyChoices() {
-  const { lang } = useContext(AdContext);
+  const { lang, enabled } = useContext(AdContext);
   const [unavailable, setUnavailable] = useState(false);
   const c = travelLabels[lang];
+  if (!enabled) return null;
   return <span className="privacyChoices"><button type="button" className="footerLegalLink" onClick={() => {
     if (window.googlefc?.showRevocationMessage) { setUnavailable(false); window.googlefc.showRevocationMessage(); }
     else setUnavailable(true);

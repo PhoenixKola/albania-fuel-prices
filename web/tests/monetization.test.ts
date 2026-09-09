@@ -4,6 +4,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { adsAllowed, isAdRoute, readMonetizationConfig, validatedRentalUrl } from "../src/config/monetization";
 import RentalReferral from "../src/components/ads/RentalReferral";
+import { PrivacyChoices } from "../src/components/ads/MonetizationProvider";
+import { AdContext } from "../src/components/ads/AdContext";
 import { initializeAdSlot } from "../src/services/advertising";
 
 test("partner links preserve attribution and reject missing, placeholder or hostile destinations", () => {
@@ -34,6 +36,12 @@ test("ad configuration requires production host, supported language, explicit ac
   assert.equal(adsAllowed(readMonetizationConfig({ VITE_DEPLOY_ENV: "production", VITE_ADS_CMP_PUBLISHED: "true" }), "karburantisot.com", "en"), false);
   assert.equal(readMonetizationConfig({ VITE_AD_SLOT_HOME: "bad", VITE_CF_ANALYTICS_TOKEN: "bad" }).slots.home, "");
   for (const path of ["/privacy", "/terms", "/fuel-quiz", "/daily-challenge", "/stations", "/missing"]) assert.equal(isAdRoute(path), false);
+});
+test("privacy choices stay hidden while advertising is disabled", () => {
+  const value = { lang: "en" as const, enabled: false, pathname: "/" };
+  const html = renderToStaticMarkup(createElement(AdContext.Provider, { value }, createElement(PrivacyChoices)));
+  assert.equal(html, "");
+  assert.doesNotMatch(html, /Advertising settings are unavailable/);
 });
 test("an ad slot is requested once, including after partial SDK failure", () => {
   let pushes = 0;
