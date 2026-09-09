@@ -1,15 +1,9 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import type { LatestEurope, CountryPrices } from "../models/fuel";
 import { Link } from "react-router-dom";
-import { getIso2ForCountry, getFlagImgUrl } from "../utils/countryFlag";
 import { isEuropeanCountry } from "../utils/regions";
-
-/** Real flag image, matching the rest of the site. */
-function CountryFlag({ name }: { name: string }) {
-  const iso2 = getIso2ForCountry(name);
-  if (!iso2) return <span className="quizCardFlag" aria-hidden="true" />;
-  return <img className="quizCardFlagImg" src={getFlagImgUrl(iso2)} alt="" aria-hidden="true" />;
-}
+import { GameChoice, GameCountryFlag, GameHeader } from "../components/games/GameChrome";
+import "../styles/games.css";
 
 type FuelKey = "gasoline95_eur" | "diesel_eur";
 
@@ -203,22 +197,16 @@ function DailyChallengeGame({ data, loading }: Props) {
 
   if (loading) {
     return (
-      <div className="quizPage">
-        <div className="quizHeader">
-          <h1 className="quizTitle">📅 Daily Challenge</h1>
-          <p className="quizSubtitle">Loading live fuel data…</p>
-        </div>
+      <div className="quizPage gameExperience gameExperienceDaily">
+        <GameHeader variant="daily" eyebrow="Daily run / five rounds" title="Daily Challenge" subtitle="Loading live fuel data…" status="Preparing today’s matchups" />
       </div>
     );
   }
 
   if (!data || eligible.length < 2) {
     return (
-      <div className="quizPage">
-        <div className="quizHeader">
-          <h1 className="quizTitle">📅 Daily Challenge</h1>
-          <p className="quizSubtitle">Could not load fuel data. Please refresh the page.</p>
-        </div>
+      <div className="quizPage gameExperience gameExperienceDaily">
+        <GameHeader variant="daily" eyebrow="Daily run / five rounds" title="Daily Challenge" subtitle="Could not load fuel data. Please refresh the page." status="Market feed unavailable" />
       </div>
     );
   }
@@ -226,17 +214,14 @@ function DailyChallengeGame({ data, loading }: Props) {
   // Results screen
   if (isAlreadyCompleted || showResults) {
     return (
-      <div className="quizPage">
-        <div className="quizHeader">
-          <h1 className="quizTitle">📅 Daily Challenge</h1>
-          <p className="quizSubtitle">Come back tomorrow for a new set of questions.</p>
-        </div>
+      <div className="quizPage gameExperience gameExperienceDaily gameExperienceComplete">
+        <GameHeader variant="daily" eyebrow="Daily run / complete" title="Daily Challenge" subtitle="Today’s run is in the books. Come back tomorrow for five fresh matchups." status={`Prices dated ${data.as_of}`} />
 
         <div className="dailyResults">
+          <span className="dailyResultsEyebrow">Run complete</span>
+          <div className="dailyResultOrb"><strong>{correctCount}</strong><span>/ {QUESTIONS_PER_DAY}</span></div>
           <div className="dailyResultEmoji">{emojiGrid}</div>
-          <div className="dailyScore">
-            {correctCount} / {QUESTIONS_PER_DAY} correct
-          </div>
+          <div className="dailyScore">{correctCount === QUESTIONS_PER_DAY ? "Perfect market read" : correctCount >= 3 ? "Strong market read" : "Tomorrow is another run"}</div>
           {displayStreak > 1 && (
             <div className="dailyStreak">🔥 {displayStreak}-day streak!</div>
           )}
@@ -267,8 +252,8 @@ function DailyChallengeGame({ data, loading }: Props) {
                   <span className="dailyReviewMark">{correct ? "✅" : "❌"}</span>
                   <span className="dailyReviewText">
                     <strong>{fuel.label}:</strong>{" "}
-                    <CountryFlag name={cA.country} /> {cA.country} (€{priceA.toFixed(3)}) vs{" "}
-                    <CountryFlag name={cB.country} /> {cB.country} (€{priceB.toFixed(3)}) — cheaper:{" "}
+                    <GameCountryFlag name={cA.country} /> {cA.country} (€{priceA.toFixed(3)}) vs{" "}
+                    <GameCountryFlag name={cB.country} /> {cB.country} (€{priceB.toFixed(3)}) — cheaper:{" "}
                     <strong>{cheaperCountry}</strong>
                   </span>
                 </div>
@@ -313,70 +298,37 @@ function DailyChallengeGame({ data, loading }: Props) {
   const isLastQ = currentQ + 1 === QUESTIONS_PER_DAY;
 
   return (
-    <div className="quizPage">
-      <div className="quizHeader">
-        <h1 className="quizTitle">📅 Daily Challenge</h1>
-        <p className="quizSubtitle">
-          5 questions — same for everyone today, resets at midnight
-        </p>
-      </div>
+    <div className="quizPage gameExperience gameExperienceDaily">
+      <GameHeader variant="daily" eyebrow="Daily run / five rounds" title="Daily Challenge" subtitle="Five live-price matchups. The same questions for everyone, every day." status={`Prices dated ${data.as_of}`} />
 
-      <div className="dailyProgress">
-        {Array.from({ length: QUESTIONS_PER_DAY }).map((_, i) => {
-          let cls = "dailyDot";
-          if (i < answers.length) {
-            cls += answers[i] ? " dailyDotCorrect" : " dailyDotWrong";
-          } else if (i === currentQ) {
-            cls += " dailyDotCurrent";
-          }
-          return <span key={i} className={cls} />;
-        })}
+      <div className="dailyProgress" role="progressbar" aria-label="Daily challenge progress" aria-valuemin={0} aria-valuemax={QUESTIONS_PER_DAY} aria-valuenow={answers.length}>
+        <div className="dailyProgressLabel"><span>Today’s run</span><strong>Round {currentQ + 1} / {QUESTIONS_PER_DAY}</strong></div>
+        <div className="dailyProgressTrack">
+          {Array.from({ length: QUESTIONS_PER_DAY }).map((_, i) => {
+            let cls = "dailyDot";
+            if (i < answers.length) {
+              cls += answers[i] ? " dailyDotCorrect" : " dailyDotWrong";
+            } else if (i === currentQ) {
+              cls += " dailyDotCurrent";
+            }
+            return <span key={i} className={cls}><i>{i + 1}</i></span>;
+          })}
+        </div>
       </div>
 
       <div className="quizGame">
+        <div className="quizArenaTopline"><span><i aria-hidden="true" />Today’s matchup</span><span>Lower €/L wins</span></div>
         <p className="quizQuestion">
           Question {currentQ + 1} of {QUESTIONS_PER_DAY} — Which country has cheaper{" "}
           <strong>{fuel.label}</strong>?
         </p>
 
         <div className="quizBattle">
-          <button
-            className={`quizCard${revealed ? (cA.country === cheaperCountry ? " quizCardCorrect" : " quizCardWrong") : ""}${picked === cA.country ? " quizCardSelected" : ""}`}
-            onClick={() => handlePick(cA.country)}
-            disabled={revealed}
-            aria-label={`Pick ${cA.country}`}
-          >
-            <CountryFlag name={cA.country} />
-            <span className="quizCardName">{cA.country}</span>
-            {revealed && (
-              <>
-                <span className="quizCardPrice">€{priceA.toFixed(3)}/L</span>
-                <span className="quizCardBadge">
-                  {cA.country === cheaperCountry ? "✓ Cheaper" : "✗ Pricier"}
-                </span>
-              </>
-            )}
-          </button>
+          <GameChoice country={cA.country} price={priceA} option="Market A" revealed={revealed} cheaper={cA.country === cheaperCountry} selected={picked === cA.country} onPick={() => handlePick(cA.country)} />
 
-          <div className="quizVs">VS</div>
+          <div className="quizVs"><strong>VS</strong><span>pick one</span></div>
 
-          <button
-            className={`quizCard${revealed ? (cB.country === cheaperCountry ? " quizCardCorrect" : " quizCardWrong") : ""}${picked === cB.country ? " quizCardSelected" : ""}`}
-            onClick={() => handlePick(cB.country)}
-            disabled={revealed}
-            aria-label={`Pick ${cB.country}`}
-          >
-            <CountryFlag name={cB.country} />
-            <span className="quizCardName">{cB.country}</span>
-            {revealed && (
-              <>
-                <span className="quizCardPrice">€{priceB.toFixed(3)}/L</span>
-                <span className="quizCardBadge">
-                  {cB.country === cheaperCountry ? "✓ Cheaper" : "✗ Pricier"}
-                </span>
-              </>
-            )}
-          </button>
+          <GameChoice country={cB.country} price={priceB} option="Market B" revealed={revealed} cheaper={cB.country === cheaperCountry} selected={picked === cB.country} onPick={() => handlePick(cB.country)} />
         </div>
 
         {revealed && (

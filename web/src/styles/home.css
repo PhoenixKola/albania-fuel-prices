@@ -1165,6 +1165,257 @@
 }
 
 
+/* Featured travel paths — a full-width editorial handoff between live data and tools. */
+.homeExperience > .travelLinksFeatured {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 24px);
+  width: 100%;
+  margin: 0;
+}
+
+.homeTravelCard {
+  --travel-accent: var(--home-emerald);
+  --travel-accent-soft: rgba(95, 242, 189, 0.16);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-width: 0;
+  min-height: clamp(360px, 35vw, 455px);
+  padding: clamp(24px, 3vw, 38px);
+  overflow: hidden;
+  color: var(--home-cream);
+  text-decoration: none;
+  background:
+    radial-gradient(circle at 84% 16%, var(--travel-accent-soft), transparent 35%),
+    linear-gradient(145deg, rgba(13, 27, 24, 0.98), rgba(7, 15, 14, 0.98));
+  border: 1px solid color-mix(in srgb, var(--travel-accent) 28%, transparent);
+  border-radius: 18px;
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.16);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.homeTravelCardGuide {
+  --travel-accent: var(--home-amber);
+  --travel-accent-soft: rgba(255, 184, 77, 0.14);
+}
+
+.homeTravelCard::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--travel-accent) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--travel-accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom left, #000, transparent 68%);
+  pointer-events: none;
+}
+
+.homeTravelCard::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 210px;
+  aspect-ratio: 1;
+  top: 54px;
+  right: -68px;
+  border: 1px solid color-mix(in srgb, var(--travel-accent) 18%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 38px color-mix(in srgb, var(--travel-accent) 3%, transparent),
+    0 0 0 78px color-mix(in srgb, var(--travel-accent) 2%, transparent);
+  pointer-events: none;
+}
+
+.homeTravelCard:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--travel-accent) 56%, transparent);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.24), 0 0 38px color-mix(in srgb, var(--travel-accent) 8%, transparent);
+}
+
+.homeTravelCard:active { transform: translateY(-1px) scale(0.995); }
+
+.homeTravelCard:focus-visible {
+  outline: 3px solid var(--travel-accent);
+  outline-offset: 4px;
+}
+
+.homeTravelCardTopline {
+  position: absolute;
+  z-index: 2;
+  inset: clamp(22px, 3vw, 34px) clamp(24px, 3vw, 38px) auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--travel-accent);
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 850;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.homeTravelCardTopline > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.homeTravelCardTopline > span::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--travel-accent);
+  box-shadow: 0 0 13px color-mix(in srgb, var(--travel-accent) 60%, transparent);
+}
+
+.homeTravelCardTopline i {
+  color: color-mix(in srgb, var(--home-cream) 42%, transparent);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.homeTravelArtwork {
+  position: absolute;
+  z-index: 0;
+  top: 53px;
+  right: 14px;
+  width: min(58%, 355px);
+  color: var(--travel-accent);
+  opacity: 0.92;
+  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.homeTravelCard:hover .homeTravelArtwork { transform: translate3d(-4px, -3px, 0); }
+.homeTravelArtwork svg { display: block; width: 100%; overflow: visible; }
+.homeTravelGridLine { stroke: currentColor; stroke-width: 0.7; opacity: 0.12; }
+.homeTravelRoute { stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 3 8; opacity: 0.54; }
+.homeTravelWaypoint { fill: var(--home-panel-solid); stroke: currentColor; stroke-width: 3; }
+.homeTravelPump,
+.homeTravelPumpBase,
+.homeTravelCar,
+.homeTravelCarWheel {
+  fill: color-mix(in srgb, var(--travel-accent) 8%, var(--home-panel-solid));
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.homeTravelCoordinate {
+  position: absolute;
+  right: 15px;
+  bottom: -2px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.homeTravelCardCopy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  max-width: min(84%, 450px);
+  padding-bottom: 54px;
+}
+
+.homeTravelCardCopy strong {
+  color: var(--home-cream);
+  font-size: clamp(28px, 3.2vw, 46px);
+  line-height: 0.98;
+  font-weight: 760;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.homeTravelCardCopy small {
+  max-width: 430px;
+  margin-top: 17px;
+  color: var(--home-dim);
+  font-size: clamp(13px, 1.15vw, 15px);
+  line-height: 1.62;
+  font-weight: 520;
+}
+
+.homeTravelCardAction {
+  position: absolute;
+  z-index: 2;
+  left: clamp(24px, 3vw, 38px);
+  bottom: clamp(22px, 3vw, 32px);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--travel-accent);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.homeTravelCardAction i {
+  position: relative;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  font-style: normal;
+  border: 1px solid color-mix(in srgb, var(--travel-accent) 45%, transparent);
+  border-radius: 50%;
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.homeTravelCardAction i::before {
+  content: "";
+  width: 9px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: rotate(-45deg);
+}
+
+.homeTravelCardAction i::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  top: 7px;
+  right: 7px;
+  border-top: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+}
+
+.homeTravelCard:hover .homeTravelCardAction i {
+  transform: translate(2px, -2px);
+  background: color-mix(in srgb, var(--travel-accent) 13%, transparent);
+}
+
+:root[data-theme="light"] .homeTravelCard {
+  background:
+    radial-gradient(circle at 84% 14%, var(--travel-accent-soft), transparent 38%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 241, 0.98));
+  border-color: color-mix(in srgb, var(--travel-accent) 25%, rgba(20, 56, 45, 0.12));
+  box-shadow: 0 24px 60px rgba(23, 53, 44, 0.1);
+}
+
+:root[data-theme="light"] .homeTravelCardGuide {
+  background:
+    radial-gradient(circle at 84% 14%, rgba(196, 105, 10, 0.12), transparent 38%),
+    linear-gradient(145deg, #fffefa, #f6f1e7);
+}
+
+:root[data-theme="light"] .homeTravelCard:hover {
+  border-color: color-mix(in srgb, var(--travel-accent) 55%, transparent);
+  box-shadow: 0 28px 70px rgba(23, 53, 44, 0.15), 0 0 34px color-mix(in srgb, var(--travel-accent) 7%, transparent);
+}
+
 @media (max-width: 1040px) {
   .homeCockpitHero { min-height: auto; }
   .homeHeroGrid {
@@ -1202,6 +1453,14 @@
   .homeCalculatorSection .homeSectionIntro { position: static; }
   .homeDisclosureGrid { grid-template-columns: 1fr; }
   .homeGuideDisclosure { grid-column: auto; }
+  .homeTravelCard {
+    min-height: 390px;
+    padding: 24px;
+  }
+  .homeTravelCardTopline { inset: 24px 24px auto; }
+  .homeTravelArtwork { top: 68px; right: 4px; width: 68%; }
+  .homeTravelCardCopy { max-width: 94%; }
+  .homeTravelCardAction { left: 24px; bottom: 24px; }
 }
 
 @media (max-width: 620px) {
@@ -1260,6 +1519,11 @@
   .homeExperience .toolbarRow > .segRow { width: 100%; }
   .homeExperience .toolbarRow > .segRow .seg { flex: 1; }
   .homeStoryGrid { grid-template-columns: minmax(0, 1fr); }
+  .homeExperience > .travelLinksFeatured { grid-template-columns: 1fr; }
+  .homeTravelCard { min-height: 340px; border-radius: 15px; }
+  .homeTravelArtwork { width: min(58%, 280px); top: 58px; right: -12px; opacity: 0.72; }
+  .homeTravelCardCopy { max-width: min(90%, 440px); }
+  .homeTravelCardCopy strong { font-size: clamp(31px, 10vw, 42px); }
 }
 
 @media (max-width: 390px) {
@@ -1275,7 +1539,8 @@
 @media (hover: none), (pointer: coarse) {
   .homeClusterShell { transform: none; }
   .homeButton:hover,
-  .homeRouteCard:hover { transform: none; }
+  .homeRouteCard:hover,
+  .homeTravelCard:hover { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

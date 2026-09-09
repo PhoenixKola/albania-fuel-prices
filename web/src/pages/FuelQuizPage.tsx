@@ -1,14 +1,8 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import type { LatestEurope, CountryPrices } from "../models/fuel";
-import { getIso2ForCountry, getFlagImgUrl } from "../utils/countryFlag";
 import { isEuropeanCountry } from "../utils/regions";
-
-/** Real flag image, matching the rest of the site. */
-function CountryFlag({ name }: { name: string }) {
-  const iso2 = getIso2ForCountry(name);
-  if (!iso2) return <span className="quizCardFlag" aria-hidden="true" />;
-  return <img className="quizCardFlagImg" src={getFlagImgUrl(iso2)} alt="" aria-hidden="true" />;
-}
+import { GameChoice, GameHeader } from "../components/games/GameChrome";
+import "../styles/games.css";
 
 type FuelKey = "gasoline95_eur" | "diesel_eur";
 type GameState = "idle" | "picking" | "revealed";
@@ -113,57 +107,48 @@ export default function FuelQuizPage({ data, loading }: Props) {
 
   if (loading) {
     return (
-      <div className="quizPage">
-        <div className="quizHeader">
-          <h1 className="quizTitle">⛽ Fuel Price Quiz</h1>
-          <p className="quizSubtitle">Loading live fuel data…</p>
-        </div>
+      <div className="quizPage gameExperience gameExperienceQuiz">
+        <GameHeader variant="quiz" eyebrow="Open play / live data" title="Fuel Price Quiz" subtitle="Loading live fuel data…" status="Connecting to market feed" />
       </div>
     );
   }
 
   if (!data || eligible.length < 2) {
     return (
-      <div className="quizPage">
-        <div className="quizHeader">
-          <h1 className="quizTitle">⛽ Fuel Price Quiz</h1>
-          <p className="quizSubtitle">
-            Could not load fuel data. Please refresh the page.
-          </p>
-        </div>
+      <div className="quizPage gameExperience gameExperienceQuiz">
+        <GameHeader variant="quiz" eyebrow="Open play / live data" title="Fuel Price Quiz" subtitle="Could not load fuel data. Please refresh the page." status="Market feed unavailable" />
       </div>
     );
   }
 
   return (
-    <div className="quizPage">
-      <div className="quizHeader">
-        <h1 className="quizTitle">⛽ Fuel Price Quiz</h1>
-        <p className="quizSubtitle">
-          Guess which country has cheaper fuel — using live price data.
-        </p>
-      </div>
+    <div className="quizPage gameExperience gameExperienceQuiz">
+      <GameHeader variant="quiz" eyebrow="Open play / live data" title="Fuel Price Quiz" subtitle="Read the flags. Trust your instinct. Pick the country with the cheaper pump price." status={`Prices dated ${data.as_of}`} />
 
       <div className="quizStats">
-        <div className="quizStat">
+        <div className="quizStat quizStatScore">
+          <span className="quizStatIndex">01</span>
           <span className="quizStatValue">
             {score.correct}/{score.total}
           </span>
           <span className="quizStatLabel">Score</span>
         </div>
-        <div className="quizStat">
+        <div className="quizStat quizStatStreak">
+          <span className="quizStatIndex">02</span>
           <span className="quizStatValue">
             {streak > 0 ? `🔥 ${streak}` : "—"}
           </span>
           <span className="quizStatLabel">Streak</span>
         </div>
-        <div className="quizStat">
+        <div className="quizStat quizStatAccuracy">
+          <span className="quizStatIndex">03</span>
           <span className="quizStatValue">
             {accuracy !== null ? `${accuracy}%` : "—"}
           </span>
           <span className="quizStatLabel">Accuracy</span>
         </div>
-        <div className="quizStat">
+        <div className="quizStat quizStatBest">
+          <span className="quizStatIndex">04</span>
           <span className="quizStatValue">{bestStreak > 0 ? bestStreak : "—"}</span>
           <span className="quizStatLabel">Best streak</span>
         </div>
@@ -171,6 +156,7 @@ export default function FuelQuizPage({ data, loading }: Props) {
 
       {round && (
         <div className="quizGame">
+          <div className="quizArenaTopline"><span><i aria-hidden="true" />Live matchup</span><span>Lower €/L wins</span></div>
           <p className="quizQuestion">
             Which country has cheaper <strong>{round.fuel.label}</strong> right now?
           </p>
@@ -182,36 +168,13 @@ export default function FuelQuizPage({ data, loading }: Props) {
               const isSelected = selected === country.country;
               const isRevealed = gameState === "revealed";
 
-              let cardClass = "quizCard";
-              if (isRevealed) {
-                cardClass += isCheaper ? " quizCardCorrect" : " quizCardWrong";
-              }
-              if (isSelected) cardClass += " quizCardSelected";
-
               return (
-                <>
+                <div className="quizBattleEntry" key={country.country}>
                   {idx === 1 && (
-                    <div key="vs" className="quizVs">VS</div>
+                    <div className="quizVs"><strong>VS</strong><span>pick one</span></div>
                   )}
-                  <button
-                    key={country.country}
-                    className={cardClass}
-                    onClick={() => handlePick(country.country)}
-                    disabled={isRevealed}
-                    aria-label={`Pick ${country.country}`}
-                  >
-                    <CountryFlag name={country.country} />
-                    <span className="quizCardName">{country.country}</span>
-                    {isRevealed && (
-                      <>
-                        <span className="quizCardPrice">€{price.toFixed(3)}/L</span>
-                        <span className="quizCardBadge">
-                          {isCheaper ? "✓ Cheaper" : "✗ Pricier"}
-                        </span>
-                      </>
-                    )}
-                  </button>
-                </>
+                  <GameChoice country={country.country} price={price} option={`Market ${idx === 0 ? "A" : "B"}`} revealed={isRevealed} cheaper={isCheaper} selected={isSelected} onPick={() => handlePick(country.country)} />
+                </div>
               );
             })}
           </div>

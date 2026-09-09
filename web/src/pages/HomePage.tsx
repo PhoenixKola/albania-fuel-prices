@@ -263,7 +263,7 @@ export default function HomePage({
       </section>
 
       <AdBar placement="home" enabled={canShowAds} />
-      <TravelLinks lang={lang} />
+      <TravelLinks lang={lang} featured />
 
       <section className="homeDashboardSection" aria-labelledby="home-routes-title">
         <SectionIntro kicker={t.homeRoutesKicker} title={t.homeRoutesTitle} text={t.homeRoutesSubtitle} id="home-routes-title" />
