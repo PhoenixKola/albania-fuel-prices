@@ -308,7 +308,9 @@
 .gameExperienceDaily .quizQuestion strong { background: color-mix(in srgb, var(--game-warm) 10%, transparent); }
 
 .gameExperience .quizBattle {
+  width: 100%;
   max-width: 900px;
+  margin-inline: auto;
   grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
   gap: 14px;
 }
