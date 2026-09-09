@@ -40,16 +40,19 @@ export default function AboutPage({ lang }: { lang: Lang }) {
           </div>
           <div>
             <dt>{page.metrics[2]}</dt>
-            <dd>{sq ? "Asnjë" : "None"}</dd>
-            <p>{sq ? "mbi renditjet ose përfundimet" : "over rankings or conclusions"}</p>
+            <dd>{sq ? "I pavarur" : "Independent"}</dd>
+            <p>{sq ? "pa renditje ose përfundime me pagesë" : "no paid rankings or conclusions"}</p>
           </div>
         </dl>
       </header>
 
       <div className="aboutStory">
-        {story.map((section) => (
+        {story.map((section, index) => (
           <section key={section.id} id={section.id} aria-labelledby={`${section.id}-title`}>
-            <h2 id={`${section.id}-title`}>{section.title}</h2>
+            <div className="aboutStoryHeading">
+              <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+              <h2 id={`${section.id}-title`}>{section.title}</h2>
+            </div>
             {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
           </section>
         ))}

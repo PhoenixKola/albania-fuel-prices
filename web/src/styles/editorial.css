@@ -45,6 +45,26 @@
     radial-gradient(760px 500px at 100% 32%, rgba(207, 132, 33, 0.055), transparent 70%);
 }
 
+/* Legal documents use a flatter, more restrained visual language than the
+   market and country reports. */
+.editorialExperience-dossier::before,
+:root[data-theme="light"] .editorialExperience-dossier::before {
+  background: none;
+}
+
+.editorialExperience-dossier .editorialHero {
+  overflow: visible;
+  border-radius: 18px;
+  border-left: 4px solid var(--ed-accent);
+  background: var(--ed-surface);
+  box-shadow: none;
+}
+
+.editorialExperience-dossier .editorialHeroAside {
+  border-radius: 12px;
+  background: var(--ed-surface-2);
+}
+
 .editorialHero {
   position: relative;
   min-width: 0;
@@ -626,7 +646,7 @@
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -775,19 +795,45 @@
   letter-spacing: -0.05em;
   white-space: nowrap;
 }
+.aboutFigures > div:last-child dd {
+  font-size: clamp(28px, 3vw, 42px);
+}
 .aboutFigures p { margin: 8px 0 0; color: var(--ed-muted); font-size: 12.5px; line-height: 1.5; }
 
 .aboutStory {
   margin-top: clamp(30px, 4vw, 52px);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-  gap: clamp(24px, 3vw, 40px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .aboutStory section {
   min-width: 0;
-  padding-left: 20px;
-  border-left: 2px solid color-mix(in srgb, var(--ed-accent) 42%, transparent);
+  padding: clamp(22px, 2.8vw, 34px);
+  border: 1px solid var(--ed-line);
+  border-radius: 18px;
+  background: var(--ed-surface);
+}
+
+.aboutStoryHeading {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.aboutStoryHeading > span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ed-line);
+  border-radius: 50%;
+  color: var(--ed-accent);
+  background: var(--ed-surface-2);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
 }
 
 .aboutStory h2 {
@@ -799,7 +845,7 @@
 }
 
 .aboutStory p {
-  margin: 12px 0 0;
+  margin: 16px 0 0 46px;
   color: var(--ed-muted);
   font-size: 15px;
   line-height: 1.75;
@@ -828,7 +874,7 @@
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -1023,6 +1069,11 @@
   .aboutStory { grid-template-columns: 1fr; }
   .aboutFigures { grid-template-columns: 1fr; gap: 20px; }
   .reportJump { top: 84px; }
+}
+
+@media (max-width: 560px) {
+  .aboutPrinciples ol { grid-template-columns: 1fr; }
+  .aboutStory p { margin-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

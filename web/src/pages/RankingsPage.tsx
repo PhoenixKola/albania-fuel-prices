@@ -39,10 +39,6 @@ export default function RankingsPage({
 
   return (
     <>
-      <div className="pageHeader">
-        <h1 className="pageHeaderTitle">{t.navRankings}</h1>
-        <p className="pageHeaderSub">{t.rankingsGuidance}</p>
-      </div>
       <RankingCard
         t={t}
         data={data}
