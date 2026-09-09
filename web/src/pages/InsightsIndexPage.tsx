@@ -14,10 +14,17 @@ export default function InsightsIndexPage() {
 
   return (
     <article className="contentPage">
-      <h1 className="contentPageTitle">Fuel Market Insights</h1>
+      <h1 className="contentPageTitle">Albania and Balkan fuel price analysis</h1>
       <p className="contentBody">
-        Analysis and background articles on the Albanian and Balkan fuel markets, written by the
-        Karburanti Sot team and grounded in the same daily price dataset that powers this site.
+        Data-backed analysis of Albania and Balkan fuel prices: diesel and petrol trends,
+        cross-border fill-up costs, taxes, LPG, and the lek-euro effect. Each article is written by
+        the Karburanti Sot team and grounded in the daily price record behind this site.
+      </p>
+
+      <p className="contentBody">
+        Start with <Link to="/fuel-prices/albania" className="inlineLink">today&apos;s Albania fuel prices</Link>,
+        the <Link to="/market-report" className="inlineLink">current European market report</Link>, or
+        the <Link to="/rankings" className="inlineLink">latest fuel price rankings</Link>.
       </p>
 
       {articles.map((a) => (

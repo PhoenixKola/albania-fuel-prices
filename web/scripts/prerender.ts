@@ -161,8 +161,8 @@ const STATIC_ROUTES: RouteEntry[] = [
   })),
   {
     path: "/",
-    title: "Fuel Today Albania & Europe | Petrol, Diesel and LPG Prices",
-    description: "Compare today's fuel prices in Albania and Europe, understand why prices move, estimate road-trip costs, and review transparent methodology before you travel.",
+    title: "Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG",
+    description: "Check current petrol, diesel and LPG prices in Albania and across Europe, compare countries, and calculate your trip fuel cost from daily-updated data.",
     jsonLdType: "WebSite",
     datePublished: "2026-02-14",
     priceBearing: true,
@@ -170,10 +170,15 @@ const STATIC_ROUTES: RouteEntry[] = [
       <header class="contentHero" aria-labelledby="prerender-home-title">
         <p class="contentHeroBadge">Europe / fuel intelligence</p>
         <h1 id="prerender-home-title" class="contentHeroTitle">Read the road before you drive it.</h1>
-        <p class="contentHeroText">A live cockpit for fuel prices across Europe—built to reveal the smarter place to fill, the true cost of a route, and the movement behind today's number.</p>
+        <p class="contentHeroText">Check current petrol, diesel and LPG prices in Albania and across Europe, compare countries, and calculate your trip fuel cost from daily-updated reference data.</p>
         <nav class="contentHeroActions" aria-label="Homepage tools">
           <a class="heroCta heroCtaPrimary" href="#price-tool">Enter the cockpit</a>
           <a class="heroCta heroCtaSecondary" href="/stations">Find fuel nearby</a>
+        </nav>
+        <nav class="contentHeroLinks" aria-label="Popular fuel tools">
+          <a href="/fuel-prices/albania">Albania fuel prices</a>
+          <a href="/trip-cost-calculator">Trip calculator</a>
+          <a href="/rankings">Europe rankings</a>
         </nav>
         <p class="heroTrustRow">Daily market updates · Europe-wide comparison · Transparent public sources</p>
       </header>
@@ -218,14 +223,14 @@ const STATIC_ROUTES: RouteEntry[] = [
   },
   {
     path: "/stations",
-    title: "Nearby Fuel Stations | Fuel Today",
-    description: "Find nearby fuel stations and use location-based context alongside country-level fuel price comparisons for Albania and Europe.",
+    title: "Fuel Stations Near Me | Map, Distance & Opening Hours",
+    description: "Find nearby fuel stations by location, distance and available opening hours. Pair the map with current country-level fuel prices for trip planning.",
     jsonLdType: "WebPage",
     datePublished: "2026-04-01",
     content: `
       <article class="contentPage">
-        <h1 class="contentPageTitle">Nearby Fuel Stations</h1>
-        <p class="contentBody">Find fuel stations near your current location using geolocation and OpenStreetMap data. This tool complements the country-level price data by showing you what stations are available nearby.</p>
+        <h1 class="contentPageTitle">Fuel stations near me</h1>
+        <p class="contentBody">Find mapped fuel stations near your current location using geolocation and OpenStreetMap data. Results include approximate distance and opening hours where available, but not current station-level pump prices.</p>
         <section class="contentSection">
           <h2 class="contentHeading">How this page works</h2>
           <p class="contentBody">The nearby stations feature uses your device's geolocation (if you grant permission) to find fuel stations within a chosen radius (2 km, 5 km, or 10 km). Results show station names, approximate distances, and opening hours when available.</p>
@@ -637,6 +642,39 @@ const STATIC_ROUTES: RouteEntry[] = [
   },
 ];
 
+function renderAlbaniaDecisionSupport(ctx: PriceContext): string {
+  if (!ctx.ok) return "";
+  const albania = ctx.prices.get("Albania");
+  if (!albania) return "";
+  const money = (value: number | null) => value == null ? "Unavailable" : `€${value.toFixed(2)}`;
+  const all = (value: number | null) => value == null || ctx.allPerEur == null ? "Unavailable" : `${Math.round(value * ctx.allPerEur).toLocaleString("en-US")} ALL`;
+  const fuels = [
+    { label: "Petrol", value: albania.petrol },
+    { label: "Diesel", value: albania.diesel },
+    { label: "LPG", value: albania.lpg },
+  ];
+  const fillRows = fuels.map((fuel) => `<tr><th scope="row">${fuel.label}</th><td>${money(fuel.value == null ? null : fuel.value * 50)}</td><td>${all(fuel.value == null ? null : fuel.value * 50)}</td></tr>`).join("");
+  const neighbors = [
+    { label: "Kosovo", slug: "kosovo" },
+    { label: "Greece", slug: "greece" },
+  ].map((neighbor) => {
+    const prices = ctx.prices.get(neighbor.label);
+    const comparison = prices?.diesel == null || albania.diesel == null
+      ? "Unavailable"
+      : `${money(Math.abs((prices.diesel - albania.diesel) * 50))} ${prices.diesel < albania.diesel ? "less" : "more"} per 50 L of diesel`;
+    return `<li><a href="/fuel-prices/${neighbor.slug}">${neighbor.label} fuel prices</a> — ${comparison}</li>`;
+  }).join("");
+
+  return `<section class="contentSection" id="albania-fill-up-cost">
+    <h2 class="contentHeading">What a 50 litre fill-up costs in Albania</h2>
+    <p class="contentBody">Calculated from the country-level reference prices dated ${ctx.asOfLabel}. Actual station totals can vary.</p>
+    <table class="contentTable"><thead><tr><th scope="col">Fuel</th><th scope="col">50 L in EUR</th><th scope="col">≈ 50 L in ALL</th></tr></thead><tbody>${fillRows}</tbody></table>
+    <h3 class="contentHeading">Albania compared with nearby countries</h3>
+    <ul class="contentList">${neighbors}</ul>
+    <p class="contentBody"><a href="/trip-cost-calculator">Calculate a specific route</a> or read the <a href="/albania-car-rental-guide">Albania car rental guide</a>.</p>
+  </section>`;
+}
+
 function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
   return COUNTRY_EDITORIAL.map((c) => {
     const faqItems = c.faqs
@@ -665,11 +703,12 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
       <article class="contentPage editorialExperience editorialExperience-newsroom">
         <header class="contentHero editorialHero">
           <p class="contentHeroBadge">Country market briefing</p>
-          <h1 class="contentHeroTitle">${escapeHtml(c.label)} fuel prices, decoded.</h1>
-          <p class="contentHeroText">A live reference for petrol, diesel, and LPG in ${escapeHtml(c.label)}, placed against Europe and Albania with practical driving context.</p>
+          <h1 class="contentHeroTitle">${escapeHtml(c.label)} fuel prices today</h1>
+          <p class="contentHeroText">Current petrol, diesel, and LPG reference prices in ${escapeHtml(c.label)}, with 30-day movement, European ranking, and practical driving context.</p>
         </header>
         ${freshnessNotice()}
         <section id="country-prices">${renderCountryPriceSection(ctx, c)}</section>
+        ${c.dataCountryName === "Albania" ? renderAlbaniaDecisionSupport(ctx) : ""}
         <section id="country-history">${getCountryAnalysis(c.slug)}</section>
         <section class="contentSection editorialSection" id="country-market">
           <h2 class="contentHeading">${escapeHtml(c.label)} fuel market overview</h2>
@@ -735,16 +774,17 @@ function buildInsightRoutes(): RouteEntry[] {
 
   const indexRoute: RouteEntry = {
     path: "/insights",
-    title: "Fuel Market Insights | Fuel Today",
+    title: "Albania Fuel Price Analysis & Balkan Market Insights",
     description:
-      "Analysis and background articles on the Albanian and Balkan fuel markets — taxes, cross-border savings, market structure, and monthly price recaps.",
+      "Read data-backed analysis of Albania and Balkan fuel prices, including diesel trends, cross-border fill-up costs, taxes, LPG and the lek-euro effect.",
     jsonLdType: "WebPage",
     datePublished: "2026-07-10",
     dateModified: articles[0]?.datePublished ?? "2026-07-10",
     content: `
       <article class="contentPage">
-        <h1 class="contentPageTitle">Fuel Market Insights</h1>
-        <p class="contentBody">Analysis and background articles on the Albanian and Balkan fuel markets, written by the Karburanti Sot team and grounded in the same daily price dataset that powers this site.</p>
+        <h1 class="contentPageTitle">Albania and Balkan fuel price analysis</h1>
+        <p class="contentBody">Data-backed analysis of Albania and Balkan fuel prices: diesel and petrol trends, cross-border fill-up costs, taxes, LPG, and the lek-euro effect. Each article is written by the Karburanti Sot team and grounded in the daily price record behind this site.</p>
+        <p class="contentBody">Start with <a href="/fuel-prices/albania">today's Albania fuel prices</a>, the <a href="/market-report">current European market report</a>, or the <a href="/rankings">latest fuel price rankings</a>.</p>
         ${indexCards}
       </article>
     `,

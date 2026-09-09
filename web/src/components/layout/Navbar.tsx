@@ -169,7 +169,7 @@ export default function Navbar({
   ];
 
   const toolLinks = [
-    { to: "/trip-cost-calculator", label: travelLabels[lang].calculator },
+    { to: "/trip-cost-calculator", label: c.tripCalculator },
     { to: "/compare", label: t.navCompare },
     { to: "/rankings", label: t.navRankings },
     { to: "/stations", label: t.navStations },

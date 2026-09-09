@@ -134,6 +134,10 @@ export type TDict = {
   homeCockpitSubtitle: string;
   homeCockpitPrimaryCta: string;
   homeCockpitSecondaryCta: string;
+  homeAlbaniaPricesCta: string;
+  homeTripCalculatorCta: string;
+  homeEuropeRankingsCta: string;
+  homeQuickLinksLabel: string;
   homeTelemetryLabel: string;
   homeTelemetryMarkets: (n: number) => string;
   homeTelemetryFuel: string;

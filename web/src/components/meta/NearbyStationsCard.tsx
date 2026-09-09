@@ -68,7 +68,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
         <div className="nearbyTopRow">
           <div className="nearbyTopText">
             <div className="nearbyTitleWrap">
-              <div className="nearbyTitle">{t.stationsNearbyTitle}</div>
+              <h1 className="nearbyTitle">{t.stationsNearbyTitle}</h1>
               <div className="nearbySub">
                 {loc.coords ? t.stationsFound(nearby.totalCount) : t.stationsUseMyLocation}
               </div>

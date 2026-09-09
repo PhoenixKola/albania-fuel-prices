@@ -100,6 +100,31 @@ export default function CountryFuelPricesPage({
     ? new Date(data.fetched_at_utc).toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", { dateStyle: "medium" })
     : ANALYSIS_META.endLabel;
   const analysisHtml = getCountryAnalysis(slug);
+  const decisionCopy = lang === "sq" ? {
+    fillTitle: "Kostoja e një furnizimi prej 50 L",
+    fillText: (fuel: string) => `Me çmimin aktual orientues të ${fuel.toLowerCase()}, 50 litra kushtojnë:`,
+    neighborTitle: "Krahasimi i furnizimit me shtetet fqinje",
+    cheaper: (country: string, amount: string) => `${country} kushton ${amount} më pak për 50 L.`,
+    dearer: (country: string, amount: string) => `${country} kushton ${amount} më shumë për 50 L.`,
+    level: (country: string) => `${country} është pothuajse në të njëjtin nivel për 50 L.`,
+    unavailable: (country: string) => `Krahasimi me ${country} nuk disponohet për këtë karburant.`,
+    calculator: "Llogarit koston për rrugën tënde",
+    related: "Planifiko me çmimet aktuale të Shqipërisë",
+    relatedText: "Përdor vlerat e sotme për një distancë dhe konsum konkret, ose kontrollo çmimet e Shqipërisë para se të krahasosh kufirin.",
+    albaniaPrices: "Shiko çmimet e Shqipërisë",
+  } : {
+    fillTitle: "What a 50 L fill-up costs",
+    fillText: (fuel: string) => `At the current ${fuel.toLowerCase()} reference price, 50 litres cost:`,
+    neighborTitle: "Fill-up comparison with nearby countries",
+    cheaper: (country: string, amount: string) => `${country} costs ${amount} less per 50 L.`,
+    dearer: (country: string, amount: string) => `${country} costs ${amount} more per 50 L.`,
+    level: (country: string) => `${country} is currently almost level per 50 L.`,
+    unavailable: (country: string) => `The ${country} comparison is unavailable for this fuel.`,
+    calculator: "Calculate your route cost",
+    related: "Plan with today's Albania prices",
+    relatedText: "Use today's values for a specific distance and consumption, or check Albania's prices before comparing a border crossing.",
+    albaniaPrices: "View Albania fuel prices",
+  };
 
   const sections = [
     { id: "country-prices", label: c.currentPrices(editorial.label) },
@@ -175,8 +200,38 @@ export default function CountryFuelPricesPage({
       <EditorialSection id="country-market" index={analysisHtml ? "04" : "03"} title={c.market(editorial.label)}><p>{editorial.marketOverview}</p></EditorialSection>
 
       <EditorialSection id="country-comparison" index={analysisHtml ? "05" : "04"} title={countryName === "Albania" ? c.albaniaReference : c.comparison(editorial.label)}>
-        <div className="countryComparisonGrid">{FUELS.map((fuel) => <div className="editorialCard" key={fuel}><b>{fuelLabel(t, fuel)}</b><p>{compareLine(fuel)}</p></div>)}</div>
+        {countryName === "Albania" ? (
+          <div className="countryDecisionGrid">
+            <div className="editorialCard countryFillCard">
+              <b>{decisionCopy.fillTitle}</b>
+              <p>{decisionCopy.fillText(fuelLabel(t, fuelType))}</p>
+              <strong className="countryDecisionValue">{selectedPrice == null ? "—" : formatMoney(selectedPrice * 50, "EUR")}</strong>
+              {localValue == null ? null : <small>{formatMoney(localValue * 50, localCurrency)}</small>}
+              <Link className="editorialAction editorialActionPrimary" to="/trip-cost-calculator">{decisionCopy.calculator}</Link>
+            </div>
+            <div className="editorialCard countryNeighborCard">
+              <b>{decisionCopy.neighborTitle}</b>
+              <div className="countryNeighborLinks">
+                {[{ name: "Kosovo", slug: "kosovo" }, { name: "Greece", slug: "greece" }].map((neighbor) => {
+                  const value = eurPrice(data?.countries.find((item) => item.country === neighbor.name) ?? null, fuelType);
+                  const difference = value == null || selectedPrice == null ? null : (value - selectedPrice) * 50;
+                  const comparison = difference == null
+                    ? decisionCopy.unavailable(neighbor.name)
+                    : Math.abs(difference) < 0.05
+                      ? decisionCopy.level(neighbor.name)
+                      : difference < 0
+                        ? decisionCopy.cheaper(neighbor.name, formatMoney(Math.abs(difference), "EUR"))
+                        : decisionCopy.dearer(neighbor.name, formatMoney(difference, "EUR"));
+                  return <Link key={neighbor.slug} to={`/fuel-prices/${neighbor.slug}`}><span>{neighbor.name}</span><small>{comparison}</small></Link>;
+                })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="countryComparisonGrid">{FUELS.map((fuel) => <div className="editorialCard" key={fuel}><b>{fuelLabel(t, fuel)}</b><p>{compareLine(fuel)}</p></div>)}</div>
+        )}
         <p>{editorial.albaniaContext}</p>
+        {countryName === "Albania" ? null : <EditorialCallout label={decisionCopy.related}><p>{decisionCopy.relatedText}</p><div className="editorialHeroActions"><Link className="editorialAction editorialActionPrimary" to="/fuel-prices/albania">{decisionCopy.albaniaPrices}</Link><Link className="editorialAction" to="/trip-cost-calculator">{decisionCopy.calculator}</Link></div></EditorialCallout>}
       </EditorialSection>
 
       <EditorialSection id="country-travel" index={analysisHtml ? "06" : "05"} title={c.travel}>

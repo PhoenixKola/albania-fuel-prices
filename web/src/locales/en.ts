@@ -82,7 +82,7 @@ export const en = {
   currencyEUR: "EUR",
   currencyLocal: "Local",
 
-  stationsNearbyTitle: "Stations nearby",
+  stationsNearbyTitle: "Fuel stations near me",
   stationsUseMyLocation: "Use my location",
   stationsGettingLocation: "Getting location…",
   stationsRadius: "Radius",
@@ -131,9 +131,13 @@ export const en = {
   homeCockpitKicker: "EUROPE / FUEL INTELLIGENCE",
   homeCockpitTitle: "Read the road before you drive it.",
   homeCockpitSubtitle:
-    "A live cockpit for fuel prices across Europe—built to reveal the smarter place to fill, the true cost of a route, and the movement behind today's number.",
+    "Check current petrol, diesel and LPG prices in Albania and across Europe, compare countries, and calculate your trip fuel cost from daily-updated reference data.",
   homeCockpitPrimaryCta: "Enter the cockpit",
   homeCockpitSecondaryCta: "Find fuel nearby",
+  homeAlbaniaPricesCta: "Albania fuel prices",
+  homeTripCalculatorCta: "Trip calculator",
+  homeEuropeRankingsCta: "Europe rankings",
+  homeQuickLinksLabel: "Popular fuel tools",
   homeTelemetryLabel: "Live telemetry",
   homeTelemetryMarkets: (n: number) => `${n} European markets`,
   homeTelemetryFuel: "Active fuel",
@@ -399,10 +403,10 @@ export const en = {
   stationsEditorialP2:
     "Tax regimes can also vary at a sub-national level in some countries. Regional surcharges, local environmental levies, or even the timing of a station's last wholesale delivery can all create gaps between the reported national average and the number on the pump display. Seasonal demand shifts — higher diesel consumption in winter for heating in certain Balkan countries, or increased petrol usage during summer travel season — add further variation.",
   stationsEditorialP3:
-    "Using the nearby stations tool alongside the country-level data on the home page gives you both a macro view and a micro view. The macro view tells you roughly where fuel sits in a given country; the micro view tells you what the nearest pump is actually charging. Combining both is the most practical approach for day-to-day fueling decisions.",
+    "Use the nearby stations tool alongside the country-level data on the home page for two different planning signals. The country view provides a broad price reference; this page shows mapped station locations, approximate distance and available opening-hour information. It does not report each station's current pump price.",
   stationsEditorialTipTitle: "Practical tip",
   stationsEditorialTip:
-    "If you are driving near a national border, check both the country average and nearby stations on each side. In the Balkans especially, a 10-minute detour across a border can sometimes save 10–20 cents per liter on a fill-up, which adds up over a full tank.",
+    "If you are driving near a national border, compare the latest country averages first, then use this finder to identify practical stops. Confirm the displayed pump price and opening hours locally before changing your route.",
 
   // ── Compare page editorial ──
   compareEditorialTitle: "How to use country comparisons effectively",

@@ -4,35 +4,51 @@ import Seo from "../components/meta/Seo";
 import { getCountryEditorial } from "../config/countryContent";
 import { getRouteConfig } from "../config/routes";
 import { getArticle } from "../config/articles";
+import type { LatestEurope } from "../models/fuel";
+import { normalizeCanonicalPath } from "../utils/canonical";
 
-export default function RouteSeo() {
+function countryDescription(base: string, country: string, data: LatestEurope | null) {
+  const row = data?.countries.find((item) => item.country === country);
+  if (row?.gasoline95_eur == null || row.diesel_eur == null || !data?.as_of) return base;
+  const date = new Date(`${data.as_of}T00:00:00Z`).toLocaleDateString("en-GB", {
+    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+  });
+  const prefix = `Petrol €${row.gasoline95_eur.toFixed(3)}/L, diesel €${row.diesel_eur.toFixed(3)}/L as of ${date}. `;
+  const full = prefix + base;
+  if (full.length <= 158) return full;
+  const cut = full.slice(0, 158);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\s]+$/, "")}…`;
+}
+
+export default function RouteSeo({ data }: { data: LatestEurope | null }) {
   const { pathname } = useLocation();
+  const canonicalPath = normalizeCanonicalPath(pathname);
 
   const meta = useMemo(() => {
-    const configured = getRouteConfig(pathname);
-    if (configured) return { title: configured.title, description: configured.description, path: pathname, noindex: configured.noindex };
-    if (pathname.startsWith("/insights/")) {
-      const slug = pathname.replace("/insights/", "");
+    const configured = getRouteConfig(canonicalPath);
+    if (configured) return { title: configured.title, description: configured.description, path: canonicalPath, noindex: configured.noindex };
+    if (canonicalPath.startsWith("/insights/")) {
+      const slug = canonicalPath.replace("/insights/", "");
       const article = getArticle(slug);
 
       if (article) {
         return {
           title: article.seoTitle ?? `${article.title} | Fuel Today`,
           description: article.description,
-          path: pathname,
+          path: canonicalPath,
         };
       }
     }
 
-    if (pathname.startsWith("/fuel-prices/")) {
-      const slug = pathname.replace("/fuel-prices/", "");
+    if (canonicalPath.startsWith("/fuel-prices/")) {
+      const slug = canonicalPath.replace("/fuel-prices/", "");
       const editorial = getCountryEditorial(slug);
 
       if (editorial) {
         return {
           title: editorial.metaTitle,
-          description: editorial.metaDescription,
-          path: pathname,
+          description: countryDescription(editorial.metaDescription, editorial.dataCountryName, data),
+          path: canonicalPath,
         };
       }
     }
@@ -44,7 +60,7 @@ export default function RouteSeo() {
       path: "/404",
       noindex: true,
     };
-  }, [pathname]);
+  }, [canonicalPath, data]);
 
   return (
     <Seo

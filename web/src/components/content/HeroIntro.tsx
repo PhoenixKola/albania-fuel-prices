@@ -112,6 +112,11 @@ export default function HeroIntro({
             <a className="homeButton homeButtonPrimary" href="#price-tool">{t.homeCockpitPrimaryCta}</a>
             <Link className="homeButton homeButtonGhost" to="/stations">{t.homeCockpitSecondaryCta}</Link>
           </div>
+          <nav className="homeHeroQuickLinks" aria-label={t.homeQuickLinksLabel}>
+            <Link to="/fuel-prices/albania">{t.homeAlbaniaPricesCta}</Link>
+            <Link to="/trip-cost-calculator">{t.homeTripCalculatorCta}</Link>
+            <Link to="/rankings">{t.homeEuropeRankingsCta}</Link>
+          </nav>
           <div className="homeTrustRail" aria-label={updated}>
             <span><i aria-hidden="true" />{t.heroShowcaseTrust1}</span>
             <span><i aria-hidden="true" />{t.heroShowcaseTrust2}</span>

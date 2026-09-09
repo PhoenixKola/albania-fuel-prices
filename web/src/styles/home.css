@@ -232,10 +232,47 @@
   background: rgba(95, 242, 189, 0.075);
 }
 
+.homeHeroQuickLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 18px;
+}
+
+.homeHeroQuickLinks a {
+  color: rgba(231, 246, 239, 0.72);
+  font-size: 12px;
+  font-weight: 720;
+  text-decoration: underline;
+  text-decoration-color: rgba(97, 239, 189, 0.38);
+  text-underline-offset: 5px;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+
+.homeHeroQuickLinks a:hover {
+  color: #effff7;
+  text-decoration-color: #61efbd;
+}
+
+:root[data-theme="light"] .homeHeroQuickLinks a { color: rgba(10, 45, 35, 0.7); }
+:root[data-theme="light"] .homeHeroQuickLinks a:hover { color: #075f46; }
+
+.homeHeroQuickLinks a:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid #ffbd59;
+  outline-offset: 4px;
+}
+
 .homeButton:focus-visible,
 .homeRouteCard:focus-visible {
   outline: 3px solid #ffbd59;
   outline-offset: 4px;
+}
+
+#price-tool { scroll-margin-top: 116px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .homeHeroQuickLinks a { transition: none; }
 }
 
 .homeTrustRail {

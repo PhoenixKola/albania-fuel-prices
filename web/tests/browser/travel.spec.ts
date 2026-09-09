@@ -70,6 +70,72 @@ test("homepage and Albania price page expose the travel entry points and bounded
   expect(counters.errors).toEqual([]);
 });
 
+test("homepage search paths and cockpit anchor stay accessible and hash-aware", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto(origin);
+  await expect(page).toHaveTitle("Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG");
+  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "smooth");
+  await expect(page.locator(".homeHeroQuickLinks")).toContainText("Albania fuel prices");
+  await page.getByRole("link", { name: "Enter the cockpit", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/#price-tool`);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+  const targetTop = await page.locator("#price-tool").evaluate((element) => element.getBoundingClientRect().top);
+  const headerBottom = await page.locator(".navbar").evaluate((element) => element.getBoundingClientRect().bottom);
+  expect(targetTop).toBeGreaterThanOrEqual(headerBottom - 2);
+  await page.goBack();
+  await expect(page).toHaveURL(`${origin}/`);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(5);
+
+  await page.goto(`${origin}/#price-tool`);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "auto");
+  expect(counters.errors).toEqual([]);
+});
+
+test("polished travel UI follows the active theme and keeps compact CTAs", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto(`${origin}/trip-cost-calculator`);
+  await expect(page.locator(".travelHeroArt")).toHaveCSS("color", "rgb(8, 123, 88)");
+  await expect(page.locator(".tripResults")).toHaveCSS("color", "rgb(16, 35, 29)");
+  const lightResult = await page.locator(".tripResults").evaluate((element) => getComputedStyle(element).backgroundImage);
+  expect(lightResult).not.toContain("rgb(18, 54, 40)");
+
+  const cta = page.locator(".travelLinks .editorialAction").first();
+  await expect(cta).toHaveCSS("border-radius", "9px");
+  expect((await cta.boundingBox())?.height).toBeLessThanOrEqual(42);
+  await cta.focus();
+  await expect(cta).toHaveCSS("outline-style", "solid");
+
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await expect(page.locator("#nav-tools-links").getByRole("link", { name: "Trip Calculator", exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Toggle theme", exact: true }).click();
+  await expect(page.locator(".travelHeroArt")).toHaveCSS("color", "rgb(196, 246, 225)");
+  await expect(page.locator(".tripResults")).toHaveCSS("color", "rgb(239, 255, 246)");
+  const darkResult = await page.locator(".tripResults").evaluate((element) => getComputedStyle(element).backgroundImage);
+  expect(darkResult).toContain("rgb(18, 54, 40)");
+  await expect(page.locator(".travelLinks .editorialActionPrimary")).toHaveCSS("color", "rgb(6, 32, 25)");
+  await expect(page.locator(".travelLinks .editorialActionPrimary")).toHaveCSS("background-color", "rgb(97, 239, 189)");
+  await expect(page.locator(".travelLinks .editorialAction:not(.editorialActionPrimary)")).toHaveCSS("color", "rgb(237, 248, 243)");
+  await expect(page.locator(".travelExample .editorialAction")).toHaveCSS("color", "rgb(237, 248, 243)");
+
+  await page.goto(`${origin}/fuel-prices/albania`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Albania fuel prices today");
+  await expect(page.locator(".countryDecisionGrid")).toContainText("€100.00");
+  await expect(page.locator(".countryDecisionGrid")).toContainText("Kosovo");
+  expect(counters.errors).toEqual([]);
+});
+
+test("station search states its real data scope and exposes one page heading", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto(`${origin}/stations`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fuel stations near me");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(page.locator("body")).toContainText("does not report each station's current pump price");
+  expect(counters.errors).toEqual([]);
+});
+
 test("calculator: defaults, multi-country return, validation, sharing and canonical", async ({ page }) => {
   const counters = await isolate(page);
   await page.goto(`${origin}/trip-cost-calculator`);
@@ -326,4 +392,30 @@ test("built pages work without JavaScript and expose canonical, schema, sitemap 
     }
   }
   await context.close();
+});
+
+test("priority landing pages ship unique metadata, one H1 and slashless canonicals", async () => {
+  const pages = [
+    { path: "/", file: "dist/index.html", title: "Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG" },
+    { path: "/fuel-prices/albania", file: "dist/fuel-prices/albania.html", title: "Fuel Prices in Albania Today | Petrol, Diesel & LPG" },
+    { path: "/fuel-prices/croatia", file: "dist/fuel-prices/croatia.html", title: "Croatia Fuel Prices Today | Petrol, Diesel & LPG per Litre" },
+    { path: "/fuel-prices/greece", file: "dist/fuel-prices/greece.html", title: "Greece Fuel Prices Today | Petrol & Diesel per Litre" },
+    { path: "/fuel-prices/portugal", file: "dist/fuel-prices/portugal.html", title: "Portugal Fuel Prices Today | Petrol & Diesel per Litre" },
+    { path: "/insights", file: "dist/insights.html", title: "Albania Fuel Price Analysis & Balkan Market Insights" },
+    { path: "/stations", file: "dist/stations.html", title: "Fuel Stations Near Me | Map, Distance & Opening Hours" },
+  ];
+  const titles = new Set<string>();
+  for (const entry of pages) {
+    const html = await readFile(resolve(entry.file), "utf8");
+    expect(html.match(/<h1\b/g)?.length).toBe(1);
+    expect(html.match(/<link rel="canonical"/g)?.length).toBe(1);
+    expect(html.match(/<meta name="description"/g)?.length).toBe(1);
+    const renderedTitle = html.match(/<title>(.*?)<\/title>/)?.[1].replaceAll("&amp;", "&");
+    expect(renderedTitle).toBe(entry.title);
+    expect(html).toContain(`<link rel="canonical" href="${origin}${entry.path === "/" ? "" : entry.path}"`);
+    titles.add(entry.title);
+  }
+  expect(titles.size).toBe(pages.length);
+  const sitemap = await readFile(resolve("dist/sitemap.xml"), "utf8");
+  expect(sitemap).not.toMatch(/<loc>[^<]+\/<\/loc>/);
 });

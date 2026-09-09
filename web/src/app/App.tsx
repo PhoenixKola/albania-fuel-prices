@@ -91,13 +91,21 @@ function CountryFuelRoute({ t, lang, data, trends, fuelType, setFuelType, loadin
 }
 
 export default function App() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
+    if (hash) {
+      const frame = window.requestAnimationFrame(() => {
+        const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        target?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-  }, [pathname]);
+  }, [pathname, hash]);
 
   const [preferredLang, setLang] = useLocalStorageState<Lang>(STORAGE_LANG_KEY, "en", {
     deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
@@ -178,7 +186,7 @@ export default function App() {
           onToggleTheme={toggleTheme}
         />
 
-        <RouteSeo />
+        <RouteSeo data={data} />
 
         <Suspense
           fallback={

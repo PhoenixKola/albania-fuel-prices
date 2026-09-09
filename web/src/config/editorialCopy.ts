@@ -217,8 +217,8 @@ const en: EditorialCopy = {
   },
   country: {
     eyebrow: "Country market briefing",
-    title: (country) => `${country} fuel prices, decoded.`,
-    lede: (country) => `A live reference for petrol, diesel, and LPG in ${country}, placed against Europe and Albania with the context a driver actually needs.`,
+    title: (country) => `${country} fuel prices today`,
+    lede: (country) => `Current petrol, diesel, and LPG reference prices in ${country}, with 30-day movement, European ranking, and practical driving context.`,
     currentPrices: (country) => `Current ${country} fuel prices`,
     currentIntro: "Country-level reference values, normalised for fair comparison.",
     loading: "Loading the latest market reading…",
@@ -364,8 +364,8 @@ const sq: EditorialCopy = {
   country: {
     ...en.country,
     eyebrow: "Raport i tregut kombëtar",
-    title: (country) => `Çmimet e karburantit në ${country}, të shpjeguara.`,
-    lede: (country) => `Referencë live për benzinën, naftën dhe LPG-në në ${country}, krahasuar me Evropën dhe Shqipërinë me kontekst praktik për shoferin.`,
+    title: (country) => `Çmimet e karburantit sot në ${country}`,
+    lede: (country) => `Çmimet aktuale orientuese të benzinës, naftës dhe LPG-së në ${country}, me lëvizjen 30-ditore, renditjen evropiane dhe kontekst praktik për shoferin.`,
     currentPrices: (country) => `Çmimet aktuale në ${country}`,
     currentIntro: "Vlera reference në nivel shteti, të normalizuara për krahasim të drejtë.",
     loading: "Po ngarkohet leximi i fundit…",

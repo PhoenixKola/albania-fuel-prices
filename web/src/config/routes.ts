@@ -36,9 +36,9 @@ export const STATIC_ROUTES: RouteConfig[] = [
   },
   {
     path: "/",
-    title: "Fuel Today Albania & Europe | Petrol, Diesel and LPG Prices",
+    title: "Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG",
     description:
-      "Compare today's fuel prices in Albania and Europe, understand why prices move, estimate road-trip costs, and review transparent methodology before you travel.",
+      "Check current petrol, diesel and LPG prices in Albania and across Europe, compare countries, and calculate your trip fuel cost from daily-updated data.",
     priority: 1.0,
     changefreq: "daily",
     jsonLdType: "WebSite",
@@ -46,9 +46,9 @@ export const STATIC_ROUTES: RouteConfig[] = [
   },
   {
     path: "/stations",
-    title: "Nearby Fuel Stations | Fuel Today",
+    title: "Fuel Stations Near Me | Map, Distance & Opening Hours",
     description:
-      "Find nearby fuel stations and use location-based context alongside country-level fuel price comparisons for Albania and Europe.",
+      "Find nearby fuel stations by location, distance and available opening hours. Pair the map with current country-level fuel prices for trip planning.",
     priority: 0.8,
     changefreq: "daily",
     jsonLdType: "WebPage",
@@ -186,13 +186,13 @@ export const STATIC_ROUTES: RouteConfig[] = [
   },
   {
     path: "/insights",
-    title: "Fuel Market Insights | Fuel Today",
+    title: "Albania Fuel Price Analysis & Balkan Market Insights",
     description:
-      "Analysis and background articles on the Albanian and Balkan fuel markets — taxes, cross-border savings, market structure, and monthly price recaps.",
+      "Read data-backed analysis of Albania and Balkan fuel prices, including diesel trends, cross-border fill-up costs, taxes, LPG and the lek-euro effect.",
     priority: 0.8,
     changefreq: "weekly",
     jsonLdType: "WebPage",
-    lastmod: "2026-07-10",
+    lastmod: "2026-08-05",
   },
   {
     path: "/editorial-policy",

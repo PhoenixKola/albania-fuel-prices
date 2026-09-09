@@ -43,7 +43,7 @@ export default function Seo({
 }: SeoProps) {
   useEffect(() => {
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
-    const canonical = `${SITE_URL}${cleanPath}`;
+    const canonical = cleanPath === "/" ? SITE_URL : `${SITE_URL}${cleanPath}`;
 
     document.title = title;
     setCanonical(canonical);
@@ -78,6 +78,16 @@ export default function Seo({
     setOrCreateMeta('meta[property="og:url"]', {
       property: "og:url",
       content: canonical,
+    });
+
+    setOrCreateMeta('meta[name="twitter:title"]', {
+      name: "twitter:title",
+      content: ogTitle ?? title,
+    });
+
+    setOrCreateMeta('meta[name="twitter:description"]', {
+      name: "twitter:description",
+      content: ogDescription ?? description,
     });
   }, [title, description, path, ogTitle, ogDescription, noindex]);
 

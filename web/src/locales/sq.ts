@@ -82,7 +82,7 @@ export const sq = {
   currencyEUR: "EUR",
   currencyLocal: "Lokale",
 
-  stationsNearbyTitle: "Stacione afër",
+  stationsNearbyTitle: "Pika karburanti pranë meje",
   stationsUseMyLocation: "Përdor vendndodhjen time",
   stationsGettingLocation: "Po merret vendndodhja…",
   stationsRadius: "Rrezja",
@@ -131,9 +131,13 @@ export const sq = {
   homeCockpitKicker: "EVROPË / INTELIGJENCË KARBURANTI",
   homeCockpitTitle: "Lexoje rrugën para se ta përshkosh.",
   homeCockpitSubtitle:
-    "Një panel i gjallë për çmimet e karburantit në Evropë—i ndërtuar për të zbuluar ku ia vlen të furnizohesh, koston reale të rrugës dhe lëvizjen pas shifrës së sotme.",
+    "Kontrollo çmimet aktuale të benzinës, naftës dhe LPG-së në Shqipëri dhe Evropë, krahaso shtetet dhe llogarit koston e karburantit për udhëtimin me të dhëna reference të përditësuara çdo ditë.",
   homeCockpitPrimaryCta: "Hyr në panel",
   homeCockpitSecondaryCta: "Gjej karburant afër",
+  homeAlbaniaPricesCta: "Çmimet në Shqipëri",
+  homeTripCalculatorCta: "Llogaritësi i udhëtimit",
+  homeEuropeRankingsCta: "Renditja në Evropë",
+  homeQuickLinksLabel: "Mjetet e njohura të karburantit",
   homeTelemetryLabel: "Telemetri live",
   homeTelemetryMarkets: (n: number) => `${n} tregje evropiane`,
   homeTelemetryFuel: "Karburanti aktiv",
@@ -398,10 +402,10 @@ export const sq = {
   stationsEditorialP2:
     "Regjimi tatimor mund të ndryshojë edhe në nivel nën-kombëtar në disa vende. Taksat rajonale, taksat mjedisore lokale ose edhe koha e dorëzimit të fundit me shumicë mund të krijojnë hendekë mes mesatares kombëtare dhe numrit në ekranin e pompës.",
   stationsEditorialP3:
-    "Përdorimi i mjetit të pikave afër së bashku me të dhënat e vendit në faqen kryesore ju jep një pamje makro dhe mikro. Pamja makro tregon ku qëndron karburanti në një vend; pamja mikro tregon çfarë po ngarkon pompa më e afërt.",
+    "Përdor mjetin e pikave pranë bashkë me të dhënat kombëtare në faqen kryesore për dy sinjale të ndryshme planifikimi. Pamja e shtetit jep një referencë të përgjithshme çmimi; kjo faqe tregon vendndodhjet e pikave në hartë, largësinë e përafërt dhe oraret kur disponohen. Ajo nuk raporton çmimin aktual të pompës për secilën pikë.",
   stationsEditorialTipTitle: "Këshillë praktike",
   stationsEditorialTip:
-    "Nëse jeni duke ngjitur afër një kufiri kombëtar, kontrolloni mesataret dhe pikat afër në të dyja anët. Në Ballkan veçanërisht, një devijim 10-minutësh mund të kursejë 10–20 centë për litër.",
+    "Nëse udhëton pranë një kufiri, krahaso fillimisht mesataret më të fundit kombëtare dhe përdor më pas këtë gjetës për të identifikuar ndalesa praktike. Konfirmo në vend çmimin e shfaqur në pompë dhe orarin para se të ndryshosh rrugën.",
 
   // Compare page editorial
   compareEditorialTitle: "Si të përdorni krahasimet mes vendeve në mënyrë efektive",

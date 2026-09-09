@@ -1,5 +1,21 @@
 # Growing the travel revenue path
 
+## Search Console optimization record — 9 September 2026
+
+This pass responds to the last-three-month baseline of roughly 33,000 impressions, 183 clicks, 0.6% CTR and average position 8.5. It keeps the current homepage design and changes the parts that affect search understanding, click appeal and movement into useful tools.
+
+| Search Console signal | Change made | Measure after Google recrawls |
+| --- | --- | --- |
+| Homepage: 15,679 impressions, 0.92% CTR | Put the search intent first in the title and supporting hero copy; added compact links to Albania prices, the trip calculator and Europe rankings. | Homepage CTR, clicks into the three linked routes and engaged visits. |
+| Albania: 3,633 impressions, 0.19% CTR | Rewrote the snippet around current prices; added a live 50 L cost in EUR/ALL and current Kosovo/Greece comparisons with direct planning links. | CTR for petrol/diesel/current-price queries; calculator entrances from Albania; rental referral clicks later in the journey. |
+| Croatia/Greece/Portugal: 9,208 combined impressions, 3 clicks | Replaced indistinguishable template snippets with country-specific current-price and route context; added paths to Albania and the calculator. | CTR and query mix per page. Compare each page independently because position and SERP competition differ. |
+| Kosovo: 1.18% CTR | Preserved its working title and route-specific description. The code audit found no special template or technical treatment; its stronger result is more consistent with clearer route intent, a slightly better position and/or different SERP competition. | Use as a directional benchmark, not proof that copying one snippet will reproduce its CTR. |
+| Insights: 1,267 impressions, 0 clicks | Reframed the title, H1 and introduction around the actual Albania/Balkan data topics and linked directly to current prices, report and rankings. | Insights CTR, article clicks and the queries Google associates with the hub. |
+| “Near me”: about 3,300 impressions and almost no clicks | Kept the existing `/stations` route, gave it an accurate near-me title and H1, and made the no-pump-price limitation explicit. No `/gas-prices-near-me` page was created because the feed has station location, distance and some hours, but no station-level prices or price timestamps. | CTR for station-finder queries. Do not optimize for “gas prices near me” until a reliable station-price feed exists. |
+| Possible slash duplicates | Verified production returns a direct `308` from trailing-slash URLs to the slashless canonical. Runtime canonical normalization and automated checks now enforce the same format. | Google Search Console canonical selection and duplicate-page reports. |
+
+Review the page and query comparisons 2–4 weeks after recrawl. Record clicks, impressions, CTR and average position for the homepage, Albania, Croatia, Greece, Portugal, Kosovo and Insights. Also record calculator starts, copied trip links, DiscoverCars clicks and completed rentals where those reports are available. Do not attribute a CTR change to the copy alone if average position or the query mix moved materially.
+
 Recommendations researched 9 September 2026. These are next experiments, not actions already published or accounts already created. The current implementation is documented in [MONETIZATION.md](MONETIZATION.md). No paid campaigns, social posts, outreach messages or alternate ad-network scripts have been launched.
 
 ## The first priority

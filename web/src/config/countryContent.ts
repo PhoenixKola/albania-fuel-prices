@@ -44,9 +44,9 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     slug: "albania",
     label: "Albania",
     dataCountryName: "Albania",
-    metaTitle: "Albania Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
+    metaTitle: "Fuel Prices in Albania Today | Petrol, Diesel & LPG",
     metaDescription:
-      "How petrol, diesel and LPG prices in Albania compare with Balkan neighbours, plus cross-border advice.",
+      "Current Albania fuel prices with EUR and ALL per litre, 30-day movement, fill-up costs, and comparisons with Kosovo and Greece.",
     marketOverview:
       "Albania's fuel market is characterized by a mix of imported refined products and moderate taxation. The country does not have significant domestic refining capacity, so pump prices are influenced heavily by Mediterranean wholesale markets, shipping costs from Italian and Greek refineries, and the ALL/EUR exchange rate. The Albanian government occasionally adjusts excise rates to manage price pressures, but generally allows market pricing. Competition among major retail chains like Kastrati, KFG, and smaller independents creates some regional price variation, particularly between Tirana and smaller cities.",
     albaniaContext:
@@ -89,11 +89,11 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
       },
     ],
     relatedLinks: [
-      { label: "How fuel prices are calculated", to: "/methodology" },
-      { label: "Compare Albania with Europe", to: "/europe-fuel-comparison" },
-      { label: "Plan a road trip from Albania", to: "/road-trip-fuel-guide" },
+      { label: "Calculate an Albania road trip", to: "/trip-cost-calculator" },
+      { label: "Kosovo fuel prices", to: "/fuel-prices/kosovo" },
+      { label: "Greece fuel prices", to: "/fuel-prices/greece" },
+      { label: "Albania car rental guide", to: "/albania-car-rental-guide" },
       { label: "European rankings", to: "/rankings" },
-      { label: "Compare countries", to: "/compare" },
     ],
   },
   {
@@ -145,11 +145,11 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
       },
     ],
     relatedLinks: [
+      { label: "Albania fuel prices", to: "/fuel-prices/albania" },
+      { label: "Calculate the Tirana–Pristina trip", to: "/trip-cost-calculator" },
       { label: "Compare countries side by side", to: "/compare" },
       { label: "European fuel rankings", to: "/rankings" },
       { label: "Road trip fuel planning", to: "/road-trip-fuel-guide" },
-      { label: "How fuel prices work", to: "/how-fuel-prices-work" },
-      { label: "Data methodology", to: "/methodology" },
     ],
   },
   {
@@ -268,9 +268,9 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     slug: "greece",
     label: "Greece",
     dataCountryName: "Greece",
-    metaTitle: "Greece Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
+    metaTitle: "Greece Fuel Prices Today | Petrol & Diesel per Litre",
     metaDescription:
-      "Greek fuel prices versus Albania, and which side of the border is cheaper for petrol and diesel.",
+      "Current petrol, diesel and LPG prices in Greece, with 30-day trends and a practical comparison against Albania for cross-border drivers.",
     marketOverview:
       "Greece has among the highest fuel prices in Southern Europe, driven by substantial excise duties and 24% VAT on top of already-taxed fuel. The country has significant domestic refining capacity through Hellenic Petroleum (now HELLENiQ Energy) and Motor Oil Hellas, but high taxation keeps pump prices elevated. The Greek market is competitive at the retail level, with hundreds of branded and independent stations. However, island locations and remote rural areas face premium pricing due to higher distribution costs. Greece's fuel pricing is fully liberalized — the government monitors but does not cap retail prices.",
     albaniaContext:
@@ -313,11 +313,11 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
       },
     ],
     relatedLinks: [
+      { label: "Albania fuel prices", to: "/fuel-prices/albania" },
+      { label: "Calculate an Albania–Greece trip", to: "/trip-cost-calculator" },
       { label: "Compare Albania vs Greece", to: "/compare" },
       { label: "European fuel rankings", to: "/rankings" },
-      { label: "Road trip fuel guide", to: "/road-trip-fuel-guide" },
       { label: "Europe fuel comparison", to: "/europe-fuel-comparison" },
-      { label: "Data methodology", to: "/methodology" },
     ],
   },
   {
@@ -380,9 +380,9 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     slug: "croatia",
     label: "Croatia",
     dataCountryName: "Croatia",
-    metaTitle: "Croatia Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
+    metaTitle: "Croatia Fuel Prices Today | Petrol, Diesel & LPG per Litre",
     metaDescription:
-      "Croatian fuel prices versus Albania, with route context for the Adriatic coast and tourist season.",
+      "Current petrol, diesel and LPG prices in Croatia, with euro-per-litre figures, 30-day trends and practical Adriatic road-trip context.",
     marketOverview:
       "Croatia joined the eurozone in January 2023, simplifying price comparisons with other Euro-using neighbors. The Croatian fuel market features government intervention: the state periodically sets maximum retail prices based on a formula tied to Mediterranean product markets and exchange rates. Major distributors include INA (the national oil company, partly owned by MOL), Petrol, Tifon, and Crodux. Croatia's excise duties sit in the mid-range for the EU — higher than Balkan non-EU states but lower than Italy, Netherlands, or Scandinavia. Coastal tourist areas may see slightly higher de facto prices during peak season.",
     albaniaContext:
@@ -425,20 +425,20 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
       },
     ],
     relatedLinks: [
+      { label: "Albania fuel prices", to: "/fuel-prices/albania" },
+      { label: "Italy fuel prices", to: "/fuel-prices/italy" },
+      { label: "Calculate an Adriatic road trip", to: "/trip-cost-calculator" },
       { label: "Europe fuel comparison", to: "/europe-fuel-comparison" },
-      { label: "Compare countries", to: "/compare" },
-      { label: "Road trip fuel guide", to: "/road-trip-fuel-guide" },
       { label: "European rankings", to: "/rankings" },
-      { label: "Data methodology", to: "/methodology" },
     ],
   },
   {
     slug: "portugal",
     label: "Portugal",
     dataCountryName: "Portugal",
-    metaTitle: "Portugal Fuel Prices Today — Petrol, Diesel & LPG | Fuel Today",
+    metaTitle: "Portugal Fuel Prices Today | Petrol & Diesel per Litre",
     metaDescription:
-      "Portuguese fuel prices as a western European benchmark against Albania and the Balkans.",
+      "Current petrol, diesel and LPG prices in Portugal, with euro-per-litre figures, 30-day trends and a comparison against Albania and Europe.",
     marketOverview:
       "Portugal has fuel prices in the upper-middle range for Western Europe, driven by significant excise duties and 23% VAT. The country benefits from Atlantic refinery access (Galp's Sines and Matosinhos refineries) which provides some price insulation from Mediterranean market dynamics. Major retail brands include Galp, Repsol, BP, and Prio, along with growing hypermarket fuel stations (Intermarché, Leclerc) that often undercut branded stations. Portugal introduced temporary fuel tax reductions during the 2022–2023 energy crisis, some of which have been partially reversed. The country's geography means distribution costs vary between coastal cities and interior regions.",
     albaniaContext:
@@ -481,11 +481,11 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
       },
     ],
     relatedLinks: [
+      { label: "Albania fuel prices", to: "/fuel-prices/albania" },
+      { label: "Calculate a Portugal road trip", to: "/trip-cost-calculator" },
       { label: "Europe fuel comparison", to: "/europe-fuel-comparison" },
       { label: "European fuel rankings", to: "/rankings" },
       { label: "How fuel prices work", to: "/how-fuel-prices-work" },
-      { label: "Compare countries", to: "/compare" },
-      { label: "Data methodology", to: "/methodology" },
     ],
   },
   {
