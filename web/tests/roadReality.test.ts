@@ -15,12 +15,8 @@ test("Road Reality seeds a bounded, unique, conservatively sourced route set", (
   assert.equal(new Set(ROAD_ROUTES.map((route) => route.slug)).size, ROAD_ROUTES.length);
   assert.deepEqual(ROAD_STATUSES, ["OPEN", "CAUTION", "RESTRICTED", "CLOSED", "UNKNOWN"]);
 
-  const grouped = Object.groupBy(ROAD_ROUTES, (route) => route.overallStatus);
-  assert.equal(grouped.RESTRICTED?.length, 2);
-  assert.equal(grouped.UNKNOWN?.length, 17);
-  assert.equal(grouped.OPEN, undefined);
-  assert.equal(grouped.CAUTION, undefined);
-  assert.equal(grouped.CLOSED, undefined);
+  const statusCounts = Object.fromEntries(ROAD_STATUSES.map((status) => [status, ROAD_ROUTES.filter((route) => route.overallStatus === status).length]));
+  assert.deepEqual(statusCounts, { OPEN: 0, CAUTION: 0, RESTRICTED: 2, CLOSED: 0, UNKNOWN: 17 });
 
   for (const route of ROAD_ROUTES) {
     assert.equal(getRoadRoute(route.slug), route);
