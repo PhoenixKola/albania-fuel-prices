@@ -82,6 +82,7 @@ export default function Footer({ t, lang, dataAsOf }: Props) {
         { to: "/rankings", label: t.navRankings },
         { to: "/compare", label: t.navCompare },
         { to: "/stations", label: t.navStations },
+        { to: "/road-status", label: c.roadStatus },
       ],
     },
     {

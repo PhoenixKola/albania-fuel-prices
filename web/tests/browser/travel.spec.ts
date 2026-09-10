@@ -413,7 +413,81 @@ test("built pages work without JavaScript and expose canonical, schema, sitemap 
       await expect(page.locator(".rentalReferral")).toContainText("may earn a commission");
     }
   }
+  const roadPath = "/road-status/tirana-korce";
+  await page.goto(`${origin}${roadPath}`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Albania Road Conditions & Route Status");
+  await expect(page.locator("body")).toContainText("Tirana → Korçë");
+  await expect(page.locator("body")).toContainText("Albanian State Police");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `${origin}${roadPath}`);
+  const roadSchema = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? "{}");
+  expect(roadSchema.url).toBe(`${origin}${roadPath}`);
+  expect(sitemap).toContain(`${origin}${roadPath}`);
+
+  await page.goto(`${origin}/road-status/tirana-durres`);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  expect(sitemap).not.toContain(`${origin}/road-status/tirana-durres`);
   await context.close();
+});
+
+test("Road Reality restores and changes curated route URLs with sourced status details", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto(`${origin}/road-status/shkoder-theth`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Albania Road Conditions & Route Status");
+  await expect(page.getByRole("heading", { level: 2, name: "Shkodër → Theth" })).toBeVisible();
+  await expect(page.locator(".roadStatusBadgeLarge")).toHaveText(/UNKNOWN/);
+  await expect(page.getByText("No route-specific current authority statement", { exact: false })).toBeVisible();
+  await expect(page.locator("link[rel='canonical']")).toHaveAttribute("href", `${origin}/road-status/shkoder-theth`);
+  await expect(page.getByRole("link", { name: "Calculate fuel cost" })).toHaveAttribute("href", "/trip-cost-calculator");
+  await expect(page.locator('[data-rental-placement="roadTrip"]')).toBeVisible();
+  await expect(page.locator("main")).not.toContainText(/safe to drive|definitely open|safe road/i);
+
+  const from = page.getByRole("combobox", { name: "From", exact: true });
+  await from.focus();
+  await page.keyboard.press("t");
+  await page.keyboard.press("Enter");
+  await expect(from).toHaveText("Tirana");
+  const to = page.getByRole("combobox", { name: "To", exact: true });
+  await to.click();
+  await page.getByRole("option", { name: "Korçë", exact: true }).click();
+  await page.getByRole("button", { name: "Check route", exact: false }).click();
+  await expect(page).toHaveURL(`${origin}/road-status/tirana-korce`);
+  await expect(page.locator(".roadStatusBadgeLarge")).toHaveText(/RESTRICTED/);
+  await expect(page.getByRole("link", { name: "View source", exact: false }).first()).toHaveAttribute("href", /asp\.gov\.al\/bllokohet-levizja/);
+  await expect(page.getByText("Stale · checked", { exact: false }).first()).toBeVisible();
+  expect(counters.errors).toEqual([]);
+});
+
+test("Road Reality is responsive and theme-aware on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 900 });
+  const counters = await isolate(page);
+  await page.goto(`${origin}/road-status/tirana-bovilla`);
+  await expect(page.locator(".roadMap")).toBeVisible();
+  await expect(page.getByRole("link", { name: /OpenStreetMap contributors/ })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  const lightPanel = await page.locator(".roadResultCard").evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(lightPanel).toBe("rgb(255, 254, 250)");
+  await page.getByRole("button", { name: "Toggle menu" }).click();
+  await page.getByRole("button", { name: /Dark mode/ }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.locator(".roadResultCard")).toHaveCSS("background-color", "rgb(11, 28, 24)");
+  await page.screenshot({ path: "test-results/road-reality-mobile-dark.png", fullPage: true });
+  expect(counters.errors).toEqual([]);
+});
+
+test("Road Reality report disclosure is keyboard accessible and creates a real email action", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto(`${origin}/road-status/tirana-theth`);
+  const summary = page.locator(".roadReport summary");
+  await summary.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".roadReport")).toHaveAttribute("open", "");
+  await expect(page.getByText("Unverified user report", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Route")).toHaveValue("Tirana → Theth");
+  await page.getByLabel("Section or location").fill("Qafë Thorë");
+  await page.getByLabel("Observed condition").selectOption({ label: "Other / uncertain" });
+  await page.getByLabel("Date and time observed").fill("2026-09-10T09:30");
+  await expect(page.getByRole("button", { name: "Prepare email report" })).toBeEnabled();
+  expect(counters.errors).toEqual([]);
 });
 
 test("priority landing pages ship unique metadata, one H1 and slashless canonicals", async () => {

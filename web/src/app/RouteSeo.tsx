@@ -6,6 +6,8 @@ import { getRouteConfig } from "../config/routes";
 import { getArticle } from "../config/articles";
 import type { LatestEurope } from "../models/fuel";
 import { normalizeCanonicalPath } from "../utils/canonical";
+import { getRoadRoute } from "../data/roadRoutes";
+import { roadRouteDescription, roadRouteTitle } from "../utils/roadSeo";
 
 function countryDescription(base: string, country: string, data: LatestEurope | null) {
   const row = data?.countries.find((item) => item.country === country);
@@ -27,6 +29,10 @@ export default function RouteSeo({ data }: { data: LatestEurope | null }) {
   const meta = useMemo(() => {
     const configured = getRouteConfig(canonicalPath);
     if (configured) return { title: configured.title, description: configured.description, path: canonicalPath, noindex: configured.noindex };
+    if (canonicalPath.startsWith("/road-status/")) {
+      const route = getRoadRoute(canonicalPath.replace("/road-status/", ""));
+      if (route) return { title: roadRouteTitle(route), description: roadRouteDescription(route), path: canonicalPath, noindex: !route.indexable };
+    }
     if (canonicalPath.startsWith("/insights/")) {
       const slug = canonicalPath.replace("/insights/", "");
       const article = getArticle(slug);

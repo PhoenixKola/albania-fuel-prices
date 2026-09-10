@@ -5,6 +5,7 @@ import { RentalGuideSections, RentalGuideSources, RentalGuideHighlights, TravelH
 import RentalReferral from "../components/ads/RentalReferral";
 import AdBar from "../components/ads/AdBar";
 import type { MonetizationConfig } from "../config/monetization";
+import RoadStatusLink from "../components/road/RoadStatusLink";
 
 export default function AlbaniaCarRentalGuidePage({ lang, data, config }: { lang: Lang; data: LatestEurope | null; config?: MonetizationConfig }) {
   return <article className="travelPage">
@@ -12,6 +13,7 @@ export default function AlbaniaCarRentalGuidePage({ lang, data, config }: { lang
     <RentalGuideSections lang={lang} end={2} />
     <AdBar placement="content" />
     <TripExample lang={lang} data={data} />
+    <RoadStatusLink lang={lang} />
     <RentalReferral lang={lang} placement="guide" config={config} />
     <RentalGuideSections lang={lang} start={2} />
     <AdBar placement="articleEnd" />

@@ -18,6 +18,7 @@ import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
 import { getPublishedArticles } from "../src/config/articles";
 import { isCountryIndexable } from "../src/generated/indexableCountries";
 import { loadPriceContext } from "./priceData";
+import { ROAD_ROUTES } from "../src/data/roadRoutes";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "../dist");
@@ -53,6 +54,12 @@ async function main() {
       priority: 0.7,
       changefreq: "monthly" as const,
       lastmod: a.dateModified ?? a.datePublished,
+    })),
+    ...ROAD_ROUTES.filter((route) => route.indexable).map((route) => ({
+      path: `/road-status/${route.slug}`,
+      priority: 0.7,
+      changefreq: "weekly" as const,
+      lastmod: route.lastCheckedAt.slice(0, 10),
     })),
   ];
 

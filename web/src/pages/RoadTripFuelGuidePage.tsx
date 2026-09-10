@@ -6,6 +6,7 @@ import AdBar from "../components/ads/AdBar";
 import type { Lang } from "../models/i18n";
 import { TravelLinks } from "../components/content/TravelLinks";
 import RentalReferral from "../components/ads/RentalReferral";
+import RoadStatusLink from "../components/road/RoadStatusLink";
 type Props = { t: TDict; lang: Lang };
 
 export default function RoadTripFuelGuidePage({ t, lang }: Props) {
@@ -94,6 +95,7 @@ export default function RoadTripFuelGuidePage({ t, lang }: Props) {
         </p>
       </section>
 
+      <RoadStatusLink lang={lang} />
       <RentalReferral lang={lang} placement="roadTrip" />
       <AdBar placement="articleEnd" />
     </article>

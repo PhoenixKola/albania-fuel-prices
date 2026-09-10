@@ -23,6 +23,12 @@ export const PUBLISHER_ID = "ca-pub-2653462201538649";
 
 export const STATIC_ROUTES: RouteConfig[] = [
   {
+    path: "/road-status",
+    title: "Albania Road Conditions & Route Status | Karburanti Sot",
+    description: "Check sourced road closures, restrictions, route sections and verification dates for important driving routes across Albania.",
+    priority: 0.9, changefreq: "weekly", jsonLdType: "WebPage", lastmod: "2026-09-10",
+  },
+  {
     path: "/trip-cost-calculator",
     title: "Trip Fuel Cost Calculator | Albania & Europe | Fuel Today",
     description: "Calculate road-trip fuel costs across Albania and Europe. Add country distances, compare petrol, diesel and LPG, and share an estimate in EUR and ALL.",

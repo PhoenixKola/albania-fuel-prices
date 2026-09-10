@@ -52,6 +52,7 @@ import RouteSeo from "./RouteSeo";
 import { MonetizationProvider } from "../components/ads/MonetizationProvider";
 const TripCostCalculatorPage = lazy(() => import("../pages/TripCostCalculatorPage"));
 const AlbaniaCarRentalGuidePage = lazy(() => import("../pages/AlbaniaCarRentalGuidePage"));
+const RoadStatusPage = lazy(() => import("../pages/RoadStatusPage"));
 import "../styles/travel.css";
 import "../styles/editorial.css";
 
@@ -88,6 +89,11 @@ function CountryFuelRoute({ t, lang, data, trends, fuelType, setFuelType, loadin
       fxRates={fxRates}
     />
   );
+}
+
+function RoadStatusRoute({ lang }: { lang: Lang }) {
+  const { routeSlug } = useParams<{ routeSlug: string }>();
+  return <RoadStatusPage key={routeSlug ?? "road-status-index"} lang={lang} initialSlug={routeSlug} />;
 }
 
 export default function App() {
@@ -225,7 +231,7 @@ export default function App() {
           />
           <Route
             path="/stations"
-            element={<StationsPage t={t} radiusM={radiusM} setRadiusM={setRadiusM} />}
+            element={<StationsPage t={t} lang={lang} radiusM={radiusM} setRadiusM={setRadiusM} />}
           />
           <Route
             path="/compare"
@@ -291,6 +297,8 @@ export default function App() {
           <Route path="/trip-cost-calculator" element={<TripCostCalculatorPage lang={lang} data={data} fxRates={fx.rates} loading={loading} />} />
           <Route path="/albania-car-rental-guide" element={<AlbaniaCarRentalGuidePage lang={lang} data={data} />} />
           <Route path="/road-trip-fuel-guide" element={<RoadTripFuelGuidePage t={t} lang={lang} />} />
+          <Route path="/road-status" element={<RoadStatusRoute lang={lang} />} />
+          <Route path="/road-status/:routeSlug" element={<RoadStatusRoute lang={lang} />} />
           <Route
             path="/fuel-prices/:countrySlug"
             element={

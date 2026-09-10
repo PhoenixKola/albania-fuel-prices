@@ -1,6 +1,7 @@
 import { loadEnv } from "vite";
 import { readMonetizationConfig } from "../src/config/monetization";
 import { travelStaticContent, travelStaticLinks } from "./travelPrerender";
+import { buildRoadRealityPrerenderRoutes } from "./roadRealityPrerender";
 /**
  * Prerender script: generates static HTML for all public routes after `vite build`.
  *
@@ -986,7 +987,7 @@ async function main() {
     process.exit(1);
   }
 
-  const routes = [...STATIC_ROUTES.map(redesignedStaticContent).map((route) => ({ ...route, dateModified: ROUTE_CONFIGS.find((config) => config.path === route.path)?.lastmod ?? route.dateModified })), ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
+  const routes = [...STATIC_ROUTES.map(redesignedStaticContent).map((route) => ({ ...route, dateModified: ROUTE_CONFIGS.find((config) => config.path === route.path)?.lastmod ?? route.dateModified })), ...buildRoadRealityPrerenderRoutes(), ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
 
   let count = 0;
   for (const route of routes) {
@@ -995,6 +996,9 @@ async function main() {
     let content = typeof route.content === "function" ? route.content(ctx) : route.content;
     if (["/", "/road-trip-fuel-guide", "/fuel-prices/albania"].includes(route.path)) {
       content += travelStaticLinks(route.path === "/" ? null : route.path === "/fuel-prices/albania" ? "albania" : "roadTrip", revenueConfig);
+    }
+    if (["/", "/trip-cost-calculator", "/albania-car-rental-guide", "/road-trip-fuel-guide", "/fuel-prices/albania", "/stations"].includes(route.path)) {
+      content += `<aside class="contentSection"><h2 class="contentHeading">Check the road before you drive</h2><p class="contentBody">Review sourced closures, restrictions and verification dates for important routes in Albania.</p><p><a href="/road-status">Road conditions →</a></p></aside>`;
     }
     const head = generateHead(route, description, ctx);
 

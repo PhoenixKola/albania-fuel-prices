@@ -170,6 +170,7 @@ export default function Navbar({
 
   const toolLinks = [
     { to: "/trip-cost-calculator", label: c.tripCalculator },
+    { to: "/road-status", label: c.roadStatus },
     { to: "/compare", label: t.navCompare },
     { to: "/rankings", label: t.navRankings },
     { to: "/stations", label: t.navStations },

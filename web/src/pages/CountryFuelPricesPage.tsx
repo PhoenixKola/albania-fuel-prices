@@ -1,5 +1,6 @@
 import AdBar from "../components/ads/AdBar";
 import RentalReferral from "../components/ads/RentalReferral";
+import RoadStatusLink from "../components/road/RoadStatusLink";
 import { TravelLinks } from "../components/content/TravelLinks";
 import { Link } from "react-router-dom";
 import type { Lang } from "../models/i18n";
@@ -238,7 +239,7 @@ export default function CountryFuelPricesPage({
         <div className="editorialCardGrid"><div className="editorialCard"><b>{c.travel}</b><p>{editorial.travelRelevance}</p></div><div className="editorialCard"><b>{c.borders}</b><p>{editorial.borderAdvice}</p></div><div className="editorialCard"><b>{c.fuels(editorial.label)}</b><p>{editorial.fuelInterpretation}</p></div></div>
       </EditorialSection>
 
-      {countryName === "Albania" ? <><TravelLinks lang={lang} /><RentalReferral lang={lang} placement="albania" /></> : null}
+      {countryName === "Albania" ? <><TravelLinks lang={lang} /><RoadStatusLink lang={lang} /><RentalReferral lang={lang} placement="albania" /></> : null}
       <AdBar placement="articleEnd" enabled={hasAnyPrice && !loading} />
       <EditorialSection id="country-coverage" index={analysisHtml ? "07" : "06"} title={c.limitations}>
         <p>{editorial.dataLimitations}</p><p>{editorial.sourceTransparency}</p>

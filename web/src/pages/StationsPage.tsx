@@ -1,17 +1,21 @@
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 import NearbyStationsCard from "../components/meta/NearbyStationsCard";
+import RoadStatusLink from "../components/road/RoadStatusLink";
+import type { Lang } from "../models/i18n";
 
 type Props = {
   t: TDict;
+  lang: Lang;
   radiusM: number;
   setRadiusM: (v: number) => void;
 };
 
-export default function StationsPage({ t, radiusM, setRadiusM }: Props) {
+export default function StationsPage({ t, lang, radiusM, setRadiusM }: Props) {
   return (
     <>
       <NearbyStationsCard t={t} radiusM={radiusM} setRadiusM={setRadiusM} />
+      <RoadStatusLink lang={lang} />
 
       <article className="contentPage">
         <section className="contentSection">

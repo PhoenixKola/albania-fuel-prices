@@ -14,6 +14,7 @@ import { useLocalStorageState } from "../hooks/useLocalStorageState";
 
 import AdBar from "../components/ads/AdBar";
 import { TravelLinks } from "../components/content/TravelLinks";
+import RoadStatusLink from "../components/road/RoadStatusLink";
 import FuelCard from "../components/fuel/FuelCard";
 import TrendCard from "../components/fuel/TrendCard";
 import QuickCalcCard from "../components/fuel/QuickCalcCard";
@@ -264,6 +265,7 @@ export default function HomePage({
 
       <AdBar placement="home" enabled={canShowAds} />
       <TravelLinks lang={lang} featured />
+      <RoadStatusLink lang={lang} featured />
 
       <section className="homeDashboardSection" aria-labelledby="home-routes-title">
         <SectionIntro kicker={t.homeRoutesKicker} title={t.homeRoutesTitle} text={t.homeRoutesSubtitle} id="home-routes-title" />
