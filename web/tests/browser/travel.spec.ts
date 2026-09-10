@@ -439,6 +439,8 @@ test("Road Reality restores and changes curated route URLs with sourced status d
   await expect(page.locator("link[rel='canonical']")).toHaveAttribute("href", `${origin}/road-status/shkoder-theth`);
   await expect(page.getByRole("link", { name: "Calculate fuel cost" })).toHaveAttribute("href", "/trip-cost-calculator");
   await expect(page.locator('[data-rental-placement="roadTrip"]')).toBeVisible();
+  await expect(page.getByText("Report a newer condition", { exact: true })).toHaveCount(0);
+  await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText(/safe to drive|definitely open|safe road/i);
 
   const from = page.getByRole("combobox", { name: "From", exact: true });
@@ -457,7 +459,37 @@ test("Road Reality restores and changes curated route URLs with sourced status d
   expect(counters.errors).toEqual([]);
 });
 
-test("Road Reality is responsive and theme-aware on mobile", async ({ page }) => {
+test("Road Reality map tiles cover the responsive viewport and every marker is labelled", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.goto(`${origin}/road-status/shkoder-koman`);
+  const map = page.locator(".roadMap");
+  const assertCoverage = async () => {
+    await expect.poll(() => map.evaluate((element) => Math.abs(Number((element as HTMLElement).dataset.mapWidth) - element.clientWidth))).toBeLessThanOrEqual(1);
+    const coverage = await map.evaluate((element) => {
+      const frame = element.getBoundingClientRect();
+      const tiles = [...element.querySelectorAll<HTMLImageElement>(".roadMapTiles img")].map((tile) => tile.getBoundingClientRect());
+      const markers = [...element.querySelectorAll<HTMLElement>(".roadMapPoint")].map((marker) => marker.getBoundingClientRect());
+      return {
+        left: Math.min(...tiles.map((tile) => tile.left)) <= frame.left,
+        right: Math.max(...tiles.map((tile) => tile.right)) >= frame.right,
+        top: Math.min(...tiles.map((tile) => tile.top)) <= frame.top,
+        bottom: Math.max(...tiles.map((tile) => tile.bottom)) >= frame.bottom,
+        markersInside: markers.every((marker) => marker.left >= frame.left && marker.right <= frame.right && marker.top >= frame.top && marker.bottom <= frame.bottom),
+      };
+    });
+    expect(coverage).toEqual({ left: true, right: true, top: true, bottom: true, markersInside: true });
+  };
+  await assertCoverage();
+  const markers = map.locator(".roadMapPoint");
+  await expect(markers).toHaveCount(3);
+  for (let index = 0; index < await markers.count(); index++) await expect(markers.nth(index).locator("span")).toBeVisible();
+  await page.setViewportSize({ width: 360, height: 900 });
+  await assertCoverage();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(counters.errors).toEqual([]);
+});
+
+test("Road Reality metrics, sections and warning are responsive and theme-aware on mobile", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 900 });
   const counters = await isolate(page);
   await page.goto(`${origin}/road-status/tirana-bovilla`);
@@ -466,27 +498,18 @@ test("Road Reality is responsive and theme-aware on mobile", async ({ page }) =>
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   const lightPanel = await page.locator(".roadResultCard").evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(lightPanel).toBe("rgb(255, 254, 250)");
+  await expect(page.locator(".roadResultFacts > div")).toHaveCount(5);
+  const metricRows = await page.locator(".roadResultFacts > div").evaluateAll((items) => [...new Set(items.map((item) => Math.round(item.getBoundingClientRect().top)))]);
+  expect(metricRows).toHaveLength(2);
+  await expect(page.locator(".roadSectionCard")).toHaveCount(3);
+  await expect(page.locator(".roadSectionCard").first().locator(".roadStatusBadge")).toHaveText(/UNKNOWN/);
+  await expect(page.locator(".roadSectionCard").first()).toContainText("No recent section-specific authority notice found.");
+  await expect(page.locator(".roadDisclaimer")).toContainText("Before you drive");
   await page.getByRole("button", { name: "Toggle menu" }).click();
   await page.getByRole("button", { name: /Dark mode/ }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.locator(".roadResultCard")).toHaveCSS("background-color", "rgb(11, 28, 24)");
   await page.screenshot({ path: "test-results/road-reality-mobile-dark.png", fullPage: true });
-  expect(counters.errors).toEqual([]);
-});
-
-test("Road Reality report disclosure is keyboard accessible and creates a real email action", async ({ page }) => {
-  const counters = await isolate(page);
-  await page.goto(`${origin}/road-status/tirana-theth`);
-  const summary = page.locator(".roadReport summary");
-  await summary.focus();
-  await page.keyboard.press("Enter");
-  await expect(page.locator(".roadReport")).toHaveAttribute("open", "");
-  await expect(page.getByText("Unverified user report", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Route")).toHaveValue("Tirana → Theth");
-  await page.getByLabel("Section or location").fill("Qafë Thorë");
-  await page.getByLabel("Observed condition").selectOption({ label: "Other / uncertain" });
-  await page.getByLabel("Date and time observed").fill("2026-09-10T09:30");
-  await expect(page.getByRole("button", { name: "Prepare email report" })).toBeEnabled();
   expect(counters.errors).toEqual([]);
 });
 

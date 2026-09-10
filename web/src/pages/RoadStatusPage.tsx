@@ -1,9 +1,9 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import type { RoadStatus, VehicleAssessment } from "../models/road";
 import { ROAD_ROUTES, getRoadRoute } from "../data/roadRoutes";
-import { countRouteStatuses, formatRoadTimestamp, roadFreshness, routeShareText, statusTone } from "../utils/roadReality";
+import { countRouteStatuses, formatRoadMetricTimestamp, formatRoadTimestamp, roadFreshness, routeShareText, statusTone } from "../utils/roadReality";
 import TripSelect from "../components/content/TripSelect";
 import RoadRouteMap from "../components/road/RoadRouteMap";
 import RentalReferral from "../components/ads/RentalReferral";
@@ -45,6 +45,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
   const invalidRoute = Boolean(initialSlug && !requested);
   const counts = countRouteStatuses(route);
   const freshness = roadFreshness(route.lastCheckedAt);
+  const checkedAt = formatRoadMetricTimestamp(route.lastCheckedAt);
   const [shareState, setShareState] = useState<"idle" | "copied" | "failed">("idle");
 
   async function shareRoute() {
@@ -58,23 +59,6 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
       if (error instanceof DOMException && error.name === "AbortError") return;
       setShareState("failed");
     }
-  }
-
-  function submitReport(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const body = [
-      "UNVERIFIED USER REPORT",
-      `Route: ${route.title}`,
-      `Section/location: ${String(form.get("location") ?? "")}`,
-      `Observed condition: ${String(form.get("condition") ?? "")}`,
-      `Date/time observed: ${String(form.get("observedAt") ?? "")}`,
-      `Source or photo URL: ${String(form.get("sourceUrl") ?? "")}`,
-      `Note: ${String(form.get("note") ?? "")}`,
-      "",
-      "I understand this report will be reviewed and will not automatically change an official road status.",
-    ].join("\n");
-    window.location.href = `mailto:fenixkola@gmail.com?subject=${encodeURIComponent(`Road condition report: ${route.title}`)}&body=${encodeURIComponent(body)}`;
   }
 
   return (
@@ -101,11 +85,11 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
           <p className="roadStatusExplanation">{route.statusExplanation}</p>
           <p className="roadConditionWarning">Conditions can change after the latest verification. Check current authority guidance before departure.</p>
           <dl className="roadResultFacts">
-            <div><dt>Last checked</dt><dd>{formatRoadTimestamp(route.lastCheckedAt)}</dd></div>
-            <div><dt>Confidence</dt><dd>{route.confidence}</dd></div>
-            <div><dt>Known cautions</dt><dd>{counts.CAUTION}</dd></div>
-            <div><dt>Restricted / closed</dt><dd>{counts.RESTRICTED + counts.CLOSED}</dd></div>
-            <div><dt>Unknown sections</dt><dd>{counts.UNKNOWN}</dd></div>
+            <div className="roadMetricTimestamp"><dt>Last checked</dt><dd><strong>{checkedAt.date}</strong><span>{checkedAt.time}</span></dd></div>
+            <div><dt>Confidence</dt><dd><strong>{route.confidence}</strong></dd></div>
+            <div><dt>Cautions</dt><dd><strong>{counts.CAUTION}</strong></dd></div>
+            <div><dt>Restricted / closed</dt><dd><strong>{counts.RESTRICTED + counts.CLOSED}</strong></dd></div>
+            <div><dt>Unknown</dt><dd><strong>{counts.UNKNOWN}</strong></dd></div>
           </dl>
           <div className="roadResultActions">
             <button type="button" className="roadAction roadActionPrimary" onClick={shareRoute}>Share this route</button>
@@ -135,11 +119,10 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
             const itemFreshness = roadFreshness(item.lastCheckedAt);
             return (
               <article className="roadSectionCard" key={item.id}>
-                <span className="roadSectionIndex">{String(index + 1).padStart(2, "0")}</span>
-                <div className="roadSectionMain"><h3>{item.name}</h3><StatusBadge status={item.status} /></div>
+                <header className="roadSectionMain"><span className="roadSectionIndex">{String(index + 1).padStart(2, "0")}</span><h3>{item.name}</h3><StatusBadge status={item.status} /></header>
                 <dl><div><dt>Surface</dt><dd>{item.surface}</dd></div><div><dt>Verification</dt><dd className={`roadFreshness-${itemFreshness.state}`}>{itemFreshness.label}</dd></div><div><dt>Confidence</dt><dd>{item.confidence}</dd></div></dl>
-                <p>{item.notes}</p>
-                <small>{item.vehicleConsideration}</small>
+                <p>{item.status === "UNKNOWN" ? "No recent section-specific authority notice found." : item.notes}</p>
+                <small><strong>Vehicle guidance</strong>{item.status === "UNKNOWN" ? "Not verified." : item.vehicleConsideration}</small>
               </article>
             );
           })}
@@ -166,24 +149,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
       </section>
 
       <RentalReferral lang={lang} placement="roadTrip" />
-
-      <details className="roadReport">
-        <summary>Report a newer condition <span>Community input · reviewed manually</span></summary>
-        <div className="roadReportBody">
-          <div><span className="roadReportLabel">Unverified user report</span><h2>Tell us what you observed</h2><p>Your email opens with these details. Reports are reviewed manually and never override an official closure or restriction automatically.</p></div>
-          <form onSubmit={submitReport}>
-            <label>Route<input value={route.title} readOnly /></label>
-            <label>Section or location<input name="location" required autoComplete="off" /></label>
-            <label>Observed condition<select name="condition" required defaultValue=""><option value="" disabled>Select one</option><option>Open / passable observation</option><option>Caution or poor surface</option><option>Restriction</option><option>Closure</option><option>Other / uncertain</option></select></label>
-            <label>Date and time observed<input name="observedAt" type="datetime-local" required /></label>
-            <label>Source or photo URL (optional)<input name="sourceUrl" type="url" inputMode="url" /></label>
-            <label className="roadReportWide">Note (optional)<textarea name="note" rows={3} /></label>
-            <button type="submit" className="roadAction roadActionPrimary">Prepare email report</button>
-          </form>
-        </div>
-      </details>
-
-      <aside className="roadDisclaimer"><strong>Before you drive</strong><p>Road conditions can change quickly. Karburanti Sot summarizes available sources and does not replace instructions from road authorities, police, emergency services, road signs, or your rental supplier.</p></aside>
+      <aside className="roadDisclaimer"><span className="roadDisclaimerIcon" aria-hidden="true">!</span><div><strong>Before you drive</strong><p>Road conditions can change quickly. Karburanti Sot summarizes available sources and does not replace instructions from road authorities, police, emergency services, road signs, or your rental supplier.</p></div></aside>
     </main>
   );
 }

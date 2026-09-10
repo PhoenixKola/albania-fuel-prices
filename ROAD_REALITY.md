@@ -7,7 +7,7 @@ Road Reality is a manually curated, source-first route-status feature at `/road-
 - `web/src/models/road.ts` defines the strongly typed route, section, source, status, confidence, geometry, and vehicle-guidance records.
 - `web/src/data/roadRoutes.ts` is the maintained route dataset and the only place where current road claims are seeded.
 - `web/src/utils/roadReality.ts` centralizes freshness labels, status counts, timestamp formatting, and share text.
-- `web/src/pages/RoadStatusPage.tsx` renders the interactive route selector, result, map, source provenance, vehicle guidance, rental referral, and report form.
+- `web/src/pages/RoadStatusPage.tsx` renders the interactive route selector, result, map, source provenance, vehicle guidance, and rental referral.
 - `web/src/components/road/RoadRouteMap.tsx` displays a lightweight schematic corridor over OpenStreetMap raster tiles.
 - `web/scripts/roadRealityPrerender.ts` creates substantive static HTML for the main route and every curated detail URL.
 - `web/src/utils/roadSeo.ts`, `web/src/app/RouteSeo.tsx`, and `web/scripts/generate-sitemap.ts` provide runtime metadata and index only the route pages with meaningful unique context.
@@ -90,11 +90,9 @@ Route and section freshness use the review timestamp. A source card uses the pub
 
 State only what the stored source supports. Preferred phrases include “No route-specific current authority statement was verified,” “conditions can change after the latest verification,” and “check current authority guidance before departure.” Never describe a route as safe, definitely open, suitable for every rental car, or guaranteed passable. Rental supplier rules remain separate from road status.
 
-Community reports open the visitor's email client and are headed `UNVERIFIED USER REPORT`. They are reviewed manually and never update a route automatically.
-
 ## Map and OpenStreetMap use
 
-The map reuses the project's lightweight raster-tile pattern and adds no mapping library or paid service. It requests nine lazy-loaded standard OSM tiles for the selected route viewport, draws a schematic status-colored corridor locally, and does not prefetch, bulk-download, or call Overpass. Visible links provide “© OpenStreetMap contributors” attribution and the OSM copyright page. Standard OSM tiles are best-effort infrastructure; a production scale-up should move to a policy-compliant dedicated provider or self-hosted tiles with caching.
+The map reuses the project's lightweight raster-tile pattern and adds no mapping library or paid service. It calculates the visible Web Mercator tile bounds from the responsive map size, adds one tile of overscan, and lazy-loads only that grid. The route and its named waypoints use the same projection and viewport origin as the tiles. It does not prefetch, bulk-download, or call Overpass. Visible links provide “© OpenStreetMap contributors” attribution and the OSM copyright page. Standard OSM tiles are best-effort infrastructure; a production scale-up should move to a policy-compliant dedicated provider or self-hosted tiles with caching.
 
 ## Manual versus automated behavior
 
@@ -109,4 +107,4 @@ Cloudflare Web Analytics remains the single analytics beacon and automatically r
 - UNKNOWN routes may still be open, restricted, or closed. UNKNOWN means only that the stored sources do not support a current claim.
 - The line on the map is a representative schematic through named waypoints, not routable navigation geometry.
 - Weather, incidents, road signs, police instructions, ferry operations, and supplier terms can supersede the summary.
-- Future work can ingest a documented official feed if one becomes available, add a reviewed zero-cost report endpoint, automate stale-record alerts, and add privacy-preserving interaction analytics if the existing analytics provider adds supported custom events.
+- Future work can ingest a documented official feed if one becomes available, automate stale-record alerts, and add privacy-preserving interaction analytics if the existing analytics provider adds supported custom events.

@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { ROAD_ROUTES, getRoadRoute } from "../src/data/roadRoutes";
 import { ROAD_STATUSES } from "../src/models/road";
-import { countRouteStatuses, roadFreshness, routeShareText } from "../src/utils/roadReality";
+import { countRouteStatuses, formatRoadMetricTimestamp, roadFreshness, routeShareText } from "../src/utils/roadReality";
 import { roadRouteDescription, roadRouteTitle } from "../src/utils/roadSeo";
 import { buildRoadRealityPrerenderRoutes, renderRoadRealityStatic } from "../scripts/roadRealityPrerender";
 import { readMonetizationConfig } from "../src/config/monetization";
@@ -48,6 +48,7 @@ test("freshness labels today, yesterday, recent, stale and invalid records centr
   assert.deepEqual(roadFreshness("2026-09-06T01:00:00Z", now), { ageDays: 4, label: "Stale · checked 4 days ago", state: "stale" });
   assert.deepEqual(roadFreshness("bad-date", now), { ageDays: null, label: "Unknown", state: "unknown" });
   assert.deepEqual(roadFreshness(null, now), { ageDays: null, label: "Unknown", state: "unknown" });
+  assert.deepEqual(formatRoadMetricTimestamp("2026-09-10T08:43:00+02:00"), { date: "10 Sept 2026", time: "08:43 CEST" });
 });
 
 test("route-specific static pages contain useful provenance, safe wording, metadata and stable links", () => {

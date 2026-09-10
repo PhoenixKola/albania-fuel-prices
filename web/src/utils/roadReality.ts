@@ -41,6 +41,15 @@ export function formatRoadTimestamp(value: string) {
   }).format(date);
 }
 
+export function formatRoadMetricTimestamp(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return { date: value, time: "" };
+  return {
+    date: new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Tirane" }).format(date),
+    time: new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Tirane", timeZoneName: "short" }).format(date),
+  };
+}
+
 export function countRouteStatuses(route: RoadRoute) {
   return route.routeSections.reduce<Record<RoadStatus, number>>(
     (counts, section) => ({ ...counts, [section.status]: counts[section.status] + 1 }),
