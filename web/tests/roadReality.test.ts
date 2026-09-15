@@ -84,7 +84,7 @@ test("sitemap, affiliate fallback, analytics and disabled-ad guards remain wired
   const affiliate = "https://www.discovercars.com/albania?a_aid=road-reality-test";
   const config = readMonetizationConfig({ VITE_RENTAL_URL: affiliate });
   assert.equal(config.rentalLinks.roadTrip, affiliate);
-  assert.equal(config.adsEnabled, false);
+  assert.equal(config.adsterraEnabled, false);
 
   const provider = readFileSync(resolve("src/components/ads/MonetizationProvider.tsx"), "utf8");
   assert.equal(provider.match(/script\.src = "https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js"/g)?.length, 1);

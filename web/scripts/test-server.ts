@@ -6,8 +6,7 @@ import { readMonetizationConfig } from "../src/config/monetization";
 import type { PriceContext } from "./priceData";
 // Isolated browser fixture build. These fake IDs never enter dist or deployment.
 const vite = resolve("node_modules/vite/bin/vite.js");
-const env = { ...process.env, VITE_DEPLOY_ENV: "production", VITE_ADS_ENABLED: "true", VITE_ADS_CMP_PUBLISHED: "true",
-  VITE_AD_SLOT_HOME: "1111111111", VITE_AD_SLOT_CONTENT: "2222222222", VITE_AD_SLOT_ARTICLE_END: "3333333333",
+const env = { ...process.env, VITE_DEPLOY_ENV: "production", VITE_ADSTERRA_ENABLED: "true",
   VITE_RENTAL_URL: "https://www.discovercars.com/albania?a_aid=browser-fixture&chan=travel",
   VITE_RENTAL_URL_CALCULATOR: "", VITE_RENTAL_URL_GUIDE: "", VITE_RENTAL_URL_ROAD_TRIP: "", VITE_RENTAL_URL_ALBANIA: "",
   VITE_CF_ANALYTICS_TOKEN: "abcdef0123456789abcdef0123456789" };

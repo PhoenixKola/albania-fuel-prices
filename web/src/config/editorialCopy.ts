@@ -143,12 +143,12 @@ const en: EditorialCopy = {
       eyebrow: "Privacy dossier",
       title: "Privacy, in plain language.",
       lede: "Karburanti Sot works without an account and is designed to keep personal-data collection to a minimum.",
-      updated: "Effective 9 September 2026",
+      updated: "Effective 15 September 2026",
       calloutLabel: "Current advertising status",
       callout: commercialCopy.en.status,
       sections: [
         { id: "collection", title: "Information we collect", paragraphs: ["We do not ask for your name, phone number, account credentials, or payment information. The service can be used without registration.", "Standard technical requests may expose information such as IP address, browser type, device type, and requested URL to hosting and data providers as part of delivering the website and preventing abuse."] },
-        { id: "local-storage", title: "Settings stored on your device", paragraphs: ["Country, fuel, currency, theme, watchlist, game progress, and similar preferences are stored in your browser. They are not an account and normally remain on that device until you clear site data."] },
+        { id: "local-storage", title: "Settings stored on your device", paragraphs: ["Country, fuel, currency, theme, watchlist, game progress, and similar preferences are stored in your browser. A versioned privacy preference records whether optional advertising is allowed, declined, or not yet decided. These settings are not an account and normally remain on that device until you clear site data."] },
         {
           id: "location",
           title: "Location and nearby stations",
@@ -311,10 +311,10 @@ const sq: EditorialCopy = {
   },
   policies: {
     privacy: {
-      eyebrow: "Dosja e privatësisë", title: "Privatësia, me fjalë të qarta.", lede: "Karburanti Sot funksionon pa llogari dhe është projektuar të mbledhë sa më pak të dhëna personale.", updated: "Në fuqi nga 9 shtator 2026", calloutLabel: "Statusi aktual i reklamave", callout: commercialCopy.sq.status,
+      eyebrow: "Dosja e privatësisë", title: "Privatësia, me fjalë të qarta.", lede: "Karburanti Sot funksionon pa llogari dhe është projektuar të mbledhë sa më pak të dhëna personale.", updated: "Në fuqi nga 15 shtator 2026", calloutLabel: "Statusi aktual i reklamave", callout: commercialCopy.sq.status,
       sections: [
         { id: "collection", title: "Informacioni që mbledhim", paragraphs: ["Nuk kërkojmë emër, numër telefoni, kredenciale llogarie apo informacion pagese. Shërbimi përdoret pa regjistrim.", "Kërkesat teknike standarde mund t’u ekspozojnë ofruesve të hostimit dhe të dhënave adresën IP, llojin e shfletuesit, pajisjen dhe URL-në e kërkuar për të ofruar shërbimin dhe parandaluar abuzimin."] },
-        { id: "local-storage", title: "Preferencat në pajisjen tënde", paragraphs: ["Shteti, karburanti, monedha, tema, lista e ndjekjes dhe progresi i lojërave ruhen në shfletues. Ato nuk janë llogari dhe zakonisht mbeten në atë pajisje derisa të pastrosh të dhënat."] },
+        { id: "local-storage", title: "Preferencat në pajisjen tënde", paragraphs: ["Shteti, karburanti, monedha, tema, lista e ndjekjes dhe progresi i lojërave ruhen në shfletues. Një preferencë privatësie me version regjistron nëse reklamat opsionale janë lejuar, refuzuar apo ende të pavendosura. Këto cilësime nuk janë llogari dhe zakonisht mbeten në pajisje derisa të pastrosh të dhënat."] },
         { id: "location", title: "Vendndodhja dhe pikat afër", paragraphs: ["Gjetësi i pikave kërkon vendndodhjen vetëm pasi zgjedh ta përdorësh. Koordinatat përdoren për të kërkuar të dhëna harte dhe llogaritur largësinë. Leja mund të refuzohet ose hiqet; pjesa tjetër vazhdon të punojë."] },
         { id: "external-data", title: "Shërbimet e jashtme të të dhënave", paragraphs: ["Faqja merr të dhëna publike për karburantin, kursin e këmbimit, hartat dhe shërbime të lidhura. Ofruesit marrin informacionin e rrjetit që nevojitet për t’iu përgjigjur kërkesës dhe zbatojnë politikat e tyre."] },
         { id: "advertising", title: "Reklamat dhe pëlqimi", paragraphs: [commercialCopy.sq.ads] },

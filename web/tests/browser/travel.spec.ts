@@ -12,8 +12,11 @@ const fixture = {
   ],
 };
 // Every external request is intercepted; these tests cannot request a real ad or book a rental.
-async function isolate(page: Page, options: { blockedAds?: boolean; noFx?: boolean; noPrices?: boolean; stale?: boolean } = {}) {
-  const counters = { adScripts: 0, analytics: 0, errors: [] as string[] };
+async function isolate(page: Page, options: { blockedAds?: boolean; noFx?: boolean; noPrices?: boolean; stale?: boolean; advertising?: boolean | null } = {}) {
+  const counters = { adScripts: 0, adsenseScripts: 0, analytics: 0, errors: [] as string[] };
+  if (options.advertising !== null) {
+    await page.addInitScript((advertising) => localStorage.setItem("karburanti-privacy-v1", JSON.stringify({ version: 1, necessary: true, advertising })), options.advertising ?? false);
+  }
   page.on("pageerror", (error) => counters.errors.push(error.message));
   await page.route("**/*", async (route) => {
     const url = new URL(route.request().url());
@@ -26,22 +29,13 @@ async function isolate(page: Page, options: { blockedAds?: boolean; noFx?: boole
       return route.fulfill({ json: { ...fixture, as_of: options.stale ? "2020-01-01" : fixture.as_of } });
     }
     if (url.hostname === "cdn.jsdelivr.net") return options.noFx ? route.abort() : route.fulfill({ json: { date: "2026-09-08", eur: { all: 100, usd: 1.1 } } });
-    if (url.hostname === "pagead2.googlesyndication.com") {
+    if (url.hostname.includes("googlesyndication.com")) { counters.adsenseScripts++; return route.abort(); }
+    if (url.hostname === "pl31351771.profitableratecpmnetwork.com") {
       counters.adScripts++;
       if (options.blockedAds) return route.abort();
       return route.fulfill({ contentType: "text/javascript", body: `
-        window.__adRequests = 0;
-        window.adsbygoogle = { push: function() {
-          window.__adRequests++;
-          var node = document.querySelector('ins.adsbygoogle:not([data-adsbygoogle-status])');
-          if (node) { node.dataset.adsbygoogleStatus = 'done'; node.dataset.adStatus = 'filled'; node.textContent = 'Test advertisement'; }
-        }};
-        window.__chooseConsent = function(choice) {
-          document.documentElement.dataset.consentChoice = choice;
-          window.googlefc.callbackQueue.forEach(function(entry) { if (entry.CONSENT_DATA_READY) entry.CONSENT_DATA_READY(); });
-          window.googlefc.callbackQueue.push = function(entry) { if (entry.CONSENT_DATA_READY) entry.CONSENT_DATA_READY(); };
-        };
-        window.googlefc.showRevocationMessage = function() { document.documentElement.dataset.consentDialog = 'open'; };
+        var node = document.getElementById('container-d3a677f82e7972dbdc5767166cde992f');
+        if (node) { var creative = document.createElement('div'); creative.dataset.testAd = 'filled'; creative.textContent = 'Test Native Banner'; creative.style.minHeight = '90px'; node.appendChild(creative); }
       ` });
     }
     if (url.hostname === "static.cloudflareinsights.com") { counters.analytics++; return route.fulfill({ contentType: "text/javascript", body: "" }); }
@@ -49,22 +43,16 @@ async function isolate(page: Page, options: { blockedAds?: boolean; noFx?: boole
   });
   return counters;
 }
-async function chooseConsent(page: Page, choice: string) {
-  await page.waitForFunction(() => "__chooseConsent" in window);
-  await page.evaluate((value) => (window as unknown as { __chooseConsent: (choice: string) => void }).__chooseConsent(value), choice);
-}
-const requests = (page: Page) => page.evaluate(() => (window as unknown as { __adRequests?: number }).__adRequests ?? 0);
-
 test("homepage and Albania price page expose the travel entry points and bounded ad placements", async ({ page }) => {
-  const counters = await isolate(page);
+  const counters = await isolate(page, { advertising: true });
   await page.goto(origin);
   await expect(page.locator(".homeExperience .travelLinks")).toBeVisible();
-  await expect(page.locator(".homeExperience .adPlacement")).toHaveCount(1);
+  await expect(page.locator(".homeExperience .adsterraPlacement")).toHaveCount(1);
   await page.locator(".homeExperience .travelLinks").getByRole("link", { name: "Calculate my trip", exact: false }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Trip fuel cost calculator");
   await page.goto(`${origin}/fuel-prices/albania`);
   await expect(page.locator('[data-rental-placement="albania"]')).toBeVisible();
-  await expect(page.locator(".adPlacement")).toHaveCount(2);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
   await expect(page.locator(".travelLinks").getByRole("link", { name: "Read the rental guide", exact: false })).toHaveAttribute("href", "/albania-car-rental-guide");
   await page.screenshot({ path: "test-results/albania-travel-placement.png", fullPage: true });
   expect(counters.errors).toEqual([]);
@@ -241,100 +229,128 @@ test("offline feed does not prevent route planning", async ({ page }) => {
   expect(counters.errors).toEqual([]);
 });
 
-for (const choice of ["consent", "decline"]) test(`ads wait for ${choice} decision; edits do not refresh; privacy control reopens`, async ({ page }) => {
-  const counters = await isolate(page);
-  await page.goto(`${origin}/trip-cost-calculator`);
-  await page.locator('[data-placement="content"]').scrollIntoViewIfNeeded();
-  expect(await requests(page)).toBe(0);
-  await chooseConsent(page, choice);
-  await expect.poll(() => requests(page)).toBe(1);
-  await page.getByLabel("One-way distance (km)").fill("500");
-  await expect(page.locator(".tripTotal")).toHaveText("€70.00");
-  expect(await requests(page)).toBe(1);
-  await page.getByRole("button", { name: "Privacy and cookie settings" }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-consent-dialog", "open");
-  // Use the actual SPA menu for route lifecycle coverage.
-  await page.getByRole("button", { name: "Guides", exact: true }).click();
-  await page.locator("#nav-guides-links").getByRole("link", { name: "Renting a car in Albania", exact: true }).click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Renting a car in Albania");
-  await page.locator('[data-placement="content"]').scrollIntoViewIfNeeded();
-  await expect.poll(() => requests(page)).toBe(2);
-  await page.locator('[data-placement="articleEnd"]').scrollIntoViewIfNeeded();
-  await expect.poll(() => requests(page)).toBe(3);
+test("first visit, decline, accept and footer preference changes gate Adsterra", async ({ page }) => {
+  const counters = await isolate(page, { advertising: null });
+  await page.goto(origin);
+  await expect(page.getByRole("dialog", { name: "Privacy choices" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close privacy choices" })).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.getByRole("button", { name: "Continue without advertising" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Close privacy choices" })).toBeFocused();
+  await page.screenshot({ path: "test-results/privacy-choices-desktop-light.png", fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => { document.documentElement.dataset.theme = "dark"; });
+  await page.screenshot({ path: "test-results/privacy-choices-mobile-dark.png", fullPage: false });
+  expect(counters.adScripts).toBe(0);
+  await page.getByRole("button", { name: "Continue without advertising" }).click();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
+  expect(counters.adScripts).toBe(0);
+
+  const privacyControl = page.getByRole("button", { name: "Privacy & cookies" });
+  await privacyControl.click();
+  await page.getByRole("button", { name: "Allow advertising" }).click();
+  await expect(privacyControl).toBeFocused();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect(page.locator("[data-test-ad='filled']")).toHaveText("Test Native Banner");
   expect(counters.adScripts).toBe(1);
+
+  await page.getByRole("button", { name: "Privacy & cookies" }).click();
+  await page.getByRole("button", { name: "Continue without advertising" }).click();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
+  expect(counters.adScripts).toBe(1);
+  expect(counters.errors).toEqual([]);
+});
+
+test("SPA navigation keeps one native container and reinvokes only on eligible pages", async ({ page }) => {
+  const counters = await isolate(page, { advertising: true });
+  await page.goto(origin);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect.poll(() => counters.adScripts).toBe(1);
+  await page.locator('a[href="/fuel-prices/albania"]').first().click();
+  await expect(page).toHaveURL(`${origin}/fuel-prices/albania`);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect.poll(() => counters.adScripts).toBe(2);
+  await expect(page.locator("#container-d3a677f82e7972dbdc5767166cde992f")).toHaveCount(1);
+  await expect(page.locator('script[data-adsterra-native="true"]')).toHaveCount(1);
+  await page.locator('a[href="/fuel-prices/greece"]').first().click();
+  await expect(page).toHaveURL(`${origin}/fuel-prices/greece`);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect.poll(() => counters.adScripts).toBe(3);
+  await expect(page.locator("#container-d3a677f82e7972dbdc5767166cde992f")).toHaveCount(1);
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.locator("#nav-tools-links").getByRole("link", { name: "Trip Calculator" }).click();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
+  await expect(page.locator('script[data-adsterra-native="true"]')).toHaveCount(0);
+  await page.locator(".brand").click();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect.poll(() => counters.adScripts).toBe(4);
   expect(counters.analytics).toBe(1);
+  expect(counters.adsenseScripts).toBe(0);
   expect(counters.errors).toEqual([]);
 });
 
-test("ads disabled keeps the privacy control and advertising warning out of the footer", async ({ page }) => {
-  const counters = await isolate(page);
-  await page.goto("http://127.0.0.1:4175/trip-cost-calculator");
-  await expect(page.getByRole("button", { name: "Privacy and cookie settings" })).toHaveCount(0);
-  await expect(page.getByText(/Advertising settings are unavailable/)).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Privacy Policy", exact: true })).toBeVisible();
+test("blocked Adsterra collapses quietly and leaves the page usable", async ({ page }) => {
+  const counters = await isolate(page, { blockedAds: true, advertising: true });
+  await page.goto(origin);
+  await expect(page.locator(".adsterraPlacement")).toHaveAttribute("data-state", "empty");
+  await expect(page.locator(".adsterraPlacement")).toBeHidden();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   expect(counters.errors).toEqual([]);
-});
-
-test("ads enabled shows the fallback only when the Google consent service is unavailable", async ({ page }) => {
-  const counters = await isolate(page);
-  await page.goto(`${origin}/trip-cost-calculator`);
-  const control = page.getByRole("button", { name: "Privacy and cookie settings" });
-  await expect(control).toBeVisible();
-  await expect(page.getByText(/Advertising settings are unavailable/)).toHaveCount(0);
-  await page.waitForFunction(() => typeof window.googlefc?.showRevocationMessage === "function");
-  await page.evaluate(() => { if (window.googlefc) window.googlefc.showRevocationMessage = undefined; });
-  await control.click();
-  await expect(page.getByRole("status")).toContainText("Advertising settings are unavailable");
-  expect(counters.errors).toEqual([]);
-});
-
-test("blocked ads and unfilled slots leave the calculator usable", async ({ page }) => {
-  const counters = await isolate(page, { blockedAds: true });
-  await page.goto(`${origin}/trip-cost-calculator`);
-  await expect(page.locator(".tripTotal")).toHaveText("€14.00");
-  await expect(page.locator(".adPlacement")).toHaveAttribute("data-state", "unfilled");
-  await page.getByLabel("One-way distance (km)").fill("200");
-  await expect(page.locator(".tripTotal")).toHaveText("€28.00");
-  expect(counters.errors).toEqual([]);
-});
-
-test("unfilled result retains reserved space without exposing SDK errors", async ({ page }) => {
-  await isolate(page);
-  await page.goto(`${origin}/trip-cost-calculator`);
-  const slot = page.locator(".adPlacement");
-  await slot.scrollIntoViewIfNeeded();
-  await chooseConsent(page, "consent");
-  await expect.poll(() => requests(page)).toBe(1);
-  const before = await slot.boundingBox();
-  await page.locator("ins.adsbygoogle").evaluate((element) => { (element as HTMLElement).dataset.adStatus = "unfilled"; });
-  await expect(slot).toHaveAttribute("data-state", "unfilled");
-  const after = await slot.boundingBox();
-  expect(after?.height).toBe(before?.height);
 });
 
 test("local previews do not load ad or analytics scripts", async ({ page }) => {
-  const counters = await isolate(page);
-  await page.goto("http://127.0.0.1:4175/trip-cost-calculator");
-  await expect(page.locator(".tripTotal")).toHaveText("€14.00");
-  await expect(page.locator(".adPlacement")).toHaveCount(0);
+  const counters = await isolate(page, { advertising: true });
+  await page.goto("http://127.0.0.1:4175/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
   expect(counters.adScripts).toBe(0); expect(counters.analytics).toBe(0);
 });
 
-test("public release stays English even with a saved Albanian preference", async ({ page }) => {
+test("public language picker restores and persists Albanian on desktop and mobile", async ({ page }) => {
   const counters = await isolate(page);
-  await page.addInitScript(() => localStorage.setItem("lang", "sq"));
   await page.goto(`${origin}/trip-cost-calculator`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Trip fuel cost calculator");
-  await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.getByRole("button", { name: "Switch to Albanian" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Switch to Albanian" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Llogaritësi i kostos së karburantit");
+  await expect(page.locator("html")).toHaveAttribute("lang", "sq");
+  await page.getByRole("button", { name: "Privatësia & cookies" }).click();
+  await expect(page.getByRole("dialog", { name: "Zgjedhjet e privatësisë" })).toBeVisible();
+  await page.getByRole("button", { name: "Mbyll zgjedhjet e privatësisë" }).click();
   const referral = page.locator('[data-rental-placement="calculator"]');
-  await expect(referral).toContainText("We may earn a commission");
+  await expect(referral).toContainText("Mund të marrim komision");
   await expect(referral.locator("a")).toHaveAttribute("rel", "sponsored noopener");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("lang", "sq");
+  await page.goto(`${origin}/road-status/shkoder-theth`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Kushtet dhe statusi i rrugëve në Shqipëri");
+  await expect(page.getByRole("button", { name: "Kontrollo itinerarin", exact: false })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Shiko burimin", exact: false }).first()).toBeVisible();
   await page.setViewportSize({ width: 360, height: 900 });
-  await page.getByRole("button", { name: "Toggle menu" }).click();
-  await expect(page.locator(".mobileMenuActions")).not.toContainText("SQ");
-  await page.goto(`${origin}/albania-car-rental-guide`);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Renting a car in Albania");
+  await page.locator(".hamburgerBtn").click();
+  await page.getByRole("button", { name: "EN", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  expect(counters.errors).toEqual([]);
+});
+
+test("disabled-ad visual matrix stays responsive across priority routes and themes", async ({ page }) => {
+  const counters = await isolate(page, { advertising: false });
+  await page.goto(origin);
+  const paths = ["/", "/fuel-prices/albania", "/fuel-prices/greece", "/road-status/shkoder-theth", "/trip-cost-calculator", "/privacy"];
+  for (const width of [390, 1366]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ["light", "dark"]) {
+      for (const path of paths) {
+        await page.evaluate((value) => localStorage.setItem("theme", value), theme);
+        await page.goto(`${origin}${path}`);
+        await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+        await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      }
+    }
+  }
+  expect(counters.adsenseScripts).toBe(0);
   expect(counters.errors).toEqual([]);
 });
 

@@ -12,7 +12,7 @@ import { isEuropeanCountry } from "../utils/regions";
 import { STORAGE_ALL_RATE_KEY } from "../config/constants";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 
-import AdBar from "../components/ads/AdBar";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 import { TravelLinks } from "../components/content/TravelLinks";
 import RoadStatusLink from "../components/road/RoadStatusLink";
 import FuelCard from "../components/fuel/FuelCard";
@@ -263,7 +263,7 @@ export default function HomePage({
         </div>
       </section>
 
-      <AdBar placement="home" enabled={canShowAds} />
+      <AdsterraNativeAd location="home-after-primary-prices" enabled={canShowAds} />
       <TravelLinks lang={lang} featured />
       <RoadStatusLink lang={lang} featured />
 

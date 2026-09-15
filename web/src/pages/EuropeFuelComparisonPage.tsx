@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
-import AdBar from "../components/ads/AdBar";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 type Props = { t: TDict };
 
@@ -81,7 +81,7 @@ export default function EuropeFuelComparisonPage({ t }: Props) {
         </p>
       </section>
 
-      <AdBar placement="articleEnd" />
+      <AdsterraNativeAd location="europe-guide-after-primary-content" />
     </article>
   );
 }

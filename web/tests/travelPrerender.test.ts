@@ -35,8 +35,8 @@ test("prerender stays useful with missing price data", () => {
   assert.match(html, /Price unavailable/);
   assert.doesNotMatch(html, /€0\.00/);
 });
-test("English-only release retains complete matching Albanian travel and commercial translations", () => {
-  assert.equal(ALBANIAN_ENABLED, false);
+test("public Albanian release retains complete matching travel and commercial translations", () => {
+  assert.equal(ALBANIAN_ENABLED, true);
   function shape(value: unknown): unknown {
     if (Array.isArray(value)) return value.map(shape);
     if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, shape(item)]));

@@ -11,8 +11,6 @@ export const travelLabels = {
     guideCardEyebrow: "Albania / driver briefing",
     guideCardText: "Know the deposit, fuel policy, cross-border questions, and driving costs before you book.",
     guideCardCta: "Read the guide",
-    privacy: "Privacy and cookie settings",
-    privacyUnavailable: "Advertising settings are unavailable here, or your browser has blocked the consent service. Read our privacy policy for details.",
   },
   sq: {
     calculator: "Llogaritësi i kostos së karburantit",
@@ -26,7 +24,5 @@ export const travelLabels = {
     guideCardEyebrow: "Shqipëri / udhëzues për shoferin",
     guideCardText: "Mëso për depozitën, politikën e karburantit, kalimin e kufirit dhe kostot e drejtimit para rezervimit.",
     guideCardCta: "Lexo udhëzuesin",
-    privacy: "Cilësimet e privatësisë dhe cookies",
-    privacyUnavailable: "Cilësimet e reklamave nuk janë të disponueshme këtu, ose shfletuesi bllokon shërbimin e pëlqimit. Lexo politikën tonë të privatësisë.",
   },
 };

@@ -1,4 +1,5 @@
 import type { RoadRoute, RoadStatus } from "../models/road";
+import type { Lang } from "../models/i18n";
 
 export const ROAD_FRESH_DAYS = 1;
 export const ROAD_STALE_AFTER_DAYS = 3;
@@ -27,10 +28,19 @@ export function roadFreshness(checkedAt: string | null, now = new Date()): RoadF
   return { ageDays, label: `Stale · checked ${ageDays} days ago`, state: "stale" };
 }
 
-export function formatRoadTimestamp(value: string) {
+export function roadFreshnessLabel(freshness: RoadFreshness, lang: Lang): string {
+  if (lang === "en") return freshness.label;
+  if (freshness.ageDays === null) return "E panjohur";
+  if (freshness.ageDays === 0) return "Kontrolluar sot";
+  if (freshness.ageDays === 1) return "Kontrolluar dje";
+  if (freshness.state === "stale") return `E vjetruar · kontrolluar ${freshness.ageDays} ditë më parë`;
+  return `Kontrolluar ${freshness.ageDays} ditë më parë`;
+}
+
+export function formatRoadTimestamp(value: string, lang: Lang = "en") {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(lang === "sq" ? "sq-AL" : "en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -41,12 +51,12 @@ export function formatRoadTimestamp(value: string) {
   }).format(date);
 }
 
-export function formatRoadMetricTimestamp(value: string) {
+export function formatRoadMetricTimestamp(value: string, lang: Lang = "en") {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return { date: value, time: "" };
   return {
-    date: new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Tirane" }).format(date),
-    time: new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Tirane", timeZoneName: "short" }).format(date),
+    date: new Intl.DateTimeFormat(lang === "sq" ? "sq-AL" : "en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Tirane" }).format(date),
+    time: new Intl.DateTimeFormat(lang === "sq" ? "sq-AL" : "en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Tirane", timeZoneName: "short" }).format(date),
   };
 }
 

@@ -306,7 +306,7 @@ export const en = {
 
   // Privacy page
   privacyTitle: "Privacy Policy",
-  privacyUpdated: "Last updated: March 2026",
+  privacyUpdated: "Last updated: 15 September 2026",
   privacyIntro:
     "This Privacy Policy describes how Karburanti Sot (\"the Service\") handles information when you use our website and mobile applications. We are committed to transparency about what data we collect and how it is used.",
   privacyCollectTitle: "What data we collect",
@@ -320,16 +320,16 @@ export const en = {
     "The Service fetches publicly available fuel price data and exchange-rate data from remote sources. These network requests are standard HTTPS calls and do not contain personal user information.",
   privacyAdsTitle: "Advertising",
   privacyAdsP1:
-    "The Service displays advertisements through Google AdSense (web) and Google AdMob (mobile). These third-party advertising services may automatically collect certain device and usage information to serve and measure ads, including:",
+    "The website may display advertising through Adsterra on selected pages, but only when site advertising is enabled and you have explicitly allowed optional advertising. Third-party advertising resources may process technical request and usage information, including:",
   privacyAdItem1: "IP address (used for network communication and approximate geographic targeting)",
   privacyAdItem2: "Basic device information such as device model, operating system version, and screen size",
   privacyAdItem3: "Ad performance and interaction data (impressions, clicks)",
   privacyAdItem4: "Cookies or mobile advertising identifiers, subject to your device and browser settings",
   privacyAdsP2:
-    "Advertising may use cookies and similar identifiers for personalized or non-personalized ads, depending on your consent status and local legal requirements. For users in the EEA, UK, and Switzerland, consent signals are managed through a certified CMP or Google Privacy & messaging flow (provider details and links can be added by the site owner). You can reset or limit ad personalization through your browser or device privacy settings.",
+    "No Adsterra resource is requested before you allow advertising. You can decline without limiting the website and change the preference at any time through Privacy & cookies in the footer. Adsterra and its delivery partners apply their own privacy terms when their resources load.",
   privacyAnalyticsTitle: "Analytics",
   privacyAnalyticsP1:
-    "The Service does not use a separate analytics product to track individual users. Any usage data collected is limited to what the advertising SDKs gather for ad measurement purposes.",
+    "Cloudflare Web Analytics measures aggregate traffic and performance without adding analytics cookies or personal identifiers through our integration. It is separate from the optional advertising preference.",
   privacySharingTitle: "Data sharing",
   privacySharingP1:
     "We do not sell personal data. Third-party ad providers may process the data described above for the purpose of delivering and measuring advertising, in accordance with their own privacy policies.",

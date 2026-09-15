@@ -42,7 +42,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "../dist");
 const SITE_URL = "https://karburantisot.com";
-const PUBLISHER_ID = "ca-pub-2653462201538649";
 
 // ─── Route definitions with static content ─────────────────────────────────
 
@@ -370,7 +369,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Advertising</h2>
-          <p class="contentBody">The Service may display advertisements through Google AdSense. Google and its advertising partners may use cookies or device identifiers to serve ads. For users in regions requiring consent, controls will be presented once a certified Consent Management Platform is enabled.</p>
+          <p class="contentBody">Karburanti Sot may display advertising through Adsterra when site advertising is enabled and you have explicitly allowed optional advertising. Third-party advertising resources are not loaded before that choice. You can change the preference at any time through Privacy &amp; cookies in the footer.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Contact</h2>
@@ -919,7 +918,6 @@ function generateHead(route: RouteEntry, description: string, ctx: PriceContext)
     <meta name="description" content="${escapeHtml(description)}" />
     <meta name="robots" content="${robots}" />
     <link rel="canonical" href="${canonical}" />
-    <meta name="google-adsense-account" content="${PUBLISHER_ID}" />
     <meta name="data-as-of" content="${ANALYSIS_META.asOf}" />
     <meta name="build-date" content="${new Date().toISOString().slice(0, 10)}" />
     <meta property="og:type" content="website" />
@@ -952,7 +950,7 @@ function escapeHtml(str: string): string {
 
 /**
  * Strip ALL template SEO tags (title, description, robots, canonical,
- * hreflang, og:*, twitter:*, adsense meta) so every prerendered page carries
+ * hreflang, og:* and twitter:*) so every prerendered page carries
  * exactly one, route-specific set. Patterns tolerate multi-line tags.
  */
 function stripTemplateSeoTags(html: string): string {
@@ -960,8 +958,7 @@ function stripTemplateSeoTags(html: string): string {
     .replace(/<title>[\s\S]*?<\/title>\s*/g, "")
     .replace(/<meta\s+name="(description|robots|twitter:[^"]*)"[\s\S]*?\/>\s*/g, "")
     .replace(/<meta\s+property="og:[^"]*"[\s\S]*?\/>\s*/g, "")
-    .replace(/<link\s+rel="(canonical|alternate)"[^>]*\/>\s*/g, "")
-    .replace(/<meta\s+name="google-adsense-account"[^>]*\/>\s*/g, "");
+    .replace(/<link\s+rel="(canonical|alternate)"[^>]*\/>\s*/g, "");
 }
 
 async function main() {

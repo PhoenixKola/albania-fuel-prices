@@ -1,3 +1,3 @@
-// Keep the public website English-only during AdSense review.
-// Translations remain available for internal QA; set true after approval.
-export const ALBANIAN_ENABLED = false;
+// The public language picker uses the existing client-side translation system.
+// English remains the canonical/indexed language for every route.
+export const ALBANIAN_ENABLED = true;

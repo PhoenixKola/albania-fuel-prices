@@ -1,4 +1,4 @@
-import AdBar from "../components/ads/AdBar";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 import RentalReferral from "../components/ads/RentalReferral";
 import RoadStatusLink from "../components/road/RoadStatusLink";
 import { TravelLinks } from "../components/content/TravelLinks";
@@ -191,7 +191,7 @@ export default function CountryFuelPricesPage({
         ) : null}
       </EditorialSection>
 
-      <AdBar placement="content" enabled={hasAnyPrice && !loading} />
+      <AdsterraNativeAd location="country-after-current-prices" enabled={hasAnyPrice && !loading} />
       <EditorialSection id="country-trend" index="02" title={c.trend(editorial.label)} intro={c.trendIntro(editorial.label)}>
         <div className="contentToolEmbed"><TrendCard t={t} trends={trends} country={countryName} fuelType={fuelType} setFuelType={setFuelType} /></div>
       </EditorialSection>
@@ -240,7 +240,6 @@ export default function CountryFuelPricesPage({
       </EditorialSection>
 
       {countryName === "Albania" ? <><TravelLinks lang={lang} /><RoadStatusLink lang={lang} /><RentalReferral lang={lang} placement="albania" /></> : null}
-      <AdBar placement="articleEnd" enabled={hasAnyPrice && !loading} />
       <EditorialSection id="country-coverage" index={analysisHtml ? "07" : "06"} title={c.limitations}>
         <p>{editorial.dataLimitations}</p><p>{editorial.sourceTransparency}</p>
         {data?.source ? <EditorialCallout label={copy.source}>{data.source} · {c.dataUpdated(updated)}</EditorialCallout> : null}

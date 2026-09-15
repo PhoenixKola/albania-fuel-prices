@@ -19,7 +19,6 @@ export type RouteConfig = {
 
 export const SITE_URL = "https://karburantisot.com";
 export const SITE_NAME = "Fuel Today";
-export const PUBLISHER_ID = "ca-pub-2653462201538649";
 
 export const STATIC_ROUTES: RouteConfig[] = [
   {

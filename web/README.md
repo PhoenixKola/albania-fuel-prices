@@ -1,7 +1,7 @@
 # Fuel Today web
 
 Revenue configuration, activation, testing and reporting: [MONETIZATION.md](MONETIZATION.md).
-Organic distribution experiments, other revenue ideas and current AdSense alternatives: [GROWTH.md](GROWTH.md).
+Organic distribution experiments and revenue ideas: [GROWTH.md](GROWTH.md).
 
 # React + TypeScript + Vite
 

@@ -11,7 +11,6 @@ import { COUNTRY_PAGES } from "../config/countryPages";
 import { isEuropeanCountry } from "../utils/regions";
 import { PriceDate, TravelHeader, TripExample, TripExplanation } from "../components/content/TravelContent";
 import RentalReferral from "../components/ads/RentalReferral";
-import AdBar from "../components/ads/AdBar";
 import type { MonetizationConfig } from "../config/monetization";
 import TripSelect from "../components/content/TripSelect";
 import RoadStatusLink from "../components/road/RoadStatusLink";
@@ -89,7 +88,6 @@ function TripCalculator({ lang, data, fxRates, loading, search, config }: Props 
     <RoadStatusLink lang={lang} />
     <RentalReferral lang={lang} placement="calculator" config={config} />
     <TripExplanation lang={lang} />
-    <AdBar placement="content" enabled={!!data} />
     <TripExample lang={lang} data={data} />
     <TravelLinks lang={lang} />
   </main>;

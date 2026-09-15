@@ -1,6 +1,6 @@
 /**
  * Rich editorial content for each country page.
- * Each country has unique sections to satisfy AdSense content depth requirements.
+ * Each country has unique sections to provide useful, search-ready context.
  * Target: 700–1000+ words of unique useful text per country.
  */
 

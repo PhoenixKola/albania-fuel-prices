@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RoadRoute, RoadStatus } from "../../models/road";
+import type { Lang } from "../../models/i18n";
 import { statusTone } from "../../utils/roadReality";
 
 const TILE_SIZE = 256;
@@ -54,7 +55,7 @@ function segmentStatus(route: RoadRoute, index: number): RoadStatus {
   return route.routeSections[Math.min(index, route.routeSections.length - 1)]?.status ?? route.overallStatus;
 }
 
-export default function RoadRouteMap({ route }: { route: RoadRoute }) {
+export default function RoadRouteMap({ route, lang }: { route: RoadRoute; lang: Lang }) {
   const mapRef = useRef<HTMLElement>(null);
   const [size, setSize] = useState<MapSize>({ width: 560, height: 480 });
 
@@ -87,7 +88,7 @@ export default function RoadRouteMap({ route }: { route: RoadRoute }) {
   const osmUrl = `https://www.openstreetmap.org/#map=${viewport.zoom}/${viewport.centerLat.toFixed(4)}/${viewport.centerLon.toFixed(4)}`;
 
   return (
-    <figure ref={mapRef} className="roadMap" aria-label={`Map of ${route.title}`} data-map-width={size.width} data-map-height={size.height}>
+    <figure ref={mapRef} className="roadMap" aria-label={lang === "sq" ? `Harta e itinerarit ${route.title}` : `Map of ${route.title}`} data-map-width={size.width} data-map-height={size.height}>
       <div className="roadMapTiles" aria-hidden="true">
         {tiles.map((tile) => (
           <img
@@ -117,12 +118,12 @@ export default function RoadRouteMap({ route }: { route: RoadRoute }) {
           <i aria-hidden="true" /><span>{point.label}</span>
         </span>
       ))}
-      <div className="roadMapLegend" aria-label="Map status legend">
+      <div className="roadMapLegend" aria-label={lang === "sq" ? "Legjenda e statusit të hartës" : "Map status legend"}>
         <span className={`roadStatus-${statusTone(route.overallStatus)}`}><i />{route.overallStatus}</span>
-        <small>Schematic corridor</small>
+        <small>{lang === "sq" ? "Korridor skematik" : "Schematic corridor"}</small>
       </div>
       <figcaption>
-        <a href={osmUrl} target="_blank" rel="noopener noreferrer">Open map ↗</a>
+        <a href={osmUrl} target="_blank" rel="noopener noreferrer">{lang === "sq" ? "Hap hartën" : "Open map"} ↗</a>
         <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
       </figcaption>
     </figure>

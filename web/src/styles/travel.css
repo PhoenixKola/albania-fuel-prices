@@ -152,12 +152,24 @@
 .rentalReferral p { color: var(--muted); line-height: 1.7; margin: 0; }
 .rentalReferral .btn { white-space: normal; text-align: center; text-decoration: none; }
 .rentalReferral .rentalDisclosure { grid-column: 1 / -1; font-size: 12px; max-width: 95ch; }
-.adPlacement { margin: 48px 0; min-height: 280px; padding: 12px 0; border-block: 1px solid var(--border); overflow: hidden; }
-.adPlacementLabel { display: block; text-align: center; font-size: 10px; letter-spacing: .1em; color: var(--muted); margin-bottom: 8px; }
-.adPlacement[data-state="unfilled"] { visibility: hidden; }
-.privacyChoices { display: inline-flex; flex-direction: column; align-items: start; max-width: 340px; }
-.privacyChoices button { border: 0; background: transparent; font: inherit; cursor: pointer; padding: 0; }
-.privacyChoices > span { font-size: 12px; line-height: 1.6; margin-top: 10px; }
+.adsterraPlacement { margin: 48px 0; min-height: 118px; padding: 12px 0; border-block: 1px solid var(--border); overflow: hidden; transition: opacity .18s ease; }
+.adsterraPlacementLabel { display: block; margin-bottom: 8px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
+.adsterraPlacement > div { width: 100%; min-width: 0; overflow: hidden; }
+.adsterraPlacement[data-state="empty"] { display: none; }
+.privacyChoicesButton { border: 0; background: transparent; font: inherit; cursor: pointer; padding: 0; }
+.privacyOverlay { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: end center; padding: 22px; background: color-mix(in srgb, #000 48%, transparent); backdrop-filter: blur(5px); }
+.privacyDialog { position: relative; width: min(620px, 100%); padding: 28px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); color: var(--text); box-shadow: 0 28px 80px #0007; }
+.privacyEyebrow { color: var(--primary); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.privacyDialog h2 { margin: 8px 40px 10px 0; font-size: clamp(24px, 4vw, 32px); letter-spacing: -.035em; }
+.privacyDialog > p { margin: 0; color: var(--muted); line-height: 1.7; }
+.privacyClose { position: absolute; top: 18px; right: 18px; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--card-2); color: var(--text); font: inherit; font-size: 22px; cursor: pointer; }
+.privacyDetails { display: grid; gap: 0; margin: 22px 0; border-block: 1px solid var(--border); }
+.privacyDetails div { display: grid; grid-template-columns: 145px 1fr; gap: 18px; padding: 14px 0; }
+.privacyDetails div + div { border-top: 1px solid var(--border); }
+.privacyDetails dt { font-weight: 700; }
+.privacyDetails dd { margin: 0; color: var(--muted); line-height: 1.55; }
+.privacyActions { display: flex; flex-wrap: wrap; gap: 10px; }
+.privacyClose:focus-visible, .privacyChoicesButton:focus-visible, .privacyActions button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 .tripShare { margin-top: 16px; font-size: 13px; }
 @media (max-width: 760px) {
   .travelPage { margin-top: 12px; }
@@ -175,6 +187,12 @@
   .tripForm, .tripResults, .travelExample, .rentalReferral { padding: 20px; }
   .rentalReferral { grid-template-columns: 1fr; }
   .travelLinks .editorialAction { width: auto; }
+  .adsterraPlacement { margin: 34px 0; min-height: 104px; }
+  .privacyOverlay { padding: 12px; }
+  .privacyDialog { padding: 24px 20px; border-radius: 18px; }
+  .privacyDetails div { grid-template-columns: 1fr; gap: 5px; }
+  .privacyActions { display: grid; }
+  .privacyActions .btn { width: 100%; justify-content: center; }
 }
 @media (max-width: 380px) { .tripLeg, .tripPreferences { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { .journeyRoadLine { animation: none; } .tripRouteBar span, .tripDistanceChips button { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .journeyRoadLine { animation: none; } .tripRouteBar span, .tripDistanceChips button, .adsterraPlacement { transition: none; } }

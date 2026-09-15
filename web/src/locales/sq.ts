@@ -311,7 +311,7 @@ export const sq = {
 
   // Privacy page
   privacyTitle: "Politika e Privatësisë",
-  privacyUpdated: "Përditësuar së fundi: Mars 2026",
+  privacyUpdated: "Përditësuar së fundi: 15 shtator 2026",
   privacyIntro:
     "Kjo Politikë Privatësie përshkruan si Karburanti Sot (\"Shërbimi\") trajton informacionin kur përdorni faqen tonë të internetit dhe aplikacionet celulare. Jemi të përkushtuar ndaj transparencës rreth të dhënave që mbledhim dhe si përdoren.",
   privacyCollectTitle: "Çfarë të dhënash mbledhim",
@@ -325,16 +325,16 @@ export const sq = {
     "Shërbimi merr të dhëna publike të çmimeve të karburantit dhe kurseve të këmbimit nga burime të largëta. Këto kërkesa rrjeti janë thirrje standarde HTTPS dhe nuk përmbajnë informacion personal.",
   privacyAdsTitle: "Reklamat",
   privacyAdsP1:
-    "Shërbimi shfaq reklama përmes Google AdSense (web) dhe Google AdMob (celular). Këto shërbime reklamash të palëve të treta mund të mbledhin automatikisht informacion të caktuar të pajisjes dhe përdorimit, duke përfshirë:",
+    "Faqja mund të shfaqë reklama përmes Adsterra në faqe të zgjedhura, por vetëm kur reklamat e faqes janë aktive dhe i ke lejuar qartë. Burimet e reklamimit të palëve të treta mund të përpunojnë informacion teknik të kërkesës dhe përdorimit, duke përfshirë:",
   privacyAdItem1: "Adresën IP (përdorur për komunikim rrjeti dhe targetim gjeografik të përafërt)",
   privacyAdItem2: "Informacion bazë të pajisjes si modeli, versioni i sistemit operativ dhe madhësia e ekranit",
   privacyAdItem3: "Të dhëna të performancës së reklamave dhe ndërveprimit (shfaqje, klikime)",
   privacyAdItem4: "Cookie-t ose identifikuesit e reklamave celulare, sipas cilësimeve të pajisjes dhe shfletuesit tuaj",
   privacyAdsP2:
-    "Reklamat mund të përdorin cookie dhe identifikues të ngjashëm për reklama të personalizuara ose jo të personalizuara, në varësi të pëlqimit tuaj dhe kërkesave ligjore lokale. Për përdoruesit në EEA, MB dhe Zvicër, sinjalet e pëlqimit menaxhohen përmes një CMP të certifikuar ose Google Privacy & messaging flow (detajet e ofruesit dhe lidhjet mund të shtohen nga pronari i faqes). Mund të rivendosni ose kufizoni personalizimin e reklamave përmes cilësimeve të privatësisë së shfletuesit ose pajisjes tuaj.",
+    "Nuk bëhet asnjë kërkesë te Adsterra para se t’i lejosh reklamat. Mund të refuzosh pa kufizuar faqen dhe ta ndryshosh preferencën në çdo kohë nga Privatësia & cookies në fund të faqes. Adsterra dhe partnerët e shpërndarjes zbatojnë kushtet e veta kur ngarkohen burimet e tyre.",
   privacyAnalyticsTitle: "Analitika",
   privacyAnalyticsP1:
-    "Shërbimi nuk përdor një produkt analitike të veçantë për të ndjekur përdoruesit individualë. Çdo e dhënë përdorimi e mbledhur kufizohet në atë që SDK-të e reklamave mbledhin për qëllime matjeje.",
+    "Cloudflare Web Analytics mat trafikun e përgjithshëm dhe performancën pa shtuar cookies analitike ose identifikues personalë në integrimin tonë. Ky shërbim është i ndarë nga preferenca opsionale e reklamave.",
   privacySharingTitle: "Ndarja e të dhënave",
   privacySharingP1:
     "Ne nuk shesim të dhëna personale. Ofruesit e reklamave të palëve të treta mund të përpunojnë të dhënat e përshkruara më sipër për qëllim shpërndarjeje dhe matjeje reklamash.",

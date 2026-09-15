@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
-import AdBar from "../components/ads/AdBar";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 import type { Lang } from "../models/i18n";
 import { TravelLinks } from "../components/content/TravelLinks";
@@ -38,7 +38,7 @@ export default function RoadTripFuelGuidePage({ t, lang }: Props) {
         <p className="contentBody">{t.roadTripCrossBorderP3}</p>
       </section>
 
-      <AdBar placement="content" />
+      <AdsterraNativeAd location="road-trip-guide-after-border-section" />
       <section className="contentSection">
         <h2 className="contentHeading">{t.roadTripPaymentTitle}</h2>
         <p className="contentBody">{t.roadTripPaymentP1}</p>
@@ -97,7 +97,6 @@ export default function RoadTripFuelGuidePage({ t, lang }: Props) {
 
       <RoadStatusLink lang={lang} />
       <RentalReferral lang={lang} placement="roadTrip" />
-      <AdBar placement="articleEnd" />
     </article>
   );
 }
