@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+import AdsterraBannerAd from "../components/ads/AdsterraBannerAd";
 
 type Props = { t: TDict };
 
@@ -49,6 +50,8 @@ export default function EuropeFuelComparisonPage({ t }: Props) {
         <p className="contentBody">{t.europeCompExchangeP1}</p>
       </section>
 
+      <AdsterraNativeAd location="europe-guide-after-primary-content" />
+
       <section className="contentSection">
         <h2 className="contentHeading">{t.europeCompSummaryTitle}</h2>
         <p className="contentBody">{t.europeCompSummaryP1}</p>
@@ -81,7 +84,7 @@ export default function EuropeFuelComparisonPage({ t }: Props) {
         </p>
       </section>
 
-      <AdsterraNativeAd location="europe-guide-after-primary-content" />
+      <AdsterraBannerAd location="europe-guide-after-practical-examples" />
     </article>
   );
 }

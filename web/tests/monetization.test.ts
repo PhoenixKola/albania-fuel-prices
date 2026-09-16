@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ADSTERRA_NATIVE, adsterraAllowed, isAdsterraRoute, readMonetizationConfig, validatedRentalUrl } from "../src/config/monetization";
+import { ADSTERRA_BANNER, ADSTERRA_NATIVE, adsterraAllowed, isAdsterraRoute, readMonetizationConfig, validatedRentalUrl } from "../src/config/monetization";
 import RentalReferral from "../src/components/ads/RentalReferral";
 import { PrivacyChoices } from "../src/components/ads/MonetizationProvider";
 import { AdContext } from "../src/components/ads/AdContext";
@@ -37,8 +37,9 @@ test("Adsterra requires the exact flag, production, production host and explicit
     scriptUrl: "https://pl31351771.profitableratecpmnetwork.com/d3a677f82e7972dbdc5767166cde992f/invoke.js",
     containerId: "container-d3a677f82e7972dbdc5767166cde992f",
   });
-  for (const path of ["/", "/fuel-prices/albania", "/albania-car-rental-guide", "/road-trip-fuel-guide", "/how-fuel-prices-work", "/europe-fuel-comparison"]) assert.equal(isAdsterraRoute(path), true);
-  for (const path of ["/trip-cost-calculator", "/road-status", "/privacy", "/terms", "/fuel-quiz", "/daily-challenge", "/stations", "/contact", "/missing"]) assert.equal(isAdsterraRoute(path), false);
+  assert.deepEqual(ADSTERRA_BANNER, { key: "2faa9939eb0689d7a6d953b40a97a354", scriptUrl: "https://www.highrevenueformat.com/2faa9939eb0689d7a6d953b40a97a354/invoke.js", width: 300, height: 250 });
+  for (const path of ["/", "/fuel-prices/albania", "/albania-car-rental-guide", "/road-trip-fuel-guide", "/how-fuel-prices-work", "/europe-fuel-comparison", "/trip-cost-calculator", "/road-status", "/road-status/tirana-theth", "/fuel-quiz", "/daily-challenge", "/stations", "/compare", "/rankings", "/market-report", "/insights", "/insights/cross-border-fill-up-math", "/about", "/methodology"]) assert.equal(isAdsterraRoute(path), true);
+  for (const path of ["/privacy", "/terms", "/editorial-policy", "/disclaimer", "/contact", "/missing"]) assert.equal(isAdsterraRoute(path), false);
 });
 
 test("privacy preference storage is versioned, strict and reversible", () => {

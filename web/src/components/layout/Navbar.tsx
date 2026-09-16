@@ -246,7 +246,7 @@ export default function Navbar({
     <nav className="navbar" ref={menuRef}>
       <div className="navbarInner">
         <Link to="/" className="brand">
-          <img className="logoImg" src={logoSrc} alt="" aria-hidden="true" />
+          <img className="logoImg" src={logoSrc} alt="" aria-hidden="true" width="44" height="44" decoding="async" />
           <div className="hgroup">
             <span className="h1">{t.title}</span>
             <p className="sub">

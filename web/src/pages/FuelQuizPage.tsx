@@ -3,6 +3,7 @@ import type { LatestEurope, CountryPrices } from "../models/fuel";
 import { isEuropeanCountry } from "../utils/regions";
 import { GameChoice, GameHeader } from "../components/games/GameChrome";
 import "../styles/games.css";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 type FuelKey = "gasoline95_eur" | "diesel_eur";
 type GameState = "idle" | "picking" | "revealed";
@@ -200,6 +201,7 @@ export default function FuelQuizPage({ data, loading }: Props) {
 
 
 
+      <AdsterraNativeAd location="fuel-quiz-after-game" />
       <article className="contentPage">
         <section className="contentSection">
           <h2 className="contentHeading">How the quiz works</h2>

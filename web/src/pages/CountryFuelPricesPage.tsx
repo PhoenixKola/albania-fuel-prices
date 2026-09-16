@@ -1,4 +1,5 @@
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+import AdsterraBannerAd from "../components/ads/AdsterraBannerAd";
 import RentalReferral from "../components/ads/RentalReferral";
 import RoadStatusLink from "../components/road/RoadStatusLink";
 import { TravelLinks } from "../components/content/TravelLinks";
@@ -244,6 +245,8 @@ export default function CountryFuelPricesPage({
         <p>{editorial.dataLimitations}</p><p>{editorial.sourceTransparency}</p>
         {data?.source ? <EditorialCallout label={copy.source}>{data.source} · {c.dataUpdated(updated)}</EditorialCallout> : null}
       </EditorialSection>
+
+      <AdsterraBannerAd location="country-after-coverage" enabled={hasAnyPrice && !loading} />
 
       <EditorialSection id="country-faq" index={analysisHtml ? "08" : "07"} title={c.faq(editorial.label)}>
         {editorial.faqs.map((faq) => <details className="editorialFaq" key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}

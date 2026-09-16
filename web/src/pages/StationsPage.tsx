@@ -3,6 +3,7 @@ import type { TDict } from "../locales";
 import NearbyStationsCard from "../components/meta/NearbyStationsCard";
 import RoadStatusLink from "../components/road/RoadStatusLink";
 import type { Lang } from "../models/i18n";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 type Props = {
   t: TDict;
@@ -16,6 +17,7 @@ export default function StationsPage({ t, lang, radiusM, setRadiusM }: Props) {
     <>
       <NearbyStationsCard t={t} radiusM={radiusM} setRadiusM={setRadiusM} />
       <RoadStatusLink lang={lang} />
+      <AdsterraNativeAd location="stations-after-map-tool" />
 
       <article className="contentPage">
         <section className="contentSection">

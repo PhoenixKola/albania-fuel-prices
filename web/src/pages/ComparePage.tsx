@@ -5,6 +5,7 @@ import type { Currency } from "../models/currency";
 import type { FxRates } from "../utils/currency";
 import type { Trends } from "../models/trends";
 import WatchlistCard from "../components/fuel/WatchlistCard";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 type Props = {
   t: TDict;
@@ -51,6 +52,7 @@ export default function ComparePage({
         fxRates={fxRates}
         trends={trends}
       />
+      <AdsterraNativeAd location="compare-after-watchlist" />
 
       <article className="contentPage">
         <section className="contentSection">

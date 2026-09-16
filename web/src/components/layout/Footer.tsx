@@ -9,7 +9,7 @@ import { COUNTRY_EDITORIAL } from "../../config/countryContent";
 import { isCountryIndexable } from "../../generated/indexableCountries";
 import { ANALYSIS_META } from "../../generated/analysisMeta";
 import { PLAY_STORE_URL } from "../../config/constants";
-import logo from "../../assets/Logo.png";
+import logo from "../../assets/Logo.webp";
 
 type Props = {
   t: TDict;
@@ -131,7 +131,7 @@ export default function Footer({ t, lang, dataAsOf }: Props) {
         <div className="footerGrid">
           <div className="footerBrand">
             <div className="footerBrandRow">
-              <img className="footerLogo" src={logo} alt="" aria-hidden="true" />
+              <img className="footerLogo" src={logo} alt="" aria-hidden="true" width="34" height="34" loading="lazy" decoding="async" />
               <span className="footerSiteName">{t.title}</span>
             </div>
 

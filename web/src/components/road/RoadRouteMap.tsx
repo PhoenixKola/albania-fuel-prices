@@ -2,12 +2,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { RoadRoute, RoadStatus } from "../../models/road";
 import type { Lang } from "../../models/i18n";
 import { statusTone } from "../../utils/roadReality";
+import { useNearViewport } from "../../hooks/useNearViewport";
 
 const TILE_SIZE = 256;
 const MIN_ZOOM = 7;
 const MAX_ZOOM = 12;
 const MAP_PADDING = 54;
-const TILE_OVERSCAN = 1;
+const TILE_OVERSCAN = 0;
 
 type MapSize = { width: number; height: number };
 type ProjectedPoint = RoadRoute["geometry"][number] & { x: number; y: number };
@@ -57,6 +58,8 @@ function segmentStatus(route: RoadRoute, index: number): RoadStatus {
 
 export default function RoadRouteMap({ route, lang }: { route: RoadRoute; lang: Lang }) {
   const mapRef = useRef<HTMLElement>(null);
+  const [tileLayer, setTileLayer] = useState<HTMLDivElement | null>(null);
+  const tilesNear = useNearViewport(tileLayer, "200px");
   const [size, setSize] = useState<MapSize>({ width: 560, height: 480 });
 
   useEffect(() => {
@@ -89,13 +92,14 @@ export default function RoadRouteMap({ route, lang }: { route: RoadRoute; lang: 
 
   return (
     <figure ref={mapRef} className="roadMap" aria-label={lang === "sq" ? `Harta e itinerarit ${route.title}` : `Map of ${route.title}`} data-map-width={size.width} data-map-height={size.height}>
-      <div className="roadMapTiles" aria-hidden="true">
-        {tiles.map((tile) => (
+      <div ref={setTileLayer} className="roadMapTiles" aria-hidden="true">
+        {tilesNear && tiles.map((tile) => (
           <img
             key={`${viewport.zoom}-${tile.x}-${tile.y}`}
             src={`https://tile.openstreetmap.org/${viewport.zoom}/${tile.x}/${tile.y}.png`}
             alt=""
             loading="lazy"
+            decoding="async"
             width={TILE_SIZE}
             height={TILE_SIZE}
             style={{ left: `${tile.left}px`, top: `${tile.top}px` }}

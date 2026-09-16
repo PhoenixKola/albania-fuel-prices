@@ -56,7 +56,7 @@ const RoadStatusPage = lazy(() => import("../pages/RoadStatusPage"));
 import "../styles/travel.css";
 import "../styles/editorial.css";
 
-import logo from "../assets/Logo.png";
+import logo from "../assets/Logo.webp";
 
 type CountryFuelRouteProps = {
   t: TDict;
@@ -318,9 +318,8 @@ export default function App() {
           />
           <Route path="*" element={<NotFoundPage t={t} />} />
         </Routes>
-        </Suspense>
-
         <Footer t={t} lang={lang} dataAsOf={data?.as_of ?? null} />
+        </Suspense>
       </div>
     </div></MonetizationProvider>
   );

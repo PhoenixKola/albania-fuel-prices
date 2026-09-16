@@ -8,6 +8,12 @@ export const ADSTERRA_NATIVE = {
   scriptUrl: "https://pl31351771.profitableratecpmnetwork.com/d3a677f82e7972dbdc5767166cde992f/invoke.js",
   containerId: "container-d3a677f82e7972dbdc5767166cde992f",
 } as const;
+export const ADSTERRA_BANNER = {
+  key: "2faa9939eb0689d7a6d953b40a97a354",
+  scriptUrl: "https://www.highrevenueformat.com/2faa9939eb0689d7a6d953b40a97a354/invoke.js",
+  width: 300,
+  height: 250,
+} as const;
 export function validatedRentalUrl(raw: string | undefined): string | null {
   if (!raw || /\s/.test(raw) || [...raw].some((char) => char.charCodeAt(0) < 32)) return null;
   try {
@@ -35,5 +41,8 @@ export function adsterraAllowed(config: MonetizationConfig, hostname: string, ad
   return config.production && config.adsterraEnabled && isProductionHost(hostname) && advertisingAllowed;
 }
 export function isAdsterraRoute(path: string): boolean {
-  return ["/", "/albania-car-rental-guide", "/road-trip-fuel-guide", "/how-fuel-prices-work", "/europe-fuel-comparison"].includes(path) || /^\/fuel-prices\/[^/]+$/.test(path);
+  return ["/", "/albania-car-rental-guide", "/road-trip-fuel-guide", "/how-fuel-prices-work", "/europe-fuel-comparison",
+    "/trip-cost-calculator", "/road-status", "/stations", "/compare", "/rankings", "/market-report", "/insights",
+    "/methodology", "/about", "/fuel-quiz", "/daily-challenge"].includes(path) ||
+    /^\/fuel-prices\/[^/]+$/.test(path) || /^\/road-status\/[^/]+$/.test(path) || /^\/insights\/[^/]+$/.test(path);
 }

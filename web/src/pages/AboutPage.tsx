@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import { editorialCopy } from "../config/editorialCopy";
 import { ANALYSIS_META } from "../generated/analysisMeta";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 /**
  * About reads as a narrative, not a reference document, so it has no contents
@@ -78,6 +79,8 @@ export default function AboutPage({ lang }: { lang: Lang }) {
           </ol>
         </section>
       ) : null}
+
+      <AdsterraNativeAd location="about-after-principles" />
 
       <section className="aboutClose" aria-labelledby="about-close">
         <h2 id="about-close">{sq ? "Kontrolloje punën tonë" : "Check our work"}</h2>

@@ -13,7 +13,7 @@ const fixture = {
 };
 // Every external request is intercepted; these tests cannot request a real ad or book a rental.
 async function isolate(page: Page, options: { blockedAds?: boolean; noFx?: boolean; noPrices?: boolean; stale?: boolean; advertising?: boolean | null } = {}) {
-  const counters = { adScripts: 0, adsenseScripts: 0, analytics: 0, errors: [] as string[] };
+  const counters = { adScripts: 0, bannerScripts: 0, adsenseScripts: 0, analytics: 0, errors: [] as string[] };
   if (options.advertising !== null) {
     await page.addInitScript((advertising) => localStorage.setItem("karburanti-privacy-v1", JSON.stringify({ version: 1, necessary: true, advertising })), options.advertising ?? false);
   }
@@ -38,6 +38,15 @@ async function isolate(page: Page, options: { blockedAds?: boolean; noFx?: boole
         if (node) { var creative = document.createElement('div'); creative.dataset.testAd = 'filled'; creative.textContent = 'Test Native Banner'; creative.style.minHeight = '90px'; node.appendChild(creative); }
       ` });
     }
+    if (url.hostname === "www.highrevenueformat.com") {
+      counters.bannerScripts++;
+      if (options.blockedAds) return route.abort();
+      return route.fulfill({ contentType: "text/javascript", body: `
+        var creative = document.createElement('div'); creative.dataset.testBanner = 'filled';
+        creative.textContent = 'Test 300×250 Banner'; creative.style.width = '300px'; creative.style.height = '250px';
+        document.body.appendChild(creative);
+      ` });
+    }
     if (url.hostname === "static.cloudflareinsights.com") { counters.analytics++; return route.fulfill({ contentType: "text/javascript", body: "" }); }
     return route.abort();
   });
@@ -52,7 +61,7 @@ test("homepage and Albania price page expose the travel entry points and bounded
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Trip fuel cost calculator");
   await page.goto(`${origin}/fuel-prices/albania`);
   await expect(page.locator('[data-rental-placement="albania"]')).toBeVisible();
-  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(2);
   await expect(page.locator(".travelLinks").getByRole("link", { name: "Read the rental guide", exact: false })).toHaveAttribute("href", "/albania-car-rental-guide");
   await page.screenshot({ path: "test-results/albania-travel-placement.png", fullPage: true });
   expect(counters.errors).toEqual([]);
@@ -150,6 +159,39 @@ test("calculator: defaults, multi-country return, validation, sharing and canoni
   expect(counters.errors).toEqual([]);
 });
 
+test("homepage and comparison country pickers use the shared accessible menu", async ({ page }) => {
+  const counters = await isolate(page);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto(origin);
+  const country = page.locator(".fuelHeroCard").getByRole("combobox");
+  await country.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await page.keyboard.press("End");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  await country.click();
+  await expect(page.getByRole("option", { name: "Greece", exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.getByRole("button", { name: "Toggle menu" }).click();
+  await page.getByRole("button", { name: /Dark mode|Light mode/ }).click();
+  await country.click();
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await page.getByRole("option", { name: "Greece", exact: true }).click();
+  await expect(country).toContainText("Greece");
+  await page.goto(`${origin}/compare`);
+  const compare = page.locator(".watchlistAddPanel").getByRole("combobox");
+  await compare.click();
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Enter");
+  await expect(compare).toHaveAttribute("aria-expanded", "false");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(counters.errors).toEqual([]);
+});
+
 test("styled dropdowns support typeahead, keyboard selection, dismissal and inset arrows", async ({ page }) => {
   await isolate(page);
   await page.goto(`${origin}/trip-cost-calculator`);
@@ -243,48 +285,66 @@ test("first visit, decline, accept and footer preference changes gate Adsterra",
   await page.evaluate(() => { document.documentElement.dataset.theme = "dark"; });
   await page.screenshot({ path: "test-results/privacy-choices-mobile-dark.png", fullPage: false });
   expect(counters.adScripts).toBe(0);
+  expect(counters.bannerScripts).toBe(0);
   await page.getByRole("button", { name: "Continue without advertising" }).click();
   await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
   expect(counters.adScripts).toBe(0);
+  expect(counters.bannerScripts).toBe(0);
 
   const privacyControl = page.getByRole("button", { name: "Privacy & cookies" });
   await privacyControl.click();
   await page.getByRole("button", { name: "Allow advertising" }).click();
   await expect(privacyControl).toBeFocused();
   await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await page.locator(".adsterraPlacement").scrollIntoViewIfNeeded();
   await expect(page.locator("[data-test-ad='filled']")).toHaveText("Test Native Banner");
   expect(counters.adScripts).toBe(1);
+  expect(counters.bannerScripts).toBe(0);
 
   await page.getByRole("button", { name: "Privacy & cookies" }).click();
   await page.getByRole("button", { name: "Continue without advertising" }).click();
   await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
   expect(counters.adScripts).toBe(1);
+  expect(counters.bannerScripts).toBe(0);
   expect(counters.errors).toEqual([]);
 });
 
-test("SPA navigation keeps one native container and reinvokes only on eligible pages", async ({ page }) => {
+test("SPA navigation keeps one unit of each format and respects short and excluded pages", async ({ page }) => {
   const counters = await isolate(page, { advertising: true });
   await page.goto(origin);
   await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await page.locator(".adsterraPlacement").scrollIntoViewIfNeeded();
   await expect.poll(() => counters.adScripts).toBe(1);
   await page.locator('a[href="/fuel-prices/albania"]').first().click();
   await expect(page).toHaveURL(`${origin}/fuel-prices/albania`);
-  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(2);
+  await page.locator('[data-ad-format="native"]').scrollIntoViewIfNeeded();
   await expect.poll(() => counters.adScripts).toBe(2);
+  await page.locator(".adsterraBannerPlacement").scrollIntoViewIfNeeded();
+  await expect.poll(() => counters.bannerScripts).toBe(1);
+  await expect(page.frameLocator(".adsterraBannerSlot iframe").locator("[data-test-banner]")).toBeVisible();
   await expect(page.locator("#container-d3a677f82e7972dbdc5767166cde992f")).toHaveCount(1);
   await expect(page.locator('script[data-adsterra-native="true"]')).toHaveCount(1);
   await page.locator('a[href="/fuel-prices/greece"]').first().click();
   await expect(page).toHaveURL(`${origin}/fuel-prices/greece`);
-  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(2);
+  await page.evaluate(() => document.querySelector('[data-ad-format="native"]')?.scrollIntoView());
   await expect.poll(() => counters.adScripts).toBe(3);
+  await page.evaluate(() => document.querySelector(".adsterraBannerPlacement")?.scrollIntoView());
+  await expect.poll(() => counters.bannerScripts).toBe(2);
   await expect(page.locator("#container-d3a677f82e7972dbdc5767166cde992f")).toHaveCount(1);
+  await expect(page.locator(".adsterraBannerSlot iframe")).toHaveCount(1);
   await page.getByRole("button", { name: "Tools", exact: true }).click();
   await page.locator("#nav-tools-links").getByRole("link", { name: "Trip Calculator" }).click();
-  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
-  await expect(page.locator('script[data-adsterra-native="true"]')).toHaveCount(0);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
+  await expect(page.locator(".adsterraBannerSlot iframe")).toHaveCount(0);
+  expect(counters.bannerScripts).toBe(2);
   await page.locator(".brand").click();
   await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
-  await expect.poll(() => counters.adScripts).toBe(4);
+  await expect.poll(() => counters.adScripts).toBeGreaterThanOrEqual(4);
+  await page.locator('footer a[href="/privacy"]').first().click();
+  await expect(page).toHaveURL(`${origin}/privacy`);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
   expect(counters.analytics).toBe(1);
   expect(counters.adsenseScripts).toBe(0);
   expect(counters.errors).toEqual([]);
@@ -292,10 +352,35 @@ test("SPA navigation keeps one native container and reinvokes only on eligible p
 
 test("blocked Adsterra collapses quietly and leaves the page usable", async ({ page }) => {
   const counters = await isolate(page, { blockedAds: true, advertising: true });
-  await page.goto(origin);
-  await expect(page.locator(".adsterraPlacement")).toHaveAttribute("data-state", "empty");
-  await expect(page.locator(".adsterraPlacement")).toBeHidden();
+  await page.goto(`${origin}/albania-car-rental-guide`);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(2);
+  await page.locator('[data-ad-format="native"]').scrollIntoViewIfNeeded();
+  await expect(page.locator('[data-ad-format="native"]')).toHaveAttribute("data-state", "empty");
+  await page.locator('[data-ad-format="banner"]').scrollIntoViewIfNeeded();
+  await expect(page.locator('[data-ad-format="banner"]')).toHaveAttribute("data-state", "empty");
+  await expect(page.locator(".adsterraPlacement:visible")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  expect(counters.adScripts).toBe(1);
+  expect(counters.bannerScripts).toBe(1);
+  expect(counters.errors).toEqual([]);
+});
+
+test("both ad formats need consent and stop after revocation", async ({ page }) => {
+  const counters = await isolate(page, { advertising: false });
+  await page.goto(`${origin}/albania-car-rental-guide`);
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
+  expect(counters.adScripts + counters.bannerScripts).toBe(0);
+  await page.getByRole("button", { name: "Privacy & cookies" }).click();
+  await page.getByRole("button", { name: "Allow advertising" }).click();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(2);
+  await page.locator('[data-ad-format="native"]').scrollIntoViewIfNeeded();
+  await page.locator('[data-ad-format="banner"]').scrollIntoViewIfNeeded();
+  await expect.poll(() => counters.adScripts).toBe(1);
+  await expect.poll(() => counters.bannerScripts).toBe(1);
+  await page.getByRole("button", { name: "Privacy & cookies" }).click();
+  await page.getByRole("button", { name: "Continue without advertising" }).click();
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
+  await expect(page.locator(".adsterraBannerSlot iframe")).toHaveCount(0);
   expect(counters.errors).toEqual([]);
 });
 
@@ -304,7 +389,7 @@ test("local previews do not load ad or analytics scripts", async ({ page }) => {
   await page.goto("http://127.0.0.1:4175/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
-  expect(counters.adScripts).toBe(0); expect(counters.analytics).toBe(0);
+  expect(counters.adScripts).toBe(0); expect(counters.bannerScripts).toBe(0); expect(counters.analytics).toBe(0);
 });
 
 test("public language picker restores and persists Albanian on desktop and mobile", async ({ page }) => {
@@ -336,7 +421,7 @@ test("public language picker restores and persists Albanian on desktop and mobil
 test("disabled-ad visual matrix stays responsive across priority routes and themes", async ({ page }) => {
   const counters = await isolate(page, { advertising: false });
   await page.goto(origin);
-  const paths = ["/", "/fuel-prices/albania", "/fuel-prices/greece", "/road-status/shkoder-theth", "/trip-cost-calculator", "/privacy"];
+  const paths = ["/", "/fuel-prices/albania", "/fuel-prices/greece", "/trip-cost-calculator", "/road-status", "/road-status/tirana-theth", "/stations", "/albania-car-rental-guide", "/road-trip-fuel-guide", "/how-fuel-prices-work", "/europe-fuel-comparison", "/privacy"];
   for (const width of [390, 1366]) {
     await page.setViewportSize({ width, height: 900 });
     for (const theme of ["light", "dark"]) {
@@ -458,6 +543,12 @@ test("Road Reality restores and changes curated route URLs with sourced status d
   await expect(page.getByText("Report a newer condition", { exact: true })).toHaveCount(0);
   await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText(/safe to drive|definitely open|safe road/i);
+  await expect(page.getByText("Check route displays the latest stored source review.", { exact: false })).toBeVisible();
+  const reviewedBefore = await page.locator(".roadMetricTimestamp").textContent();
+  await page.getByRole("button", { name: "Check route", exact: false }).click();
+  await expect(page.locator(".roadMetricTimestamp")).toHaveText(reviewedBefore ?? "");
+  await page.reload();
+  await expect(page.locator(".roadMetricTimestamp")).toHaveText(reviewedBefore ?? "");
 
   const from = page.getByRole("combobox", { name: "From", exact: true });
   await from.focus();
@@ -471,7 +562,8 @@ test("Road Reality restores and changes curated route URLs with sourced status d
   await expect(page).toHaveURL(`${origin}/road-status/tirana-korce`);
   await expect(page.locator(".roadStatusBadgeLarge")).toHaveText(/RESTRICTED/);
   await expect(page.getByRole("link", { name: "View source", exact: false }).first()).toHaveAttribute("href", /asp\.gov\.al\/bllokohet-levizja/);
-  await expect(page.getByText("Stale · checked", { exact: false }).first()).toBeVisible();
+  await expect(page.getByText("Source review ·", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Check official sources", exact: false })).toHaveAttribute("href", /asp\.gov\.al/);
   expect(counters.errors).toEqual([]);
 });
 

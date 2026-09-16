@@ -78,13 +78,13 @@ To add a route, add one `Seed` entry with a stable slug, route-specific descript
 
 Freshness is calculated centrally from `lastCheckedAt` by calendar day:
 
-- 0 days: **Checked today** (`fresh`)
-- 1 day: **Checked yesterday** (`fresh`)
-- 2–3 days: **Checked N days ago** (`recent`)
-- more than 3 days: **Stale · checked N days ago** (`stale`)
+- 0 days: **Source reviewed today** (`fresh`)
+- 1 day: **Source reviewed yesterday** (`fresh`)
+- 2–3 days: **Source reviewed N days ago** (`recent`)
+- more than 3 days: **Source review · N days ago** (`stale`)
 - missing or invalid timestamp: **Unknown**
 
-Route and section freshness use the review timestamp. A source card uses the publication timestamp when one exists, so an old notice stays visibly stale even if it was reviewed today. Reviewing an old notice does not make the source itself fresh.
+Route and section freshness use the stored manual source-review timestamp. A source card uses the publication timestamp when one exists and labels it **Source data · N days old**, so an old notice stays visibly old even if it was reviewed today. If no publication date exists, the card says when the archive was reviewed. Opening a route or pressing **Check route** only displays the stored record: it does not query ARRSH, Police or any other authority and never changes a timestamp. The route result says this explicitly. Where a recorded official source exists, **Check official sources** opens it in a new tab so visitors can verify current guidance themselves.
 
 ## Safety wording
 
@@ -92,13 +92,13 @@ State only what the stored source supports. Preferred phrases include “No rout
 
 ## Map and OpenStreetMap use
 
-The map reuses the project's lightweight raster-tile pattern and adds no mapping library or paid service. It calculates the visible Web Mercator tile bounds from the responsive map size, adds one tile of overscan, and lazy-loads only that grid. The route and its named waypoints use the same projection and viewport origin as the tiles. It does not prefetch, bulk-download, or call Overpass. Visible links provide “© OpenStreetMap contributors” attribution and the OSM copyright page. Standard OSM tiles are best-effort infrastructure; a production scale-up should move to a policy-compliant dedicated provider or self-hosted tiles with caching.
+The map reuses the project's lightweight raster-tile pattern and adds no mapping library or paid service. It calculates the visible Web Mercator tile bounds from the responsive map size, uses no off-screen overscan, and lazy-loads only that grid. The route and its named waypoints use the same projection and viewport origin as the tiles. It does not prefetch, bulk-download, or call Overpass. Visible links provide “© OpenStreetMap contributors” attribution and the OSM copyright page. Standard OSM tiles are best-effort infrastructure; a production scale-up should move to a policy-compliant dedicated provider or self-hosted tiles with caching.
 
 ## Manual versus automated behavior
 
 Road status, sections, source provenance, confidence, route geometry, and vehicle guidance are maintained manually in the repository. Freshness labels, status counts, route rendering, canonical metadata, share URLs, map viewport, prerendering, and sitemap generation are automated from those records. OSM tiles provide map context at view time only.
 
-Cloudflare Web Analytics remains the single analytics beacon and automatically records SPA page views, including route-detail URLs. Cloudflare Web Analytics does not offer arbitrary custom event tracking, so named interaction events were not fabricated and no second analytics script was added. Affiliate rendering reuses the existing `roadTrip` placement and its configured base-URL fallback. AdSense and consent configuration are untouched.
+Cloudflare Web Analytics remains the single analytics beacon and automatically records SPA page views, including route-detail URLs. Cloudflare Web Analytics does not offer arbitrary custom event tracking, so named interaction events were not fabricated and no second analytics script was added. Affiliate rendering reuses the existing `roadTrip` placement and its configured base-URL fallback. The page's one Adsterra Native placement uses the existing advertising-consent gate.
 
 ## Known limitations and future automation
 
@@ -107,4 +107,4 @@ Cloudflare Web Analytics remains the single analytics beacon and automatically r
 - UNKNOWN routes may still be open, restricted, or closed. UNKNOWN means only that the stored sources do not support a current claim.
 - The line on the map is a representative schematic through named waypoints, not routable navigation geometry.
 - Weather, incidents, road signs, police instructions, ferry operations, and supplier terms can supersede the summary.
-- Future work can ingest a documented official feed if one becomes available, automate stale-record alerts, and add privacy-preserving interaction analytics if the existing analytics provider adds supported custom events.
+- The current ARRSH and State Police records are notice/archive URLs, not documented machine-readable feeds. No reliable permitted live API is present in the source architecture, so automatic status refresh would be misleading. A future integration could use an authority-published feed with stable identifiers, publication/update times, geographic scope, vehicle restrictions, usage permission and outage handling if one is documented. Until then, preserve manual review and consider a repository-side stale-record reminder; do not scrape pages or infer passability from silence.

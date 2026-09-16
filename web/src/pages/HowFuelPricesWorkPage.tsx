@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+import AdsterraBannerAd from "../components/ads/AdsterraBannerAd";
 
 type Props = { t: TDict };
 
@@ -44,6 +45,8 @@ export default function HowFuelPricesWorkPage({ t }: Props) {
         <p className="contentBody">{t.howPricesRetailP2}</p>
       </section>
 
+      <AdsterraNativeAd location="fuel-prices-guide-after-primary-content" />
+
       <section className="contentSection">
         <h2 className="contentHeading">{t.howPricesSeasonalTitle}</h2>
         <p className="contentBody">{t.howPricesSeasonalP1}</p>
@@ -79,7 +82,7 @@ export default function HowFuelPricesWorkPage({ t }: Props) {
         </p>
       </section>
 
-      <AdsterraNativeAd location="fuel-prices-guide-after-primary-content" />
+      <AdsterraBannerAd location="fuel-prices-guide-after-drivers" />
     </article>
   );
 }

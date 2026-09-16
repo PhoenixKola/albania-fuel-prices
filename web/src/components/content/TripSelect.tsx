@@ -1,10 +1,11 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { createPortal } from "react-dom";
 
 type Option = { value: string; label: string };
-type Props = { label: string; value: string; options: Option[]; onChange: (value: string) => void };
+type Props = { label: string; value: string; options: Option[]; onChange: (value: string) => void; className?: string };
 
 // Select-only combobox: focus stays on the trigger while the active option is announced.
-export default function TripSelect({ label, value, options, onChange }: Props) {
+export default function TripSelect({ label, value, options, onChange, className = "" }: Props) {
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -12,7 +13,7 @@ export default function TripSelect({ label, value, options, onChange }: Props) {
   const search = useRef({ text: "", time: 0 });
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const [placement, setPlacement] = useState({ above: false, height: 272 });
+  const [placement, setPlacement] = useState({ top: 0, left: 0, width: 0, height: 272 });
   const selected = Math.max(0, options.findIndex((option) => option.value === value));
 
   function show(index = selected) {
@@ -21,7 +22,8 @@ export default function TripSelect({ label, value, options, onChange }: Props) {
       const below = window.innerHeight - rect.bottom - 20;
       const above = rect.top - 20;
       const upward = below < Math.min(272, options.length * 44 + 16) && above > below;
-      setPlacement({ above: upward, height: Math.max(80, Math.min(272, upward ? above : below)) });
+      const height = Math.max(80, Math.min(272, upward ? above : below));
+      setPlacement({ top: upward ? rect.top - height - 8 : rect.bottom + 8, left: rect.left, width: rect.width, height });
     }
     search.current = { text: "", time: 0 };
     setActive(index);
@@ -36,7 +38,7 @@ export default function TripSelect({ label, value, options, onChange }: Props) {
   useEffect(() => {
     if (!open) return;
     const dismiss = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false);
+      if (!root.current?.contains(event.target as Node) && !list.current?.contains(event.target as Node)) setOpen(false);
     };
     const resize = () => setOpen(false);
     document.addEventListener("pointerdown", dismiss);
@@ -84,7 +86,7 @@ export default function TripSelect({ label, value, options, onChange }: Props) {
     search.current = { text, time: now };
   }
 
-  return <div className="tripSelectField">
+  return <div className={`tripSelectField ${className}`.trim()}>
     <label id={`${id}-label`} htmlFor={id}>{label}</label>
     <div ref={root} className={`tripSelect${open ? " tripSelectOpen" : ""}`} onBlur={(event) => {
       if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
@@ -96,8 +98,8 @@ export default function TripSelect({ label, value, options, onChange }: Props) {
         <span>{options[selected]?.label ?? value}</span>
         <svg className="tripSelectChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 10 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>
-      {open && <ul ref={list} id={`${id}-list`} role="listbox" aria-labelledby={`${id}-label`}
-        className={`tripSelectMenu${placement.above ? " tripSelectMenuAbove" : ""}`} style={{ maxHeight: placement.height }}
+      {open && createPortal(<ul ref={list} id={`${id}-list`} role="listbox" aria-labelledby={`${id}-label`}
+        className="tripSelectMenu" style={{ top: placement.top, left: placement.left, width: placement.width, maxHeight: placement.height }}
         onMouseDown={(event) => event.preventDefault()}>
         {options.map((option, index) => <li id={`${id}-option-${index}`} key={option.value} role="option"
           aria-selected={option.value === value} data-active={index === active} className="tripSelectOption"
@@ -105,7 +107,7 @@ export default function TripSelect({ label, value, options, onChange }: Props) {
           onClick={() => choose(index)}>
           <span>{option.label}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </li>)}
-      </ul>}
+      </ul>, document.body)}
     </div>
   </div>;
 }

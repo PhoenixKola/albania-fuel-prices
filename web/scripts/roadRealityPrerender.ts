@@ -29,7 +29,8 @@ export function renderRoadRealityStatic(route: RoadRoute, includeRouteIndex = fa
           <h2 class="contentHeading">${escapeHtml(route.title)}</h2>
           <p class="roadStatusBadge roadStatus-${statusTone(route.overallStatus)}">${route.overallStatus}</p>
           <p class="contentBody">${escapeHtml(route.statusExplanation)}</p>
-          <p class="contentBody"><strong>Last checked:</strong> ${escapeHtml(formatRoadTimestamp(route.lastCheckedAt))}. <strong>Confidence:</strong> ${route.confidence}. <strong>Known restricted or closed sections:</strong> ${counts.RESTRICTED + counts.CLOSED}. <strong>Unknown sections:</strong> ${counts.UNKNOWN}.</p>
+          <p class="contentBody"><strong>Source reviewed:</strong> ${escapeHtml(formatRoadTimestamp(route.lastCheckedAt))}. <strong>Confidence:</strong> ${route.confidence}. <strong>Known restricted or closed sections:</strong> ${counts.RESTRICTED + counts.CLOSED}. <strong>Unknown sections:</strong> ${counts.UNKNOWN}.</p>
+          <p class="contentBodyMuted">Check route displays the latest stored source review. It does not query road authorities in real time.</p>
           <p class="contentBody"><a href="/trip-cost-calculator">Calculate fuel cost</a></p>
         </section>
         <section class="contentSection">
@@ -43,7 +44,7 @@ export function renderRoadRealityStatic(route: RoadRoute, includeRouteIndex = fa
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Sources and provenance</h2>
-          ${route.sources.map((source) => `<article><h3>${escapeHtml(source.authority)}</h3><p class="contentBody">${escapeHtml(source.title)}. Scope: ${escapeHtml(source.geographicScope)}. Published: ${source.publishedAt ? escapeHtml(formatRoadTimestamp(source.publishedAt)) : "not stated / rolling archive"}. Checked by Karburanti Sot: ${escapeHtml(formatRoadTimestamp(source.checkedAt))}.</p><p class="contentBody">${escapeHtml(source.note)}</p><p><a href="${escapeHtml(source.url)}" rel="noopener noreferrer">View source</a></p></article>`).join("")}
+          ${route.sources.map((source) => `<article><h3>${escapeHtml(source.authority)}</h3><p class="contentBody">${escapeHtml(source.title)}. Scope: ${escapeHtml(source.geographicScope)}. Published: ${source.publishedAt ? escapeHtml(formatRoadTimestamp(source.publishedAt)) : "not stated / rolling archive"}. Reviewed by Karburanti Sot: ${escapeHtml(formatRoadTimestamp(source.checkedAt))}.</p><p class="contentBody">${escapeHtml(source.note)}</p><p><a href="${escapeHtml(source.url)}" rel="noopener noreferrer">View source</a></p></article>`).join("")}
         </section>
         ${routeIndex}
         <section class="contentSection"><h2 class="contentHeading">Before you drive</h2><p class="contentBody">Road conditions can change quickly. Karburanti Sot summarizes available sources and does not replace instructions from road authorities, police, emergency services, road signs, or your rental supplier.</p></section>

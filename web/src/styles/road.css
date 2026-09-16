@@ -191,6 +191,7 @@
 .roadStatus-unknown { --status-color: var(--road-unknown); color: var(--road-unknown); }
 .roadStatusExplanation { max-width: 680px; margin: 20px 0 0; color: var(--road-ink); font-size: 17px; line-height: 1.65; }
 .roadConditionWarning { margin: 13px 0 0; padding-left: 14px; color: var(--road-amber); border-left: 2px solid var(--road-amber); font-size: 12px; line-height: 1.55; }
+.roadStoredReviewNote { margin: 12px 0 0; color: var(--road-muted); font-size: 11px; line-height: 1.55; }
 .roadResultFacts { display: grid; grid-template-columns: minmax(0, 1.24fr) repeat(4, minmax(0, 1fr)); margin: 24px 0 0; padding: 0; overflow: hidden; border: 1px solid var(--road-line); border-radius: 12px; }
 .roadResultFacts div { min-width: 0; min-height: 86px; padding: 15px 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; border-left: 1px solid var(--road-line); }
 .roadResultFacts div:first-child { border-left: 0; }

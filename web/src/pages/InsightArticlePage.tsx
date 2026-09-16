@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getArticle } from "../config/articles";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 function formatDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00Z`);
@@ -34,6 +35,7 @@ export default function InsightArticlePage() {
         {" "}· {article.readMinutes} min read
       </p>
       <div dangerouslySetInnerHTML={{ __html: article.html }} />
+      <AdsterraNativeAd location="insight-after-article" />
       <section className="contentSection">
         <h2 className="contentHeading">Keep exploring</h2>
         <ul className="contentList">

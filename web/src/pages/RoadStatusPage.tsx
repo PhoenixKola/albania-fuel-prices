@@ -3,30 +3,31 @@ import { Link, useNavigate } from "react-router-dom";
 import type { Lang } from "../models/i18n";
 import type { RoadStatus, VehicleAssessment } from "../models/road";
 import { ROAD_ROUTES, getRoadRoute } from "../data/roadRoutes";
-import { countRouteStatuses, formatRoadMetricTimestamp, formatRoadTimestamp, roadFreshness, roadFreshnessLabel, routeShareText, statusTone } from "../utils/roadReality";
+import { countRouteStatuses, formatRoadMetricTimestamp, formatRoadTimestamp, roadFreshness, roadFreshnessLabel, roadSourceAgeLabel, routeShareText, statusTone } from "../utils/roadReality";
 import TripSelect from "../components/content/TripSelect";
 import RoadRouteMap from "../components/road/RoadRouteMap";
 import RentalReferral from "../components/ads/RentalReferral";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 const roadCopy = {
   en: {
     from: "From", to: "To", check: "Check route", eyebrow: "Road Reality · sourced route intelligence", title: "Albania Road Conditions & Route Status",
     lede: "Check road closures, restrictions, surface conditions, and recent official updates before driving in Albania.", curated: "curated routes", timestamped: "Every claim timestamped", unknownTrust: "Unknown beats a guess", verify: "VERIFY BEFORE DEPARTURE",
     invalid: "That route is not in the curated list yet. Showing Tirana → Theth instead.", routeStatus: "Route status", warning: "Conditions can change after the latest verification. Check current authority guidance before departure.",
-    lastChecked: "Last checked", confidence: "Confidence", cautions: "Cautions", restricted: "Restricted / closed", unknown: "Unknown", share: "Share this route", calculate: "Calculate fuel cost", shared: "Route status copied or shared.", shareFailed: "Sharing is unavailable in this browser.",
+    lastChecked: "Source reviewed", storedReview: "Check route displays the latest stored source review. It does not query road authorities in real time.", officialUpdates: "Check official sources", confidence: "Confidence", cautions: "Cautions", restricted: "Restricted / closed", unknown: "Unknown", share: "Share this route", calculate: "Calculate fuel cost", shared: "Route status copied or shared.", shareFailed: "Sharing is unavailable in this browser.",
     vehicleEyebrow: "Vehicle check", vehicleTitle: "What this record can tell you", vehicleIntro: "These indicators are conservative. They do not replace vehicle-specific restrictions, signs, or supplier terms.", normal: "Normal 2WD", low: "Low-clearance vehicle", high: "Higher-clearance vehicle", rental: "Rental vehicle", rentalText: "Check your rental supplier's road restrictions.",
     breakdown: "Route breakdown", sections: "Known sections", surface: "Surface", verification: "Verification", vehicleGuidance: "Vehicle guidance", noNotice: "No recent section-specific authority notice found.", notVerified: "Not verified.",
-    provenance: "Provenance", sources: "Sources checked", sourcesIntro: "Each source retains its authority, scope, publication date where available, and the time Karburanti Sot checked it.", scope: "Scope", published: "Published", sourceFreshness: "Source freshness", rolling: "Rolling archive / not stated", viewSource: "View source",
+    provenance: "Provenance", sources: "Sources reviewed", sourcesIntro: "Each source retains its authority, scope, publication date where available, and the time Karburanti Sot last reviewed it.", scope: "Scope", published: "Published", sourceFreshness: "Source age", rolling: "Rolling archive / not stated", viewSource: "View source",
     before: "Before you drive", disclaimer: "Road conditions can change quickly. Karburanti Sot summarizes available sources and does not replace instructions from road authorities, police, emergency services, road signs, or your rental supplier.",
   },
   sq: {
     from: "Nga", to: "Për në", check: "Kontrollo itinerarin", eyebrow: "Road Reality · informacion rrugor me burime", title: "Kushtet dhe statusi i rrugëve në Shqipëri",
     lede: "Kontrollo mbylljet, kufizimet, sipërfaqen dhe njoftimet e fundit zyrtare para se të udhëtosh në Shqipëri.", curated: "itinerare të kuruara", timestamped: "Çdo pretendim ka datë", unknownTrust: "E panjohura është më mirë se hamendësimi", verify: "VERIFIKO PARA NISJES",
     invalid: "Ky itinerar nuk është ende në listën e kuruar. Po shfaqet Tirana → Theth.", routeStatus: "Statusi i itinerarit", warning: "Kushtet mund të ndryshojnë pas verifikimit të fundit. Kontrollo udhëzimet aktuale të autoriteteve para nisjes.",
-    lastChecked: "Kontrolluar së fundi", confidence: "Besueshmëria", cautions: "Kujdes", restricted: "Kufizuar / mbyllur", unknown: "E panjohur", share: "Ndaje itinerarin", calculate: "Llogarit karburantin", shared: "Statusi u kopjua ose u nda.", shareFailed: "Ndarja nuk ofrohet në këtë shfletues.",
+    lastChecked: "Burimet u rishikuan", storedReview: "Kontrollo itinerarin shfaq rishikimin e fundit të ruajtur. Nuk pyet autoritetet rrugore në kohë reale.", officialUpdates: "Kontrollo burimet zyrtare", confidence: "Besueshmëria", cautions: "Kujdes", restricted: "Kufizuar / mbyllur", unknown: "E panjohur", share: "Ndaje itinerarin", calculate: "Llogarit karburantin", shared: "Statusi u kopjua ose u nda.", shareFailed: "Ndarja nuk ofrohet në këtë shfletues.",
     vehicleEyebrow: "Kontrolli i mjetit", vehicleTitle: "Çfarë tregon ky regjistrim", vehicleIntro: "Këta tregues janë konservatorë. Nuk zëvendësojnë kufizimet për mjetin, sinjalistikën apo kushtet e ofruesit.", normal: "Mjet normal 2WD", low: "Mjet me lartësi të ulët", high: "Mjet me lartësi më të madhe", rental: "Mjet me qira", rentalText: "Kontrollo kufizimet rrugore të ofruesit të qirasë.",
     breakdown: "Ndarja e itinerarit", sections: "Seksionet e njohura", surface: "Sipërfaqja", verification: "Verifikimi", vehicleGuidance: "Udhëzim për mjetin", noNotice: "Nuk u gjet njoftim i fundit zyrtar për këtë seksion.", notVerified: "E paverifikuar.",
-    provenance: "Prejardhja", sources: "Burimet e kontrolluara", sourcesIntro: "Çdo burim ruan autoritetin, shtrirjen, datën e publikimit kur ka dhe kohën kur e kontrolloi Karburanti Sot.", scope: "Shtrirja", published: "Publikuar", sourceFreshness: "Aktualiteti i burimit", rolling: "Arkiv i vazhdueshëm / pa datë", viewSource: "Shiko burimin",
+    provenance: "Prejardhja", sources: "Burimet e rishikuara", sourcesIntro: "Çdo burim ruan autoritetin, shtrirjen, datën e publikimit kur ka dhe kohën kur Karburanti Sot e rishikoi së fundi.", scope: "Shtrirja", published: "Publikuar", sourceFreshness: "Mosha e burimit", rolling: "Arkiv i vazhdueshëm / pa datë", viewSource: "Shiko burimin",
     before: "Para se të udhëtosh", disclaimer: "Kushtet rrugore mund të ndryshojnë shpejt. Karburanti Sot përmbledh burimet e disponueshme dhe nuk zëvendëson udhëzimet e autoriteteve, policisë, emergjencës, sinjalistikës apo ofruesit të qirasë.",
   },
 } as const;
@@ -77,7 +78,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
 
   async function shareRoute() {
     const url = `${window.location.origin}/road-status/${route.slug}`;
-    const text = lang === "sq" ? `${route.title}: ${statusSq[route.overallStatus]}. Kontrolluar së fundi ${formatRoadTimestamp(route.lastCheckedAt, lang)}. ${url}` : routeShareText(route, url);
+    const text = lang === "sq" ? `${route.title}: ${statusSq[route.overallStatus]}. Burimet u rishikuan më ${formatRoadTimestamp(route.lastCheckedAt, lang)}. ${url}` : routeShareText(route, url);
     try {
       if (navigator.share) await navigator.share({ title: `${route.title} road status`, text, url });
       else await navigator.clipboard.writeText(text);
@@ -111,6 +112,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
           <StatusBadge status={route.overallStatus} lang={lang} large />
           <p className="roadStatusExplanation">{lang === "sq" ? (route.overallStatus === "RESTRICTED" ? "Një njoftim i Policisë së Shtetit kufizon mjetet e rënda dhe autobusët në Arrat e Gurrës deri në një njoftim tjetër. Gjatë këtij kontrolli nuk u verifikua njoftim më i ri për rihapjen." : "Në burimet e kontrolluara nuk u verifikua njoftim aktual i autoriteteve për këtë itinerar. Kjo nuk provon se rruga është e hapur.") : route.statusExplanation}</p>
           <p className="roadConditionWarning">{c.warning}</p>
+          <p className="roadStoredReviewNote">{c.storedReview}</p>
           <dl className="roadResultFacts">
             <div className="roadMetricTimestamp"><dt>{c.lastChecked}</dt><dd><strong>{checkedAt.date}</strong><span>{checkedAt.time}</span></dd></div>
             <div><dt>{c.confidence}</dt><dd><strong>{lang === "sq" && route.confidence === "LOW" ? "E ULËT" : route.confidence}</strong></dd></div>
@@ -121,6 +123,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
           <div className="roadResultActions">
             <button type="button" className="roadAction roadActionPrimary" onClick={shareRoute}>{c.share}</button>
             <Link className="roadAction" to="/trip-cost-calculator">{c.calculate}</Link>
+            {route.sources.find((source) => source.sourceType !== "OPEN_MAP") ? <a className="roadAction" href={route.sources.find((source) => source.sourceType !== "OPEN_MAP")!.url} target="_blank" rel="noopener noreferrer">{c.officialUpdates} ↗</a> : null}
           </div>
           {shareState !== "idle" ? <p className={`roadShareState roadShareState-${shareState}`} role="status">{shareState === "copied" ? c.shared : c.shareFailed}</p> : null}
         </article>
@@ -167,7 +170,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
                 <h3>{source.authority}</h3>
                 <strong>{lang === "sq" ? (source.id === "openstreetmap" ? "Harta bazë OpenStreetMap" : source.id.includes("restriction") ? "Kufizimi Librazhd–Pogradec në Arrat e Gurrës" : source.id.includes("deviation") ? "Devijimi i përkohshëm në Arrat e Gurrës" : source.id === "state-police-updates" ? "Njoftime policie dhe përditësime rrugore" : "Njoftime për kushtet rrugore") : source.title}</strong>
                 <p>{lang === "sq" ? (source.id === "openstreetmap" ? "Përdoret vetëm për kontekst gjeografik. OpenStreetMap nuk verifikon mbylljen aktuale ose përshtatshmërinë për udhëtim." : source.id.includes("restriction") ? "Njoftimi kufizon mjetet e rënda dhe autobusët deri në një njoftim tjetër dhe u kërkon drejtuesve të ndjekin sinjalistikën dhe policinë." : source.id.includes("deviation") ? "ARRSH përshkroi një devijim të përkohshëm me sinjalistikë punimesh; njoftimi i vjetër jep kontekst dhe jo garanci aktuale." : "Arkivi publik u kontrollua, por nuk u verifikua njoftim aktual posaçërisht për këtë itinerar. Mungesa e njoftimit nuk konfirmon rrugë të hapur.") : source.note}</p>
-                <dl><div><dt>{c.scope}</dt><dd>{lang === "sq" ? `${route.from} – ${route.to}${source.id === "openstreetmap" ? " · kontekst harte" : ""}` : source.geographicScope}</dd></div><div><dt>{c.published}</dt><dd>{source.publishedAt ? formatRoadTimestamp(source.publishedAt, lang) : c.rolling}</dd></div><div><dt>{c.sourceFreshness}</dt><dd className={`roadFreshness-${sourceFreshness.state}`}>{roadFreshnessLabel(sourceFreshness, lang)}</dd></div></dl>
+                <dl><div><dt>{c.scope}</dt><dd>{lang === "sq" ? `${route.from} – ${route.to}${source.id === "openstreetmap" ? " · kontekst harte" : ""}` : source.geographicScope}</dd></div><div><dt>{c.published}</dt><dd>{source.publishedAt ? formatRoadTimestamp(source.publishedAt, lang) : c.rolling}</dd></div><div><dt>{c.sourceFreshness}</dt><dd className={`roadFreshness-${sourceFreshness.state}`}>{roadSourceAgeLabel(source.publishedAt, source.checkedAt, lang)}</dd></div></dl>
                 <a href={source.url} target="_blank" rel="noopener noreferrer">{c.viewSource} <span aria-hidden="true">↗</span></a>
               </article>
             );
@@ -177,6 +180,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
 
       <RentalReferral lang={lang} placement="roadTrip" />
       <aside className="roadDisclaimer"><span className="roadDisclaimerIcon" aria-hidden="true">!</span><div><strong>{c.before}</strong><p>{c.disclaimer}</p></div></aside>
+      <AdsterraNativeAd location="road-after-source-review" />
     </main>
   );
 }

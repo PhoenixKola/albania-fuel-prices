@@ -821,7 +821,7 @@
 .homeExperience .seg,
 .homeExperience .countryChip,
 .homeExperience .input,
-.homeExperience .select {
+.homeExperience .tripSelectTrigger {
   min-height: 44px;
 }
 

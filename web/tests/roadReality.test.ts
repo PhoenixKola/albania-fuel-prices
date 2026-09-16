@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { ROAD_ROUTES, getRoadRoute } from "../src/data/roadRoutes";
 import { ROAD_STATUSES } from "../src/models/road";
-import { countRouteStatuses, formatRoadMetricTimestamp, roadFreshness, routeShareText } from "../src/utils/roadReality";
+import { countRouteStatuses, formatRoadMetricTimestamp, roadFreshness, roadSourceAgeLabel, routeShareText } from "../src/utils/roadReality";
 import { roadRouteDescription, roadRouteTitle } from "../src/utils/roadSeo";
 import { buildRoadRealityPrerenderRoutes, renderRoadRealityStatic } from "../scripts/roadRealityPrerender";
 import { readMonetizationConfig } from "../src/config/monetization";
@@ -42,12 +42,14 @@ test("Road Reality seeds a bounded, unique, conservatively sourced route set", (
 
 test("freshness labels today, yesterday, recent, stale and invalid records centrally", () => {
   const now = new Date("2026-09-10T12:00:00Z");
-  assert.deepEqual(roadFreshness("2026-09-10T01:00:00Z", now), { ageDays: 0, label: "Checked today", state: "fresh" });
-  assert.deepEqual(roadFreshness("2026-09-09T01:00:00Z", now), { ageDays: 1, label: "Checked yesterday", state: "fresh" });
-  assert.deepEqual(roadFreshness("2026-09-07T01:00:00Z", now), { ageDays: 3, label: "Checked 3 days ago", state: "recent" });
-  assert.deepEqual(roadFreshness("2026-09-06T01:00:00Z", now), { ageDays: 4, label: "Stale · checked 4 days ago", state: "stale" });
+  assert.deepEqual(roadFreshness("2026-09-10T01:00:00Z", now), { ageDays: 0, label: "Source reviewed today", state: "fresh" });
+  assert.deepEqual(roadFreshness("2026-09-09T01:00:00Z", now), { ageDays: 1, label: "Source reviewed yesterday", state: "fresh" });
+  assert.deepEqual(roadFreshness("2026-09-07T01:00:00Z", now), { ageDays: 3, label: "Source reviewed 3 days ago", state: "recent" });
+  assert.deepEqual(roadFreshness("2026-09-06T01:00:00Z", now), { ageDays: 4, label: "Source review · 4 days ago", state: "stale" });
   assert.deepEqual(roadFreshness("bad-date", now), { ageDays: null, label: "Unknown", state: "unknown" });
   assert.deepEqual(roadFreshness(null, now), { ageDays: null, label: "Unknown", state: "unknown" });
+  assert.equal(roadSourceAgeLabel("2026-09-06T01:00:00Z", "2026-09-10T01:00:00Z", "en", now), "Source data · 4 days old");
+  assert.equal(roadSourceAgeLabel("2026-09-06T01:00:00Z", "2026-09-10T01:00:00Z", "sq", now), "Të dhënat e burimit · 4 ditë të vjetra");
   assert.deepEqual(formatRoadMetricTimestamp("2026-09-10T08:43:00+02:00"), { date: "10 Sept 2026", time: "08:43 CEST" });
 });
 
@@ -60,6 +62,7 @@ test("route-specific static pages contain useful provenance, safe wording, metad
   assert.match(html, /Albanian State Police/);
   assert.match(html, /Calculate fuel cost/);
   assert.match(html, /View source/);
+  assert.match(html, /does not query road authorities in real time/);
   assert.doesNotMatch(html, /safe to drive|definitely open|safe road/i);
   assert.equal(countRouteStatuses(route).RESTRICTED, 1);
   assert.match(routeShareText(route, "https://karburantisot.com/road-status/tirana-korce"), /RESTRICTED/);

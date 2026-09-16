@@ -9,6 +9,7 @@ import { formatFuelPrice } from "../../utils/priceDisplay";
 import LoadingRow from "../feedback/LeadingRow";
 import PriceKpi from "./PriceKpi";
 import { getIso2ForCountry, getFlagImgUrl } from "../../utils/countryFlag";
+import TripSelect from "../content/TripSelect";
 
 type Props = {
   t: TDict;
@@ -113,16 +114,7 @@ export default function FuelCard({
         {data ? (
           <>
             <div className="fuelControlGrid">
-              <div className="field">
-                <div className="label">{t.selectCountry}</div>
-                <select className="select" aria-label={t.selectCountry} value={country} onChange={(e) => onSelectCountry(e.target.value)}>
-                  {countries.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <TripSelect label={t.selectCountry} value={country} options={countries.map((c) => ({ value: c, label: c }))} onChange={onSelectCountry} />
             </div>
 
             <div className="quickCountryWrap">

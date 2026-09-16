@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { TDict } from "../locales";
 import type { LatestEurope, FuelType } from "../models/fuel";
@@ -5,7 +6,10 @@ import type { Currency } from "../models/currency";
 import type { FxRates } from "../utils/currency";
 import type { Trends } from "../models/trends";
 import RankingCard from "../components/fuel/RankingCard";
-import EuropeChoroplethMap from "../components/fuel/EuropeChoroplethMap";
+import { useNearViewport } from "../hooks/useNearViewport";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+
+const EuropeChoroplethMap = lazy(() => import("../components/fuel/EuropeChoroplethMap"));
 
 type Props = {
   t: TDict;
@@ -31,6 +35,8 @@ export default function RankingsPage({
   onOpen,
 }: Props) {
   const navigate = useNavigate();
+  const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
+  const mapNear = useNearViewport(mapElement, "250px");
 
   const openCountry = (c: string) => {
     onOpen(c);
@@ -51,7 +57,10 @@ export default function RankingsPage({
         onOpen={openCountry}
       />
 
-      <EuropeChoroplethMap data={data} fuelType={fuelType} currentCountry={country} onOpen={openCountry} />
+      <div ref={setMapElement} className="deferredMap">
+        {mapNear ? <Suspense fallback={null}><EuropeChoroplethMap data={data} fuelType={fuelType} currentCountry={country} onOpen={openCountry} /></Suspense> : null}
+      </div>
+      <AdsterraNativeAd location="rankings-after-map" />
 
       <article className="contentPage">
         <section className="contentSection">

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getPublishedArticles } from "../config/articles";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 function formatDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00Z`);
@@ -39,6 +40,7 @@ export default function InsightsIndexPage() {
           <Link to={`/insights/${a.slug}`} className="inlineLink">Read the article →</Link>
         </section>
       ))}
+      <AdsterraNativeAd location="insights-after-articles" />
 
       <section className="contentSection">
         <h2 className="contentHeading">More from Fuel Today</h2>

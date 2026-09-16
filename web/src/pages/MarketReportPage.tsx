@@ -4,6 +4,7 @@ import { editorialCopy } from "../config/editorialCopy";
 import { MARKET_REPORT_HTML } from "../generated/marketReport";
 import { ANALYSIS_META } from "../generated/analysisMeta";
 import { isEuropeanCountry } from "../utils/regions";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 /**
  * A market report is read for its numbers, so the headline figures sit above
@@ -91,6 +92,7 @@ export default function MarketReportPage({ lang, data }: { lang: Lang; data: Lat
       ) : null}
 
       <div className="reportBody marketReportHtml" dangerouslySetInnerHTML={{ __html: MARKET_REPORT_HTML }} />
+      <AdsterraNativeAd location="market-report-after-analysis" />
     </main>
   );
 }

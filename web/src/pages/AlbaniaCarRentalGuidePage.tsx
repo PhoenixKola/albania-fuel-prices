@@ -4,6 +4,7 @@ import type { LatestEurope } from "../models/fuel";
 import { RentalGuideSections, RentalGuideSources, RentalGuideHighlights, TravelHeader, TripExample } from "../components/content/TravelContent";
 import RentalReferral from "../components/ads/RentalReferral";
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+import AdsterraBannerAd from "../components/ads/AdsterraBannerAd";
 import type { MonetizationConfig } from "../config/monetization";
 import RoadStatusLink from "../components/road/RoadStatusLink";
 
@@ -16,6 +17,7 @@ export default function AlbaniaCarRentalGuidePage({ lang, data, config }: { lang
     <RoadStatusLink lang={lang} />
     <RentalReferral lang={lang} placement="guide" config={config} />
     <RentalGuideSections lang={lang} start={2} />
+    <AdsterraBannerAd location="rental-guide-after-planning-sections" />
     <RentalGuideSources lang={lang} /><TravelLinks lang={lang} />
   </article>;
 }

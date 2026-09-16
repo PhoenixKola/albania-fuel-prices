@@ -61,8 +61,7 @@
 .tripSelectTrigger[aria-expanded="true"] { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent); }
 .tripSelectChevron { flex-shrink: 0; color: var(--muted); transition: transform .18s; }
 .tripSelectOpen .tripSelectChevron { transform: rotate(180deg); color: var(--primary); }
-.tripSelectMenu { position: absolute; z-index: 1; inset: calc(100% + 8px) 0 auto; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--primary) 35%, transparent) transparent; margin: 0; padding: 6px; list-style: none; border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border)); border-radius: 14px; background: var(--bg); box-shadow: 0 16px 36px -10px #0006, 0 3px 8px #0001; }
-.tripSelectMenuAbove { top: auto; bottom: calc(100% + 8px); }
+.tripSelectMenu { position: fixed; z-index: 120; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--primary) 35%, transparent) transparent; margin: 0; padding: 6px; list-style: none; border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border)); border-radius: 14px; background: var(--card); box-shadow: 0 16px 36px -10px #0006, 0 3px 8px #0001; }
 .tripSelectOption { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 10px 12px; border-radius: 8px; color: var(--text); font-size: 14px; line-height: 1.5; cursor: pointer; overflow-wrap: anywhere; }
 .tripSelectOption > svg { flex-shrink: 0; visibility: hidden; color: var(--primary); }
 .tripSelectOption[aria-selected="true"] { color: var(--primary); font-weight: 600; }
@@ -76,7 +75,10 @@
 .tripDistanceChips button:focus-visible, .travelPage a:focus-visible, .travelPage button:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
 .tripPreferences { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
 .tripForm .tripCheckbox { display: flex; gap: 12px; align-items: center; font-size: 14px; color: var(--text); cursor: pointer; }
-.tripCheckbox input { accent-color: var(--primary); width: 19px; height: 19px; flex-shrink: 0; }
+.tripCheckbox input { appearance: none; width: 19px; height: 19px; flex-shrink: 0; margin: 0; border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border)); border-radius: 5px; background: var(--card); cursor: pointer; transition: background-color .15s, border-color .15s; }
+.tripCheckbox input:checked { border-color: var(--primary); background: var(--primary); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m4 10 4 4 8-8' fill='none' stroke='%23062019' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-theme="light"] .tripCheckbox input:checked { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m4 10 4 4 8-8' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.tripCheckbox input:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 .tripResults {
   color: var(--text);
   background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--primary) 9%, var(--card)), var(--card-2) 68%);
@@ -155,6 +157,9 @@
 .adsterraPlacement { margin: 48px 0; min-height: 118px; padding: 12px 0; border-block: 1px solid var(--border); overflow: hidden; transition: opacity .18s ease; }
 .adsterraPlacementLabel { display: block; margin-bottom: 8px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
 .adsterraPlacement > div { width: 100%; min-width: 0; overflow: hidden; }
+.adsterraBannerPlacement { min-height: 290px; overflow: visible; }
+.adsterraBannerPlacement .adsterraBannerSlot { position: relative; left: 50%; width: 300px; min-width: 300px; height: 250px; overflow: visible; transform: translateX(-50%); }
+.adsterraBannerSlot iframe { display: block; width: 300px; height: 250px; border: 0; }
 .adsterraPlacement[data-state="empty"] { display: none; }
 .privacyChoicesButton { border: 0; background: transparent; font: inherit; cursor: pointer; padding: 0; }
 .privacyOverlay { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: end center; padding: 22px; background: color-mix(in srgb, #000 48%, transparent); backdrop-filter: blur(5px); }

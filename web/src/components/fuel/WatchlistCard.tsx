@@ -9,6 +9,7 @@ import { formatFuelPrice } from "../../utils/priceDisplay";
 import type { FxRates } from "../../utils/currency";
 import { getIso2ForCountry, getFlagImgUrl } from "../../utils/countryFlag";
 import CompareTrendChart from "./CompareTrendChart";
+import TripSelect from "../content/TripSelect";
 
 type Props = {
   t: TDict;
@@ -75,16 +76,7 @@ export default function WatchlistCard({
         </p>
 
         <div className="watchlistAddPanel">
-          <div className="field watchlistAddField">
-            <div className="label">Country to compare</div>
-            <select className="select" aria-label={t.selectCountry} value={countryToAdd} onChange={(e) => setCountryToAdd(e.target.value)}>
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TripSelect className="watchlistAddField" label={t.selectCountry} value={countryToAdd} options={countries.map((country) => ({ value: country, label: country }))} onChange={setCountryToAdd} />
           <button
             className="btn btn-primary watchlistAddBtn"
             type="button"

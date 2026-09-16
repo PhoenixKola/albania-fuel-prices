@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import opening_hours from "opening_hours";
 import { haversineKm } from "../utils/geo";
 
 export type Station = {
@@ -25,11 +24,11 @@ function is24Hours(openingHours?: string) {
   return normalized === "24/7" || normalized === "00:00-24:00" || normalized.includes("24/7");
 }
 
-function getOpenNow(openingHours?: string): boolean | null {
-  if (!openingHours) return null;
+function getOpenNow(openingHours: string | undefined, parser: typeof import("opening_hours").default | null): boolean | null {
+  if (!openingHours || !parser) return null;
 
   try {
-    const oh = new opening_hours(openingHours, null);
+    const oh = new parser(openingHours, null);
     return oh.getState();
   } catch {
     return null;
@@ -121,6 +120,9 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
       const json = await r.json();
       const elements: OverpassElement[] = Array.isArray(json?.elements) ? json.elements : [];
+      // The parser is large; only fetch it after a location search returns opening-hour data.
+      const hoursParser = elements.some((element) => typeof element.tags?.opening_hours === "string")
+        ? (await import("opening_hours")).default : null;
 
       const parsed = elements
         .map((el) => {
@@ -148,7 +150,7 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
             distanceKm: d,
             openingHours,
             isOpen24Hours: is24Hours(openingHours),
-            isOpenNow: getOpenNow(openingHours)
+            isOpenNow: getOpenNow(openingHours, hoursParser)
           } as Station;
         })
         .filter(Boolean) as Station[];

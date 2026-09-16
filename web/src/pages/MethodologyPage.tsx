@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 import { ANALYSIS_META } from "../generated/analysisMeta";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+import AdsterraBannerAd from "../components/ads/AdsterraBannerAd";
 
 type Props = { t: TDict };
 
@@ -41,6 +43,8 @@ export default function MethodologyPage({ t }: Props) {
         <h2 className="contentHeading">{t.methodologyUpdateTitle}</h2>
         <p className="contentBody">{t.methodologyUpdateP1}</p>
       </section>
+
+      <AdsterraNativeAd location="methodology-after-data-process" />
 
       <section className="contentSection">
         <h2 className="contentHeading">{t.methodologyEditorialTitle}</h2>
@@ -111,6 +115,8 @@ export default function MethodologyPage({ t }: Props) {
           Before making travel or purchasing decisions, users should verify prices with local stations or official channels. For practical examples, see <Link to="/road-trip-fuel-guide" className="inlineLink">Road trip fuel guide</Link>.
         </p>
       </section>
+
+      <AdsterraBannerAd location="methodology-after-analysis" />
 
 
     </article>

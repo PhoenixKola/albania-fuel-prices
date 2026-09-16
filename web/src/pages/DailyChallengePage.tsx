@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { isEuropeanCountry } from "../utils/regions";
 import { GameChoice, GameCountryFlag, GameHeader } from "../components/games/GameChrome";
 import "../styles/games.css";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 type FuelKey = "gasoline95_eur" | "diesel_eur";
 
@@ -421,6 +422,7 @@ export default function DailyChallengePage(props: Props) {
   return (
     <>
       <DailyChallengeGame {...props} />
+      {!props.loading && props.data ? <AdsterraNativeAd location="daily-challenge-after-game" /> : null}
       <DailyChallengeAbout />
     </>
   );

@@ -1001,8 +1001,10 @@ async function main() {
 
     let html = template.replace("</head>", `${head}\n  </head>`);
 
-    // Inject static content inside <div id="root">
-    html = html.replace('<div id="root"></div>', `<div id="root">${content}</div>`);
+    // Keep the first paint close to the SPA shell so the navbar does not push
+    // the entire prerendered article down when React takes over.
+    const shell = `<div class="page"><div class="container"><nav class="prerenderNav" aria-label="Primary navigation"><a class="prerenderBrand" href="/">Fuel Today</a><div class="prerenderNavLinks"><a href="/">Home</a><a href="/market-report">Market report</a><a href="/compare">Compare</a><a href="/rankings">Rankings</a><a href="/stations">Stations</a></div></nav>${content}</div></div>`;
+    html = html.replace('<div id="root"></div>', `<div id="root">${shell}</div>`);
 
     // Flat .html output: Cloudflare Pages serves /foo from foo.html with a
     // direct 200 (and 308s /foo/ -> /foo), matching the slashless canonicals.

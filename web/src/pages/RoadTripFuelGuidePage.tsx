@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { TDict } from "../locales";
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+import AdsterraBannerAd from "../components/ads/AdsterraBannerAd";
 
 import type { Lang } from "../models/i18n";
 import { TravelLinks } from "../components/content/TravelLinks";
@@ -85,6 +86,7 @@ export default function RoadTripFuelGuidePage({ t, lang }: Props) {
         </ul>
       </section>
 
+      <AdsterraBannerAd location="road-trip-guide-after-planning" />
       <section className="contentSection">
         <h2 className="contentHeading">{lang === "sq" ? "Ndryshimet në planifikim për benzinën, naftën dhe LPG-në" : "Petrol, diesel, and LPG planning differences"}</h2>
         <p className="contentBody">

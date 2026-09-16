@@ -14,6 +14,7 @@ import RentalReferral from "../components/ads/RentalReferral";
 import type { MonetizationConfig } from "../config/monetization";
 import TripSelect from "../components/content/TripSelect";
 import RoadStatusLink from "../components/road/RoadStatusLink";
+import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
 type Props = { lang: Lang; data: LatestEurope | null; fxRates: FxRates | null; loading: boolean; config?: MonetizationConfig };
 export default function TripCostCalculatorPage(props: Props) {
@@ -85,6 +86,7 @@ function TripCalculator({ lang, data, fxRates, loading, search, config }: Props 
         {share ? <div className="tripShare"><p role="status">{share.copied ? c.copied : c.copyFallback}</p><label>{c.shareLink}<input readOnly value={share.url} onFocus={(event) => event.target.select()} /></label></div> : null}
       </section>
     </div>
+    <AdsterraNativeAd location="calculator-after-results" />
     <RoadStatusLink lang={lang} />
     <RentalReferral lang={lang} placement="calculator" config={config} />
     <TripExplanation lang={lang} />

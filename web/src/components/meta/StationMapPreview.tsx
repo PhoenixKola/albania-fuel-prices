@@ -61,6 +61,9 @@ export default function StationMapPreview({ center, stations, onSelect }: Props)
             src={`https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`}
             alt=""
             loading="lazy"
+            decoding="async"
+            width={TILE_SIZE}
+            height={TILE_SIZE}
             style={{
               left: `calc(50% + ${((tile.x - centerX) * TILE_SIZE).toFixed(2)}px)`,
               top: `calc(50% + ${((tile.y - centerY) * TILE_SIZE).toFixed(2)}px)`,
