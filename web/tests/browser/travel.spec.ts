@@ -418,6 +418,31 @@ test("public language picker restores and persists Albanian on desktop and mobil
   expect(counters.errors).toEqual([]);
 });
 
+test("Albanian navbar keeps every action inside its border", async ({ page }) => {
+  await isolate(page);
+  await page.goto(`${origin}/trip-cost-calculator`);
+  await page.getByRole("button", { name: "Switch to Albanian" }).click();
+  for (const width of [1100, 1200, 1240, 1241, 1366]) {
+    await page.setViewportSize({ width, height: 900 });
+    const layout = await page.evaluate(() => {
+      const nav = document.querySelector(".navbar")!.getBoundingClientRect();
+      const compact = window.innerWidth <= 1240;
+      const action = document.querySelector(compact ? ".hamburgerBtn" : ".navActions .btn:last-child")!.getBoundingClientRect();
+      const brand = document.querySelector(".brand")!.getBoundingClientRect();
+      const title = document.querySelector<HTMLElement>(".brand .h1")!;
+      const links = document.querySelector(".navLinks")!.getBoundingClientRect();
+      const actions = document.querySelector(".navActions")!.getBoundingClientRect();
+      return { left: action.left, right: action.right, navLeft: nav.left, navRight: nav.right, brandRight: brand.right,
+        titleFits: title.scrollWidth <= title.clientWidth, linksRight: links.right, actionsLeft: actions.left, compact };
+    });
+    expect(layout.left).toBeGreaterThanOrEqual(layout.brandRight);
+    expect(layout.right).toBeLessThanOrEqual(layout.navRight - 8);
+    expect(layout.navLeft).toBeGreaterThanOrEqual(0);
+    expect(layout.titleFits).toBe(true);
+    if (!layout.compact) expect(layout.linksRight).toBeLessThanOrEqual(layout.actionsLeft);
+  }
+});
+
 test("disabled-ad visual matrix stays responsive across priority routes and themes", async ({ page }) => {
   const counters = await isolate(page, { advertising: false });
   await page.goto(origin);

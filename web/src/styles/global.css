@@ -471,6 +471,25 @@ input {
   }
 }
 
+/* Albanian labels need more room than their English counterparts. Keep the
+   desktop bar compact where it fits, then use the existing drawer sooner. */
+.navbarSq .navbarInner { gap: 8px; }
+.navbarSq .navLinks { gap: 2px; }
+.navbarSq .navLink,
+.navbarSq .navMenuBtn { padding-inline: 8px; }
+.navbarSq .navActions { gap: 6px; }
+.navbarSq .navActions .btn { padding-inline: 10px; }
+
+@media (min-width: 1025px) and (max-width: 1240px) {
+  .navbarSq .navLinks,
+  .navbarSq .navActions { display: none; }
+  .navbarSq .hamburgerBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 .brand {
   flex: 1 1 auto;
   overflow: hidden;

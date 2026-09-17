@@ -243,7 +243,7 @@ export default function Navbar({
   );
 
   return (
-    <nav className="navbar" ref={menuRef}>
+    <nav className={`navbar${lang === "sq" ? " navbarSq" : ""}`} ref={menuRef}>
       <div className="navbarInner">
         <Link to="/" className="brand">
           <img className="logoImg" src={logoSrc} alt="" aria-hidden="true" width="44" height="44" decoding="async" />
