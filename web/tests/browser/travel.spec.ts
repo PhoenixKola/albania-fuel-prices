@@ -67,13 +67,13 @@ test("homepage and Albania price page expose the travel entry points and bounded
   expect(counters.errors).toEqual([]);
 });
 
-test("homepage search paths and cockpit anchor stay accessible and hash-aware", async ({ page }) => {
+test("homepage search paths and price-tool anchor stay accessible and hash-aware", async ({ page }) => {
   const counters = await isolate(page);
   await page.goto(origin);
   await expect(page).toHaveTitle("Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG");
   await expect(page.locator("html")).toHaveCSS("scroll-behavior", "smooth");
   await expect(page.locator(".homeHeroQuickLinks")).toContainText("Albania fuel prices");
-  await page.getByRole("link", { name: "Enter the cockpit", exact: true }).click();
+  await page.locator(".homeHeroQuickLinks").getByRole("link", { name: "Albania fuel prices", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/#price-tool`);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
   const targetTop = await page.locator("#price-tool").evaluate((element) => element.getBoundingClientRect().top);
@@ -104,8 +104,8 @@ test("polished travel UI follows the active theme and keeps compact CTAs", async
   await cta.focus();
   await expect(cta).toHaveCSS("outline-style", "solid");
 
-  await page.getByRole("button", { name: "Tools", exact: true }).click();
-  await expect(page.locator("#nav-tools-links").getByRole("link", { name: "Trip Calculator", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Plan", exact: true }).click();
+  await expect(page.locator("#nav-plan-links").getByRole("link", { name: "Trip Calculator", exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Toggle theme", exact: true }).click();
   await expect(page.locator(".travelHeroArt")).toHaveCSS("color", "rgb(196, 246, 225)");
@@ -163,7 +163,7 @@ test("homepage and comparison country pickers use the shared accessible menu", a
   const counters = await isolate(page);
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto(origin);
-  const country = page.locator(".fuelHeroCard").getByRole("combobox");
+  const country = page.locator(".homeFuelPulse").getByRole("combobox");
   await country.focus();
   await page.keyboard.press("ArrowDown");
   await expect(page.getByRole("listbox")).toBeVisible();
@@ -315,7 +315,7 @@ test("SPA navigation keeps one unit of each format and respects short and exclud
   await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
   await page.locator(".adsterraPlacement").scrollIntoViewIfNeeded();
   await expect.poll(() => counters.adScripts).toBe(1);
-  await page.locator('a[href="/fuel-prices/albania"]').first().click();
+  await page.locator('a[href="/fuel-prices/albania"]:visible').first().click();
   await expect(page).toHaveURL(`${origin}/fuel-prices/albania`);
   await expect(page.locator(".adsterraPlacement")).toHaveCount(2);
   await page.locator('[data-ad-format="native"]').scrollIntoViewIfNeeded();
@@ -334,8 +334,8 @@ test("SPA navigation keeps one unit of each format and respects short and exclud
   await expect.poll(() => counters.bannerScripts).toBe(2);
   await expect(page.locator("#container-d3a677f82e7972dbdc5767166cde992f")).toHaveCount(1);
   await expect(page.locator(".adsterraBannerSlot iframe")).toHaveCount(1);
-  await page.getByRole("button", { name: "Tools", exact: true }).click();
-  await page.locator("#nav-tools-links").getByRole("link", { name: "Trip Calculator" }).click();
+  await page.getByRole("button", { name: "Plan", exact: true }).click();
+  await page.locator("#nav-plan-links").getByRole("link", { name: "Trip Calculator" }).click();
   await expect(page.locator(".adsterraPlacement")).toHaveCount(1);
   await expect(page.locator(".adsterraBannerSlot iframe")).toHaveCount(0);
   expect(counters.bannerScripts).toBe(2);

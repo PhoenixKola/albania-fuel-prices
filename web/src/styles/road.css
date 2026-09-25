@@ -294,8 +294,6 @@
 .roadEntry strong { color: var(--text); font-size: 15px; }
 .roadEntry p { max-width: 580px; margin: 3px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .roadEntry a { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-size: 10px; font-weight: 830; letter-spacing: 0.07em; text-decoration: none; text-transform: uppercase; }
-.roadEntryFeatured { min-height: 120px; padding: 24px 28px; border-color: color-mix(in srgb, var(--primary) 28%, var(--border)); background: radial-gradient(circle at 90% 0, color-mix(in srgb, var(--primary) 10%, transparent), transparent 34%), var(--surface); }
-
 @media (max-width: 980px) {
   .roadHero { grid-template-columns: minmax(0, 1fr) 230px; }
   .roadDashboard { grid-template-columns: 1fr; }

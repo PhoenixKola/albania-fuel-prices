@@ -33,6 +33,8 @@ export type LineChartOptions = {
   title: string;
   /** Formats a value for the axis labels. */
   format?: (v: number) => string;
+  /** Formats ISO dates for the horizontal axis. */
+  formatDate?: (iso: string) => string;
   width?: number;
   height?: number;
   /** Draw a dashed line at this value (e.g. the period average). */
@@ -48,6 +50,7 @@ export function renderLineChart(opts: LineChartOptions): string {
     points,
     title,
     format = (v) => `€${v.toFixed(2)}`,
+    formatDate: formatAxisDate = shortDate,
     width = 760,
     height = 260,
     reference,
@@ -110,7 +113,7 @@ export function renderLineChart(opts: LineChartOptions): string {
   ]
     .map(
       ({ i, anchor }) =>
-        `<text x="${x(i).toFixed(1)}" y="${height - 8}" text-anchor="${anchor}" font-size="11" fill="currentColor" fill-opacity="0.6">${esc(shortDate(points[i].date))}</text>`
+        `<text x="${x(i).toFixed(1)}" y="${height - 8}" text-anchor="${anchor}" font-size="11" fill="currentColor" fill-opacity="0.6">${esc(formatAxisDate(points[i].date))}</text>`
     )
     .join("");
 

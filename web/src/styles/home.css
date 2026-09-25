@@ -41,661 +41,6 @@
   --home-dim: rgba(16, 33, 29, 0.62);
 }
 
-:root[data-theme="light"] .homeCockpitHero {
-  color: #10211d;
-  background:
-    linear-gradient(90deg, rgba(250, 249, 244, 0.99) 0%, rgba(244, 247, 242, 0.96) 46%, rgba(231, 241, 235, 0.94) 100%),
-    radial-gradient(circle at 78% 44%, rgba(5, 128, 88, 0.15), transparent 34%),
-    #f7f6f1;
-  border-bottom-color: rgba(8, 102, 74, 0.18);
-}
-
-:root[data-theme="light"] .homeCockpitHero::before {
-  opacity: 0.52;
-  background-image:
-    linear-gradient(rgba(7, 112, 80, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(7, 112, 80, 0.06) 1px, transparent 1px);
-}
-
-:root[data-theme="light"] .homeCockpitHero::after {
-  border-color: rgba(7, 112, 80, 0.13);
-  box-shadow: 0 0 0 90px rgba(7, 112, 80, 0.025), 0 0 0 190px rgba(7, 112, 80, 0.018);
-}
-
-.homeCockpitHero {
-  position: relative;
-  min-height: min(760px, calc(100vh - 120px));
-  min-height: min(760px, calc(100svh - 120px));
-  margin-inline: calc(50% - 50vw);
-  margin-top: -22px;
-  padding: clamp(54px, 7vw, 104px) max(18px, calc((100vw - var(--container)) / 2 + 18px));
-  overflow: hidden;
-  min-width: 0;
-  color: #f5f1e8;
-  background:
-    linear-gradient(90deg, rgba(5, 12, 11, 0.98) 0%, rgba(5, 13, 12, 0.91) 43%, rgba(4, 12, 11, 0.78) 100%),
-    radial-gradient(circle at 78% 44%, rgba(42, 233, 164, 0.13), transparent 32%),
-    #050c0b;
-  border-bottom: 1px solid rgba(126, 238, 196, 0.14);
-}
-
-.homeCockpitHero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.34;
-  background-image:
-    linear-gradient(rgba(95, 242, 189, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(95, 242, 189, 0.045) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: linear-gradient(to right, transparent, #000 44%, #000);
-}
-
-.homeCockpitHero::after {
-  content: "";
-  position: absolute;
-  width: min(64vw, 900px);
-  aspect-ratio: 1;
-  right: -12vw;
-  top: 50%;
-  translate: 0 -50%;
-  border-radius: 50%;
-  border: 1px solid rgba(95, 242, 189, 0.09);
-  box-shadow: 0 0 0 90px rgba(95, 242, 189, 0.018), 0 0 0 190px rgba(95, 242, 189, 0.012);
-  pointer-events: none;
-}
-
-.homeHeroGrid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(470px, 1.08fr);
-  align-items: center;
-  gap: clamp(28px, 6vw, 92px);
-  max-width: var(--container);
-  min-height: 560px;
-  min-width: 0;
-  margin: 0 auto;
-}
-
-.homeHeroCopy {
-  position: relative;
-  z-index: 3;
-  min-width: 0;
-  animation: home-rise 760ms cubic-bezier(0.2, 0.85, 0.25, 1) both;
-}
-
-.homeEyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  color: var(--home-emerald);
-  font-size: 11px;
-  line-height: 1.2;
-  font-weight: 800;
-  letter-spacing: 0.19em;
-  text-transform: uppercase;
-}
-
-.homeHeroEyebrow {
-  color: #79f6c8;
-  margin-bottom: 24px;
-}
-
-:root[data-theme="light"] .homeHeroEyebrow { color: #086f50; }
-
-.homeLiveDot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: #5ff2bd;
-  box-shadow: 0 0 0 5px rgba(95, 242, 189, 0.11), 0 0 18px rgba(95, 242, 189, 0.6);
-}
-
-.homeHeroTitle {
-  max-width: 760px;
-  margin: 0;
-  color: #f8f6ef;
-  font-size: clamp(48px, 6.3vw, 92px);
-  line-height: 0.92;
-  font-weight: 760;
-  letter-spacing: -0.072em;
-  text-wrap: balance;
-}
-
-:root[data-theme="light"] .homeHeroTitle { color: #0a1b17; }
-
-.homeHeroText {
-  max-width: 640px;
-  margin: 28px 0 0;
-  color: rgba(235, 245, 239, 0.7);
-  font-size: clamp(16px, 1.45vw, 20px);
-  line-height: 1.7;
-  letter-spacing: -0.015em;
-}
-
-:root[data-theme="light"] .homeHeroText { color: rgba(10, 31, 25, 0.7); }
-
-.homeHeroActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 34px;
-}
-
-.homeButton {
-  min-height: 50px;
-  padding: 0 21px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-}
-
-.homeButtonPrimary {
-  color: #07130f;
-  border-color: #66f5c0;
-  background: linear-gradient(135deg, #85f8cf, #3edca5);
-  box-shadow: 0 12px 34px rgba(44, 229, 161, 0.18);
-}
-
-.homeButtonGhost {
-  color: #eaf5ef;
-  background: rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(12px);
-}
-
-:root[data-theme="light"] .homeButtonGhost {
-  color: #10352b;
-  border-color: rgba(8, 82, 61, 0.24);
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.homeButton:hover {
-  transform: translateY(-2px);
-}
-
-.homeButtonPrimary:hover {
-  box-shadow: 0 17px 38px rgba(44, 229, 161, 0.25);
-}
-
-.homeButtonGhost:hover {
-  border-color: rgba(95, 242, 189, 0.45);
-  background: rgba(95, 242, 189, 0.075);
-}
-
-.homeHeroQuickLinks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  margin-top: 18px;
-}
-
-.homeHeroQuickLinks a {
-  color: rgba(231, 246, 239, 0.72);
-  font-size: 12px;
-  font-weight: 720;
-  text-decoration: underline;
-  text-decoration-color: rgba(97, 239, 189, 0.38);
-  text-underline-offset: 5px;
-  transition: color 160ms ease, text-decoration-color 160ms ease;
-}
-
-.homeHeroQuickLinks a:hover {
-  color: #effff7;
-  text-decoration-color: #61efbd;
-}
-
-:root[data-theme="light"] .homeHeroQuickLinks a { color: rgba(10, 45, 35, 0.7); }
-:root[data-theme="light"] .homeHeroQuickLinks a:hover { color: #075f46; }
-
-.homeHeroQuickLinks a:focus-visible {
-  border-radius: 3px;
-  outline: 3px solid #ffbd59;
-  outline-offset: 4px;
-}
-
-.homeButton:focus-visible,
-.homeRouteCard:focus-visible {
-  outline: 3px solid #ffbd59;
-  outline-offset: 4px;
-}
-
-#price-tool { scroll-margin-top: 116px; }
-
-@media (prefers-reduced-motion: reduce) {
-  .homeHeroQuickLinks a { transition: none; }
-}
-
-.homeTrustRail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-  margin-top: 30px;
-  color: rgba(232, 242, 237, 0.52);
-  font-size: 11px;
-  font-weight: 650;
-  letter-spacing: 0.02em;
-}
-
-.homeTrustRail span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.homeTrustRail i {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #65eebc;
-}
-
-:root[data-theme="light"] .homeTrustRail { color: rgba(10, 42, 33, 0.62); }
-
-
-
-
-.homeCockpitScene {
-  --scene-rx: 0deg;
-  --scene-ry: 0deg;
-  --light-x: 50%;
-  --light-y: 42%;
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 520px;
-  min-width: 0;
-  width: 100%;
-  perspective: 1200px;
-  animation: home-scene-in 950ms 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.homeCockpitGlow {
-  position: absolute;
-  inset: 5% -5%;
-  border-radius: 50%;
-  opacity: 0.9;
-  background: radial-gradient(circle at var(--light-x) var(--light-y), rgba(88, 241, 186, 0.25), rgba(22, 112, 84, 0.08) 34%, transparent 68%);
-  filter: blur(8px);
-  transition: background-position 100ms linear;
-  pointer-events: none;
-}
-
-:root[data-theme="light"] .homeCockpitGlow {
-  opacity: 0.72;
-  background: radial-gradient(circle at var(--light-x) var(--light-y), rgba(16, 159, 111, 0.22), rgba(48, 126, 97, 0.07) 35%, transparent 68%);
-}
-
-.homeClusterShell {
-  position: relative;
-  width: min(100%, 620px);
-  min-height: 420px;
-  padding: 42px 34px 26px;
-  overflow: hidden;
-  transform: rotateX(var(--scene-rx)) rotateY(var(--scene-ry));
-  transform-style: preserve-3d;
-  transition: transform 160ms ease-out;
-  border: 1px solid rgba(131, 241, 200, 0.22);
-  border-radius: 42% 42% 22px 22px / 28% 28% 22px 22px;
-  background:
-    linear-gradient(130deg, rgba(255, 255, 255, 0.07), transparent 18%, transparent 78%, rgba(95, 242, 189, 0.05)),
-    linear-gradient(180deg, #111b1a, #080e0d 68%);
-  box-shadow:
-    0 50px 100px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    inset 0 -20px 40px rgba(0, 0, 0, 0.34),
-    0 0 70px rgba(31, 205, 145, 0.08);
-}
-
-:root[data-theme="light"] .homeClusterShell {
-  border-color: rgba(6, 102, 73, 0.3);
-  background:
-    linear-gradient(130deg, rgba(255, 255, 255, 0.88), transparent 22%, transparent 76%, rgba(7, 125, 88, 0.06)),
-    linear-gradient(180deg, #fbfcf8, #e8eee9 70%);
-  box-shadow:
-    0 44px 90px rgba(18, 59, 47, 0.2),
-    inset 0 1px 0 #fff,
-    inset 0 -20px 42px rgba(42, 77, 65, 0.1),
-    0 0 65px rgba(11, 124, 87, 0.08);
-}
-
-.homeClusterShell::before {
-  content: "";
-  position: absolute;
-  inset: 9px;
-  border: 1px solid rgba(211, 255, 237, 0.07);
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-:root[data-theme="light"] .homeClusterShell::before { border-color: rgba(7, 89, 65, 0.14); }
-
-.homeClusterTopline {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  color: rgba(229, 244, 237, 0.48);
-  font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  padding-inline: clamp(20px, 5vw, 56px);
-}
-
-.homeClusterTopline span:first-child {
-  color: #74efc1;
-}
-
-:root[data-theme="light"] .homeClusterTopline { color: rgba(9, 48, 37, 0.58); }
-:root[data-theme="light"] .homeClusterTopline span:first-child { color: #076e4e; }
-
-.homeClusterTopline b {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  margin-right: 7px;
-  border-radius: 50%;
-  background: #5ff2bd;
-  box-shadow: 0 0 9px rgba(95, 242, 189, 0.8);
-}
-
-.homeGauge {
-  position: relative;
-  z-index: 1;
-  width: min(320px, 78%);
-  aspect-ratio: 1;
-  margin: -2px auto -54px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, transparent 57%, rgba(0, 0, 0, 0.6) 58%, transparent 61%),
-    conic-gradient(from 222deg, #5ff2bd 0 var(--gauge-progress), rgba(95, 242, 189, 0.08) var(--gauge-progress) 76%, transparent 76% 100%);
-  filter: drop-shadow(0 0 15px rgba(44, 228, 162, 0.15));
-  transform: translateZ(44px);
-  animation: home-gauge-breathe 3.4s ease-in-out infinite;
-}
-
-:root[data-theme="light"] .homeGauge {
-  background:
-    radial-gradient(circle, transparent 57%, rgba(13, 62, 48, 0.14) 58%, transparent 61%),
-    conic-gradient(from 222deg, #0ba878 0 var(--gauge-progress), rgba(9, 110, 79, 0.12) var(--gauge-progress) 76%, transparent 76% 100%);
-  filter: drop-shadow(0 0 16px rgba(8, 122, 85, 0.18));
-}
-
-.homeGauge::before {
-  content: "";
-  position: absolute;
-  inset: 11px;
-  border-radius: 50%;
-  background: #09110f;
-  box-shadow: inset 0 0 58px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(177, 246, 220, 0.08);
-}
-
-:root[data-theme="light"] .homeGauge::before {
-  background: #f7faf5;
-  box-shadow: inset 0 0 58px rgba(24, 78, 60, 0.11), 0 0 0 1px rgba(5, 95, 68, 0.14);
-}
-
-.homeGauge::after {
-  content: "";
-  position: absolute;
-  inset: 31px;
-  border-radius: 50%;
-  border: 1px solid rgba(147, 245, 208, 0.13);
-  background: radial-gradient(circle at 48% 38%, rgba(95, 242, 189, 0.055), transparent 55%);
-}
-
-:root[data-theme="light"] .homeGauge::after {
-  border-color: rgba(7, 111, 79, 0.2);
-  background: radial-gradient(circle at 48% 38%, rgba(5, 143, 99, 0.08), transparent 58%);
-}
-
-:root[data-theme="light"] .homeGaugeTicks {
-  opacity: 0.72;
-  background: repeating-conic-gradient(from 222deg, rgba(7, 82, 60, 0.82) 0 1deg, transparent 1deg 8deg);
-}
-
-.homeGaugeTicks {
-  position: absolute;
-  inset: 2px;
-  border-radius: 50%;
-  opacity: 0.5;
-  background: repeating-conic-gradient(from 222deg, rgba(224, 255, 244, 0.8) 0 1deg, transparent 1deg 8deg);
-  mask: radial-gradient(circle, transparent 67%, #000 68% 71%, transparent 72%);
-}
-
-.homeGaugeCore {
-  position: relative;
-  z-index: 2;
-  width: 74%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.homeGaugeLabel {
-  color: rgba(218, 239, 230, 0.47);
-  font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-:root[data-theme="light"] .homeGaugeLabel { color: rgba(11, 60, 46, 0.56); }
-
-.homeGaugePrice {
-  margin-top: 8px;
-  color: #f4f3ea;
-  font-size: clamp(38px, 4vw, 55px);
-  line-height: 1;
-  font-weight: 670;
-  letter-spacing: -0.07em;
-  text-shadow: 0 0 28px rgba(95, 242, 189, 0.13);
-}
-
-:root[data-theme="light"] .homeGaugePrice {
-  color: #0a1c17;
-  text-shadow: 0 0 24px rgba(8, 131, 92, 0.11);
-}
-
-.homeGaugeUnit {
-  margin-top: 10px;
-  color: #69e8b8;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-:root[data-theme="light"] .homeGaugeUnit { color: #087451; }
-:root[data-theme="light"] .homeGaugeUnit i { color: rgba(9, 57, 43, 0.38); }
-
-.homeGaugeUnit i {
-  margin-inline: 3px;
-  color: rgba(233, 246, 239, 0.35);
-  font-style: normal;
-}
-
-.homeClusterStats {
-  position: relative;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  transform: translateZ(58px);
-  border: 1px solid rgba(134, 236, 198, 0.12);
-  border-radius: 10px;
-  background: rgba(141, 237, 202, 0.08);
-  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.22);
-}
-
-:root[data-theme="light"] .homeClusterStats {
-  border-color: rgba(7, 111, 79, 0.2);
-  background: rgba(7, 111, 79, 0.12);
-  box-shadow: 0 18px 34px rgba(22, 65, 52, 0.12);
-}
-
-.homeClusterStats > div {
-  min-width: 0;
-  padding: 15px 13px 14px;
-  background: rgba(7, 15, 13, 0.9);
-}
-
-:root[data-theme="light"] .homeClusterStats > div { background: rgba(251, 253, 249, 0.96); }
-:root[data-theme="light"] .homeClusterStats span { color: rgba(9, 55, 42, 0.56); }
-:root[data-theme="light"] .homeClusterStats strong { color: #10231d; }
-:root[data-theme="light"] .homeClusterStats strong.isGood { color: #06704f; }
-:root[data-theme="light"] .homeClusterStats strong.isWarm { color: #935300; }
-:root[data-theme="light"] .homeClusterReflection {
-  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.62), transparent 70%);
-}
-:root[data-theme="light"] .homeOrbitLabel {
-  color: rgba(7, 62, 46, 0.65);
-  border-color: rgba(7, 102, 73, 0.22);
-  background: rgba(250, 253, 249, 0.9);
-  box-shadow: 0 12px 26px rgba(24, 67, 53, 0.12);
-}
-
-.homeClusterStats span,
-.homeClusterStats strong {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.homeClusterStats span {
-  color: rgba(220, 239, 231, 0.4);
-  font-size: 8px;
-  font-weight: 760;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
-.homeClusterStats strong {
-  margin-top: 7px;
-  color: #eaf4ef;
-  font-size: 13px;
-  font-weight: 720;
-}
-
-.homeClusterStats strong.isGood { color: #66eab8; }
-.homeClusterStats strong.isWarm { color: #ffbc58; }
-
-.homeClusterReflection {
-  position: absolute;
-  inset: -40% 35% 30% -20%;
-  z-index: 4;
-  transform: rotate(-16deg) translateZ(75px);
-  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.045), transparent 70%);
-  pointer-events: none;
-}
-
-.homeOrbitLabel {
-  position: absolute;
-  z-index: 4;
-  padding: 8px 10px;
-  border: 1px solid rgba(144, 242, 205, 0.18);
-  border-radius: 4px;
-  color: rgba(205, 239, 226, 0.53);
-  background: rgba(6, 14, 12, 0.78);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
-  font-size: 9px;
-  font-weight: 760;
-  letter-spacing: 0.14em;
-}
-
-.homeOrbitLabelTop { top: 17%; right: -2%; }
-.homeOrbitLabelBottom { bottom: 12%; left: 0; }
-
-.homeTelemetry {
-  display: grid;
-  grid-template-columns: 1.05fr repeat(4, minmax(0, 1fr));
-  margin-top: clamp(-92px, -7vw, -64px);
-  overflow: hidden;
-  border: 1px solid var(--home-line);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--home-panel-solid) 90%, transparent);
-  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.16);
-  backdrop-filter: blur(16px);
-}
-
-.homeStaleNotice {
-  margin: clamp(-72px, -6vw, -50px) 0 0;
-  padding: 14px 17px;
-  border: 1px solid color-mix(in srgb, var(--home-amber) 38%, transparent);
-  border-radius: 8px;
-  color: var(--home-cream);
-  background: color-mix(in srgb, var(--home-amber) 9%, var(--home-panel));
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.homeStaleNotice + .homeTelemetry {
-  margin-top: -48px;
-}
-
-.homeTelemetry > div {
-  min-width: 0;
-  min-height: 78px;
-  padding: 16px 17px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 7px;
-  border-left: 1px solid var(--home-line);
-}
-
-.homeTelemetry > div:first-child { border-left: 0; }
-
-.homeTelemetry span {
-  overflow: hidden;
-  color: var(--home-dim);
-  font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.09em;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.homeTelemetry strong {
-  overflow: hidden;
-  color: var(--home-cream);
-  font-size: 12px;
-  font-weight: 720;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.homeTelemetry .homeTelemetryLead {
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  color: var(--home-emerald);
-}
-
-.homeTelemetryLead strong {
-  color: var(--home-emerald);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .homeDashboardSection {
   position: relative;
   scroll-margin-top: 110px;
@@ -733,20 +78,6 @@
   line-height: 1.75;
 }
 
-.homeCommandDeck {
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
-  gap: 16px;
-  align-items: stretch;
-}
-
-.homePriceModule,
-.homeTrendModule {
-  min-width: 0;
-}
-
-.homeExperience .homePriceModule > .card,
-.homeExperience .homeTrendModule > .card,
 .homeExperience .homeCalculatorShell > .card,
 .homeExperience .homeSourcePanel > .card {
   height: 100%;
@@ -759,62 +90,9 @@
   box-shadow: 0 24px 62px rgba(0, 0, 0, 0.16);
 }
 
-.homeExperience .cardHeader,
-.homeExperience .fuelHeroTop {
+.homeExperience .cardHeader {
   border-color: var(--home-line);
   background: transparent;
-}
-
-.homeExperience .fuelHeroTitle {
-  letter-spacing: -0.05em;
-}
-
-.homeExperience .fuelHeroCard .kpiGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.homeExperience .kpiCard {
-  border-radius: 10px;
-  border-color: var(--home-line);
-  background: rgba(255, 255, 255, 0.022);
-}
-
-.homeEmptyPanel {
-  min-height: 100%;
-  padding: 34px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  border: 1px dashed color-mix(in srgb, var(--home-emerald) 32%, transparent);
-  border-radius: 14px;
-  color: var(--home-cream);
-  background: var(--home-panel);
-}
-
-.homeEmptyMark {
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--home-line);
-  border-radius: 50%;
-  color: var(--home-emerald);
-  font-size: 29px;
-}
-
-.homeEmptyPanel strong {
-  margin-top: 24px;
-  font-size: 20px;
-  letter-spacing: -0.03em;
-}
-
-.homeEmptyPanel p {
-  max-width: 420px;
-  margin: 9px 0 0;
-  color: var(--home-dim);
-  font-size: 13px;
-  line-height: 1.65;
 }
 
 .homeExperience .btn,
@@ -844,138 +122,127 @@
   background: #69f2c0;
 }
 
-.homeExperience .trendCard .body {
+.homeDecisionRoute {
+  position: relative;
+  padding-block: clamp(12px, 2vw, 24px);
+}
+
+.homeDecisionTrack {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+}
+
+.homeDecisionTrack::before {
+  content: "";
+  position: absolute;
+  top: 44px;
+  right: 5%;
+  left: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--home-emerald) 12% 88%, transparent);
+  opacity: 0.32;
+}
+
+.homeDecisionStop {
+  position: relative;
+  min-width: 0;
+  min-height: 290px;
+  padding: 27px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  color: var(--home-cream);
+  border-left: 1px solid var(--home-line);
+  transition: background-color 180ms ease;
+}
+
+.homeDecisionStop:first-child { border-left: 0; }
+.homeDecisionStop:hover { background: color-mix(in srgb, var(--home-emerald) 5%, transparent); }
+.homeDecisionStop:focus-visible { z-index: 2; outline: 3px solid #ffbd59; outline-offset: -3px; }
+
+.homeDecisionMarker {
+  position: relative;
+  z-index: 1;
+  height: 35px;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
-.homeExperience .trendChart {
-  min-height: 228px;
-}
-
-.homeRouteGrid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.homeRouteCard {
-  position: relative;
-  min-height: 330px;
-  padding: 28px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--home-line);
-  border-radius: 14px;
-  background: var(--home-panel);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14);
-  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
-}
-
-.homeRouteCard::before {
-  content: "";
-  position: absolute;
-  width: 260px;
-  aspect-ratio: 1;
-  right: -110px;
-  bottom: -130px;
-  border: 1px solid rgba(95, 242, 189, 0.15);
-  border-radius: 50%;
-  box-shadow: 0 0 0 30px rgba(95, 242, 189, 0.025), 0 0 0 70px rgba(95, 242, 189, 0.018);
-  transition: transform 260ms ease;
-  animation: home-orbit-breathe 3.8s ease-in-out infinite;
-}
-
-.homeRouteCard-compare { grid-column: span 5; }
-.homeRouteCard-rankings { grid-column: span 4; }
-.homeRouteCard-stations { grid-column: span 3; }
-
-.homeRouteCard:hover {
-  transform: translateY(-5px);
-  border-color: rgba(95, 242, 189, 0.38);
-  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.2);
-}
-
-.homeRouteCard:hover::before { transform: scale(1.1); }
-
-.homeRouteIcon {
-  width: 56px;
-  height: 56px;
+.homeDecisionMarker > i {
+  width: 35px;
+  height: 35px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(95, 242, 189, 0.22);
+  color: #06130f;
   border-radius: 50%;
-  color: var(--home-emerald);
-  background: rgba(95, 242, 189, 0.055);
+  background: var(--home-emerald);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  transition: transform 180ms ease;
 }
 
-.homeRouteIcon svg {
+.homeDecisionMarker svg {
   width: 25px;
   fill: none;
-  stroke: currentColor;
+  stroke: var(--home-emerald);
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
+  opacity: 0.72;
 }
 
-.homeRouteIndex {
-  margin-top: 32px;
-  color: var(--home-dim);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+.homeDecisionStop:hover .homeDecisionMarker > i { transform: translateX(5px); }
+
+.homeDecisionCopy {
+  margin-top: 37px;
+  display: grid;
+  gap: 13px;
 }
 
-.homeRouteCard > strong {
-  margin-top: 9px;
-  color: var(--home-cream);
-  font-size: clamp(23px, 2.6vw, 36px);
+.homeDecisionCopy strong {
+  max-width: 220px;
+  font-size: clamp(22px, 2.3vw, 31px);
   line-height: 1;
-  font-weight: 710;
   letter-spacing: -0.045em;
 }
 
-.homeRouteText {
-  max-width: 370px;
-  margin-top: 15px;
+.homeDecisionCopy small {
+  max-width: 235px;
   color: var(--home-dim);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.65;
 }
 
-.homeRouteLink {
-  position: relative;
-  z-index: 1;
+.homeDecisionAction {
   margin-top: auto;
   padding-top: 25px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   color: var(--home-emerald);
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.homeRouteLink i {
-  font-size: 19px;
-  font-style: normal;
-}
+.homeDecisionAction i { font-size: 17px; font-style: normal; transition: transform 180ms ease; }
+.homeDecisionStop:hover .homeDecisionAction i { transform: translateX(4px); }
 
 .homeCalculatorSection {
   display: grid;
   grid-template-columns: minmax(260px, 0.68fr) minmax(0, 1.32fr);
   gap: clamp(36px, 7vw, 100px);
   align-items: start;
-  padding: clamp(34px, 5vw, 68px);
-  border: 1px solid var(--home-line);
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 0 0, rgba(95, 242, 189, 0.09), transparent 35%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.018), transparent 45%),
-    var(--home-panel);
-  box-shadow: 0 34px 80px rgba(0, 0, 0, 0.17);
+  padding-block: clamp(38px, 5vw, 68px);
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
 }
 
 .homeCalculatorSection .homeSectionIntro {
@@ -1002,7 +269,8 @@
 }
 
 .homeExperience .homeCalculatorShell > .card {
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.14);
 }
 
 .homeExperience .resultRow {
@@ -1016,21 +284,38 @@
   letter-spacing: -0.04em;
 }
 
+.homeStorySection {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  padding: clamp(64px, 8vw, 110px) max(18px, calc((100vw - var(--container)) / 2 + 18px));
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+  background: #0b1714;
+}
+
+:root[data-theme="light"] .homeStorySection { background: #e8ede6; }
+
+.homeStorySection > .homeSectionIntro,
+.homeStorySection > .homeStoryGrid { max-width: var(--container); margin-inline: auto; }
+
 .homeStoryGrid {
   display: grid;
   grid-template-columns: minmax(0, 1.22fr) minmax(330px, 0.78fr);
-  gap: 16px;
+  gap: 0;
   align-items: stretch;
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
 }
 
 .homeMarketStory,
 .homeEditorialPanel {
+  min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--home-line);
-  border-radius: 14px;
-  background: var(--home-panel);
-  box-shadow: 0 24px 62px rgba(0, 0, 0, 0.14);
+  background: transparent;
 }
+
+.homeMarketStory { border-right: 1px solid var(--home-line); }
+.homeEditorialPanel { padding-left: clamp(12px, 2vw, 28px); }
 
 .homeMarketStory > .contentSection,
 .homeEditorialPanel > .contentSection {
@@ -1074,21 +359,36 @@
 .homeEditorialPanel .contentList li:last-child { border-bottom: 0; }
 
 .homeTransparencySection {
-  padding-top: 8px;
+  display: grid;
+  grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr);
+  align-items: start;
+  gap: clamp(42px, 7vw, 110px);
+  padding-top: clamp(34px, 5vw, 64px);
+  border-top: 1px solid var(--home-line);
 }
 
-.homeDisclosureGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  align-items: start;
+.homeTransparencySection > .homeSectionIntro {
+  position: sticky;
+  top: 112px;
+  display: block;
+  margin: 0;
+}
+
+.homeTransparencySection > .homeSectionIntro .homeEyebrow { margin-bottom: 15px; }
+.homeTransparencySection > .homeSectionIntro p { margin-top: 22px; }
+
+.homeTransparencyLedger {
+  min-width: 0;
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
 }
 
 .homeExperience .homeDisclosure {
   margin: 0;
-  border: 1px solid var(--home-line);
-  border-radius: 12px;
-  background: var(--home-panel);
+  border: 0;
+  border-top: 1px solid var(--home-line);
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
 
@@ -1112,58 +412,16 @@
   box-shadow: none;
 }
 
-.homeGuideDisclosure { grid-column: 1 / -1; }
-
 .homeSourcePanel {
   min-width: 0;
 }
 
 .homeExperience .homeSourcePanel > .card {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
-
-.homeAdZone {
-  min-height: 128px;
-  padding: 22px 0 0;
-  border-top: 1px solid var(--home-line);
-  text-align: center;
-}
-
-.homeAdZone > span {
-  color: var(--home-dim);
-  font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.homeExperience .homeAdZone .adbar {
-  min-height: 90px;
-  margin-top: 9px;
-  border: 0;
-  background: transparent;
-}
-
-@keyframes home-rise {
-  from { opacity: 0; transform: translateY(26px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes home-scene-in {
-  from { opacity: 0; transform: translate3d(35px, 20px, 0) scale(0.94); }
-  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
-@keyframes home-gauge-breathe {
-  0%, 100% { transform: translateZ(44px) scale(0.985); opacity: 0.88; }
-  50% { transform: translateZ(44px) scale(1.02); opacity: 1; }
-}
-
-@keyframes home-orbit-breathe {
-  0%, 100% { transform: scale(0.96); opacity: 0.58; }
-  50% { transform: scale(1.08); opacity: 1; }
-}
-
 
 /* Featured travel paths — a full-width editorial handoff between live data and tools. */
 .homeExperience > .travelLinksFeatured {
@@ -1176,7 +434,6 @@
 
 .homeTravelCard {
   --travel-accent: var(--home-emerald);
-  --travel-accent-soft: rgba(95, 242, 189, 0.16);
   position: relative;
   isolation: isolate;
   display: flex;
@@ -1186,18 +443,16 @@
   overflow: hidden;
   color: var(--home-cream);
   text-decoration: none;
-  background:
-    radial-gradient(circle at 84% 16%, var(--travel-accent-soft), transparent 35%),
-    linear-gradient(145deg, rgba(13, 27, 24, 0.98), rgba(7, 15, 14, 0.98));
+  background: #0b1916;
   border: 1px solid color-mix(in srgb, var(--travel-accent) 28%, transparent);
-  border-radius: 18px;
-  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.16);
+  border-radius: 11px;
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.14);
   transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
 }
 
 .homeTravelCardGuide {
   --travel-accent: var(--home-amber);
-  --travel-accent-soft: rgba(255, 184, 77, 0.14);
+  background: #19150e;
 }
 
 .homeTravelCard::before {
@@ -1214,26 +469,10 @@
   pointer-events: none;
 }
 
-.homeTravelCard::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: 210px;
-  aspect-ratio: 1;
-  top: 54px;
-  right: -68px;
-  border: 1px solid color-mix(in srgb, var(--travel-accent) 18%, transparent);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 38px color-mix(in srgb, var(--travel-accent) 3%, transparent),
-    0 0 0 78px color-mix(in srgb, var(--travel-accent) 2%, transparent);
-  pointer-events: none;
-}
-
 .homeTravelCard:hover {
   transform: translateY(-5px);
   border-color: color-mix(in srgb, var(--travel-accent) 56%, transparent);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.24), 0 0 38px color-mix(in srgb, var(--travel-accent) 8%, transparent);
+  box-shadow: 0 26px 62px rgba(0, 0, 0, 0.2);
 }
 
 .homeTravelCard:active { transform: translateY(-1px) scale(0.995); }
@@ -1271,7 +510,6 @@
   height: 7px;
   border-radius: 50%;
   background: var(--travel-accent);
-  box-shadow: 0 0 13px color-mix(in srgb, var(--travel-accent) 60%, transparent);
 }
 
 .homeTravelCardTopline i {
@@ -1398,61 +636,38 @@
 }
 
 :root[data-theme="light"] .homeTravelCard {
-  background:
-    radial-gradient(circle at 84% 14%, var(--travel-accent-soft), transparent 38%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 241, 0.98));
+  background: #f5faf5;
   border-color: color-mix(in srgb, var(--travel-accent) 25%, rgba(20, 56, 45, 0.12));
-  box-shadow: 0 24px 60px rgba(23, 53, 44, 0.1);
+  box-shadow: 0 20px 48px rgba(23, 53, 44, 0.09);
 }
 
 :root[data-theme="light"] .homeTravelCardGuide {
-  background:
-    radial-gradient(circle at 84% 14%, rgba(196, 105, 10, 0.12), transparent 38%),
-    linear-gradient(145deg, #fffefa, #f6f1e7);
+  background: #fff9ee;
 }
 
 :root[data-theme="light"] .homeTravelCard:hover {
   border-color: color-mix(in srgb, var(--travel-accent) 55%, transparent);
-  box-shadow: 0 28px 70px rgba(23, 53, 44, 0.15), 0 0 34px color-mix(in srgb, var(--travel-accent) 7%, transparent);
+  box-shadow: 0 25px 58px rgba(23, 53, 44, 0.13);
 }
 
 @media (max-width: 1040px) {
-  .homeCockpitHero { min-height: auto; }
-  .homeHeroGrid {
-    grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
-    gap: 24px;
-  }
-  .homeHeroTitle { font-size: clamp(48px, 7vw, 72px); }
-  .homeCockpitScene { min-height: 470px; }
-  .homeClusterShell { min-height: 390px; padding: 38px 28px 22px; }
-  .homeGauge { width: 280px; margin-bottom: -45px; }
-  .homeCommandDeck,
   .homeStoryGrid { grid-template-columns: 1fr; }
-  .homeRouteCard-compare,
-  .homeRouteCard-rankings { grid-column: span 6; }
-  .homeRouteCard-stations { grid-column: span 12; min-height: 270px; }
+  .homeMarketStory { border-right: 0; border-bottom: 1px solid var(--home-line); }
+  .homeEditorialPanel { padding: 18px 0 0; }
+  .homeDecisionTrack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .homeDecisionTrack::before { display: none; }
+  .homeDecisionStop:nth-child(3) { border-left: 0; }
+  .homeDecisionStop:nth-child(n + 3) { border-top: 1px solid var(--home-line); }
 }
 
 @media (max-width: 820px) {
   .homeExperience { gap: 82px; }
-  .homeCockpitHero { padding-top: 62px; padding-bottom: 82px; }
-  .homeHeroGrid { grid-template-columns: 1fr; }
-  .homeHeroCopy { max-width: 700px; }
-  .homeCockpitScene { min-height: 500px; margin-top: -10px; }
-  .homeClusterShell { width: min(94%, 600px); }
-  .homeTelemetry {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: -68px;
-  }
-  .homeTelemetry > div { border-top: 1px solid var(--home-line); }
-  .homeTelemetry > div:nth-child(odd) { border-left: 0; }
-  .homeTelemetry .homeTelemetryLead { grid-column: 1 / -1; border-top: 0; }
   .homeSectionIntro { grid-template-columns: 1fr; gap: 16px; }
   .homeSectionIntro p { margin-top: 0; }
   .homeCalculatorSection { grid-template-columns: 1fr; }
   .homeCalculatorSection .homeSectionIntro { position: static; }
-  .homeDisclosureGrid { grid-template-columns: 1fr; }
-  .homeGuideDisclosure { grid-column: auto; }
+  .homeTransparencySection { grid-template-columns: 1fr; }
+  .homeTransparencySection > .homeSectionIntro { position: static; }
   .homeTravelCard {
     min-height: 390px;
     padding: 24px;
@@ -1465,59 +680,27 @@
 
 @media (max-width: 620px) {
   .homeExperience { gap: 68px; }
-  .homeCockpitHero {
-    width: 100vw;
-    max-width: 100vw;
-    margin-top: -16px;
-    padding-top: 50px;
-    padding-bottom: 68px;
-  }
-  .homeCockpitHero::before { background-size: 42px 42px; }
-  .homeHeroTitle { font-size: clamp(44px, 15vw, 64px); }
-  .homeHeroText { font-size: 15px; line-height: 1.65; }
-  .homeHeroActions { display: grid; }
-  .homeButton { width: 100%; }
-  .homeTrustRail { display: grid; }
-  .homeCockpitScene { min-height: 405px; margin-top: 0; }
-  .homeClusterShell {
-    width: 100%;
-    min-height: 358px;
-    padding: 34px 15px 19px;
-    border-radius: 34% 34% 16px 16px / 21% 21% 16px 16px;
-  }
-  .homeClusterTopline span:last-child { display: none; }
-  .homeClusterTopline { padding-inline: 24px; }
-  .homeGauge { width: min(260px, 82%); margin-top: -3px; margin-bottom: -35px; }
-  .homeGaugePrice { font-size: 40px; }
-  .homeClusterStats > div { padding: 12px 8px; }
-  .homeClusterStats span { font-size: 7px; }
-  .homeClusterStats strong { font-size: 10px; }
-  .homeOrbitLabel { display: none; }
-  .homeTelemetry { grid-template-columns: 1fr; }
-  .homeTelemetry > div,
-  .homeTelemetry > div:nth-child(odd) { border-left: 0; }
-  .homeTelemetry .homeTelemetryLead { grid-column: auto; }
-  .homeTelemetry > div { min-height: 65px; }
   .homeSectionIntro h2 { font-size: clamp(34px, 11vw, 47px); }
-  .homeCommandDeck { grid-template-columns: minmax(0, 1fr); }
-  .homeExperience .homePriceModule > .card,
-  .homeExperience .homeTrendModule > .card,
   .homeExperience .homeCalculatorShell > .card,
   .homeMarketStory,
   .homeEditorialPanel { border-radius: 11px; }
-  .homeExperience .fuelHeroCard .kpiGrid { grid-template-columns: 1fr; }
   .homeExperience .cardHeaderRow { align-items: stretch; }
   .homeExperience .cardHeaderRow > .segRow { width: 100%; }
   .homeExperience .cardHeaderRow > .segRow .seg { flex: 1; }
-  .homeExperience .trendChart { min-height: 176px; }
-  .homeRouteGrid { grid-template-columns: 1fr; }
-  .homeRouteCard-compare,
-  .homeRouteCard-rankings,
-  .homeRouteCard-stations { grid-column: auto; min-height: 280px; }
-  .homeCalculatorSection { padding: 24px 16px; margin-inline: -2px; }
+  .homeDecisionTrack { grid-template-columns: 1fr; padding-left: 52px; }
+  .homeDecisionTrack::before { display: block; top: 30px; bottom: 30px; left: 17px; right: auto; width: 1px; height: auto; background: var(--home-emerald); }
+  .homeDecisionStop { min-height: 0; padding: 24px 4px 24px 12px; border-left: 0; border-top: 1px solid var(--home-line); }
+  .homeDecisionStop:first-child { border-top: 0; }
+  .homeDecisionMarker { position: absolute; top: 22px; right: calc(100% + 17px); left: auto; width: 35px; }
+  .homeDecisionMarker svg { display: none; }
+  .homeDecisionCopy { margin-top: 0; padding-right: 10px; }
+  .homeDecisionCopy strong, .homeDecisionCopy small { max-width: 100%; }
+  .homeDecisionAction { margin-top: 18px; padding-top: 0; }
+  .homeCalculatorSection { padding-block: 34px; }
   .homeExperience .toolbarRow { align-items: stretch; }
   .homeExperience .toolbarRow > .segRow { width: 100%; }
   .homeExperience .toolbarRow > .segRow .seg { flex: 1; }
+  .homeStorySection { padding-inline: 18px; }
   .homeStoryGrid { grid-template-columns: minmax(0, 1fr); }
   .homeExperience > .travelLinksFeatured { grid-template-columns: 1fr; }
   .homeTravelCard { min-height: 340px; border-radius: 15px; }
@@ -1527,20 +710,13 @@
 }
 
 @media (max-width: 390px) {
-  .homeHeroTitle { font-size: 43px; }
-  .homeClusterShell { min-height: 335px; }
-  .homeGauge { width: 228px; margin-bottom: -29px; }
-  .homeGaugePrice { font-size: 34px; }
-  .homeGaugeLabel { font-size: 8px; }
-  .homeClusterStats span { letter-spacing: 0.04em; }
   .homeCalculatorSection { padding-inline: 12px; }
 }
 
 @media (hover: none), (pointer: coarse) {
-  .homeClusterShell { transform: none; }
-  .homeButton:hover,
-  .homeRouteCard:hover,
   .homeTravelCard:hover { transform: none; }
+  .homeDecisionStop:hover .homeDecisionMarker > i,
+  .homeDecisionStop:hover .homeDecisionAction i { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1553,5 +729,4 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .homeClusterShell { transform: none !important; }
 }

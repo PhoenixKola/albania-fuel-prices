@@ -88,7 +88,7 @@ function main() {
   // ── Home market summary (small, ships in the main chunk) ──
   writeFileSync(
     resolve(OUT_DIR, "homeSummary.ts"),
-    `${HEADER}export const HOME_SUMMARY_HTML = ${JSON.stringify(renderHomeMarketSummary(hist))};\n`,
+    `${HEADER}export const HOME_SUMMARY_HTML = { en: ${JSON.stringify(renderHomeMarketSummary(hist, "en"))}, sq: ${JSON.stringify(renderHomeMarketSummary(hist, "sq"))} } as const;\n`,
     "utf-8"
   );
 

@@ -163,7 +163,22 @@ export function renderSpreadSection(
 
 // ─── Home page: market summary ──────────────────────────────────────────────
 
-export function renderHomeMarketSummary(hist: HistoryContext): string {
+function albanianDate(iso: string): string {
+  const date = new Date(`${iso}T00:00:00Z`);
+  return Number.isNaN(date.getTime())
+    ? iso
+    : date.toLocaleDateString("sq-AL", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
+function albanianVerdict(percentile: number): { label: string; detail: string } {
+  if (percentile <= 15) return { label: "Jashtëzakonisht lirë", detail: `Sot është më lirë se ${100 - percentile}% e ditëve të regjistruara. Nëse rezervuari është bosh, ky është një moment i mirë për ta mbushur.` };
+  if (percentile <= 40) return { label: "Nën mesatare", detail: `Sot gjendet në pjesën më të lirë të intervalit tonë të regjistruar — një moment i arsyeshëm për t'u furnizuar.` };
+  if (percentile < 60) return { label: "Rreth mesatares", detail: "Çmimi i sotëm është pranë mesit të të gjitha vlerave të regjistruara. Nuk ka arsye të fortë për të pritur ose nxituar." };
+  if (percentile < 85) return { label: "Mbi mesatare", detail: `Sot është më shtrenjtë se ${percentile}% e ditëve të regjistruara. Nëse mund të presësh, konsidero të furnizosh vetëm aq sa të duhet.` };
+  return { label: "Pranë rekordit maksimal", detail: `Sot është më shtrenjtë se ${percentile}% e ditëve të regjistruara. Nëse rezervuari nuk është bosh, pritja mund të vlejë.` };
+}
+
+export function renderHomeMarketSummary(hist: HistoryContext, lang: "en" | "sq" = "en"): string {
   if (!hist.ok) return "";
   const alb = hist.byCountry.get("Albania")?.fuels.diesel;
   if (!alb) return "";
@@ -172,19 +187,36 @@ export function renderHomeMarketSummary(hist: HistoryContext): string {
   const albRank = ranked.findIndex((r) => r.country === "Albania") + 1;
   const avgSeries = regionAverageSeries(hist, "diesel", inEurope);
   const euAvg = avgSeries.length ? avgSeries[avgSeries.length - 1].value : null;
-  const verdict = fillUpVerdict(alb);
+  const verdict = lang === "sq" ? albanianVerdict(alb.percentile) : fillUpVerdict(alb);
+  const startLabel = lang === "sq" ? albanianDate(hist.startDate) : hist.startLabel;
+  const endLabel = lang === "sq" ? albanianDate(hist.endDate) : hist.endLabel;
 
   const chart = renderLineChart({
     points: avgSeries,
-    title: `European average diesel price, ${hist.startLabel} to ${hist.endLabel}`,
+    title: lang === "sq"
+      ? `Çmimi mesatar evropian i naftës, ${startLabel} deri më ${endLabel}`
+      : `European average diesel price, ${startLabel} to ${endLabel}`,
+    formatDate: lang === "sq" ? (iso) => albanianDate(iso).split(" ").slice(0, 2).join(" ") : undefined,
   });
 
   const vsAvg = euAvg ? alb.current - euAvg : null;
 
+  if (lang === "sq") return `
+        <section class="contentSection">
+          <h2 class="contentHeading">Tregu i sotëm në një paragraf</h2>
+          <p class="contentBody">Nafta në Shqipëri kushton sot ${eur3(alb.current)} për litër, ${pct(alb.changePct.d30)} gjatë 30 ditëve të fundit dhe ${pct(alb.changePct.all)} që prej fillimit të regjistrimit më ${startLabel}.${albRank ? ` Kjo e vendos Shqipërinë në vendin e ${albRank} si tregu më i lirë ndër ${ranked.length} tregjet evropiane që ndjekim.` : ""}${vsAvg != null ? ` Mesatarja evropiane sot është ${eur3(euAvg!)}, prandaj drejtuesit në Shqipëri paguajnë ${eur3(Math.abs(vsAvg))} ${vsAvg > 0 ? "mbi" : "nën"} mesataren e kontinentit.` : ""}</p>
+          <div class="verdictBox">
+            <p class="verdictLabel">Vlerësimi për furnizimin në Shqipëri: ${esc(verdict.label)}</p>
+            <p class="contentBody contentBodyNoMargin">${esc(verdict.detail)}</p>
+          </div>
+          ${chart}
+          <p class="contentBodyMuted">Llogaritur nga ${hist.daysObserved} ditë vëzhgimesh tona të çmimeve. Analizën e plotë e gjeni te <a href="/market-report">raporti ditor i tregut</a>.</p>
+        </section>`;
+
   return `
         <section class="contentSection">
           <h2 class="contentHeading">Today's market in one paragraph</h2>
-          <p class="contentBody">Albanian diesel stands at ${eur3(alb.current)} per liter today, ${pct(alb.changePct.d30)} over the past 30 days and ${pct(alb.changePct.all)} since we began recording on ${hist.startLabel}.${albRank ? ` That places Albania ${ordinal(albRank)} cheapest of the ${ranked.length} European markets we track.` : ""}${vsAvg != null ? ` The European average today is ${eur3(euAvg!)}, so Albanian drivers are paying ${eur3(Math.abs(vsAvg))} ${vsAvg > 0 ? "above" : "below"} the continental average.` : ""}</p>
+          <p class="contentBody">Albanian diesel stands at ${eur3(alb.current)} per liter today, ${pct(alb.changePct.d30)} over the past 30 days and ${pct(alb.changePct.all)} since we began recording on ${startLabel}.${albRank ? ` That places Albania ${ordinal(albRank)} cheapest of the ${ranked.length} European markets we track.` : ""}${vsAvg != null ? ` The European average today is ${eur3(euAvg!)}, so Albanian drivers are paying ${eur3(Math.abs(vsAvg))} ${vsAvg > 0 ? "above" : "below"} the continental average.` : ""}</p>
           <div class="verdictBox">
             <p class="verdictLabel">Albania refuelling verdict: ${esc(verdict.label)}</p>
             <p class="contentBody contentBodyNoMargin">${esc(verdict.detail)}</p>

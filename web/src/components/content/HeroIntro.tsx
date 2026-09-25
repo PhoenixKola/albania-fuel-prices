@@ -1,12 +1,13 @@
-import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Lang } from "../../models/i18n";
-import type { FuelType } from "../../models/fuel";
+import { FUEL_TYPES, type CountryPrices, type FuelType, type LatestEurope } from "../../models/fuel";
 import type { TDict } from "../../locales";
 import type { Currency } from "../../models/currency";
 import type { FxRates } from "../../utils/currency";
-import { fuelLabel } from "../../utils/fuel";
+import { fuelLabel, getEurPrice } from "../../utils/fuel";
 import { formatFuelPrice } from "../../utils/priceDisplay";
+import { getFlagImgUrl, getIso2ForCountry } from "../../utils/countryFlag";
+import TripSelect from "./TripSelect";
 
 export type HomeHeroModel = {
   selectedPrice: number | null;
@@ -20,25 +21,65 @@ export type HomeHeroModel = {
   updatedAt: string | null;
 };
 
+export type HomeFreshness = {
+  state: "current" | "stale" | "unknown";
+  shortLabel: string;
+  detail: string;
+};
+
 type HeroIntroProps = {
   t: TDict;
   lang: Lang;
   model: HomeHeroModel;
+  data: LatestEurope | null;
+  selected: CountryPrices | null;
+  countries: string[];
   currency: Currency;
   fxRates: FxRates | null;
+  freshness: HomeFreshness;
+  onSelectCountry: (country: string) => void;
+  onSelectFuel: (fuel: FuelType) => void;
 };
 
-function formatUpdatedAt(value: string | null, t: TDict, lang: Lang) {
-  if (!value) return t.heroLiveFallback;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return t.heroLiveFallback;
+const copy = {
+  en: {
+    board: "Roadside price board",
+    national: "National reference",
+    dated: "Prices dated",
+    source: "Source",
+    scope: "Country-level reference values. Individual pump prices vary.",
+    selectMarket: "Choose market",
+    selected: "Selected",
+    marketPosition: "European position",
+    versusAverage: "vs Europe average",
+    week: "7-day movement",
+    routeLabel: "Journey starts here",
+  },
+  sq: {
+    board: "Tabela e çmimeve në rrugë",
+    national: "Vlerë orientuese kombëtare",
+    dated: "Çmimet më",
+    source: "Burimi",
+    scope: "Vlera orientuese kombëtare. Çmimet në pompa të veçanta ndryshojnë.",
+    selectMarket: "Zgjidh tregun",
+    selected: "Zgjedhur",
+    marketPosition: "Pozicioni në Evropë",
+    versusAverage: "kundrejt mesatares evropiane",
+    week: "Lëvizja 7-ditore",
+    routeLabel: "Udhëtimi nis këtu",
+  },
+} as const;
 
-  return t.heroUpdatedAt(
-    date.toLocaleString(lang === "sq" ? "sq-AL" : "en-GB", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    })
-  );
+function formatDate(value: string | undefined, lang: Lang, fallback: string) {
+  if (!value) return fallback;
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return fallback;
+  return date.toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 function signed(value: number | null) {
@@ -51,122 +92,101 @@ export default function HeroIntro({
   t,
   lang,
   model,
+  data,
+  selected,
+  countries,
   currency,
   fxRates,
+  freshness,
+  onSelectCountry,
+  onSelectFuel,
 }: HeroIntroProps) {
-  const sceneRef = useRef<HTMLDivElement>(null);
-  const frameRef = useRef<number | null>(null);
-  const selectedPrice = formatFuelPrice(model.country, model.selectedPrice, currency, fxRates);
-  const fuel = fuelLabel(t, model.fuelType);
-  const rank = model.rank == null ? t.notAvailable : t.homeGaugeRankValue(model.rank, model.marketTotal);
-  const averageValue = signed(model.averageDifference);
-  const average = averageValue == null ? t.notAvailable : t.homeGaugeAverageValue(averageValue);
-  const weeklyValue = signed(model.weeklyDelta);
-  const week = weeklyValue == null ? t.notAvailable : weeklyValue === "0.000" ? t.homeGaugeWeekFlat : t.homeGaugeWeekValue(weeklyValue);
-  const updated = formatUpdatedAt(model.updatedAt, t, lang);
-  const gaugeProgress = model.rank && model.marketTotal > 1
-    ? Math.max(10, Math.min(92, 100 - ((model.rank - 1) / (model.marketTotal - 1)) * 78))
-    : 58;
-  const sceneStyle = { "--gauge-progress": `${gaugeProgress}%` } as CSSProperties;
-
-  useEffect(() => () => {
-    if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
-  }, []);
-
-  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!window.matchMedia("(pointer: fine)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const element = sceneRef.current;
-    if (!element) return;
-    const bounds = element.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width;
-    const y = (event.clientY - bounds.top) / bounds.height;
-    if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
-    frameRef.current = requestAnimationFrame(() => {
-      element.style.setProperty("--scene-rx", `${(0.5 - y) * 8}deg`);
-      element.style.setProperty("--scene-ry", `${(x - 0.5) * 10}deg`);
-      element.style.setProperty("--light-x", `${x * 100}%`);
-      element.style.setProperty("--light-y", `${y * 100}%`);
-    });
-  };
-
-  const resetPointer = () => {
-    const element = sceneRef.current;
-    if (!element) return;
-    element.style.setProperty("--scene-rx", "0deg");
-    element.style.setProperty("--scene-ry", "0deg");
-    element.style.setProperty("--light-x", "50%");
-    element.style.setProperty("--light-y", "42%");
-  };
+  const c = copy[lang];
+  const iso2 = getIso2ForCountry(model.country);
+  const average = signed(model.averageDifference);
+  const week = signed(model.weeklyDelta);
+  const date = formatDate(data?.as_of, lang, t.notAvailable);
 
   return (
-    <section className="homeCockpitHero" aria-labelledby="home-hero-title">
-      <div className="homeHeroGrid">
+    <section className="homeJourneyHero" aria-labelledby="home-hero-title">
+      <div className="homeJourneyGrid">
         <div className="homeHeroCopy">
           <div className="homeEyebrow homeHeroEyebrow">
-            <span className="homeLiveDot" aria-hidden="true" />
+            <span className={`homeStatusDot homeStatusDot-${freshness.state}`} aria-hidden="true" />
             {t.homeCockpitKicker}
           </div>
           <h1 id="home-hero-title" className="homeHeroTitle">{t.homeCockpitTitle}</h1>
           <p className="homeHeroText">{t.homeCockpitSubtitle}</p>
           <div className="homeHeroActions">
-            <a className="homeButton homeButtonPrimary" href="#price-tool">{t.homeCockpitPrimaryCta}</a>
-            <Link className="homeButton homeButtonGhost" to="/stations">{t.homeCockpitSecondaryCta}</Link>
+            <Link className="homeButton homeButtonPrimary" to="/trip-cost-calculator">
+              {t.homeCockpitPrimaryCta}<span aria-hidden="true">↗</span>
+            </Link>
+            <Link className="homeButton homeButtonGhost" to="/stations">
+              {t.homeCockpitSecondaryCta}<span aria-hidden="true">→</span>
+            </Link>
           </div>
           <nav className="homeHeroQuickLinks" aria-label={t.homeQuickLinksLabel}>
-            <Link to="/fuel-prices/albania">{t.homeAlbaniaPricesCta}</Link>
-            <Link to="/trip-cost-calculator">{t.homeTripCalculatorCta}</Link>
+            <a href="#price-tool">{t.homeAlbaniaPricesCta}</a>
+            <Link to="/compare">{t.navCompare}</Link>
             <Link to="/rankings">{t.homeEuropeRankingsCta}</Link>
           </nav>
-          <div className="homeTrustRail" aria-label={updated}>
-            <span><i aria-hidden="true" />{t.heroShowcaseTrust1}</span>
-            <span><i aria-hidden="true" />{t.heroShowcaseTrust2}</span>
-            <span><i aria-hidden="true" />{updated}</span>
-          </div>
+          <p className="homeHeroScope">{c.scope}</p>
         </div>
 
-        <div
-          ref={sceneRef}
-          className="homeCockpitScene"
-          style={sceneStyle}
-          onPointerMove={handlePointerMove}
-          onPointerLeave={resetPointer}
-          role="img"
-          aria-label={t.homeGaugeA11y(model.country, fuel, selectedPrice, rank, average, week)}
-        >
-          <div className="homeCockpitGlow" aria-hidden="true" />
-          <div className="homeClusterShell">
-            <div className="homeClusterTopline">
-              <span><b aria-hidden="true" />{t.homeLiveStatus}</span>
-              <span>{updated}</span>
-            </div>
-            <div className="homeGauge" aria-hidden="true">
-              <div className="homeGaugeTicks" />
-              <div className="homeGaugeCore">
-                <span className="homeGaugeLabel">{t.homeGaugePriceLabel}</span>
-                <strong className="homeGaugePrice">{model.selectedPrice == null ? "—" : selectedPrice}</strong>
-                <span className="homeGaugeUnit">{model.country} <i>·</i> {fuel}</span>
-              </div>
-            </div>
-            <div className="homeClusterStats">
-              <div>
-                <span>{t.homeGaugeRank}</span>
-                <strong>{rank}</strong>
-              </div>
-              <div>
-                <span>{t.homeGaugeAverage}</span>
-                <strong className={model.averageDifference != null && model.averageDifference <= 0 ? "isGood" : "isWarm"}>{average}</strong>
-              </div>
-              <div>
-                <span>{t.homeGaugeWeek}</span>
-                <strong className={model.weeklyDelta != null && model.weeklyDelta <= 0 ? "isGood" : "isWarm"}>{week}</strong>
-              </div>
-            </div>
-            <div className="homeClusterReflection" aria-hidden="true" />
+        <div className="homeRoadBoard" aria-label={`${model.country} ${c.board}`}>
+          <div className="homeRoadBoardRoute" aria-hidden="true">
+            <span>AL</span><i /><small>{c.routeLabel}</small>
           </div>
-          <span className="homeOrbitLabel homeOrbitLabelTop" aria-hidden="true">{String(model.marketTotal).padStart(2, "0")} / EU</span>
-          <span className="homeOrbitLabel homeOrbitLabelBottom" aria-hidden="true">EUR · LITER · LIVE</span>
+
+          <div className="homeRoadBoardHeader">
+            <div>
+              <span className="homeBoardEyebrow">{c.board}</span>
+              <strong>{iso2 ? <img src={getFlagImgUrl(iso2)} alt="" aria-hidden="true" /> : null}{model.country}</strong>
+            </div>
+            <span className={`homeFreshnessBadge homeFreshnessBadge-${freshness.state}`}>{freshness.shortLabel}</span>
+          </div>
+
+          <div className="homeBoardCountrySelect">
+            <TripSelect
+              label={c.selectMarket}
+              value={model.country}
+              options={countries.map((country) => ({ value: country, label: country }))}
+              onChange={onSelectCountry}
+            />
+          </div>
+
+          <div className="homeBoardPrices" aria-label={c.national}>
+            {FUEL_TYPES.map((fuel) => {
+              const value = getEurPrice(selected, fuel);
+              const active = fuel === model.fuelType;
+              return (
+                <button
+                  key={fuel}
+                  type="button"
+                  className={`homeBoardPrice${active ? " is-selected" : ""}`}
+                  aria-pressed={active}
+                  onClick={() => onSelectFuel(fuel)}
+                >
+                  <span><i aria-hidden="true" />{fuelLabel(t, fuel)}{active ? <small>{c.selected}</small> : null}</span>
+                  <strong>{value == null ? "—" : formatFuelPrice(model.country, value, currency, fxRates)}</strong>
+                </button>
+              );
+            })}
+          </div>
+
+          <dl className="homeBoardSignals">
+            <div><dt>{c.marketPosition}</dt><dd>{model.rank == null ? t.notAvailable : t.homeGaugeRankValue(model.rank, model.marketTotal)}</dd></div>
+            <div><dt>{c.versusAverage}</dt><dd className={model.averageDifference != null && model.averageDifference <= 0 ? "is-good" : "is-warm"}>{average == null ? t.notAvailable : `${average} EUR/L`}</dd></div>
+            <div><dt>{c.week}</dt><dd className={model.weeklyDelta != null && model.weeklyDelta <= 0 ? "is-good" : "is-warm"}>{week == null ? t.notAvailable : week === "0.000" ? t.homeGaugeWeekFlat : `${week} EUR/L`}</dd></div>
+          </dl>
+
+          <div className="homeBoardProvenance">
+            <span><b>{c.dated}</b>{date}</span>
+            <span><b>{c.source}</b>{data?.source_url ? <a href={data.source_url} target="_blank" rel="noopener noreferrer">{data.source ?? t.notAvailable} ↗</a> : data?.source ?? t.notAvailable}</span>
+          </div>
         </div>
       </div>
+      <div className="homeRouteTrace" aria-hidden="true"><i /><i /><i /></div>
     </section>
   );
 }

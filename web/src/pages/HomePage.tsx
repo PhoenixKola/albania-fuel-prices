@@ -6,37 +6,29 @@ import type { CountryPrices, FuelType, LatestEurope } from "../models/fuel";
 import type { TDict } from "../locales";
 import type { FxRates } from "../utils/currency";
 import type { Trends } from "../models/trends";
-import { getTrendSeries, getWeeklyDeltaEur } from "../models/trends";
-import { fuelLabel, getEurPrice } from "../utils/fuel";
+import { getWeeklyDeltaEur } from "../models/trends";
+import { getEurPrice } from "../utils/fuel";
 import { isEuropeanCountry } from "../utils/regions";
 import { STORAGE_ALL_RATE_KEY } from "../config/constants";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 import { TravelLinks } from "../components/content/TravelLinks";
-import RoadStatusLink from "../components/road/RoadStatusLink";
-import FuelCard from "../components/fuel/FuelCard";
-import TrendCard from "../components/fuel/TrendCard";
+import FuelPulse from "../components/fuel/FuelPulse";
 import QuickCalcCard from "../components/fuel/QuickCalcCard";
 import SourceCard from "../components/meta/SourceCard";
 import Notice from "../components/feedback/Notice";
 import ToastHost from "../components/feedback/ToastHost";
 
 import { HOME_SUMMARY_HTML } from "../generated/homeSummary";
-import HeroIntro, { type HomeHeroModel } from "../components/content/HeroIntro";
+import HeroIntro, { type HomeFreshness, type HomeHeroModel } from "../components/content/HeroIntro";
 import EditorialSummary from "../components/content/EditorialSummary";
 import MethodologySection from "../components/content/MethodologySection";
 import "../styles/home.css";
+import "../styles/home-signature.css";
 
 const HomeEditorialDeepDive = lazy(() => import("../components/content/HomeEditorialDeepDive"));
 const HOME_RENDERED_AT = Date.now();
-
-function formatHomeUpdated(value: string | undefined, lang: Lang, fallback: string) {
-  if (!value) return fallback;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return fallback;
-  return date.toLocaleString(lang === "sq" ? "sq-AL" : "en-GB", { dateStyle: "medium", timeStyle: "short" });
-}
 
 type Props = {
   t: TDict;
@@ -59,34 +51,52 @@ type Props = {
   refresh: () => void;
 };
 
-type RouteCardProps = {
+type DecisionLink = {
   to: string;
   eyebrow: string;
   title: string;
   text: string;
   cta: string;
-  icon: "compare" | "rankings" | "stations";
+  icon: "compare" | "rankings" | "roads" | "stations";
 };
 
-function RouteIcon({ icon }: { icon: RouteCardProps["icon"] }) {
+function RouteIcon({ icon }: { icon: DecisionLink["icon"] }) {
   if (icon === "compare") {
     return <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 8h18M7 8l4-4M7 8l4 4M25 24H7m18 0-4-4m4 4-4 4" /></svg>;
   }
   if (icon === "rankings") {
     return <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26V16h6v10M13 26V9h6v17M20 26V4h6v22M4 26h24" /></svg>;
   }
+  if (icon === "roads") {
+    return <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 28 15 4M20 28 17 4M16 9v4M16 18v5M5 26c4-3 6-3 9-1M27 7c-4 3-6 3-9 1" /></svg>;
+  }
   return <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 28V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v22M8 14h14M12 9h6M22 9h3l3 4v10a3 3 0 0 1-6 0v-5" /></svg>;
 }
 
-function RouteCard({ to, eyebrow, title, text, cta, icon }: RouteCardProps) {
+function DriverDecisionRail({ t, lang }: { t: TDict; lang: Lang }) {
+  const road = lang === "sq"
+    ? { title: "Kontrollo rrugën", text: "Shiko kufizimet, mbylljet dhe datën e fundit të verifikimit.", cta: "Gjendja e rrugëve" }
+    : { title: "Check the road", text: "Review restrictions, closures, and the latest verification date.", cta: "Road conditions" };
+  const links: DecisionLink[] = [
+    { to: "/compare", eyebrow: "01", title: t.homeRouteCompareTitle, text: t.homeRouteCompareText, cta: t.homeRouteCta, icon: "compare" },
+    { to: "/rankings", eyebrow: "02", title: t.homeRouteRankingsTitle, text: t.homeRouteRankingsText, cta: t.homeRouteCta, icon: "rankings" },
+    { to: "/road-status", eyebrow: "03", title: road.title, text: road.text, cta: road.cta, icon: "roads" },
+    { to: "/stations", eyebrow: "04", title: t.homeRouteStationsTitle, text: t.homeRouteStationsText, cta: t.homeRouteCta, icon: "stations" },
+  ];
+
   return (
-    <Link className={`homeRouteCard homeRouteCard-${icon}`} to={to}>
-      <span className="homeRouteIcon"><RouteIcon icon={icon} /></span>
-      <span className="homeRouteIndex">{eyebrow}</span>
-      <strong>{title}</strong>
-      <span className="homeRouteText">{text}</span>
-      <span className="homeRouteLink">{cta}<i aria-hidden="true">↗</i></span>
-    </Link>
+    <section className="homeDecisionRoute" aria-labelledby="home-routes-title">
+      <SectionIntro kicker={t.homeRoutesKicker} title={t.homeRoutesTitle} text={t.homeRoutesSubtitle} id="home-routes-title" />
+      <nav className="homeDecisionTrack" aria-label={t.homeRoutesTitle}>
+        {links.map((item) => (
+          <Link className={`homeDecisionStop homeDecisionStop-${item.icon}`} to={item.to} key={item.to}>
+            <span className="homeDecisionMarker"><i>{item.eyebrow}</i><RouteIcon icon={item.icon} /></span>
+            <span className="homeDecisionCopy"><strong>{item.title}</strong><small>{item.text}</small></span>
+            <span className="homeDecisionAction">{item.cta}<i aria-hidden="true">→</i></span>
+          </Link>
+        ))}
+      </nav>
+    </section>
   );
 }
 
@@ -191,22 +201,35 @@ export default function HomePage({
       currency: "EUR",
     })) ?? [];
 
-  const updatedLabel = formatHomeUpdated(data?.fetched_at_utc, lang, t.heroLiveFallback);
-  const selectedTrendSeries = getTrendSeries(trends, country, fuelType);
-  const hasSelectedTrend = (selectedTrendSeries?.filter((value) => typeof value === "number" && Number.isFinite(value)).length ?? 0) >= 2;
-  const staleStatus = useMemo(() => {
-    if (!data?.as_of) return null;
+  const freshness = useMemo<HomeFreshness>(() => {
+    if (!data?.as_of) return {
+      state: "unknown",
+      shortLabel: lang === "sq" ? "Data e panjohur" : "Date unavailable",
+      detail: t.heroLiveFallback,
+    };
     const asOf = new Date(`${data.as_of}T00:00:00Z`);
-    if (Number.isNaN(asOf.getTime())) return null;
+    if (Number.isNaN(asOf.getTime())) return {
+      state: "unknown",
+      shortLabel: lang === "sq" ? "Data e panjohur" : "Date unavailable",
+      detail: t.heroLiveFallback,
+    };
     const days = Math.max(0, Math.floor((HOME_RENDERED_AT - asOf.getTime()) / 86_400_000));
-    if (days <= 3) return null;
     const date = asOf.toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
       timeZone: "UTC",
     });
-    return t.homeStaleNotice(date, days);
+    if (days <= 3) return {
+      state: "current",
+      shortLabel: date,
+      detail: lang === "sq" ? `Vlerat e referencës më ${date}.` : `Reference values dated ${date}.`,
+    };
+    return {
+      state: "stale",
+      shortLabel: lang === "sq" ? `${days} ditë të vjetra` : `${days} days old`,
+      detail: t.homeStaleNotice(date, days),
+    };
   }, [data, lang, t]);
 
   return (
@@ -216,65 +239,40 @@ export default function HomePage({
         t={t}
         lang={lang}
         model={heroModel}
+        data={data}
+        selected={selected}
+        countries={countries}
         currency={currency}
         fxRates={fxRates}
+        freshness={freshness}
+        onSelectCountry={setCountry}
+        onSelectFuel={setFuelType}
       />
 
       {error ? <Notice t={t} message={error} onRetry={refresh} /> : null}
-      {staleStatus ? <p className="homeStaleNotice" role="status">{staleStatus}</p> : null}
 
-      <section className="homeTelemetry" aria-label={t.homeTelemetryLabel}>
-        <div className="homeTelemetryLead"><span className="homeLiveDot" aria-hidden="true" /><strong>{t.homeTelemetryLabel}</strong></div>
-        <div><span>{t.homeTelemetryMarkets(heroModel.marketTotal)}</span><strong>{String(heroModel.marketTotal).padStart(2, "0")}</strong></div>
-        <div><span>{t.homeTelemetryFuel}</span><strong>{fuelLabel(t, fuelType)}</strong></div>
-        <div><span>{t.homeTelemetrySource}</span><strong>{data?.source ?? t.notAvailable}</strong></div>
-        <div><span>{t.homeTelemetryUpdated}</span><strong>{updatedLabel}</strong></div>
-      </section>
-
-      <section className="homeDashboardSection" aria-labelledby="home-command-title">
-        <SectionIntro kicker={t.homeCommandKicker} title={t.homeCommandTitle} text={t.homeCommandSubtitle} id="home-command-title" />
-        <div className="homeCommandDeck">
-          <div id="price-tool" className="homePriceModule">
-            <FuelCard
-              t={t}
-              data={data}
-              loading={loading}
-              countries={countries}
-              country={country}
-              selected={selected}
-              onSelectCountry={setCountry}
-              currency={currency}
-              fxRates={fxRates}
-              trends={trends}
-              onCopy={copyText}
-              onShare={shareText}
-            />
-          </div>
-          <div className="homeTrendModule">
-            <TrendCard t={t} trends={trends} country={country} fuelType={fuelType} setFuelType={setFuelType} />
-            {!hasSelectedTrend ? (
-              <div className="homeEmptyPanel" role="status">
-                <span className="homeEmptyMark" aria-hidden="true">∿</span>
-                <strong>{t.homeTrendUnavailableTitle}</strong>
-                <p>{t.homeTrendUnavailableText}</p>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </section>
+      <FuelPulse
+        t={t}
+        lang={lang}
+        data={data}
+        loading={loading}
+        countries={countries}
+        country={country}
+        selected={selected}
+        fuelType={fuelType}
+        setFuelType={setFuelType}
+        setCountry={setCountry}
+        currency={currency}
+        fxRates={fxRates}
+        trends={trends}
+        model={heroModel}
+        onCopy={copyText}
+        onShare={shareText}
+      />
 
       <AdsterraNativeAd location="home-after-primary-prices" enabled={canShowAds} />
       <TravelLinks lang={lang} featured />
-      <RoadStatusLink lang={lang} featured />
-
-      <section className="homeDashboardSection" aria-labelledby="home-routes-title">
-        <SectionIntro kicker={t.homeRoutesKicker} title={t.homeRoutesTitle} text={t.homeRoutesSubtitle} id="home-routes-title" />
-        <div className="homeRouteGrid">
-          <RouteCard to="/compare" eyebrow="01 / 03" title={t.homeRouteCompareTitle} text={t.homeRouteCompareText} cta={t.homeRouteCta} icon="compare" />
-          <RouteCard to="/rankings" eyebrow="02 / 03" title={t.homeRouteRankingsTitle} text={t.homeRouteRankingsText} cta={t.homeRouteCta} icon="rankings" />
-          <RouteCard to="/stations" eyebrow="03 / 03" title={t.homeRouteStationsTitle} text={t.homeRouteStationsText} cta={t.homeRouteCta} icon="stations" />
-        </div>
-      </section>
+      <DriverDecisionRail t={t} lang={lang} />
 
       <section className="homeDashboardSection homeCalculatorSection" aria-labelledby="home-calculator-title">
         <SectionIntro kicker={t.homeCalculatorKicker} title={t.homeCalculatorTitle} text={t.homeCalculatorSubtitle} id="home-calculator-title" />
@@ -295,36 +293,37 @@ export default function HomePage({
       <section className="homeDashboardSection homeStorySection" aria-labelledby="home-story-title">
         <SectionIntro kicker={t.homeStoryKicker} title={t.homeStoryTitle} text={t.homeStorySubtitle} id="home-story-title" />
         <div className="homeStoryGrid">
-          {HOME_SUMMARY_HTML ? <div className="homeMarketStory" dangerouslySetInnerHTML={{ __html: HOME_SUMMARY_HTML }} /> : null}
+          {HOME_SUMMARY_HTML[lang] ? <div className="homeMarketStory" dangerouslySetInnerHTML={{ __html: HOME_SUMMARY_HTML[lang] }} /> : null}
           <div className="homeEditorialPanel"><EditorialSummary t={t} items={editorialItems} /></div>
         </div>
       </section>
 
       <section className="homeDashboardSection homeTransparencySection" aria-labelledby="home-transparency-title">
         <SectionIntro kicker={t.homeTransparencyKicker} title={t.homeTransparencyTitle} text={t.homeTransparencySubtitle} id="home-transparency-title" />
-        <div className="homeDisclosureGrid">
-          <details className="contentAccordion homeDisclosure">
-            <summary className="contentAccordionSummary">{t.accordionMethodology}</summary>
-            <div className="contentAccordionBody">
-              <MethodologySection
-                t={t}
-                fuelSourceLabel={data?.source ?? t.methodologyFuelSourceDefault}
-                fxSourceLabel={t.methodologyFxSourceDefault}
-                updateFrequency={t.methodologyUpdateFrequencyDefault}
-              />
-            </div>
-          </details>
-
+        <div className="homeTransparencyLedger">
           <div className="homeSourcePanel"><SourceCard t={t} data={data} /></div>
+          <div className="homeTrustDetails">
+            <details className="contentAccordion homeDisclosure">
+              <summary className="contentAccordionSummary">{t.accordionMethodology}</summary>
+              <div className="contentAccordionBody">
+                <MethodologySection
+                  t={t}
+                  fuelSourceLabel={data?.source ?? t.methodologyFuelSourceDefault}
+                  fxSourceLabel={t.methodologyFxSourceDefault}
+                  updateFrequency={t.methodologyUpdateFrequencyDefault}
+                />
+              </div>
+            </details>
 
-          <details className="contentAccordion homeDisclosure homeGuideDisclosure">
-            <summary className="contentAccordionSummary">{t.accordionGuide}</summary>
-            <div className="contentAccordionBody">
-              <Suspense fallback={<section className="contentSection"><div className="skeletonWrap"><div className="skeletonLine" /><div className="skeletonLine short" /></div></section>}>
-                <HomeEditorialDeepDive data={data} />
-              </Suspense>
-            </div>
-          </details>
+            <details className="contentAccordion homeDisclosure homeGuideDisclosure">
+              <summary className="contentAccordionSummary">{t.accordionGuide}</summary>
+              <div className="contentAccordionBody">
+                <Suspense fallback={<section className="contentSection"><div className="skeletonWrap"><div className="skeletonLine" /><div className="skeletonLine short" /></div></section>}>
+                  <HomeEditorialDeepDive data={data} lang={lang} />
+                </Suspense>
+              </div>
+            </details>
+          </div>
         </div>
       </section>
 

@@ -168,28 +168,28 @@ const STATIC_ROUTES: RouteEntry[] = [
     priceBearing: true,
     content: (ctx) => `
       <header class="contentHero" aria-labelledby="prerender-home-title">
-        <p class="contentHeroBadge">Europe / fuel intelligence</p>
-        <h1 id="prerender-home-title" class="contentHeroTitle">Read the road before you drive it.</h1>
-        <p class="contentHeroText">Check current petrol, diesel and LPG prices in Albania and across Europe, compare countries, and calculate your trip fuel cost from daily-updated reference data.</p>
+        <p class="contentHeroBadge">Albania / Europe fuel prices</p>
+        <h1 id="prerender-home-title" class="contentHeroTitle">Know the fuel cost before the road starts.</h1>
+        <p class="contentHeroText">Check dated national reference prices for petrol, diesel and LPG, compare Albania with Europe, and turn the numbers into a practical trip budget.</p>
         <nav class="contentHeroActions" aria-label="Homepage tools">
-          <a class="heroCta heroCtaPrimary" href="#price-tool">Enter the cockpit</a>
+          <a class="heroCta heroCtaPrimary" href="/trip-cost-calculator">Calculate a trip</a>
           <a class="heroCta heroCtaSecondary" href="/stations">Find fuel nearby</a>
         </nav>
         <nav class="contentHeroLinks" aria-label="Popular fuel tools">
-          <a href="/fuel-prices/albania">Albania fuel prices</a>
-          <a href="/trip-cost-calculator">Trip calculator</a>
+          <a href="#price-tool">Albania fuel prices</a>
+          <a href="/compare">Compare countries</a>
           <a href="/rankings">Europe rankings</a>
         </nav>
-        <p class="heroTrustRow">Daily market updates · Europe-wide comparison · Transparent public sources</p>
+        <p class="heroTrustRow">Country-level reference values · Individual pump prices vary · Source and date shown with every reading</p>
       </header>
       <article class="contentPage">
         ${freshnessNotice()}
         <section class="contentSection" id="price-tool">
-          <h2 class="contentHeading">Live fuel telemetry for Albania and Europe</h2>
-          <p class="contentBody">Inspect today's petrol, diesel, and LPG reference prices, then use the live snapshot to compare the selected market with the European range.</p>
+          <h2 class="contentHeading">One market. Three fuel prices.</h2>
+          <p class="contentBody">Inspect the dated petrol, diesel, and LPG national reference values, then compare the selected market with the European range and recent movement.</p>
         </section>
         ${renderHomeSnapshot(ctx)}
-        ${HOME_SUMMARY_HTML}
+        ${HOME_SUMMARY_HTML.en}
         <section class="contentSection">
           <h2 class="contentHeading">One market. Every signal.</h2>
           <p class="contentBody">Fuel Today (Karburanti Sot) is an independent fuel price comparison website for Albania and Europe. It collects public country-level fuel price data, converts it into a consistent EUR-per-liter format, and presents it with editorial context so drivers can make informed decisions about where and when to refuel.</p>
