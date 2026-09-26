@@ -3,8 +3,6 @@ export type Lang = "en" | "sq";
 export type TDict = {
   title: string;
   subtitleAsOf: (d: string) => string;
-  subtitleLoading: string;
-  fetching: string;
   couldntLoad: string;
   tryAgain: string;
   refresh: string;
@@ -112,11 +110,8 @@ export type TDict = {
   themeLight: string;
   themeDark: string;
 
-  trendCardTitle: string;
   trendStableWeek: string;
   trendVsLastWeek: string;
-  trendLow: string;
-  trendHigh: string;
 
   scopeEurope: string;
   scopeWorld: string;
@@ -164,42 +159,9 @@ export type TDict = {
   version: string;
   allCountries: string;
   favorites: string;
-  homeDashboard: string;
-  homeLivePrice: string;
-  homeAddFavorites: string;
-  homeInsights: string;
-  homeFreshness: string;
-  homeConfidence: string;
   homeVerified: string;
-  homeMarketMoves: string;
-  homeNearbySubtitle: string;
-  homeCompareSubtitle: string;
-  homeRankingsSubtitle: string;
   allFuelPrices: string;
-  homeSearchCountries: string;
-  homeUpdatedToday: string;
-  homeSourceVerified: string;
-  homeNoPrice: string;
-  homeRankBadge: (rank: number) => string;
-  homeOutOf: (total: number) => string;
-  homeFuelPulse: string;
-  homeSelectedPrice: string;
   homeEuropeAverage: string;
-  homeTrend: string;
-  homeWidgets: string;
-  homeMore: string;
-  homeNearAverage: string;
-  homeBelowAverage: string;
-  homeAboveAverage: string;
-  homeNoPrevious: string;
-  homeStableTrend: string;
-  homeCheaperTrend: string;
-  homeHigherTrend: string;
-  homeCheapestToday: string;
-  homeEuropeAverageWidget: string;
-  homeNearbyStationsWidget: string;
-  homeSavedCountriesWidget: string;
-  homeCompareCountriesWidget: string;
 
   // Compare sets, alerts and quick-switch labels
   best: string;
@@ -268,14 +230,65 @@ export type TDict = {
   stationsTimeoutCached: string;
   linkUnavailable: string;
   dataUnavailable: string;
+  // Home fuel deck
+  monthsShort: string[];
+  ordinalCheapest: (rank: number, total: number) => string;
+  changeCountryA11y: (country: string) => string;
+  saveMarketA11y: (country: string) => string;
+  unsaveMarketA11y: (country: string) => string;
+  pricesOf: (date: string) => string;
+  freshSynced: string;
+  freshChecking: string;
+  freshStale: string;
+  offlineCopy: (saved: string) => string;
+  refreshFailed: string;
+  loadingPrices: string;
+  notReported: string;
+  perLitre: string;
+  aboveEuropeBy: (amount: string) => string;
+  belowEuropeBy: (amount: string) => string;
+  atEuropeAverage: string;
+  outsideEuropeRank: string;
+  weekChange: (amount: string) => string;
+  weekFlat: string;
+  localRateUnavailable: string;
+  alertAction: string;
+  alertBelowShort: (amount: string) => string;
+  alertAboveShort: (amount: string) => string;
+  alertBelow: string;
+  alertAbove: string;
+  alertRuleBelow: string;
+  alertRuleAbove: string;
+  alertTargetLabel: string;
+  alertNow: (amount: string) => string;
+  alertInvalid: string;
+  shareAction: string;
+  shareMessage: (fuel: string, country: string, price: string, date: string) => string;
+  compareAction: string;
+  compareMarketA11y: (country: string) => string;
+  savedMarkets: string;
+  savedMarketsEmpty: string;
+  addMarket: string;
+  marketPulse: string;
+  movement: (days: number) => string;
+  movementRange: (low: string, high: string) => string;
+  movementMissing: string;
+  positionInEurope: string;
+  europeAverageIs: (amount: string) => string;
+  cheapestShort: string;
+  dearestShort: string;
+  lastSyncAt: (when: string) => string;
+  sourceIs: (source: string) => string;
+  unlockExtras: string;
+  extrasTitle: string;
+  extrasDetail: string;
+  extrasActive: (minutes: number) => string;
 };
 
 export const i18n: Record<Lang, TDict> = {
   en: {
     title: "Fuel Today",
     subtitleAsOf: (d: string) => `As of ${d}`,
-    subtitleLoading: "Loading latest data…",
-    fetching: "Fetching latest data…",
     couldntLoad: "Couldn’t load data",
     tryAgain: "Try again",
     refresh: "Refresh",
@@ -383,11 +396,8 @@ export const i18n: Record<Lang, TDict> = {
     themeLight: "Light",
     themeDark: "Dark",
 
-    trendCardTitle: "30-day trend",
     trendStableWeek: "Stable this week",
     trendVsLastWeek: "vs last week",
-    trendLow: "Low",
-    trendHigh: "High",
 
     scopeEurope: "Europe",
     scopeWorld: "World",
@@ -435,42 +445,9 @@ export const i18n: Record<Lang, TDict> = {
     version: "Version",
     allCountries: "All",
     favorites: "Favorites",
-    homeDashboard: "Fuel dashboard",
-    homeLivePrice: "Live price",
-    homeAddFavorites: "Add favorite countries",
-    homeInsights: "Quick intelligence",
-    homeFreshness: "Freshness",
-    homeConfidence: "Source confidence",
     homeVerified: "Verified",
-    homeMarketMoves: "Market moves",
-    homeNearbySubtitle: "Find pumps around you",
-    homeCompareSubtitle: "Compare your saved countries",
-    homeRankingsSubtitle: "See cheapest markets",
     allFuelPrices: "All fuel prices",
-    homeSearchCountries: "Search countries",
-    homeUpdatedToday: "Updated today",
-    homeSourceVerified: "Verified",
-    homeNoPrice: "No price",
-    homeRankBadge: (rank: number) => `#${rank} cheapest in Europe`,
-    homeOutOf: (total: number) => `of ${total} countries`,
-    homeFuelPulse: "Today's fuel pulse",
-    homeSelectedPrice: "Selected price",
     homeEuropeAverage: "Europe average",
-    homeTrend: "Trend",
-    homeWidgets: "Widgets",
-    homeMore: "More",
-    homeNearAverage: "Near Europe average",
-    homeBelowAverage: "Below Europe average",
-    homeAboveAverage: "Above Europe average",
-    homeNoPrevious: "No previous update",
-    homeStableTrend: "Holding steady",
-    homeCheaperTrend: "Cheaper than previous update",
-    homeHigherTrend: "Higher than previous update",
-    homeCheapestToday: "Cheapest today",
-    homeEuropeAverageWidget: "Europe average",
-    homeNearbyStationsWidget: "Nearby stations",
-    homeSavedCountriesWidget: "Saved countries",
-    homeCompareCountriesWidget: "Compare countries",
     best: "Best",
     savedSets: "Saved",
     compareSetsTitle: "Compare sets",
@@ -537,12 +514,67 @@ export const i18n: Record<Lang, TDict> = {
     stationsTimeoutCached: "The station service timed out. Cached results are shown.",
     linkUnavailable: "This link is unavailable right now.",
     dataUnavailable: "Data unavailable",
+    monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    ordinalCheapest: (rank: number, total: number) => {
+      const mod100 = rank % 100;
+      const suffixes: Record<number, string> = { 1: "st", 2: "nd", 3: "rd" };
+      const suffix = mod100 >= 11 && mod100 <= 13 ? "th" : suffixes[rank % 10] ?? "th";
+      return `${rank}${suffix} cheapest of ${total}`;
+    },
+    changeCountryA11y: (country: string) => `${country}, change country`,
+    saveMarketA11y: (country: string) => `Save ${country} to your markets`,
+    unsaveMarketA11y: (country: string) => `Remove ${country} from your markets`,
+    pricesOf: (date: string) => `Prices of ${date}`,
+    freshSynced: "synced",
+    freshChecking: "checking for updates",
+    freshStale: "no newer publication",
+    offlineCopy: (saved: string) => `Offline copy · saved ${saved}`,
+    refreshFailed: "Couldn’t refresh",
+    loadingPrices: "Loading prices…",
+    notReported: "Not reported",
+    perLitre: "per litre",
+    aboveEuropeBy: (amount: string) => `${amount} above Europe average`,
+    belowEuropeBy: (amount: string) => `${amount} below Europe average`,
+    atEuropeAverage: "At the Europe average",
+    outsideEuropeRank: "Not part of the European ranking",
+    weekChange: (amount: string) => `${amount} this week`,
+    weekFlat: "Unchanged this week",
+    localRateUnavailable: "Local rate unavailable · showing EUR",
+    alertAction: "Alert",
+    alertBelowShort: (amount: string) => `Below ${amount}`,
+    alertAboveShort: (amount: string) => `Above ${amount}`,
+    alertBelow: "Below",
+    alertAbove: "Above",
+    alertRuleBelow: "Notify me when the price drops below",
+    alertRuleAbove: "Notify me when the price rises above",
+    alertTargetLabel: "Target price, EUR per litre",
+    alertNow: (amount: string) => `Now ${amount}`,
+    alertInvalid: "Enter a price above zero.",
+    shareAction: "Share",
+    shareMessage: (fuel: string, country: string, price: string, date: string) => `${fuel} in ${country}: ${price}\nPrices of ${date}`,
+    compareAction: "Compare",
+    compareMarketA11y: (country: string) => `Compare ${country} with other markets`,
+    savedMarkets: "Saved markets",
+    savedMarketsEmpty: "Save the markets you drive through",
+    addMarket: "Add market",
+    marketPulse: "Market pulse",
+    movement: (days: number) => `Movement · last ${days} days`,
+    movementRange: (low: string, high: string) => `Range ${low} – ${high}`,
+    movementMissing: "Price history isn’t available for this market yet.",
+    positionInEurope: "Position in Europe",
+    europeAverageIs: (amount: string) => `Europe average ${amount}`,
+    cheapestShort: "Cheapest",
+    dearestShort: "Dearest",
+    lastSyncAt: (when: string) => `Last sync ${when}`,
+    sourceIs: (source: string) => `Source: ${source}`,
+    unlockExtras: "Unlock extras",
+    extrasTitle: "Extras",
+    extrasDetail: "Watch a short ad to unlock bonus features for 30 minutes",
+    extrasActive: (minutes: number) => `Unlocked · ${minutes} min left`,
   },
   sq: {
     title: "Karburanti Sot",
     subtitleAsOf: (d: string) => `Data: ${d}`,
-    subtitleLoading: "Po ngarkohen të dhënat…",
-    fetching: "Po shkarkohen të dhënat…",
     couldntLoad: "S’u arrit të ngarkohen të dhënat",
     tryAgain: "Provo përsëri",
     refresh: "Rifresko",
@@ -650,11 +682,8 @@ export const i18n: Record<Lang, TDict> = {
     themeLight: "E çelët",
     themeDark: "E errët",
 
-    trendCardTitle: "Ecuria 30-ditore",
     trendStableWeek: "Stabil këtë javë",
     trendVsLastWeek: "krahasuar me javën e kaluar",
-    trendLow: "Më i ulëti",
-    trendHigh: "Më i larti",
 
     scopeEurope: "Europa",
     scopeWorld: "Bota",
@@ -702,42 +731,9 @@ export const i18n: Record<Lang, TDict> = {
     version: "Versioni",
     allCountries: "Të gjitha",
     favorites: "Të preferuarat",
-    homeDashboard: "Paneli i karburantit",
-    homeLivePrice: "Çmimi live",
-    homeAddFavorites: "Shto shtete të preferuara",
-    homeInsights: "Informacion i shpejtë",
-    homeFreshness: "Freskia",
-    homeConfidence: "Besueshmëria e burimit",
     homeVerified: "Verifikuar",
-    homeMarketMoves: "Lëvizjet e tregut",
-    homeNearbySubtitle: "Gjej pika pranë teje",
-    homeCompareSubtitle: "Krahaso shtetet e ruajtura",
-    homeRankingsSubtitle: "Shiko tregjet më të lira",
     allFuelPrices: "Të gjitha çmimet",
-    homeSearchCountries: "Kerko shtete",
-    homeUpdatedToday: "Perditesuar sot",
-    homeSourceVerified: "Verifikuar",
-    homeNoPrice: "Pa cmim",
-    homeRankBadge: (rank: number) => `#${rank} me lire ne Evrope`,
-    homeOutOf: (total: number) => `nga ${total} shtete`,
-    homeFuelPulse: "Pulsi i karburantit sot",
-    homeSelectedPrice: "Cmimi i zgjedhur",
     homeEuropeAverage: "Mesatarja evropiane",
-    homeTrend: "Tendenca",
-    homeWidgets: "Widget-e",
-    homeMore: "Me shume",
-    homeNearAverage: "Afer mesatares evropiane",
-    homeBelowAverage: "Nen mesataren evropiane",
-    homeAboveAverage: "Mbi mesataren evropiane",
-    homeNoPrevious: "Pa perditesim te meparshem",
-    homeStableTrend: "I qendrueshem",
-    homeCheaperTrend: "Me lire se perditesimi i kaluar",
-    homeHigherTrend: "Me shtrenjte se perditesimi i kaluar",
-    homeCheapestToday: "Me lire sot",
-    homeEuropeAverageWidget: "Mesatarja evropiane",
-    homeNearbyStationsWidget: "Pika afer",
-    homeSavedCountriesWidget: "Shtete te ruajtura",
-    homeCompareCountriesWidget: "Krahaso shtetet",
     best: "Më i miri",
     savedSets: "Të ruajtura",
     compareSetsTitle: "Grupet e krahasimit",
@@ -804,5 +800,57 @@ export const i18n: Record<Lang, TDict> = {
     stationsTimeoutCached: "Shërbimi i pikave nuk u përgjigj në kohë. Po shfaqen rezultatet e ruajtura.",
     linkUnavailable: "Kjo lidhje nuk është e disponueshme tani.",
     dataUnavailable: "Të dhënat nuk disponohen",
+    monthsShort: ["jan", "shk", "mar", "pri", "maj", "qer", "korr", "gush", "sht", "tet", "nën", "dhj"],
+    ordinalCheapest: (rank: number, total: number) => `Vendi ${rank} nga ${total} për çmim më të lirë`,
+    changeCountryA11y: (country: string) => `${country}, ndrysho shtetin`,
+    saveMarketA11y: (country: string) => `Ruaj ${country} te tregjet e tua`,
+    unsaveMarketA11y: (country: string) => `Hiq ${country} nga tregjet e tua`,
+    pricesOf: (date: string) => `Çmimet e ${date}`,
+    freshSynced: "sinkronizuar",
+    freshChecking: "po kontrollohet",
+    freshStale: "pa publikim më të ri",
+    offlineCopy: (saved: string) => `Kopje offline · ruajtur ${saved}`,
+    refreshFailed: "Rifreskimi dështoi",
+    loadingPrices: "Po ngarkohen çmimet…",
+    notReported: "Nuk raportohet",
+    perLitre: "për litër",
+    aboveEuropeBy: (amount: string) => `${amount} mbi mesataren evropiane`,
+    belowEuropeBy: (amount: string) => `${amount} nën mesataren evropiane`,
+    atEuropeAverage: "Në mesataren evropiane",
+    outsideEuropeRank: "Jashtë renditjes evropiane",
+    weekChange: (amount: string) => `${amount} këtë javë`,
+    weekFlat: "E pandryshuar këtë javë",
+    localRateUnavailable: "Kursi lokal mungon · në EUR",
+    alertAction: "Njoftim",
+    alertBelowShort: (amount: string) => `Nën ${amount}`,
+    alertAboveShort: (amount: string) => `Mbi ${amount}`,
+    alertBelow: "Nën",
+    alertAbove: "Mbi",
+    alertRuleBelow: "Më njofto kur çmimi bie nën",
+    alertRuleAbove: "Më njofto kur çmimi rritet mbi",
+    alertTargetLabel: "Çmimi i synuar, EUR për litër",
+    alertNow: (amount: string) => `Tani ${amount}`,
+    alertInvalid: "Shkruaj një çmim mbi zero.",
+    shareAction: "Shpërndaj",
+    shareMessage: (fuel: string, country: string, price: string, date: string) => `${fuel} në ${country}: ${price}\nÇmimet e ${date}`,
+    compareAction: "Krahaso",
+    compareMarketA11y: (country: string) => `Krahaso ${country} me tregje të tjera`,
+    savedMarkets: "Tregjet e ruajtura",
+    savedMarketsEmpty: "Ruaj tregjet ku udhëton",
+    addMarket: "Shto treg",
+    marketPulse: "Pulsi i tregut",
+    movement: (days: number) => `Lëvizja · ${days} ditët e fundit`,
+    movementRange: (low: string, high: string) => `Intervali ${low} – ${high}`,
+    movementMissing: "Historiku i çmimeve nuk disponohet ende për këtë treg.",
+    positionInEurope: "Pozicioni në Evropë",
+    europeAverageIs: (amount: string) => `Mesatarja evropiane ${amount}`,
+    cheapestShort: "Më i liri",
+    dearestShort: "Më i shtrenjti",
+    lastSyncAt: (when: string) => `Sinkronizimi i fundit ${when}`,
+    sourceIs: (source: string) => `Burimi: ${source}`,
+    unlockExtras: "Zhblloko shtesat",
+    extrasTitle: "Shtesat",
+    extrasDetail: "Shiko një reklamë të shkurtër për të zhbllokuar veçori shtesë për 30 minuta",
+    extrasActive: (minutes: number) => `Zhbllokuar · ${minutes} min mbetur`,
   },
 };

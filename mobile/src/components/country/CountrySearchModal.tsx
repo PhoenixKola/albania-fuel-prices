@@ -10,6 +10,8 @@ export default function CountrySearchModal(props: {
   placeholder: string;
   closeLabel: string;
   selectedLabel: string;
+  saveLabel?: (country: string) => string;
+  unsaveLabel?: (country: string) => string;
   countries: string[];
   value: string;
   favorites?: string[];
@@ -101,7 +103,7 @@ export default function CountrySearchModal(props: {
                           }}
                           style={s.starBtn}
                           accessibilityRole="button"
-                          accessibilityLabel={item}
+                          accessibilityLabel={(isFav ? props.unsaveLabel : props.saveLabel)?.(item) ?? item}
                           accessibilityState={{ selected: isFav }}
                           hitSlop={6}
                         >

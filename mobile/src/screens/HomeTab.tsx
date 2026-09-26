@@ -1,359 +1,213 @@
-import React, { useMemo, useState } from "react";
-import { Modal, RefreshControl, ScrollView, Share, Text, TextInput, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useCallback, useMemo, useState } from "react";
+import { RefreshControl, ScrollView, Share, Text, View } from "react-native";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native";
 
 import { useApp } from "../context/AppContext";
-import { makeHomeStyles } from "./HomeTab.styles";
+import { isTwoColumnHome, makeHomeStyles } from "./HomeTab.styles";
+import { formatShortDate, toneOf, useHomeMarket } from "../hooks/useHomeMarket";
 
 import CountrySearchModal from "../components/country/CountrySearchModal";
 import FavoritesQuickSheet from "../components/country/FavoritesQuickSheet";
 import ErrorCard from "../components/feedback/ErrorCard";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
-import TrendCard from "../components/fuel/TrendCard";
+import FuelDeck, { FuelDeckSkeleton } from "../components/home/FuelDeck";
+import HomeActions, { type HomeAction } from "../components/home/HomeActions";
+import SavedMarketsRail from "../components/home/SavedMarketsRail";
+import MarketPulse from "../components/home/MarketPulse";
+import PriceAlertSheet from "../components/home/PriceAlertSheet";
+import { homePalette } from "../components/home/homePalette";
 
-import type { FuelType } from "../types/fuel";
-import { convertEur, getCurrencyForCountry } from "../utils/currency";
-import { fuelLabel, getFuelPrice } from "../utils/fuel";
-import { formatMoney } from "../utils/money";
-import { getFlagForCountry } from "../utils/countryFlag";
-import { isEuropeanCountry } from "../utils/regions";
-import { getWeeklyDeltaEur } from "../hooks/useTrends";
+import { ADS_ENABLED } from "../constants/ads";
 import { PLAY_STORE_URL } from "../constants/urls";
+import { fuelLabel } from "../utils/fuel";
+import { getFlagForCountry } from "../utils/countryFlag";
 
-type IconName = React.ComponentProps<typeof Ionicons>["name"];
-type ShortcutRoute = "Stations" | "Compare" | "Rankings" | "Settings";
-type Tone = "teal" | "blue" | "violet" | "amber";
-
-const fuelIcons: Record<FuelType, IconName> = {
-  gasoline95: "car-sport-outline",
-  diesel: "trail-sign-outline",
-  lpg: "flame-outline"
-};
+const FLAT = 0.0005;
 
 export default function HomeTab() {
   const ctx = useApp();
+  const { t, theme } = ctx;
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
-  const s = useMemo(() => makeHomeStyles(ctx.theme), [ctx.theme]);
+  const s = useMemo(() => makeHomeStyles(theme), [theme]);
+  const p = useMemo(() => homePalette(theme), [theme]);
+  const market = useHomeMarket();
+
   const [quickSheetOpen, setQuickSheetOpen] = useState(false);
   const [countryModalOpen, setCountryModalOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const [alertDirection, setAlertDirection] = useState<"below" | "above">("below");
-  const [alertTarget, setAlertTarget] = useState("");
 
-  const isLightTheme = ctx.theme.name === "light";
-  const topIconColor = isLightTheme ? "#172033" : "#FFFFFF";
-  const searchIconColor = isLightTheme ? "rgba(15,23,42,0.58)" : "rgba(255,255,255,0.72)";
-  const accentColor = isLightTheme ? "#0F766E" : "#8DEDE1";
-  const actionIconColor = isLightTheme ? "#172033" : "#FFFFFF";
-  const fuelInactiveColor = isLightTheme ? "rgba(15,23,42,0.56)" : "rgba(255,255,255,0.72)";
-  const fuelActiveColor = isLightTheme ? "#FFFFFF" : "#07111F";
-  const refreshTint = isLightTheme ? "#0F766E" : "#8DEDE1";
-  const heroGradient = (
-    isLightTheme
-      ? ["#FFFFFF", "#F0FAF7", "#E7F4F0", "#F7F3EC"]
-      : ["#134E4A", "#0E3538", "#0A1F2B", "#07111F"]
-  ) as [string, string, string, string];
-
+  const fuelName = fuelLabel(ctx.fuelType, t);
   const flag = useMemo(() => getFlagForCountry(ctx.country), [ctx.country]);
-  const currency = useMemo(() => getCurrencyForCountry(ctx.country), [ctx.country]);
-  const currentEurPrice = getFuelPrice(ctx.selected, ctx.fuelType);
-  const currentAlert = ctx.priceAlerts.getRule(ctx.country, ctx.fuelType);
+  const isFavorite = ctx.favorites.includes(ctx.country);
+  const alertRule = ctx.priceAlerts.getRule(ctx.country, ctx.fuelType) ?? null;
+  const { signal, current } = market;
 
-  const fuelOptions = useMemo(
-    () => [
-      { key: "diesel" as FuelType, label: ctx.t.diesel, icon: fuelIcons.diesel },
-      { key: "gasoline95" as FuelType, label: ctx.t.gasoline95, icon: fuelIcons.gasoline95 },
-      { key: "lpg" as FuelType, label: ctx.t.lpg, icon: fuelIcons.lpg }
-    ],
-    [ctx.t]
+  const diff = useMemo(() => {
+    if (signal.diffEur == null) return null;
+    if (Math.abs(signal.diffEur) < FLAT) return { text: t.atEuropeAverage, tone: "neutral" as const };
+    const amount = market.fmt(Math.abs(signal.diffEur));
+    return signal.diffEur > 0
+      ? { text: t.aboveEuropeBy(amount), tone: "bad" as const }
+      : { text: t.belowEuropeBy(amount), tone: "good" as const };
+  }, [signal.diffEur, market, t]);
+
+  const week = useMemo(() => {
+    if (signal.deltaEur == null) return null;
+    if (Math.abs(signal.deltaEur) < FLAT) return { text: t.weekFlat, tone: "neutral" as const };
+    return { text: t.weekChange(market.fmtSigned(signal.deltaEur)), tone: toneOf(signal.deltaEur) };
+  }, [signal.deltaEur, market, t]);
+
+  const sharePrice = useCallback(async () => {
+    if (current == null || !ctx.data) return;
+    const message = [
+      "Karburanti Sot",
+      t.shareMessage(fuelName, ctx.country, `${market.fmt(current)}/L`, formatShortDate(ctx.data.as_of, t)),
+      "",
+      PLAY_STORE_URL,
+    ].join("\n");
+    try {
+      await Share.share({ message });
+    } catch {}
+  }, [current, ctx.data, ctx.country, fuelName, market, t]);
+
+  const compareThis = useCallback(() => {
+    if (!ctx.compareCountries.includes(ctx.country)) {
+      if (ctx.compareCountries.length >= ctx.maxCompare) ctx.showToast(t.compareLimitHint(ctx.maxCompare));
+      else ctx.addCompare(ctx.country);
+    }
+    navigation.navigate("Compare");
+  }, [ctx, navigation, t]);
+
+  const actions: HomeAction[] = [
+    {
+      key: "alert",
+      icon: alertRule ? "notifications" : "notifications-outline",
+      label: alertRule
+        ? (alertRule.direction === "below" ? t.alertBelowShort : t.alertAboveShort)(`€${alertRule.targetEur.toFixed(3)}`)
+        : t.alertAction,
+      a11yLabel: alertRule
+        ? `${t.priceAlert}: ${(alertRule.direction === "below" ? t.alertBelowShort : t.alertAboveShort)(`€${alertRule.targetEur.toFixed(3)}`)}`
+        : t.priceAlert,
+      active: !!alertRule,
+      disabled: current == null,
+      onPress: () => setAlertOpen(true),
+    },
+    { key: "share", icon: "share-outline", label: t.shareAction, a11yLabel: t.shareAction, disabled: current == null, onPress: sharePrice },
+    { key: "compare", icon: "git-compare-outline", label: t.compareAction, a11yLabel: t.compareMarketA11y(ctx.country), onPress: compareThis },
+  ];
+
+  const rewardChip = !ADS_ENABLED ? null : ctx.reward.unlocked ? (
+    <View style={s.rewardChip} accessible accessibilityLabel={t.extrasActive(ctx.reward.minutesLeft)}>
+      <Ionicons name="checkmark-circle" size={15} color={p.accent} />
+      <Text style={s.rewardText} numberOfLines={1} maxFontSizeMultiplier={1.3}>{t.extrasActive(ctx.reward.minutesLeft)}</Text>
+    </View>
+  ) : ctx.canAskReward ? (
+    <AnimatedPressable onPress={() => ctx.openRewardModal()} contentStyle={s.rewardChip} reduceMotion={theme.motion.reduced} accessibilityLabel={t.unlockExtras}>
+      <Ionicons name="gift-outline" size={15} color={p.accent} />
+      <Text style={s.rewardText} numberOfLines={1} maxFontSizeMultiplier={1.3}>{t.unlockExtras}</Text>
+    </AnimatedPressable>
+  ) : null;
+
+  const deck = ctx.data ? (
+    <FuelDeck
+      theme={theme}
+      t={t}
+      country={ctx.country}
+      flag={flag}
+      isFavorite={isFavorite}
+      fuelType={ctx.fuelType}
+      prices={market.prices}
+      format={market.fmt}
+      raisedDigit={market.mode === "eur"}
+      diff={diff}
+      week={week}
+      note={market.localRequestedButMissing ? t.localRateUnavailable : null}
+      freshness={market.freshness}
+      refreshFailed={market.refreshFailed}
+      onRetry={ctx.refreshAll}
+      onOpenCountry={() => setQuickSheetOpen(true)}
+      onToggleFavorite={() => ctx.toggleFavorite(ctx.country)}
+      onSelectFuel={ctx.setFuelType}
+    />
+  ) : ctx.loading ? (
+    <FuelDeckSkeleton theme={theme} label={t.loadingPrices} />
+  ) : (
+    <ErrorCard theme={theme} title={t.couldntLoad} message={ctx.error || t.dataUnavailable} cta={t.tryAgain} onPress={ctx.refreshAll} />
   );
 
-  const dashboard = useMemo(() => {
-    const selectedEur = getFuelPrice(ctx.selected, ctx.fuelType);
-    const displayCurrency = ctx.effectiveCurrencyMode === "local" ? currency : "EUR";
-    const displayValue =
-      ctx.effectiveCurrencyMode === "local" ? convertEur(selectedEur, currency, ctx.fxRates) : selectedEur;
+  const primary = (
+    <View style={s.column}>
+      {deck}
+      {ctx.data ? <HomeActions theme={theme} actions={actions} /> : null}
+    </View>
+  );
 
-    // Europe-only stats: the dataset also carries global reference markets
-    // (US, Australia, …) that must not skew the "Europe average" or rank.
-    const pricedCountries =
-      ctx.data?.countries
-        ?.filter((country) => isEuropeanCountry(country.country))
-        .map((country) => ({ country: country.country, price: getFuelPrice(country, ctx.fuelType) }))
-        .filter((item): item is { country: string; price: number } => typeof item.price === "number" && Number.isFinite(item.price))
-        .sort((a, b) => a.price - b.price) ?? [];
-
-    const total = pricedCountries.length;
-    const averageEur = total ? pricedCountries.reduce((sum, item) => sum + item.price, 0) / total : null;
-    const avgDisplay =
-      ctx.effectiveCurrencyMode === "local" ? convertEur(averageEur, currency, ctx.fxRates) : averageEur;
-    const rank =
-      selectedEur != null && Number.isFinite(selectedEur) && total && isEuropeanCountry(ctx.country)
-        ? pricedCountries.filter((item) => item.price < selectedEur).length + 1
-        : null;
-    const averageDiffEur = selectedEur != null && averageEur != null ? selectedEur - averageEur : null;
-
-    // Prefer the real 7-day change from trend history; fall back to the
-    // delta vs the previously cached fetch when trends are unavailable.
-    const weeklyDeltaEur = getWeeklyDeltaEur(ctx.trends, ctx.country, ctx.fuelType);
-    const previousEur = getFuelPrice(ctx.prevSelected, ctx.fuelType);
-    const fallbackDeltaEur = selectedEur != null && previousEur != null ? selectedEur - previousEur : null;
-    const deltaEur = weeklyDeltaEur ?? fallbackDeltaEur;
-    const deltaDisplay =
-      ctx.effectiveCurrencyMode === "local"
-        ? convertEur(Math.abs(deltaEur ?? 0), currency, ctx.fxRates)
-        : Math.abs(deltaEur ?? 0);
-
-    const averageCaption =
-      averageDiffEur == null || Math.abs(averageDiffEur) < 0.0001
-        ? ctx.t.homeNearAverage
-        : averageDiffEur < 0
-          ? ctx.t.homeBelowAverage
-          : ctx.t.homeAboveAverage;
-
-    const trendCaption =
-      deltaEur == null
-        ? ctx.t.homeNoPrevious
-        : Math.abs(deltaEur) < 0.0001
-          ? ctx.t.homeStableTrend
-          : weeklyDeltaEur != null
-            ? ctx.t.trendVsLastWeek
-            : deltaEur < 0
-              ? ctx.t.homeCheaperTrend
-              : ctx.t.homeHigherTrend;
-
-    const averageTone: "good" | "bad" | "neutral" =
-      averageDiffEur == null || Math.abs(averageDiffEur) < 0.0001 ? "neutral" : averageDiffEur < 0 ? "good" : "bad";
-    const trendTone: "good" | "bad" | "neutral" =
-      deltaEur == null || Math.abs(deltaEur) < 0.0001 ? "neutral" : deltaEur < 0 ? "good" : "bad";
-
-    return {
-      fuelName: fuelLabel(ctx.fuelType, ctx.t),
-      displayCurrency,
-      price: selectedEur == null ? ctx.t.homeNoPrice : `${formatMoney(displayValue, displayCurrency)}/L`,
-      account: `${ctx.country} · ${fuelLabel(ctx.fuelType, ctx.t)}`,
-      rank: rank ? `#${rank}` : "--",
-      rankBadge: rank ? ctx.t.homeRankBadge(rank) : ctx.t.rankUnavailable,
-      rankCaption: total ? ctx.t.homeOutOf(total) : ctx.t.rankUnavailable,
-      average: `${formatMoney(avgDisplay, displayCurrency)}/L`,
-      averageCaption,
-      averageTone,
-      trend:
-        deltaEur == null || Math.abs(deltaEur) < 0.0001
-          ? "--"
-          : `${deltaEur > 0 ? "+" : "-"}${formatMoney(deltaDisplay, displayCurrency)}`,
-      trendCaption,
-      trendTone
-    };
-  }, [
-    ctx.data,
-    ctx.effectiveCurrencyMode,
-    ctx.fuelType,
-    ctx.fxRates,
-    ctx.prevSelected,
-    ctx.selected,
-    ctx.t,
-    ctx.country,
-    ctx.trends,
-    currency
-  ]);
-
-  const updatedLabel = ctx.data ? ctx.t.subtitleAsOf(ctx.data.as_of) : ctx.t.subtitleLoading;
-  const statusLabel = ctx.loading ? ctx.t.fetching : ctx.isFromCache ? ctx.t.showingCached : ctx.t.homeUpdatedToday;
-  const sourceLabel = ctx.data?.source ? ctx.t.homeSourceVerified : ctx.t.homeNoPrice;
-
-  const shareCurrentPrice = async () => {
-    const lines = [
-      "Fuel Today | Karburanti Sot",
-      `${dashboard.fuelName} in ${ctx.country}: ${dashboard.price}`,
-      ctx.data?.as_of ? ctx.t.subtitleAsOf(ctx.data.as_of) : "",
-      "",
-      `Open app: ${PLAY_STORE_URL}`,
-    ];
-    try {
-      await Share.share({ message: lines.filter(Boolean).join("\n") });
-    } catch {}
-  };
-
-  const actions: Array<{ label: string; icon: IconName; route: ShortcutRoute; tone: Tone; params?: object }> = [
-    { label: ctx.t.stationsTitle, icon: "navigate-outline", route: "Stations", tone: "teal" },
-    { label: ctx.t.compareTitle, icon: "git-compare-outline", route: "Compare", tone: "blue" },
-    { label: ctx.t.rankingsTitle, icon: "podium-outline", route: "Rankings", tone: "violet" },
-    { label: ctx.t.homeMore, icon: "ellipsis-horizontal", route: "Settings", tone: "amber" }
-  ];
+  const secondary = ctx.data ? (
+    <View style={s.column}>
+      <SavedMarketsRail
+        theme={theme}
+        t={t}
+        markets={market.saved}
+        current={ctx.country}
+        format={market.fmt}
+        onSelect={ctx.setCountryTracked}
+        onAdd={() => setCountryModalOpen(true)}
+      />
+      <MarketPulse
+        theme={theme}
+        t={t}
+        fuelName={fuelName}
+        country={ctx.country}
+        series={market.series}
+        weekText={week?.text ?? null}
+        europe={market.europe}
+        current={current}
+        rank={signal.rank}
+        format={market.fmt}
+      />
+      <View style={s.sourceNote}>
+        <Text style={s.sourceText} maxFontSizeMultiplier={1.4}>{t.sourceIs(ctx.data.source)}</Text>
+        {ctx.cacheSavedAtUtc ? (
+          <Text style={s.sourceText} maxFontSizeMultiplier={1.4}>{t.lastSyncAt(formatShortDate(ctx.cacheSavedAtUtc, t, true))}</Text>
+        ) : null}
+      </View>
+    </View>
+  ) : null;
 
   return (
     <View style={s.screen}>
       <ScrollView
         contentContainerStyle={s.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={ctx.refreshing} onRefresh={ctx.refreshAll} tintColor={refreshTint} />}
+        refreshControl={<RefreshControl refreshing={ctx.refreshing} onRefresh={ctx.refreshAll} tintColor={p.accent} colors={[p.accent]} />}
       >
-        <View style={s.topChrome}>
-          <AnimatedPressable
-            onPress={() => setQuickSheetOpen(true)}
-            contentStyle={s.avatarButton}
-            scaleIn={0.96}
-            hitSlop={8}
-          >
-            <Text style={s.avatarFlag}>{flag || "•"}</Text>
-          </AnimatedPressable>
-
-          <AnimatedPressable
-            onPress={() => setCountryModalOpen(true)}
-            style={s.searchWrapper}
-            contentStyle={s.searchPill}
-            scaleIn={0.98}
-          >
-            <Ionicons name="search" size={17} color={searchIconColor} />
-            <Text style={s.searchText} numberOfLines={1}>
-              {ctx.t.homeSearchCountries}
-            </Text>
-          </AnimatedPressable>
-
-          <View style={s.topIconCluster}>
-            <AnimatedPressable onPress={ctx.openFeedback} contentStyle={s.topCircle} scaleIn={0.96}>
-              <Ionicons name="chatbubble-ellipses-outline" size={18} color={topIconColor} />
-            </AnimatedPressable>
-            <AnimatedPressable onPress={shareCurrentPrice} contentStyle={s.topCircle} scaleIn={0.96}>
-              <Ionicons name="share-social-outline" size={18} color={topIconColor} />
-            </AnimatedPressable>
-            <AnimatedPressable
-              onPress={() => {
-                if (currentEurPrice == null) return;
-                setAlertDirection(currentAlert?.direction ?? "below");
-                setAlertTarget((currentAlert?.targetEur ?? currentEurPrice).toFixed(3));
-                setAlertOpen(true);
-              }}
-              contentStyle={[s.topCircle, currentAlert ? s.topCircleAccent : null]}
-              scaleIn={0.96}
-            >
-              <Ionicons name={currentAlert ? "notifications" : "notifications-outline"} size={18} color={currentAlert ? accentColor : topIconColor} />
-            </AnimatedPressable>
-            <AnimatedPressable
-              onPress={() => ctx.openRewardModal()}
-              disabled={!ctx.canAskReward || ctx.reward.unlocked}
-              contentStyle={[
-                s.topCircle,
-                ctx.canAskReward && !ctx.reward.unlocked ? s.topCircleAccent : null,
-                ctx.reward.unlocked ? s.topCircleSuccess : null
-              ]}
-              scaleIn={0.96}
-            >
-              <Ionicons
-                name={ctx.reward.unlocked ? "checkmark-circle-outline" : "trophy-outline"}
-                size={19}
-                color={ctx.canAskReward || ctx.reward.unlocked ? accentColor : topIconColor}
-              />
-            </AnimatedPressable>
+        <View style={s.topBar}>
+          <View style={s.brand} accessible accessibilityRole="header" accessibilityLabel="Karburanti Sot">
+            <View style={s.brandMark}>
+              <MaterialCommunityIcons name="gas-station" size={16} color={p.moduleText} />
+            </View>
+            <Text style={s.brandText} numberOfLines={1} maxFontSizeMultiplier={1.3}>Karburanti Sot</Text>
           </View>
+          {rewardChip}
         </View>
 
-        <LinearGradient colors={heroGradient} style={s.hero}>
-          <View style={s.heroStatusRow}>
-            <View style={s.livePill}>
-              <Ionicons name={ctx.isFromCache ? "cloud-offline-outline" : "pulse-outline"} size={13} color={accentColor} />
-              <Text style={s.livePillText} numberOfLines={1}>
-                {statusLabel}
-              </Text>
-            </View>
-            <Text style={s.heroUpdated} numberOfLines={1}>
-              {updatedLabel}
-            </Text>
+        {isTwoColumnHome(theme) ? (
+          <View style={s.columns}>
+            <View style={s.columnSlot}>{primary}</View>
+            <View style={s.columnSlot}>{secondary}</View>
           </View>
-
-          <View style={s.heroCenter}>
-            <Text style={s.heroPrice} adjustsFontSizeToFit numberOfLines={1}>
-              {dashboard.price}
-            </Text>
-            <View style={s.accountPill}>
-              <Text style={s.accountPillText} numberOfLines={1}>
-                {dashboard.account}
-              </Text>
-            </View>
-            <Text style={s.rankBadgeText} numberOfLines={1}>
-              {dashboard.rankBadge}
-            </Text>
-          </View>
-
-          <View style={s.fuelSelector}>
-            {fuelOptions.map((option) => {
-              const active = option.key === ctx.fuelType;
-              return (
-                <AnimatedPressable
-                  key={option.key}
-                  onPress={() => ctx.setFuelType(option.key)}
-                  style={s.fuelChipItem}
-                  contentStyle={[s.fuelChip, active ? s.fuelChipActive : null]}
-                  scaleIn={0.97}
-                >
-                  <Ionicons name={option.icon} size={15} color={active ? fuelActiveColor : fuelInactiveColor} />
-                  <Text style={[s.fuelChipText, active ? s.fuelChipTextActive : null]} numberOfLines={1}>
-                    {option.label}
-                  </Text>
-                </AnimatedPressable>
-              );
-            })}
-          </View>
-        </LinearGradient>
-
-        <View style={s.actionSplitRow}>
-          <View style={s.actionGroup}>
-            {actions.slice(0, 2).map((action) => (
-              <ActionButton
-                key={`${action.route}-${action.label}`}
-                icon={action.icon}
-                label={action.label}
-                tone={action.tone}
-                onPress={() => navigation.navigate(action.route, action.params)}
-              />
-            ))}
-          </View>
-          <View style={s.actionGroup}>
-            {actions.slice(2).map((action) => (
-              <ActionButton
-                key={`${action.route}-${action.label}`}
-                icon={action.icon}
-                label={action.label}
-                tone={action.tone}
-                onPress={() => navigation.navigate(action.route, action.params)}
-              />
-            ))}
-          </View>
-        </View>
-
-        <TrendCard theme={ctx.theme} t={ctx.t} trends={ctx.trends} country={ctx.country} fuelType={ctx.fuelType} />
-
-        <View style={s.marketCard}>
-          <View style={s.marketHeader}>
-            <View>
-              <Text style={s.marketKicker}>{dashboard.fuelName}</Text>
-              <Text style={s.marketTitle}>{ctx.t.homeFuelPulse}</Text>
-            </View>
-            <View style={s.sourcePill}>
-              <Ionicons name="shield-checkmark-outline" size={13} color={accentColor} />
-              <Text style={s.sourcePillText} numberOfLines={1}>
-                {sourceLabel}
-              </Text>
-            </View>
-          </View>
-
-          <PulseRow label={ctx.country} value={dashboard.price} detail={ctx.t.homeSelectedPrice} tone="neutral" />
-          <PulseRow label={ctx.t.homeEuropeAverage} value={dashboard.average} detail={dashboard.averageCaption} tone={dashboard.averageTone} />
-          <PulseRow label={ctx.t.rankingsTitle} value={dashboard.rank} detail={dashboard.rankCaption} tone="neutral" />
-          <PulseRow label={ctx.t.homeTrend} value={dashboard.trend} detail={dashboard.trendCaption} tone={dashboard.trendTone} />
-        </View>
-
-        {ctx.error ? (
-          <ErrorCard theme={ctx.theme} title={ctx.t.couldntLoad} message={ctx.error} cta={ctx.t.tryAgain} onPress={ctx.refreshAll} />
-        ) : null}
+        ) : (
+          <>
+            {primary}
+            {secondary}
+          </>
+        )}
       </ScrollView>
 
       <FavoritesQuickSheet
-        theme={ctx.theme}
-        t={ctx.t}
+        theme={theme}
+        t={t}
         open={quickSheetOpen}
         currentCountry={ctx.country}
         favorites={ctx.favorites}
@@ -369,12 +223,14 @@ export default function HomeTab() {
       />
 
       <CountrySearchModal
-        theme={ctx.theme}
+        theme={theme}
         open={countryModalOpen}
-        title={ctx.t.changeCountry}
-        placeholder={ctx.t.searchPlaceholder}
-        closeLabel={ctx.t.close}
-        selectedLabel={ctx.t.selected}
+        title={t.changeCountry}
+        placeholder={t.searchPlaceholder}
+        closeLabel={t.close}
+        selectedLabel={t.selected}
+        saveLabel={t.saveMarketA11y}
+        unsaveLabel={t.unsaveMarketA11y}
         countries={ctx.countries}
         value={ctx.country}
         favorites={ctx.favorites}
@@ -386,115 +242,23 @@ export default function HomeTab() {
         }}
       />
 
-      <Modal visible={alertOpen} transparent animationType="fade" onRequestClose={() => setAlertOpen(false)}>
-        <View style={s.modalBackdrop}>
-          <View style={s.alertModal}>
-            <View style={s.alertModalHeader}>
-              <View>
-                <Text style={s.alertModalTitle}>{ctx.t.priceAlert}</Text>
-                <Text style={s.alertModalSub}>{ctx.country} | {fuelLabel(ctx.fuelType, ctx.t)}</Text>
-              </View>
-              <AnimatedPressable onPress={() => setAlertOpen(false)} contentStyle={s.alertCloseBtn} scaleIn={0.98}>
-                <Ionicons name="close" size={18} color={ctx.theme.colors.text} />
-              </AnimatedPressable>
-            </View>
-
-            <View style={s.alertSegment}>
-              {(["below", "above"] as const).map((direction) => (
-                <AnimatedPressable
-                  key={direction}
-                  onPress={() => setAlertDirection(direction)}
-                  style={s.alertSegmentItem}
-                  contentStyle={[s.alertSegmentBtn, alertDirection === direction ? s.alertSegmentBtnActive : null]}
-                  scaleIn={0.98}
-                >
-                  <Text style={[s.alertSegmentText, alertDirection === direction ? s.alertSegmentTextActive : null]}>
-                    {direction === "below" ? "Below" : "Above"}
-                  </Text>
-                </AnimatedPressable>
-              ))}
-            </View>
-
-            <TextInput
-              value={alertTarget}
-              onChangeText={setAlertTarget}
-              keyboardType="decimal-pad"
-              placeholder="1.650"
-              placeholderTextColor={ctx.theme.colors.muted}
-              style={s.alertInput}
-            />
-
-            <View style={s.alertActions}>
-              {currentAlert ? (
-                <AnimatedPressable
-                  onPress={() => {
-                    ctx.priceAlerts.removeRule(currentAlert.id);
-                    setAlertOpen(false);
-                  }}
-                  contentStyle={s.alertGhostBtn}
-                  scaleIn={0.98}
-                >
-                  <Text style={s.alertGhostText}>{ctx.t.remove}</Text>
-                </AnimatedPressable>
-              ) : null}
-              <AnimatedPressable
-                onPress={() => {
-                  const target = Number(alertTarget.replace(",", "."));
-                  if (!Number.isFinite(target) || target <= 0) return;
-                  ctx.priceAlerts.upsertRule(ctx.country, ctx.fuelType, alertDirection, target);
-                  setAlertOpen(false);
-                }}
-                contentStyle={s.alertPrimaryBtn}
-                scaleIn={0.98}
-              >
-                <Ionicons name="notifications-outline" size={17} color={ctx.theme.colors.primaryText} />
-                <Text style={s.alertPrimaryText}>{ctx.t.saveAlert}</Text>
-              </AnimatedPressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <PriceAlertSheet
+        theme={theme}
+        t={t}
+        open={alertOpen}
+        subtitle={`${ctx.country} · ${fuelName}`}
+        currentEur={current}
+        rule={alertRule}
+        onSave={(direction, target) => {
+          ctx.priceAlerts.upsertRule(ctx.country, ctx.fuelType, direction, target);
+          setAlertOpen(false);
+        }}
+        onRemove={() => {
+          if (alertRule) ctx.priceAlerts.removeRule(alertRule.id);
+          setAlertOpen(false);
+        }}
+        onClose={() => setAlertOpen(false)}
+      />
     </View>
   );
-
-  function ActionButton(props: { icon: IconName; label: string; tone: Tone; onPress: () => void }) {
-    const toneStyle = {
-      teal: s.tone_teal,
-      blue: s.tone_blue,
-      violet: s.tone_violet,
-      amber: s.tone_amber
-    }[props.tone];
-
-    return (
-      <AnimatedPressable onPress={props.onPress} style={s.actionItem} contentStyle={s.actionPressable} scaleIn={0.96}>
-        <View style={[s.actionCircle, toneStyle]}>
-          <Ionicons name={props.icon} size={20} color={actionIconColor} />
-        </View>
-        <Text style={s.actionLabel} numberOfLines={1}>
-          {props.label}
-        </Text>
-      </AnimatedPressable>
-    );
-  }
-
-  function PulseRow(props: { label: string; value: string; detail: string; tone: "good" | "bad" | "neutral" }) {
-    const toneStyle = props.tone === "good" ? s.pulseValueGood : props.tone === "bad" ? s.pulseValueBad : null;
-
-    return (
-      <View style={s.pulseRow}>
-        <View style={s.pulseTextWrap}>
-          <Text style={s.pulseLabel} numberOfLines={1}>
-            {props.label}
-          </Text>
-          <Text style={s.pulseDetail} numberOfLines={1}>
-            {props.detail}
-          </Text>
-        </View>
-        <Text style={[s.pulseValue, toneStyle]} numberOfLines={1}>
-          {props.value}
-        </Text>
-      </View>
-    );
-  }
-
 }

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { Theme } from "../../theme/theme";
 import AnimatedPressable from "./AnimatedPressable";
@@ -13,6 +13,7 @@ export default function BottomSheet(props: {
   footer?: React.ReactNode;
   scroll?: boolean;
   closeLabel?: string;
+  avoidKeyboard?: boolean;
 }) {
   const s = useMemo(() => makeStyles(props.theme), [props.theme]);
   const body = props.scroll === false ? props.children : <ScrollView showsVerticalScrollIndicator={false}>{props.children}</ScrollView>;
@@ -25,7 +26,11 @@ export default function BottomSheet(props: {
       onRequestClose={props.onClose}
       statusBarTranslucent
     >
-      <View style={s.backdrop}>
+      <KeyboardAvoidingView
+        style={s.backdrop}
+        enabled={!!props.avoidKeyboard}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
         <Pressable style={StyleSheet.absoluteFill} onPress={props.onClose} accessibilityRole="button" accessibilityLabel={props.closeLabel ?? "Close"} />
         <View style={s.sheet} accessibilityViewIsModal>
           <View style={s.handle} />
@@ -43,7 +48,7 @@ export default function BottomSheet(props: {
           <View style={s.body}>{body}</View>
           {props.footer ? <View style={s.footer}>{props.footer}</View> : null}
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

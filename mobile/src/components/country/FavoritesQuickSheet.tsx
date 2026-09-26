@@ -37,6 +37,9 @@ export default function FavoritesQuickSheet({
   function Row({ country, isCurrent }: { country: string; isCurrent?: boolean }) {
     return (
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={isCurrent ? `${country}, ${t.selected}` : country}
+        accessibilityState={{ selected: !!isCurrent }}
         style={[s.row, isCurrent ? s.rowActive : null]}
         onPress={() => {
           onSelect(country);
@@ -62,7 +65,7 @@ export default function FavoritesQuickSheet({
 
           <View style={s.headerRow}>
             <Text style={s.title}>{t.quickSwitch}</Text>
-            <Pressable onPress={onClose} style={s.closeBtn}>
+            <Pressable onPress={onClose} style={s.closeBtn} accessibilityRole="button" accessibilityLabel={t.close}>
               <Text style={s.closeText}>{t.close}</Text>
             </Pressable>
           </View>
@@ -86,13 +89,11 @@ export default function FavoritesQuickSheet({
                 </View>
               </>
             ) : (
-              <Text style={s.emptyHint}>
-                Star countries from the search to add favorites here.
-              </Text>
+              <Text style={s.emptyHint}>{t.quickSwitchEmpty}</Text>
             )}
           </ScrollView>
 
-          <Pressable style={s.searchBtn} onPress={onOpenFull}>
+          <Pressable style={s.searchBtn} onPress={onOpenFull} accessibilityRole="button" accessibilityLabel={t.searchAllCountries}>
             <Ionicons name="search" size={16} color={theme.colors.muted} />
             <Text style={s.searchBtnText}>{t.searchAllCountries}</Text>
             <Ionicons name="chevron-forward" size={15} color={theme.colors.muted} />

@@ -9,6 +9,7 @@ import BottomSheet from "../components/ui/BottomSheet";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
 import { makeSettingsStyles } from "./SettingsTab.styles";
 import { PLAY_STORE_URL } from "../constants/urls";
+import { ADS_ENABLED } from "../constants/ads";
 
 declare const require: (name: string) => any;
 const PRIVACY_URL = "https://karburantisot.com/privacy";
@@ -93,6 +94,18 @@ export default function SettingsTab() {
         </View>
 
         <Section title={ctx.t.appSupport}>
+          {ADS_ENABLED ? (
+            <>
+              <SettingsRow
+                icon="gift-outline"
+                tone="teal"
+                label={ctx.t.extrasTitle}
+                detail={ctx.reward.unlocked ? ctx.t.extrasActive(ctx.reward.minutesLeft) : ctx.t.extrasDetail}
+                onPress={() => (ctx.reward.unlocked ? ctx.showToast(ctx.t.extrasActive(ctx.reward.minutesLeft)) : ctx.openRewardModal())}
+              />
+              <Divider />
+            </>
+          ) : null}
           <SettingsRow icon="mail-outline" tone="pink" label={ctx.t.feedback} detail={ctx.t.feedbackSubtitle} onPress={ctx.openFeedback} />
           <Divider />
           <SettingsRow icon="star-outline" tone="amber" label={ctx.t.rateApp} detail={ctx.t.rateAppSubtitle} onPress={ctx.openStoreReview} />
