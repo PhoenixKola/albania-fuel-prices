@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Theme } from "../../theme/theme";
 import AnimatedPressable from "./AnimatedPressable";
 
@@ -16,7 +17,8 @@ export default function BottomSheet(props: {
   avoidKeyboard?: boolean;
 }) {
   const s = useMemo(() => makeStyles(props.theme), [props.theme]);
-  const body = props.scroll === false ? props.children : <ScrollView showsVerticalScrollIndicator={false}>{props.children}</ScrollView>;
+  const insets = useSafeAreaInsets();
+  const body = props.scroll === false ? props.children : <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">{props.children}</ScrollView>;
 
   return (
     <Modal
@@ -32,7 +34,7 @@ export default function BottomSheet(props: {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <Pressable style={StyleSheet.absoluteFill} onPress={props.onClose} accessibilityRole="button" accessibilityLabel={props.closeLabel ?? "Close"} />
-        <View style={s.sheet} accessibilityViewIsModal>
+        <View style={[s.sheet, { paddingBottom: props.theme.m.s(18) + insets.bottom }]} accessibilityViewIsModal>
           <View style={s.handle} />
           <View style={s.header}>
             <Text style={s.title} accessibilityRole="header">{props.title}</Text>
@@ -65,8 +67,8 @@ const makeStyles = (theme: Theme) => StyleSheet.create({
     paddingBottom: theme.m.s(18),
   },
   handle: { width: 42, height: 5, borderRadius: 999, backgroundColor: theme.colors.border, alignSelf: "center", marginTop: 9 },
-  header: { minHeight: 64, paddingHorizontal: theme.m.s(18), flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  title: { color: theme.colors.text, fontSize: theme.m.f(20), fontWeight: "900" },
+  header: { minHeight: 64, paddingHorizontal: theme.m.s(18), paddingVertical: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  title: { flex: 1, color: theme.colors.text, fontSize: theme.m.f(20), fontWeight: "900" },
   close: { width: 48, height: 48, borderRadius: theme.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.pillBg },
   body: { paddingHorizontal: theme.m.s(18) },
   footer: { paddingHorizontal: theme.m.s(18), paddingTop: theme.m.s(14), borderTopWidth: 1, borderTopColor: theme.colors.border },

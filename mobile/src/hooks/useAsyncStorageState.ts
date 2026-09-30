@@ -11,6 +11,7 @@ export function useAsyncStorageState<T>(key: string, initial: T, options?: Optio
   const deserialize = options?.deserialize ?? ((raw: any) => raw as T);
 
   const [value, setValueState] = useState<T>(initial);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -19,7 +20,10 @@ export function useAsyncStorageState<T>(key: string, initial: T, options?: Optio
         if (cancelled) return;
         if (raw != null) setValueState(deserialize(raw));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setHydrated(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -36,5 +40,5 @@ export function useAsyncStorageState<T>(key: string, initial: T, options?: Optio
     [key]
   );
 
-  return { value, setValue };
+  return { value, setValue, hydrated };
 }

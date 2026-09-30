@@ -43,9 +43,13 @@ function parseStringArray(raw: string) {
   }
 }
 
+export const FREE_MAX_RADIUS_M = 10000;
+export const STATION_RADII_M = [2000, 5000, 10000, 30000, 50000] as const;
+
 type RewardPlaceholder = {
   unlocked: boolean;
   loaded: boolean;
+  hydrated: boolean;
   minutesLeft: number;
   showRewardedAndUnlock: () => Promise<boolean>;
   refreshStored: () => Promise<void>;
@@ -142,7 +146,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
   });
 
-  const { value: radiusM, setValue: setRadiusM } = useAsyncStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
+  const { value: radiusM, setValue: setRadiusM, hydrated: radiusHydrated } = useAsyncStorageState<number>(STORAGE_STATIONS_RADIUS_KEY, 5000, {
     deserialize: (raw) => {
       const n = Number(raw);
       return n === 2000 || n === 5000 || n === 10000 || n === 30000 || n === 50000 ? n : 5000;
@@ -206,6 +210,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const reward = useRewardUnlock({ enabled: ADS_ENABLED, unitId: rewardedUnitId, durationMinutes: 30 });
 
   const maxCompare = reward.unlocked ? 5 : 3;
+
+  // 30/50 km are rewarded radii: once the unlock lapses, fall back to the largest free one.
+  useEffect(() => {
+    if (!radiusHydrated || !reward.hydrated || reward.unlocked) return;
+    if (radiusM > FREE_MAX_RADIUS_M) setRadiusM(FREE_MAX_RADIUS_M);
+  }, [radiusHydrated, reward.hydrated, reward.unlocked, radiusM, setRadiusM]);
 
   const rate = useRatePrompt({ threshold: 4, cooldownDays: 7 });
 

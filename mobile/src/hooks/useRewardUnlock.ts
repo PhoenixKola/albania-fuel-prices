@@ -26,6 +26,7 @@ export function useRewardUnlock(opts: Options) {
 
   const [loaded, setLoaded] = useState(false);
   const [unlockUntilMs, setUnlockUntilMs] = useState<number>(0);
+  const [hydrated, setHydrated] = useState(false);
 
   const durationMs = opts.durationMinutes * 60 * 1000;
   const earningRef = useRef(false);
@@ -42,8 +43,12 @@ export function useRewardUnlock(opts: Options) {
   }, [unlockUntilMs]);
 
   const loadStored = useCallback(async () => {
-    const raw = await AsyncStorage.getItem(STORAGE_REWARD_UNTIL_UTC);
-    setUnlockUntilMs(parseDateMs(raw));
+    try {
+      const raw = await AsyncStorage.getItem(STORAGE_REWARD_UNTIL_UTC);
+      setUnlockUntilMs(parseDateMs(raw));
+    } finally {
+      setHydrated(true);
+    }
   }, []);
 
   const setUnlockForDuration = useCallback(async () => {
@@ -136,6 +141,7 @@ export function useRewardUnlock(opts: Options) {
 
   return {
     loaded,
+    hydrated,
     unlocked,
     minutesLeft,
     showRewardedAndUnlock,

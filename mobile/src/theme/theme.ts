@@ -107,6 +107,8 @@ export type Metrics = {
   maxContentWidth: number;
   fontScale: number;
   isLargeText: boolean;
+  /** fontScale ≥ 1.6: horizontal groupings should stack. */
+  isXLText: boolean;
 };
 
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
@@ -138,6 +140,7 @@ export function makeMetrics(width: number, height: number, fontScale = 1): Metri
     maxContentWidth,
     fontScale,
     isLargeText: fontScale >= 1.3,
+    isXLText: fontScale >= 1.6,
   };
 }
 

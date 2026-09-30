@@ -1,61 +1,79 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Linking, RefreshControl, Text, TextInput, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useCallback, useDeferredValue, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, FlatList, Linking, RefreshControl, ScrollView, Text, TextInput, View, type ListRenderItem } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 
-import { useApp } from "../context/AppContext";
+import { FREE_MAX_RADIUS_M, STATION_RADII_M, useApp } from "../context/AppContext";
 import type { Station } from "../hooks/useNearbyStations";
-import PremiumHeader from "../components/ui/PremiumHeader";
-import BottomSheet from "../components/ui/BottomSheet";
+import { useStationFavorites } from "../hooks/useStationFavorites";
+import ScreenTitle from "../components/ui/ScreenTitle";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
+import NextStopCard from "../components/stations/NextStopCard";
+import StationRow from "../components/stations/StationRow";
+import StationFiltersSheet from "../components/stations/StationFiltersSheet";
+import { StationsSkeleton, StationsState } from "../components/stations/StationsStates";
+import { makeStationStyles, stationsPalette } from "../components/stations/stations.styles";
+import { formatStamp, searchKey, stationTitle } from "../components/stations/stationFormat";
 import { openMaps } from "../utils/maps";
-import { makeStationsTabStyles } from "./StationsTab.styles";
+import { isTwoPaneStations, makeStationsTabStyles } from "./StationsTab.styles";
 
-const FAVORITES_KEY = "stations_favorites_v1";
-
-function parseFavorites(raw: string | null) {
-  if (!raw) return [];
-  try {
-    const value = JSON.parse(raw);
-    return Array.isArray(value) ? value.filter((item) => typeof item === "string") : [];
-  } catch {
-    return [];
-  }
-}
+type Phase = "checking" | "permission" | "blocked" | "locating" | "locationError" | "loading" | "loadError" | "empty" | "ready";
 
 export default function StationsTab() {
   const ctx = useApp();
-  const s = useMemo(() => makeStationsTabStyles(ctx.theme), [ctx.theme]);
+  const { theme, t, lang, loc, nearby, reward } = ctx;
+  const s = useMemo(() => makeStationStyles(theme), [theme]);
+  const p = useMemo(() => stationsPalette(theme), [theme]);
+  const layout = useMemo(() => makeStationsTabStyles(theme), [theme]);
+  const reduce = theme.motion.reduced;
+  const twoPane = isTwoPaneStations(theme);
+  const { favoriteSet, toggleFavorite } = useStationFavorites();
+
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
   const [openOnly, setOpenOnly] = useState(false);
   const [favoriteOnly, setFavoriteOnly] = useState(false);
-  const [radiusOpen, setRadiusOpen] = useState(false);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [pulling, setPulling] = useState(false);
 
-  useEffect(() => {
-    AsyncStorage.getItem(FAVORITES_KEY).then((raw) => setFavoriteIds(parseFavorites(raw))).catch(() => {});
+  // Listed hours are evaluated against the clock, so re-derive them whenever the tab is shown.
+  const recheckHours = nearby.recheckHours;
+  useFocusEffect(useCallback(() => recheckHours(), [recheckHours]));
+
+  const km = Math.round(ctx.radiusM / 1000);
+  const needle = searchKey(deferredQuery.trim());
+  const isFiltering = !!needle || openOnly || favoriteOnly;
+  const activeFilterCount = (openOnly ? 1 : 0) + (favoriteOnly ? 1 : 0);
+
+  const filtered = useMemo(
+    () =>
+      nearby.stations.filter((st) => {
+        if (openOnly && !(st.isOpen24Hours || st.isOpenNow === true)) return false;
+        if (favoriteOnly && !favoriteSet.has(st.id)) return false;
+        if (needle && !searchKey(`${st.name} ${st.brand ?? ""}`).includes(needle)) return false;
+        return true;
+      }),
+    [nearby.stations, openOnly, favoriteOnly, favoriteSet, needle]
+  );
+  const nextStop = filtered[0] ?? null;
+  const feed = useMemo(() => filtered.slice(1), [filtered]);
+
+  // Stable handlers keep memoised rows from re-rendering on unrelated context changes (toasts, ads…).
+  const latest = useRef({ markMapsOpened: ctx.markMapsOpened, t });
+  latest.current = { markMapsOpened: ctx.markMapsOpened, t };
+  const onDirections = useCallback((st: Station) => {
+    latest.current.markMapsOpened();
+    openMaps(st.lat, st.lon, stationTitle(st, latest.current.t));
   }, []);
 
-  const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
-  const nearest = ctx.nearby.stations[0] ?? null;
-  const openCount = useMemo(
-    () => ctx.nearby.stations.filter((station) => station.isOpen24Hours || station.isOpenNow === true).length,
-    [ctx.nearby.stations]
-  );
-
-  const filtered = useMemo(() => {
-    const needle = query.trim().toLocaleLowerCase();
-    return [...ctx.nearby.stations]
-      .filter((station) => !needle || `${station.name} ${station.brand ?? ""}`.toLocaleLowerCase().includes(needle))
-      .filter((station) => !openOnly || station.isOpen24Hours || station.isOpenNow === true)
-      .filter((station) => !favoriteOnly || favoriteSet.has(station.id))
-      .sort((a, b) => a.distanceKm - b.distanceKm);
-  }, [ctx.nearby.stations, query, openOnly, favoriteOnly, favoriteSet]);
-
-  const toggleFavorite = async (id: string) => {
-    const next = favoriteSet.has(id) ? favoriteIds.filter((item) => item !== id) : [id, ...favoriteIds];
-    setFavoriteIds(next);
-    await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
+  const isLocked = useCallback((radiusM: number) => radiusM > FREE_MAX_RADIUS_M && !reward.unlocked, [reward.unlocked]);
+  const selectRadius = (radiusM: number) => {
+    if (isLocked(radiusM)) {
+      setFiltersOpen(false);
+      ctx.openRewardModal(() => ctx.setRadiusM(radiusM));
+      return;
+    }
+    ctx.setRadiusM(radiusM);
   };
 
   const clearFilters = () => {
@@ -64,227 +82,355 @@ export default function StationsTab() {
     setFavoriteOnly(false);
   };
 
-  const hasFilters = !!query.trim() || openOnly || favoriteOnly;
-  const freshness = ctx.nearby.cacheSavedAtUtc
-    ? `${ctx.t.lastUpdated} ${new Date(ctx.nearby.cacheSavedAtUtc).toLocaleString(ctx.lang === "sq" ? "sq-AL" : "en-US")}`
-    : null;
-  const stationStatusLabel = ctx.loc.permission !== "granted"
-    ? ctx.t.stationsNearbyNeedLocation
-    : ctx.loc.loading && !ctx.loc.coords
-      ? ctx.t.stationsNearbyGettingLocation
-      : ctx.nearby.fromCache
-        ? ctx.t.stationsNearbyCached
-        : ctx.t.liveData;
-  const stationStatusColor = ctx.loc.permission !== "granted" || !ctx.loc.coords
-    ? ctx.theme.colors.muted
-    : ctx.nearby.fromCache ? ctx.theme.colors.warning : ctx.theme.colors.success;
+  const busy = nearby.loading || loc.loading;
+  const refreshStations = useCallback(async () => {
+    if (loc.permission !== "granted") return;
+    // Re-read the position first: a station finder should answer for where the driver is now.
+    const moved = await loc.locate();
+    if (!moved) await nearby.refresh();
+  }, [loc.permission, loc.locate, nearby.refresh]);
 
-  const header = (
-    <View style={s.headerContent}>
-      <PremiumHeader
-        theme={ctx.theme}
-        eyebrow={ctx.t.premiumInsights}
-        title={ctx.t.stationsNearbyTitle}
-        subtitle={ctx.loc.permission === "granted" ? ctx.t.withinRadius(Math.round(ctx.radiusM / 1000)) : ctx.t.stationsNearbyNeedLocation}
-        icon="navigate-outline"
-        action={
-          <AnimatedPressable
-            onPress={() => ctx.nearby.refresh?.()}
-            disabled={ctx.nearby.loading || ctx.loc.permission !== "granted"}
-            contentStyle={s.headerAction}
-            reduceMotion={ctx.theme.motion.reduced}
-            accessibilityLabel={ctx.t.refresh}
-          >
-            {ctx.nearby.loading ? <ActivityIndicator color={ctx.theme.colors.primary} /> : <Ionicons name="refresh" size={20} color={ctx.theme.colors.primary} />}
+  const onPull = useCallback(() => {
+    setPulling(true);
+    refreshStations().finally(() => setPulling(false));
+  }, [refreshStations]);
+
+  const hasStations = nearby.stations.length > 0;
+  let phase: Phase;
+  if (!loc.checked) phase = "checking";
+  else if (loc.permission !== "granted") phase = loc.permission === "denied" && !loc.canAskAgain ? "blocked" : "permission";
+  else if (!loc.coords) phase = loc.loading ? "locating" : "locationError";
+  else if (hasStations) phase = "ready";
+  else if (nearby.loading) phase = "loading";
+  else if (nearby.error) phase = "loadError";
+  else phase = nearby.cacheSavedAtUtc ? "empty" : "loading";
+
+  const nextRadius = STATION_RADII_M.find((r) => r > ctx.radiusM) ?? null;
+  const stamp = formatStamp(nearby.cacheSavedAtUtc, t);
+  const refreshFailed = !!nearby.error && nearby.fromCache;
+
+  // ── Blocks ────────────────────────────────────────────────────────────────
+
+  const refreshAction =
+    loc.permission === "granted" && loc.coords ? (
+      <AnimatedPressable
+        onPress={refreshStations}
+        disabled={busy}
+        contentStyle={layout.headerAction}
+        reduceMotion={reduce}
+        accessibilityLabel={t.refresh}
+        accessibilityState={{ busy }}
+      >
+        {busy ? <ActivityIndicator color={p.accent} /> : <Ionicons name="refresh" size={20} color={p.ink} />}
+      </AnimatedPressable>
+    ) : null;
+
+  const statusLine =
+    phase === "ready" ? (
+      <View style={s.statusRow}>
+        <View style={[s.dot, { backgroundColor: refreshFailed ? p.warn : p.accent }]} />
+        <Text style={s.statusText} accessibilityLiveRegion="polite">
+          {[
+            t.stationsWithin(nearby.totalCount, km),
+            stamp ? (refreshFailed ? t.stationsSavedList(stamp) : t.stationsUpdatedAt(stamp)) : null,
+            refreshFailed ? (nearby.error === "timeout" ? t.stationsTimeoutCached : t.refreshFailed) : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </Text>
+        {refreshFailed ? (
+          <AnimatedPressable onPress={refreshStations} disabled={busy} contentStyle={s.retry} haptic={false} reduceMotion={reduce} accessibilityLabel={t.tryAgain}>
+            <Text style={s.retryText}>{t.tryAgain}</Text>
           </AnimatedPressable>
-        }
-      />
-
-      <View style={s.hero} accessible accessibilityLabel={ctx.loc.permission === "granted" ? `${ctx.nearby.totalCount} ${ctx.t.stationsTitle}. ${openCount} ${ctx.t.openNowOnly}.` : ctx.t.stationsNearbyNeedLocation}>
-        <View style={s.heroCopy}>
-          <Text style={s.heroKicker}>{ctx.t.locationAccess}</Text>
-          <Text style={s.heroTitle} numberOfLines={2}>
-            {ctx.loc.permission === "granted" ? ctx.t.stationsNearbyFound(ctx.nearby.totalCount) : ctx.t.stationsNearbyUseMyLocation}
-          </Text>
-          <View style={s.statusRow}>
-            <View style={[s.statusDot, { backgroundColor: stationStatusColor }]} />
-            <Text style={s.statusText} numberOfLines={2}>
-              {stationStatusLabel}{ctx.loc.coords && freshness ? ` · ${freshness}` : ""}
-            </Text>
-          </View>
-        </View>
-        <View style={s.heroMark} accessibilityElementsHidden>
-          <Ionicons name="location" size={34} color={ctx.theme.colors.primary} />
-        </View>
+        ) : null}
       </View>
+    ) : null;
 
-      <View style={s.metrics}>
-        <Metric label={ctx.t.nearest} value={nearest ? `${nearest.distanceKm.toFixed(1)} km` : "—"} />
-        <Metric label={ctx.t.openNowOnly} value={openCount ? String(openCount) : "—"} />
-        <Metric label={ctx.t.radius} value={`${Math.round(ctx.radiusM / 1000)} km`} />
-      </View>
-
-      {ctx.loc.permission === "granted" ? (
-        <>
-          <View style={s.searchWrap}>
-            <Ionicons name="search" size={19} color={ctx.theme.colors.muted} />
+  const controls =
+    phase === "ready" ? (
+      <View style={{ gap: 10 }}>
+        <View style={s.controls}>
+          <View style={s.search}>
+            <Ionicons name="search" size={19} color={p.inkSoft} />
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder={ctx.t.stationSearchPlaceholder}
-              placeholderTextColor={ctx.theme.colors.muted}
+              placeholder={t.stationSearchPlaceholder}
+              placeholderTextColor={p.inkSoft}
               style={s.searchInput}
-              accessibilityLabel={ctx.t.searchStations}
+              accessibilityLabel={t.searchStations}
               returnKeyType="search"
+              autoCorrect={false}
+              clearButtonMode="never"
             />
             {query ? (
-              <AnimatedPressable onPress={() => setQuery("")} contentStyle={s.clearSearch} accessibilityLabel={ctx.t.clearFilters}>
-                <Ionicons name="close-circle" size={20} color={ctx.theme.colors.muted} />
+              <AnimatedPressable onPress={() => setQuery("")} contentStyle={s.clearSearch} haptic={false} reduceMotion={reduce} accessibilityLabel={t.clearFilters}>
+                <Ionicons name="close-circle" size={21} color={p.inkSoft} />
               </AnimatedPressable>
             ) : null}
           </View>
-
-          <View style={s.filterRow}>
-            <FilterChip label={ctx.t.openNowOnly} icon="time-outline" active={openOnly} onPress={() => setOpenOnly((value) => !value)} />
-            <FilterChip label={ctx.t.favoriteOnly} icon="star-outline" active={favoriteOnly} onPress={() => setFavoriteOnly((value) => !value)} />
-            <FilterChip label={`${Math.round(ctx.radiusM / 1000)} km`} icon="options-outline" active={radiusOpen} onPress={() => setRadiusOpen(true)} />
-          </View>
-
-          <View style={s.resultHeader}>
-            <View>
-              <Text style={s.resultTitle}>{ctx.t.allStations}</Text>
-              <Text style={s.resultSub}>{ctx.t.stationsNearbyShowing(filtered.length, ctx.nearby.totalCount)}</Text>
-            </View>
-            {hasFilters ? (
-              <AnimatedPressable onPress={clearFilters} contentStyle={s.textButton} accessibilityLabel={ctx.t.clearFilters}>
-                <Text style={s.textButtonLabel}>{ctx.t.clearFilters}</Text>
-              </AnimatedPressable>
+          <AnimatedPressable
+            onPress={() => setFiltersOpen(true)}
+            contentStyle={[s.filterButton, activeFilterCount ? s.filterButtonActive : null]}
+            reduceMotion={reduce}
+            accessibilityLabel={t.filtersA11y(activeFilterCount)}
+          >
+            <Ionicons name="options-outline" size={19} color={activeFilterCount ? p.accent : p.ink} />
+            <Text style={s.filterText}>{t.filters}</Text>
+            {activeFilterCount ? (
+              <View style={s.badge}>
+                <Text style={s.badgeText}>{activeFilterCount}</Text>
+              </View>
             ) : null}
-          </View>
-        </>
-      ) : null}
-    </View>
-  );
-
-  return (
-    <View style={s.screen}>
-      <FlatList
-        data={ctx.loc.permission === "granted" ? filtered : []}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <StationRow station={item} favorite={favoriteSet.has(item.id)} onFavorite={() => toggleFavorite(item.id)} />}
-        ItemSeparatorComponent={() => <View style={{ height: ctx.theme.m.s(10) }} />}
-        ListHeaderComponent={header}
-        ListEmptyComponent={
-          ctx.loc.permission === "denied" ? (
-            <StateCard icon="location-outline" title={ctx.t.locationPermissionDenied} message={ctx.t.locationPermissionDeniedHint} action={ctx.t.openSettings} onPress={() => Linking.openSettings()} />
-          ) : ctx.loc.permission !== "granted" ? (
-            <StateCard icon="locate-outline" title={ctx.t.stationsNearbyUseMyLocation} message={ctx.t.stationsNearbyNeedLocation} action={ctx.t.stationsNearbyUseMyLocation} loading={ctx.loc.loading} onPress={ctx.loc.request} />
-          ) : ctx.loc.loading && !ctx.loc.coords ? (
-            <View style={s.loadingState}><ActivityIndicator size="large" color={ctx.theme.colors.primary} /><Text style={s.stateMessage}>{ctx.t.stationsNearbyGettingLocation}</Text></View>
-          ) : ctx.loc.error || !ctx.loc.coords ? (
-            <StateCard icon="warning-outline" title={ctx.t.locationUnavailable} message={ctx.t.locationUnavailableHint} action={ctx.t.tryAgain} loading={ctx.loc.loading} onPress={ctx.loc.request} />
-          ) : ctx.nearby.loading ? (
-            <View style={s.loadingState}><ActivityIndicator size="large" color={ctx.theme.colors.primary} /><Text style={s.stateMessage}>{ctx.t.loading}</Text></View>
-          ) : (
-            <StateCard icon={hasFilters ? "search-outline" : "map-outline"} title={hasFilters ? ctx.t.noStationMatches : ctx.t.stationsNearbyNone} message={hasFilters ? ctx.t.clearFilters : ctx.t.stationsTryWiderRadius} action={hasFilters ? ctx.t.clearFilters : ctx.t.refresh} onPress={hasFilters ? clearFilters : ctx.nearby.refresh} />
-          )
-        }
-        ListFooterComponent={ctx.nearby.error ? <View style={s.error}><Ionicons name="warning-outline" size={18} color={ctx.theme.colors.warning} /><Text style={s.errorText}>{ctx.nearby.fromCache ? ctx.t.stationsTimeoutCached : ctx.t.stationsLoadError}</Text></View> : <View style={s.footerSpace} />}
-        contentContainerStyle={s.listContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        refreshControl={<RefreshControl refreshing={ctx.nearby.loading} onRefresh={() => ctx.nearby.refresh?.()} tintColor={ctx.theme.colors.primary} />}
-      />
-
-      <BottomSheet theme={ctx.theme} open={radiusOpen} title={ctx.t.radius} closeLabel={ctx.t.close} onClose={() => setRadiusOpen(false)}>
-        <View style={s.radiusList}>
-          {[2000, 5000, 10000, 30000, 50000].map((value) => {
-            const locked = value > 10000 && !ctx.reward.unlocked;
-            const active = ctx.radiusM === value;
-            return (
-              <AnimatedPressable
-                key={value}
-                onPress={() => {
-                  if (locked) {
-                    setRadiusOpen(false);
-                    ctx.openRewardModal(() => ctx.setRadiusM(value));
-                    return;
-                  }
-                  ctx.setRadiusM(value);
-                  setRadiusOpen(false);
-                }}
-                contentStyle={[s.radiusOption, active ? s.radiusOptionActive : null]}
-                reduceMotion={ctx.theme.motion.reduced}
-                accessibilityLabel={`${value / 1000} km${locked ? `, ${ctx.t.locked}` : ""}`}
-                accessibilityState={{ selected: active }}
-              >
-                <View style={s.radiusIcon}><Ionicons name={locked ? "lock-closed-outline" : "navigate-outline"} size={19} color={active ? ctx.theme.colors.primary : ctx.theme.colors.muted} /></View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.radiusTitle}>{value / 1000} km</Text>
-                  <Text style={s.radiusSub}>{locked ? ctx.t.unlockStations : ctx.t.withinRadius(value / 1000)}</Text>
-                </View>
-                {active ? <Ionicons name="checkmark-circle" size={22} color={ctx.theme.colors.primary} /> : null}
-              </AnimatedPressable>
-            );
-          })}
+          </AnimatedPressable>
         </View>
-      </BottomSheet>
-    </View>
+        {activeFilterCount ? (
+          <View style={s.activeFilters}>
+            {openOnly ? activeChip("open", t.stationsNearbyOpenNow, () => setOpenOnly(false)) : null}
+            {favoriteOnly ? activeChip("favorites", t.favoriteOnly, () => setFavoriteOnly(false)) : null}
+          </View>
+        ) : null}
+      </View>
+    ) : null;
+
+  const stage = (() => {
+    switch (phase) {
+      case "checking":
+        return <StationsSkeleton s={s} label={t.loading} />;
+      case "locating":
+        return <StationsSkeleton s={s} label={t.stationsNearbyGettingLocation} />;
+      case "loading":
+        return <StationsSkeleton s={s} label={t.stationsLookingWithin(km)} />;
+      case "permission":
+        return (
+          <StationsState
+            s={s}
+            p={p}
+            reduceMotion={reduce}
+            icon="navigate-outline"
+            title={t.locationPrimerTitle}
+            body={t.locationPrimerBody}
+            primary={{ label: t.allowLocation, icon: "locate-outline", onPress: loc.request, loading: loc.loading }}
+          />
+        );
+      case "blocked":
+        return (
+          <StationsState
+            s={s}
+            p={p}
+            reduceMotion={reduce}
+            icon="location-outline"
+            title={t.locationPermissionDenied}
+            body={t.locationPermissionDeniedHint}
+            primary={{ label: t.openSettings, icon: "settings-outline", onPress: () => Linking.openSettings().catch(() => {}) }}
+          />
+        );
+      case "locationError":
+        return (
+          <StationsState
+            s={s}
+            p={p}
+            reduceMotion={reduce}
+            icon="warning-outline"
+            title={t.locationUnavailable}
+            body={t.locationUnavailableHint}
+            primary={{ label: t.tryAgain, icon: "refresh", onPress: () => loc.locate(), loading: loc.loading }}
+          />
+        );
+      case "loadError":
+        return (
+          <StationsState
+            s={s}
+            p={p}
+            reduceMotion={reduce}
+            icon="cloud-offline-outline"
+            title={t.stationsLoadFailedTitle}
+            body={t.stationsLoadError}
+            primary={{ label: t.tryAgain, icon: "refresh", onPress: refreshStations, loading: busy }}
+          />
+        );
+      case "empty":
+        return (
+          <StationsState
+            s={s}
+            p={p}
+            reduceMotion={reduce}
+            icon="map-outline"
+            title={t.noStationsWithin(km)}
+            body={t.stationsTryWiderRadius}
+            primary={
+              nextRadius
+                ? {
+                    label: t.searchWithinKm(nextRadius / 1000),
+                    icon: isLocked(nextRadius) ? "lock-closed-outline" : "expand-outline",
+                    onPress: () => selectRadius(nextRadius),
+                  }
+                : undefined
+            }
+            secondary={{ label: t.refresh, icon: "refresh", onPress: refreshStations }}
+          />
+        );
+      case "ready":
+        return nextStop ? (
+          <NextStopCard
+            station={nextStop}
+            isMatch={isFiltering}
+            favorite={favoriteSet.has(nextStop.id)}
+            s={s}
+            p={p}
+            t={t}
+            lang={lang}
+            reduceMotion={reduce}
+            stacked={theme.m.isXLText}
+            onDirections={onDirections}
+            onToggleFavorite={toggleFavorite}
+          />
+        ) : (
+          <StationsState
+            s={s}
+            p={p}
+            reduceMotion={reduce}
+            icon="search-outline"
+            title={t.noStationMatches}
+            body={openOnly ? t.openNowFilterDetail : favoriteOnly ? t.favoriteFilterDetail : undefined}
+            primary={{ label: t.clearFilters, icon: "close-circle-outline", onPress: clearFilters }}
+          />
+        );
+    }
+  })();
+
+  const feedHeader =
+    phase === "ready" && feed.length ? (
+      <View style={s.feedHeader}>
+        <Text style={s.feedKicker} accessibilityRole="header">{t.otherStations}</Text>
+        {isFiltering ? (
+          <Text style={s.feedCount} accessibilityLiveRegion="polite">{t.stationsMatches(filtered.length)}</Text>
+        ) : null}
+      </View>
+    ) : null;
+
+  const note =
+    phase === "ready" ? (
+      <View style={s.note}>
+        <Ionicons name="information-circle-outline" size={16} color={p.inkSoft} />
+        <Text style={s.noteText}>{t.stationsSourceNote}</Text>
+      </View>
+    ) : null;
+
+  const renderItem: ListRenderItem<Station> = useCallback(
+    ({ item }) => (
+      <StationRow
+        station={item}
+        favorite={favoriteSet.has(item.id)}
+        s={s}
+        p={p}
+        t={t}
+        lang={lang}
+        reduceMotion={reduce}
+        compactName={!theme.m.isLargeText}
+        onDirections={onDirections}
+        onToggleFavorite={toggleFavorite}
+      />
+    ),
+    [favoriteSet, s, p, t, lang, reduce, theme.m.isLargeText, onDirections, toggleFavorite]
+  );
+  const Separator = useCallback(() => <View style={s.separator} />, [s]);
+
+  const refreshControl =
+    loc.permission === "granted" ? (
+      <RefreshControl refreshing={pulling} onRefresh={onPull} tintColor={p.accent} colors={[p.accent]} />
+    ) : undefined;
+
+  const sheet = (
+    <StationFiltersSheet
+      theme={theme}
+      t={t}
+      s={s}
+      p={p}
+      open={filtersOpen}
+      openOnly={openOnly}
+      favoriteOnly={favoriteOnly}
+      radiusM={ctx.radiusM}
+      radii={STATION_RADII_M}
+      isLocked={isLocked}
+      onToggleOpenOnly={() => setOpenOnly((v) => !v)}
+      onToggleFavoriteOnly={() => setFavoriteOnly((v) => !v)}
+      onSelectRadius={selectRadius}
+      onClear={() => {
+        setOpenOnly(false);
+        setFavoriteOnly(false);
+      }}
+      onClose={() => setFiltersOpen(false)}
+    />
   );
 
-  function Metric({ label, value }: { label: string; value: string }) {
-    return <View style={s.metric}><Text style={s.metricValue} numberOfLines={1} adjustsFontSizeToFit>{value}</Text><Text style={s.metricLabel} numberOfLines={2}>{label}</Text></View>;
+  const list = (listHeader: React.ReactElement | null, contentStyle: object, footer: React.ReactElement | null) => (
+    <FlatList
+      data={phase === "ready" ? feed : []}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      ItemSeparatorComponent={Separator}
+      ListHeaderComponent={listHeader}
+      ListFooterComponent={footer}
+      contentContainerStyle={contentStyle}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+      initialNumToRender={8}
+      windowSize={9}
+      refreshControl={refreshControl}
+    />
+  );
+
+  if (twoPane) {
+    return (
+      <View style={layout.screen}>
+        <View style={layout.panes}>
+          <ScrollView
+            style={layout.sidePane}
+            contentContainerStyle={layout.sideContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            refreshControl={refreshControl}
+          >
+            <ScreenTitle theme={theme} title={t.stationsNearbyTitle} action={refreshAction} />
+            {statusLine}
+            {controls}
+            {stage}
+            {note}
+          </ScrollView>
+          <View style={layout.feedPane}>{list(feedHeader, layout.feedContent, null)}</View>
+        </View>
+        {sheet}
+      </View>
+    );
   }
 
-  function FilterChip(props: { label: string; icon: React.ComponentProps<typeof Ionicons>["name"]; active: boolean; onPress: () => void }) {
+  return (
+    <View style={layout.screen}>
+      {list(
+        <View style={layout.header}>
+          <ScreenTitle theme={theme} title={t.stationsNearbyTitle} action={refreshAction} />
+          {statusLine}
+          {controls}
+          {stage}
+          {feedHeader}
+        </View>,
+        layout.listContent,
+        note
+      )}
+      {sheet}
+    </View>
+  );
+
+  function activeChip(key: string, label: string, onRemove: () => void) {
     return (
-      <AnimatedPressable onPress={props.onPress} contentStyle={[s.filterChip, props.active ? s.filterChipActive : null]} accessibilityLabel={props.label} accessibilityState={{ selected: props.active }} reduceMotion={ctx.theme.motion.reduced}>
-        <Ionicons name={props.icon} size={16} color={props.active ? ctx.theme.colors.primary : ctx.theme.colors.muted} />
-        <Text style={[s.filterText, props.active ? s.filterTextActive : null]} numberOfLines={1}>{props.label}</Text>
+      <AnimatedPressable key={key} onPress={onRemove} contentStyle={s.activeChip} reduceMotion={reduce} accessibilityLabel={t.removeFilterA11y(label)}>
+        <Text style={s.activeChipText}>{label}</Text>
+        <Ionicons name="close" size={17} color={p.accent} />
       </AnimatedPressable>
     );
   }
-
-  function StationRow({ station, favorite, onFavorite }: { station: Station; favorite: boolean; onFavorite: () => void }) {
-    const open = station.isOpen24Hours || station.isOpenNow === true;
-    const status = station.isOpen24Hours ? "24h" : station.isOpenNow === true ? ctx.t.stationsNearbyOpenNow : station.isOpenNow === false ? ctx.t.stationsNearbyClosed : ctx.t.stationsNearbyHoursUnknown;
-    const displayName = station.name === "Fuel station" ? ctx.t.stationsTitle : station.name;
-    return (
-      <View style={s.stationCard}>
-        <View style={s.stationTop}>
-          <View style={s.stationPin} accessibilityElementsHidden><Ionicons name="business-outline" size={20} color={ctx.theme.colors.primary} /></View>
-          <View style={s.stationCopy} accessible accessibilityLabel={`${displayName}, ${station.brand ?? ctx.t.stationsTitle}`}>
-            <Text style={s.stationName} numberOfLines={1}>{displayName}</Text>
-            <Text style={s.stationBrand} numberOfLines={1}>{station.brand ?? ctx.t.stationsTitle}</Text>
-          </View>
-          <AnimatedPressable onPress={onFavorite} contentStyle={s.favoriteButton} accessibilityLabel={`${favorite ? ctx.t.remove : ctx.t.save} ${ctx.t.favorites}`} accessibilityState={{ selected: favorite }}>
-            <Ionicons name={favorite ? "star" : "star-outline"} size={21} color={favorite ? ctx.theme.colors.warning : ctx.theme.colors.muted} />
-          </AnimatedPressable>
-        </View>
-        <View style={s.stationBottom}>
-          <View style={s.stationMeta} accessible accessibilityLabel={`${status}, ${station.distanceKm.toFixed(2)} km`}>
-            <View style={[s.openDot, { backgroundColor: open ? ctx.theme.colors.success : station.isOpenNow === false ? ctx.theme.colors.danger : ctx.theme.colors.muted }]} />
-            <Text style={s.stationStatus}>{status}</Text><Text style={s.metaDivider}>•</Text>
-            <Ionicons name="navigate-outline" size={14} color={ctx.theme.colors.muted} />
-            <Text style={s.stationDistance}>{station.distanceKm.toFixed(2)} km</Text>
-          </View>
-          <AnimatedPressable onPress={() => { ctx.markMapsOpened(); openMaps(station.lat, station.lon, displayName); }} contentStyle={s.directionsButton} accessibilityLabel={`${ctx.t.directions}, ${displayName}`} reduceMotion={ctx.theme.motion.reduced}>
-            <Ionicons name="arrow-forward" size={17} color={ctx.theme.colors.primaryText} /><Text style={s.directionsText}>{ctx.t.directions}</Text>
-          </AnimatedPressable>
-        </View>
-      </View>
-    );
-  }
-
-  function StateCard(props: { icon: React.ComponentProps<typeof Ionicons>["name"]; title: string; message: string; action: string; loading?: boolean; onPress?: () => void }) {
-    return (
-      <View style={s.stateCard}>
-        <View style={s.stateIcon}><Ionicons name={props.icon} size={27} color={ctx.theme.colors.primary} /></View>
-        <Text style={s.stateTitle}>{props.title}</Text><Text style={s.stateMessage}>{props.message}</Text>
-        <AnimatedPressable onPress={props.onPress} disabled={props.loading} contentStyle={s.stateButton} accessibilityLabel={props.action}>
-          {props.loading ? <ActivityIndicator color={ctx.theme.colors.primaryText} /> : <Ionicons name="arrow-forward" size={18} color={ctx.theme.colors.primaryText} />}<Text style={s.stateButtonText}>{props.action}</Text>
-        </AnimatedPressable>
-      </View>
-    );
-  }
 }
+
+const keyExtractor = (item: Station) => item.id;

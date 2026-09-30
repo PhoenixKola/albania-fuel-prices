@@ -25,6 +25,7 @@ export function homePalette(theme: Theme) {
       good: "#0F766E",
       bad: "#B45309",
       accent: "#0F766E",
+      onAccent: "#FFFFFF",
       accentSoft: "rgba(15,118,110,0.10)",
       chip: "#FFFCF6",
       chipBorder: "rgba(16,32,51,0.16)",
@@ -53,6 +54,8 @@ export function homePalette(theme: Theme) {
     good: "#5EEAD4",
     bad: "#FCD34D",
     accent: "#2DD4BF",
+    // White on this light teal is ~1.9:1; dark ink clears AA.
+    onAccent: "#06201D",
     accentSoft: "rgba(45,212,191,0.12)",
     chip: "#0D1B2F",
     chipBorder: "rgba(226,232,240,0.14)",

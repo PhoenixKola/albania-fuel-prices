@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AppState } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import opening_hours from "opening_hours";
 import { OVERPASS_URL } from "../constants/urls";
@@ -7,15 +8,22 @@ import { haversineKm } from "../utils/geo";
 
 export type Station = {
   id: string;
+  /** Empty when OpenStreetMap has neither a name nor a brand; the UI localises the fallback. */
   name: string;
   brand?: string;
   lat: number;
   lon: number;
+  /** Straight-line distance from the search centre. */
   distanceKm: number;
   openingHours?: string;
   isOpen24Hours?: boolean;
+  /** Derived from the listed opening_hours; null when not listed or not machine-readable. */
   isOpenNow?: boolean | null;
+  /** Next listed open/close change within 24 h, epoch ms. */
+  hoursChangeAtMs?: number | null;
 };
+
+export type StationsError = "timeout" | "failed" | null;
 
 type CacheEnvelope = {
   savedAtUtc: string;
@@ -26,6 +34,9 @@ type CacheEnvelope = {
 
 const CACHE_TTL_MS = 15 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 12 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+/** Placeholder older app versions wrote into the cache for unnamed stations. */
+const LEGACY_UNNAMED = "Fuel station";
 
 function safeParse(raw: string | null): CacheEnvelope | null {
   if (!raw) return null;
@@ -44,71 +55,69 @@ function safeParse(raw: string | null): CacheEnvelope | null {
 
 function is24Hours(openingHours?: string) {
   if (!openingHours) return false;
-
   const normalized = openingHours.trim().toLowerCase();
-
-  return normalized === "24/7" || normalized === "00:00-24:00" || normalized.includes("24/7");
+  return normalized === "24/7" || normalized === "00:00-24:00" || normalized === "mo-su 00:00-24:00";
 }
 
-function getOpenNow(openingHours?: string): boolean | null {
-  if (!openingHours) return null;
-
+/**
+ * Evaluates the listed OSM hours in device-local time. Nearby stations share
+ * the user's timezone, so local evaluation is correct for this screen.
+ * Rules the parser marks "unknown" (e.g. "open by appointment") stay unknown
+ * instead of being reported as closed.
+ */
+function readHours(openingHours: string | undefined, now: Date) {
+  if (!openingHours) return { isOpenNow: null, hoursChangeAtMs: null };
+  if (is24Hours(openingHours)) return { isOpenNow: true, hoursChangeAtMs: null };
   try {
     const oh = new opening_hours(openingHours, null);
-    return oh.getState();
+    if (oh.getUnknown(now)) return { isOpenNow: null, hoursChangeAtMs: null };
+    const next = oh.getNextChange(now, new Date(now.getTime() + DAY_MS));
+    return { isOpenNow: oh.getState(now), hoursChangeAtMs: next ? next.getTime() : null };
   } catch {
-    return null;
+    return { isOpenNow: null, hoursChangeAtMs: null };
   }
 }
 
 /**
- * Re-derives open/closed from the retained opening_hours string.
- *
- * isOpenNow is evaluated once when a station is fetched and then written to
- * the cache with it. The failure fallback below reads that cache with no age
- * limit, so without this a station could be shown as "Open now" hours after
- * it closed — the worst possible error for a station finder.
+ * isOpenNow is evaluated when a station is fetched and then cached with it,
+ * so it must be re-derived from the retained hours string whenever it is
+ * shown later — otherwise a station could read "Open now" hours after it closed.
  */
-function withFreshOpenState(stations: Station[]): Station[] {
-  return stations.map((st) => ({ ...st, isOpenNow: getOpenNow(st.openingHours) }));
+function withFreshHours(stations: Station[]): Station[] {
+  const now = new Date();
+  return stations.map((st) => ({
+    ...st,
+    name: st.name === LEGACY_UNNAMED && !st.brand ? "" : st.name,
+    isOpen24Hours: is24Hours(st.openingHours),
+    ...readHours(st.openingHours, now),
+  }));
 }
 
 export function useNearbyStations(opts: { center: { lat: number; lon: number } | null; radiusM?: number }) {
   const radiusM = opts.radiusM ?? 5000;
-  // Extract primitives so callbacks don't re-create when the center object reference changes
   const centerLat = opts.center?.lat ?? null;
   const centerLon = opts.center?.lon ?? null;
 
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<StationsError>(null);
   const [fromCache, setFromCache] = useState(false);
   const [cacheSavedAtUtc, setCacheSavedAtUtc] = useState<string | null>(null);
 
-  // Tracks the AbortController of the current in-flight request
   const abortRef = useRef<AbortController | null>(null);
 
-  // Merged cache loader: strict=true enforces the TTL, strict=false returns any matching cached data
+  // strict=true enforces the TTL; strict=false accepts any age for the same centre and radius.
   const loadCache = useCallback(async (strict: boolean) => {
-    const raw = await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY);
-    const env = safeParse(raw);
+    if (centerLat === null || centerLon === null) return null;
+    const env = safeParse(await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY));
     if (!env) return null;
 
-    if (strict) {
-      const age = Date.now() - new Date(env.savedAtUtc).getTime();
-      if (age > CACHE_TTL_MS) return null;
-    }
+    if (strict && Date.now() - new Date(env.savedAtUtc).getTime() > CACHE_TTL_MS) return null;
 
-    if (centerLat === null || centerLon === null) return null;
+    const nearSameCenter = Math.abs(env.center.lat - centerLat) < 0.01 && Math.abs(env.center.lon - centerLon) < 0.01;
+    if (!nearSameCenter || env.radiusM !== radiusM) return null;
 
-    const nearSameCenter =
-      Math.abs(env.center.lat - centerLat) < 0.01 &&
-      Math.abs(env.center.lon - centerLon) < 0.01;
-    const sameRadius = env.radiusM === radiusM;
-
-    if (!nearSameCenter || !sameRadius) return null;
-
-    setStations(withFreshOpenState(env.stations));
+    setStations(withFreshHours(env.stations));
     setFromCache(true);
     setCacheSavedAtUtc(env.savedAtUtc);
     return env;
@@ -117,7 +126,6 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
   const refresh = useCallback(async () => {
     if (centerLat === null || centerLon === null) return;
 
-    // Cancel any previous in-flight request
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -129,15 +137,13 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
 
     try {
       const url = `${OVERPASS_URL}?lat=${encodeURIComponent(centerLat)}&lon=${encodeURIComponent(centerLon)}&radiusM=${encodeURIComponent(radiusM)}`;
-      const r = await fetch(url, {
-        method: "GET",
-        signal: controller.signal
-      });
-
+      const r = await fetch(url, { method: "GET", signal: controller.signal });
       if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
       const json = await r.json();
+      if (abortRef.current !== controller) return;
 
       const elements: any[] = Array.isArray(json?.elements) ? json.elements : [];
+      const now = new Date();
 
       const parsed: Station[] = elements
         .map((el) => {
@@ -146,8 +152,8 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
           if (lat == null || lon == null) return null;
 
           const tags = el.tags ?? {};
-          const name = typeof tags.name === "string" ? tags.name : typeof tags.brand === "string" ? tags.brand : "Fuel station";
-          const brand = typeof tags.brand === "string" ? tags.brand : undefined;
+          const brand = typeof tags.brand === "string" ? tags.brand.trim() || undefined : undefined;
+          const name = typeof tags.name === "string" && tags.name.trim() ? tags.name.trim() : brand ?? "";
           const openingHours = typeof tags.opening_hours === "string" ? tags.opening_hours : undefined;
 
           return {
@@ -159,46 +165,46 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
             distanceKm: haversineKm({ lat: centerLat, lon: centerLon }, { lat, lon }),
             openingHours,
             isOpen24Hours: is24Hours(openingHours),
-            isOpenNow: getOpenNow(openingHours)
+            ...readHours(openingHours, now),
           } as Station;
         })
         .filter(Boolean) as Station[];
 
       parsed.sort((a, b) => a.distanceKm - b.distanceKm);
 
+      const savedAtUtc = new Date().toISOString();
       setStations(parsed);
       setFromCache(false);
-      setCacheSavedAtUtc(new Date().toISOString());
+      setCacheSavedAtUtc(savedAtUtc);
 
-      const env: CacheEnvelope = {
-        savedAtUtc: new Date().toISOString(),
-        center: { lat: centerLat, lon: centerLon },
-        radiusM,
-        stations: parsed
-      };
-      await AsyncStorage.setItem(STORAGE_STATIONS_CACHE_KEY, JSON.stringify(env));
-    } catch (e) {
-      // Silently drop if this request was superseded by a newer refresh() call
+      const env: CacheEnvelope = { savedAtUtc, center: { lat: centerLat, lon: centerLon }, radiusM, stations: parsed };
+      AsyncStorage.setItem(STORAGE_STATIONS_CACHE_KEY, JSON.stringify(env)).catch(() => {});
+    } catch {
+      // A superseded request (newer refresh or changed centre/radius) is dropped silently.
       if (abortRef.current !== controller) return;
 
-      const msg = e instanceof Error ? e.message : String(e);
+      const kind: StationsError = controller.signal.aborted ? "timeout" : "failed";
       const usedCache = await loadCache(false);
-      if (usedCache) {
-        setError("Stations server timeout. Showing cached results.");
-      } else {
-        setError(msg);
+      if (abortRef.current !== controller) return;
+      if (!usedCache) {
+        setStations([]);
+        setFromCache(false);
+        setCacheSavedAtUtc(null);
       }
+      setError(kind);
     } finally {
       clearTimeout(timeoutId);
-      // Only clear loading for the request that is still current
-      if (abortRef.current === controller) {
-        setLoading(false);
-      }
+      if (abortRef.current === controller) setLoading(false);
     }
   }, [centerLat, centerLon, radiusM, loadCache]);
 
   useEffect(() => {
     let cancelled = false;
+    // A new centre or radius must never keep showing the previous result set.
+    setStations([]);
+    setFromCache(false);
+    setCacheSavedAtUtc(null);
+    setError(null);
     (async () => {
       await loadCache(true);
       if (cancelled) return;
@@ -206,10 +212,23 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     })();
     return () => {
       cancelled = true;
-      abortRef.current?.abort();
+      const controller = abortRef.current;
+      abortRef.current = null;
+      controller?.abort();
+      setLoading(false);
     };
   }, [centerLat, centerLon, radiusM, loadCache, refresh]);
 
-  const top = useMemo(() => stations.slice(0, 100), [stations]);
-  return { stations: top, totalCount: stations.length, loading, error, refresh, fromCache, cacheSavedAtUtc };
+  const recheckHours = useCallback(() => {
+    setStations((prev) => (prev.length ? withFreshHours(prev) : prev));
+  }, []);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") recheckHours();
+    });
+    return () => sub.remove();
+  }, [recheckHours]);
+
+  return { stations, totalCount: stations.length, loading, error, refresh, recheckHours, fromCache, cacheSavedAtUtc };
 }

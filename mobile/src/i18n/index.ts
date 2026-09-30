@@ -61,25 +61,10 @@ export type TDict = {
   showingCached: string;
 
   stationsNearbyTitle: string;
-  stationsNearbyNeedLocation: string;
-  stationsNearbyUseMyLocation: string;
   stationsNearbyGettingLocation: string;
-  stationsNearbyRefresh: string;
-  stationsNearbyCached: string;
-  stationsNearbyNone: string;
   stationsNearbyOpen: string;
   stationsNearbyOpenNow: string;
-  stationsNearbyClosed: string;
   stationsNearbyHoursUnknown: string;
-  radius: string;
-  radius2km: string;
-  radius5km: string;
-  radius10km: string;
-  stationsNearbyFound: (n: number) => string;
-  stationsNearbyShowing: (shown: number, total: number) => string;
-  stationsNearbyShowMore: string;
-  stationsNearbyShowAll: string;
-  stationsNearbyCollapse: string;
   stationsTryWiderRadius: string;
   tapToSwitch: string;
   quickSwitchEmpty: string;
@@ -90,8 +75,6 @@ export type TDict = {
   watchVideo: string;
   continueWithout: string;
   maxCompareReachedN: (n: number) => string;
-  radius30km: string;
-  radius50km: string;
   rateTitle: string;
   rateBody: string;
   rateNow: string;
@@ -172,7 +155,6 @@ export type TDict = {
   save: string;
   noSavedSets: string;
   spread: string;
-  nearest: string;
   current: string;
   searchAllCountries: string;
   priceAlert: string;
@@ -184,14 +166,11 @@ export type TDict = {
   searchStations: string;
   stationSearchPlaceholder: string;
   filters: string;
-  openNowOnly: string;
   favoriteOnly: string;
-  allStations: string;
   directions: string;
   withinRadius: (radius: number) => string;
   noStationMatches: string;
   clearFilters: string;
-  locationAccess: string;
   compareOverview: string;
   bestValue: string;
   selectedCountries: string;
@@ -283,6 +262,42 @@ export type TDict = {
   extrasTitle: string;
   extrasDetail: string;
   extrasActive: (minutes: number) => string;
+  // Stations
+  nearestStation: string;
+  closestMatch: string;
+  unnamedStation: string;
+  straightLine: string;
+  hoursOpen24: string;
+  hoursClosedNow: string;
+  hoursClosesAt: (time: string) => string;
+  hoursOpensAt: (time: string) => string;
+  hoursListedNote: string;
+  stationsSourceNote: string;
+  stationsWithin: (count: number, km: number) => string;
+  stationsMatches: (count: number) => string;
+  otherStations: string;
+  stationsUpdatedAt: (time: string) => string;
+  stationsSavedList: (time: string) => string;
+  stationsLookingWithin: (km: number) => string;
+  locationPrimerTitle: string;
+  locationPrimerBody: string;
+  allowLocation: string;
+  stationsLoadFailedTitle: string;
+  noStationsWithin: (km: number) => string;
+  searchWithinKm: (km: number) => string;
+  filtersA11y: (active: number) => string;
+  filterShow: string;
+  openNowFilterDetail: string;
+  favoriteFilterDetail: string;
+  searchRadius: string;
+  radiusLockedDetail: string;
+  done: string;
+  directionsTo: (name: string) => string;
+  saveStationA11y: (name: string) => string;
+  unsaveStationA11y: (name: string) => string;
+  removeFilterA11y: (name: string) => string;
+  byListedHours: string;
+  savedStation: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -347,25 +362,10 @@ export const i18n: Record<Lang, TDict> = {
     showingCached: "Showing cached data",
 
     stationsNearbyTitle: "Stations nearby",
-    stationsNearbyNeedLocation: "Location is needed to show nearby stations.",
-    stationsNearbyUseMyLocation: "Use my location",
     stationsNearbyGettingLocation: "Getting location…",
-    stationsNearbyRefresh: "Refresh",
-    stationsNearbyCached: "Showing cached results",
-    stationsNearbyNone: "No stations found nearby.",
     stationsNearbyOpen: "Open",
     stationsNearbyOpenNow: "Open now",
-    stationsNearbyClosed: "Closed",
-    stationsNearbyHoursUnknown: "Hours unknown",
-    radius: "Radius",
-    radius2km: "2 km",
-    radius5km: "5 km",
-    radius10km: "10 km",
-    stationsNearbyFound: (n: number) => `Found ${n} stations`,
-    stationsNearbyShowing: (shown: number, total: number) => `Showing ${shown} of ${total}`,
-    stationsNearbyShowMore: "Show more",
-    stationsNearbyShowAll: "Show all",
-    stationsNearbyCollapse: "Collapse",
+    stationsNearbyHoursUnknown: "Hours not listed",
     stationsTryWiderRadius: "Try a wider radius or refresh the station list.",
     tapToSwitch: "Tap a country to switch instantly.",
     quickSwitchEmpty: "Add favorites to switch countries in one tap.",
@@ -376,8 +376,6 @@ export const i18n: Record<Lang, TDict> = {
     watchVideo: "Watch video",
     continueWithout: "No thanks",
     maxCompareReachedN: (n: number) => `You can compare up to ${n} countries.`,
-    radius30km: "30 km",
-    radius50km: "50 km",
     rateTitle: "Enjoying the app?",
     rateBody: "A quick rating helps a lot and supports future updates.",
     rateNow: "Rate now",
@@ -456,7 +454,6 @@ export const i18n: Record<Lang, TDict> = {
     save: "Save",
     noSavedSets: "No saved sets yet.",
     spread: "Spread",
-    nearest: "Nearest",
     current: "Current",
     searchAllCountries: "Search all countries",
     priceAlert: "Price alert",
@@ -468,14 +465,11 @@ export const i18n: Record<Lang, TDict> = {
     searchStations: "Search stations",
     stationSearchPlaceholder: "Search name or brand",
     filters: "Filters",
-    openNowOnly: "Open now",
     favoriteOnly: "Favorites",
-    allStations: "All stations",
     directions: "Directions",
     withinRadius: (radius: number) => `Within ${radius} km`,
     noStationMatches: "No stations match these filters.",
     clearFilters: "Clear filters",
-    locationAccess: "Location access",
     compareOverview: "Comparison overview",
     bestValue: "Best value",
     selectedCountries: "Selected countries",
@@ -571,6 +565,42 @@ export const i18n: Record<Lang, TDict> = {
     extrasTitle: "Extras",
     extrasDetail: "Watch a short ad to unlock bonus features for 30 minutes",
     extrasActive: (minutes: number) => `Unlocked · ${minutes} min left`,
+    nearestStation: "Nearest station",
+    closestMatch: "Closest match",
+    unnamedStation: "Fuel station",
+    straightLine: "straight-line distance",
+    hoursOpen24: "Open 24 hours",
+    hoursClosedNow: "Closed now",
+    hoursClosesAt: (time: string) => `closes ${time}`,
+    hoursOpensAt: (time: string) => `opens ${time}`,
+    hoursListedNote: "Based on listed opening hours",
+    stationsSourceNote:
+      "Stations and opening hours come from OpenStreetMap and may miss holidays or temporary closures. Distances are straight-line, not driving routes.",
+    stationsWithin: (count: number, km: number) => `${count} ${count === 1 ? "station" : "stations"} within ${km} km`,
+    stationsMatches: (count: number) => `${count} ${count === 1 ? "match" : "matches"}`,
+    otherStations: "More nearby",
+    stationsUpdatedAt: (time: string) => `Updated ${time}`,
+    stationsSavedList: (time: string) => `Saved list from ${time}`,
+    stationsLookingWithin: (km: number) => `Looking for stations within ${km} km…`,
+    locationPrimerTitle: "Find fuel near you",
+    locationPrimerBody: "Allow location to list stations around you by distance. Your position is used only to look up nearby stations.",
+    allowLocation: "Allow location",
+    stationsLoadFailedTitle: "Couldn’t load stations",
+    noStationsWithin: (km: number) => `No stations within ${km} km`,
+    searchWithinKm: (km: number) => `Search within ${km} km`,
+    filtersA11y: (active: number) => (active ? `Filters, ${active} active` : "Filters"),
+    filterShow: "Show",
+    openNowFilterDetail: "Hides stations without listed hours",
+    favoriteFilterDetail: "Only stations you starred",
+    searchRadius: "Search radius",
+    radiusLockedDetail: "Unlock for 30 min with a short video",
+    done: "Done",
+    directionsTo: (name: string) => `Directions to ${name}`,
+    saveStationA11y: (name: string) => `Save ${name} to favorites`,
+    unsaveStationA11y: (name: string) => `Remove ${name} from favorites`,
+    removeFilterA11y: (name: string) => `Remove filter: ${name}`,
+    byListedHours: "according to listed hours",
+    savedStation: "Saved",
   },
   sq: {
     title: "Karburanti Sot",
@@ -633,26 +663,11 @@ export const i18n: Record<Lang, TDict> = {
     showingCached: "Po shfaqen të dhënat e ruajtura",
 
     stationsNearbyTitle: "Pikat e karburantit afër",
-    stationsNearbyNeedLocation: "Duhet vendndodhja për të shfaqur pikat afër.",
-    stationsNearbyUseMyLocation: "Përdor vendndodhjen time",
     stationsNearbyGettingLocation: "Po merret vendndodhja…",
-    stationsNearbyRefresh: "Rifresko",
-    stationsNearbyCached: "Po shfaqen rezultatet e ruajtura",
-    stationsNearbyNone: "S’u gjetën pika karburanti afër.",
     stationsNearbyOpen: "Hap",
     stationsNearbyOpenNow: "Hapur tani",
-    stationsNearbyClosed: "Mbyllur",
-    stationsNearbyHoursUnknown: "Orari i panjohur",
-    radius: "Rrezja",
-    radius2km: "2 km",
-    radius5km: "5 km",
-    radius10km: "10 km",
-    stationsNearbyFound: (n: number) => `U gjetën ${n} pika`,
-    stationsNearbyShowing: (shown: number, total: number) => `Po shfaqen ${shown} nga ${total}`,
-    stationsNearbyShowMore: "Shfaq më shumë",
-    stationsNearbyShowAll: "Shfaq të gjitha",
-    stationsNearbyCollapse: "Mbyll",
-    stationsTryWiderRadius: "Provo nje radius me te gjere ose rifresko listen.",
+    stationsNearbyHoursUnknown: "Orari s’është i shënuar",
+    stationsTryWiderRadius: "Provo një rreze më të gjerë ose rifresko listën.",
     tapToSwitch: "Prek një shtet për ta ndërruar menjëherë.",
     quickSwitchEmpty: "Shto të preferuarat që t’i ndërroni shtetet me një prekje.",
     unlockTitle: (m: number) => `Zhblloko bonus për ${m} min`,
@@ -662,8 +677,6 @@ export const i18n: Record<Lang, TDict> = {
     watchVideo: "Shiko video",
     continueWithout: "Jo faleminderit",
     maxCompareReachedN: (n: number) => `Mund të krahasosh deri në ${n} shtete.`,
-    radius30km: "30 km",
-    radius50km: "50 km",
     rateTitle: "Po të pëlqen aplikacioni?",
     rateBody: "Një vlerësim i shpejtë na ndihmon shumë dhe mbështet përditësimet.",
     rateNow: "Vlerëso tani",
@@ -742,7 +755,6 @@ export const i18n: Record<Lang, TDict> = {
     save: "Ruaj",
     noSavedSets: "Ende nuk ka grupe të ruajtura.",
     spread: "Diferenca",
-    nearest: "Më e afërta",
     current: "Aktual",
     searchAllCountries: "Kërko të gjitha shtetet",
     priceAlert: "Njoftim çmimi",
@@ -754,14 +766,11 @@ export const i18n: Record<Lang, TDict> = {
     searchStations: "Kërko pika",
     stationSearchPlaceholder: "Kërko emër ose markë",
     filters: "Filtrat",
-    openNowOnly: "Hapur tani",
     favoriteOnly: "Të preferuarat",
-    allStations: "Të gjitha pikat",
     directions: "Udhëzimet",
     withinRadius: (radius: number) => `Brenda ${radius} km`,
     noStationMatches: "Asnjë pikë nuk përputhet me filtrat.",
     clearFilters: "Pastro filtrat",
-    locationAccess: "Qasja në vendndodhje",
     compareOverview: "Përmbledhja e krahasimit",
     bestValue: "Vlera më e mirë",
     selectedCountries: "Shtetet e zgjedhura",
@@ -852,5 +861,41 @@ export const i18n: Record<Lang, TDict> = {
     extrasTitle: "Shtesat",
     extrasDetail: "Shiko një reklamë të shkurtër për të zhbllokuar veçori shtesë për 30 minuta",
     extrasActive: (minutes: number) => `Zhbllokuar · ${minutes} min mbetur`,
+    nearestStation: "Pika më e afërt",
+    closestMatch: "Përputhja më e afërt",
+    unnamedStation: "Pikë karburanti",
+    straightLine: "distancë në vijë ajrore",
+    hoursOpen24: "Hapur 24 orë",
+    hoursClosedNow: "Mbyllur tani",
+    hoursClosesAt: (time: string) => `mbyllet në ${time}`,
+    hoursOpensAt: (time: string) => `hapet në ${time}`,
+    hoursListedNote: "Sipas orarit të shënuar",
+    stationsSourceNote:
+      "Pikat dhe oraret vijnë nga OpenStreetMap dhe mund të mos përfshijnë festat ose mbylljet e përkohshme. Distancat janë në vijë ajrore, jo sipas rrugës.",
+    stationsWithin: (count: number, km: number) => `${count} ${count === 1 ? "pikë" : "pika"} brenda ${km} km`,
+    stationsMatches: (count: number) => `${count} ${count === 1 ? "rezultat" : "rezultate"}`,
+    otherStations: "Të tjera afër",
+    stationsUpdatedAt: (time: string) => `Përditësuar ${time}`,
+    stationsSavedList: (time: string) => `Lista e ruajtur nga ${time}`,
+    stationsLookingWithin: (km: number) => `Po kërkojmë pika brenda ${km} km…`,
+    locationPrimerTitle: "Gjej karburant pranë teje",
+    locationPrimerBody: "Lejo vendndodhjen për të parë pikat përreth, sipas distancës. Pozicioni yt përdoret vetëm për të kërkuar pikat afër.",
+    allowLocation: "Lejo vendndodhjen",
+    stationsLoadFailedTitle: "Pikat nuk u ngarkuan",
+    noStationsWithin: (km: number) => `Asnjë pikë brenda ${km} km`,
+    searchWithinKm: (km: number) => `Kërko brenda ${km} km`,
+    filtersA11y: (active: number) => (active ? `Filtrat, ${active} aktivë` : "Filtrat"),
+    filterShow: "Shfaq",
+    openNowFilterDetail: "Fsheh pikat pa orar të shënuar",
+    favoriteFilterDetail: "Vetëm pikat me yll",
+    searchRadius: "Rrezja e kërkimit",
+    radiusLockedDetail: "Zhblloko për 30 min me një video të shkurtër",
+    done: "U krye",
+    directionsTo: (name: string) => `Udhëzime për te ${name}`,
+    saveStationA11y: (name: string) => `Ruaj ${name} te të preferuarat`,
+    unsaveStationA11y: (name: string) => `Hiq ${name} nga të preferuarat`,
+    removeFilterA11y: (name: string) => `Hiq filtrin: ${name}`,
+    byListedHours: "sipas orarit të shënuar",
+    savedStation: "E ruajtur",
   },
 };

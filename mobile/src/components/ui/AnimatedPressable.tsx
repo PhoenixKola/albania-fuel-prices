@@ -1,6 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useSyncExternalStore } from "react";
 import { AccessibilityInfo, Animated, Easing, Pressable, type AccessibilityRole, type AccessibilityState } from "react-native";
 import { hapticLight } from "../../utils/haptics";
+
+// One app-wide reduce-motion subscription shared by every pressable, instead
+// of one listener per instance (long lists mount hundreds of these).
+let systemReduceMotion = false;
+const listeners = new Set<() => void>();
+let subscribed = false;
+
+function subscribeReduceMotion(listener: () => void) {
+  listeners.add(listener);
+  if (!subscribed) {
+    subscribed = true;
+    const set = (value: boolean) => {
+      if (value === systemReduceMotion) return;
+      systemReduceMotion = value;
+      listeners.forEach((l) => l());
+    };
+    AccessibilityInfo.isReduceMotionEnabled().then(set).catch(() => {});
+    AccessibilityInfo.addEventListener("reduceMotionChanged", set);
+  }
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+const getReduceMotion = () => systemReduceMotion;
 
 export default function AnimatedPressable({
   onPress,
@@ -34,14 +59,7 @@ export default function AnimatedPressable({
   testID?: string;
 }) {
   const scale = useRef(new Animated.Value(1)).current;
-  const [systemReduceMotion, setSystemReduceMotion] = useState(false);
-  const shouldReduceMotion = reduceMotion || systemReduceMotion;
-
-  useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setSystemReduceMotion).catch(() => {});
-    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setSystemReduceMotion);
-    return () => subscription.remove();
-  }, []);
+  const shouldReduceMotion = useSyncExternalStore(subscribeReduceMotion, getReduceMotion) || reduceMotion;
 
   const pressIn = () => {
     if (disabled) return;
