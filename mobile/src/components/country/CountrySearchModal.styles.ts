@@ -8,16 +8,20 @@ export const makeCountryModalStyles = (theme: Theme) =>
       backgroundColor: theme.colors.overlay,
       justifyContent: "flex-end",
     },
+    backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
     sheet: {
       backgroundColor: theme.colors.surfaceRaised,
       borderTopLeftRadius: theme.radius.xl,
       borderTopRightRadius: theme.radius.xl,
       padding: theme.m.s(18),
-      paddingBottom: theme.m.s(110),
       borderTopWidth: 1,
       borderColor: theme.colors.border,
       maxHeight: "88%",
     },
+    flag: { fontSize: 20 },
+    rowCopy: { flex: 1, minWidth: 0, gap: 2 },
+    rowTextMuted: { color: theme.colors.muted },
+    empty: { padding: theme.m.s(18), color: theme.colors.muted, fontSize: theme.m.f(14), fontWeight: "700", textAlign: "center" },
     headerRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -26,6 +30,7 @@ export const makeCountryModalStyles = (theme: Theme) =>
       marginBottom: theme.m.s(10),
     },
     title: {
+      flex: 1,
       fontSize: theme.m.f(19),
       fontWeight: "900",
       color: theme.colors.text,
@@ -55,9 +60,11 @@ export const makeCountryModalStyles = (theme: Theme) =>
       color: theme.colors.text,
       backgroundColor: theme.colors.card,
       marginBottom: theme.m.s(10),
+      fontSize: theme.m.f(15),
       fontWeight: "600",
     },
     list: {
+      flexShrink: 1,
       borderRadius: 14,
       overflow: "hidden",
       borderWidth: 1,
@@ -77,13 +84,8 @@ export const makeCountryModalStyles = (theme: Theme) =>
     },
     rowText: {
       color: theme.colors.text,
+      fontSize: theme.m.f(15),
       fontWeight: "700",
-      flex: 1,
-    },
-    right: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: theme.m.s(10),
     },
     starBtn: {
       width: 48,
@@ -105,16 +107,8 @@ export const makeCountryModalStyles = (theme: Theme) =>
     starOff: {
       color: theme.colors.muted,
     },
-    badge: {
-      paddingVertical: theme.m.s(4),
-      paddingHorizontal: theme.m.s(10),
-      borderRadius: 999,
-      backgroundColor: theme.colors.pillBg,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
     badgeText: {
-      color: theme.colors.muted,
+      color: theme.colors.subText,
       fontWeight: "800",
       fontSize: theme.m.f(12),
     },

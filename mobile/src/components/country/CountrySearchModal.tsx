@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
-import { FlatList, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Theme } from "../../theme/theme";
+import { getFlagForCountry } from "../../utils/countryFlag";
 import { makeCountryModalStyles } from "./CountrySearchModal.styles";
 
 export default function CountrySearchModal(props: {
@@ -18,8 +20,16 @@ export default function CountrySearchModal(props: {
   onToggleFavorite?: (c: string) => void;
   onSelect: (c: string) => void;
   onClose: () => void;
+  /** Countries already chosen: shown with a badge and not selectable again. */
+  added?: string[];
+  addedLabel?: string;
+  /** Countries that cannot be chosen, with the reason shown on the row. */
+  unavailable?: string[];
+  unavailableLabel?: string;
+  emptyLabel?: string;
 }) {
   const s = useMemo(() => makeCountryModalStyles(props.theme), [props.theme]);
+  const insets = useSafeAreaInsets();
   const [q, setQ] = useState("");
 
   React.useEffect(() => {
@@ -27,6 +37,8 @@ export default function CountrySearchModal(props: {
   }, [props.open]);
 
   const favSet = useMemo(() => new Set(props.favorites ?? []), [props.favorites]);
+  const addedSet = useMemo(() => new Set(props.added ?? []), [props.added]);
+  const unavailableSet = useMemo(() => new Set(props.unavailable ?? []), [props.unavailable]);
 
   const items = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -44,8 +56,9 @@ export default function CountrySearchModal(props: {
       statusBarTranslucent
       onRequestClose={props.onClose}
     >
-      <Pressable style={s.overlay} onPress={props.onClose}>
-        <Pressable style={s.sheet} onPress={() => {}} accessibilityViewIsModal>
+      <KeyboardAvoidingView style={s.overlay} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <Pressable style={s.backdrop} onPress={props.onClose} accessibilityRole="button" accessibilityLabel={props.closeLabel} />
+        <View style={[s.sheet, { paddingBottom: props.theme.m.s(18) + insets.bottom }]} accessibilityViewIsModal>
           <View style={s.headerRow}>
             <Text style={s.title} accessibilityRole="header">{props.title}</Text>
             <Pressable
@@ -74,56 +87,56 @@ export default function CountrySearchModal(props: {
               data={items}
               keyExtractor={(x) => x}
               keyboardShouldPersistTaps="handled"
-              contentContainerStyle={{ paddingBottom: 14 }}
+              keyboardDismissMode="on-drag"
+              contentContainerStyle={{ paddingBottom: 6 }}
+              ListEmptyComponent={props.emptyLabel ? <Text style={s.empty}>{props.emptyLabel}</Text> : null}
               renderItem={({ item, index }) => {
                 const active = item === props.value;
+                const isAdded = addedSet.has(item);
+                const isUnavailable = !isAdded && unavailableSet.has(item);
+                const disabled = isAdded || isUnavailable;
                 const isLast = index === items.length - 1;
                 const isFav = favSet.has(item);
+                const badge = isAdded ? props.addedLabel : isUnavailable ? props.unavailableLabel : active ? props.selectedLabel : null;
 
                 return (
                   <Pressable
                     onPress={() => props.onSelect(item)}
+                    disabled={disabled}
                     accessibilityRole="button"
-                    accessibilityLabel={active ? `${item}, ${props.selectedLabel}` : item}
-                    accessibilityState={{ selected: active }}
-                    style={[
+                    accessibilityLabel={badge ? `${item}, ${badge}` : item}
+                    accessibilityState={{ selected: active || isAdded, disabled }}
+                    style={({ pressed }) => [
                       s.row,
                       isLast ? { borderBottomWidth: 0 } : null,
-                      active ? { backgroundColor: props.theme.colors.tile } : null
+                      active || isAdded ? { backgroundColor: props.theme.colors.tile } : null,
+                      pressed && !disabled ? { backgroundColor: props.theme.colors.pillBg } : null,
                     ]}
                   >
-                    <Text style={s.rowText}>{item}</Text>
-
-                    <View style={s.right}>
-                      {props.onToggleFavorite ? (
-                        <Pressable
-                          onPress={(event) => {
-                            event.stopPropagation();
-                            props.onToggleFavorite?.(item);
-                          }}
-                          style={s.starBtn}
-                          accessibilityRole="button"
-                          accessibilityLabel={(isFav ? props.unsaveLabel : props.saveLabel)?.(item) ?? item}
-                          accessibilityState={{ selected: isFav }}
-                          hitSlop={6}
-                        >
-                          <Text style={[s.starText, isFav ? s.starOn : s.starOff]}>{isFav ? "★" : "☆"}</Text>
-                        </Pressable>
-                      ) : null}
-
-                      {active ? (
-                        <View style={s.badge}>
-                          <Text style={s.badgeText}>{props.selectedLabel}</Text>
-                        </View>
-                      ) : null}
+                    <Text style={s.flag} accessibilityElementsHidden importantForAccessibility="no">{getFlagForCountry(item) || "•"}</Text>
+                    <View style={s.rowCopy}>
+                      <Text style={[s.rowText, isUnavailable ? s.rowTextMuted : null]}>{item}</Text>
+                      {badge ? <Text style={s.badgeText}>{badge}</Text> : null}
                     </View>
+
+                    {props.onToggleFavorite ? (
+                      <Pressable
+                        onPress={() => props.onToggleFavorite?.(item)}
+                        style={s.starBtn}
+                        accessibilityRole="button"
+                        accessibilityLabel={(isFav ? props.unsaveLabel : props.saveLabel)?.(item) ?? item}
+                        accessibilityState={{ selected: isFav }}
+                      >
+                        <Text style={[s.starText, isFav ? s.starOn : s.starOff]}>{isFav ? "★" : "☆"}</Text>
+                      </Pressable>
+                    ) : null}
                   </Pressable>
                 );
               }}
             />
           </View>
-        </Pressable>
-      </Pressable>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

@@ -33,10 +33,6 @@ export type TDict = {
   rankUnavailable: string;
 
   compareTitle: string;
-  compareEmpty: string;
-  compareSubtitle: (fuel: string) => string;
-  addCountry: string;
-  compareHint: string;
   maxCompareReached: string;
   remove: string;
 
@@ -74,7 +70,6 @@ export type TDict = {
   unlockRankings: string;
   watchVideo: string;
   continueWithout: string;
-  maxCompareReachedN: (n: number) => string;
   rateTitle: string;
   rateBody: string;
   rateNow: string;
@@ -148,9 +143,6 @@ export type TDict = {
 
   // Compare sets, alerts and quick-switch labels
   best: string;
-  savedSets: string;
-  compareSetsTitle: string;
-  saveCurrentSet: string;
   setNamePlaceholder: string;
   save: string;
   noSavedSets: string;
@@ -162,7 +154,6 @@ export type TDict = {
   keepCurrent: string;
   loading: string;
   fxUnavailable: string;
-  premiumInsights: string;
   searchStations: string;
   stationSearchPlaceholder: string;
   filters: string;
@@ -171,10 +162,7 @@ export type TDict = {
   withinRadius: (radius: number) => string;
   noStationMatches: string;
   clearFilters: string;
-  compareOverview: string;
-  bestValue: string;
   selectedCountries: string;
-  differenceFromBest: string;
   sevenDays: string;
   thirtyDays: string;
   trendComparison: string;
@@ -298,6 +286,44 @@ export type TDict = {
   removeFilterA11y: (name: string) => string;
   byListedHours: string;
   savedStation: string;
+  // Compare
+  compareKicker: (fuel: string, count: number) => string;
+  cheapestIn: (country: string) => string;
+  costsMore: (country: string, amount: string) => string;
+  samePriceEverywhere: string;
+  tankEstimate: (amount: string) => string;
+  addOneMore: string;
+  compareEmptyTitle: string;
+  compareEmptyBody: (max: number) => string;
+  quickPicks: string;
+  moreThanCheapest: (amount: string) => string;
+  europeRank: (rank: number, total: number) => string;
+  noWeekData: string;
+  fuelNotReported: (fuel: string) => string;
+  removeMarketA11y: (country: string) => string;
+  removedMarket: (country: string) => string;
+  undo: string;
+  marketsCount: (count: number, max: number) => string;
+  unlockMoreMarkets: string;
+  unlockMoreDetail: string;
+  allSlotsUsed: (max: number) => string;
+  hiddenMarkets: (count: number) => string;
+  removeHidden: string;
+  added: string;
+  noCountryResults: string;
+  savedComparisons: string;
+  saveThisComparison: string;
+  setNameReplaces: string;
+  openSetA11y: (name: string) => string;
+  deleteSetA11y: (name: string) => string;
+  setTrimmed: (count: number) => string;
+  setSaved: (name: string) => string;
+  setUnavailable: string;
+  trendNoData: string;
+  trendChangeOver: (amount: string, days: number) => string;
+  trendPeriodA11y: (days: number) => string;
+  secondaryPriceA11y: (amount: string) => string;
+  selectFuel: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -334,10 +360,6 @@ export const i18n: Record<Lang, TDict> = {
     rankUnavailable: "Rank unavailable (missing data).",
 
     compareTitle: "Compare",
-    compareEmpty: "Add countries to start comparing.",
-    compareSubtitle: (fuel: string) => `Compare ${fuel} across 2–3 countries`,
-    addCountry: "Add country",
-    compareHint: "Pick 2–3 countries to compare.",
     maxCompareReached: "You can compare up to 3 countries.",
     remove: "Remove",
 
@@ -375,7 +397,6 @@ export const i18n: Record<Lang, TDict> = {
     unlockRankings: "Rankings: show most expensive too",
     watchVideo: "Watch video",
     continueWithout: "No thanks",
-    maxCompareReachedN: (n: number) => `You can compare up to ${n} countries.`,
     rateTitle: "Enjoying the app?",
     rateBody: "A quick rating helps a lot and supports future updates.",
     rateNow: "Rate now",
@@ -447,9 +468,6 @@ export const i18n: Record<Lang, TDict> = {
     allFuelPrices: "All fuel prices",
     homeEuropeAverage: "Europe average",
     best: "Best",
-    savedSets: "Saved",
-    compareSetsTitle: "Compare sets",
-    saveCurrentSet: "Save current set",
     setNamePlaceholder: "Name",
     save: "Save",
     noSavedSets: "No saved sets yet.",
@@ -461,7 +479,6 @@ export const i18n: Record<Lang, TDict> = {
     keepCurrent: "Keep current",
     loading: "Loading…",
     fxUnavailable: "FX unavailable",
-    premiumInsights: "Live market intelligence",
     searchStations: "Search stations",
     stationSearchPlaceholder: "Search name or brand",
     filters: "Filters",
@@ -470,10 +487,7 @@ export const i18n: Record<Lang, TDict> = {
     withinRadius: (radius: number) => `Within ${radius} km`,
     noStationMatches: "No stations match these filters.",
     clearFilters: "Clear filters",
-    compareOverview: "Comparison overview",
-    bestValue: "Best value",
     selectedCountries: "Selected countries",
-    differenceFromBest: "Extra vs best",
     sevenDays: "7 days",
     thirtyDays: "30 days",
     trendComparison: "Price movement",
@@ -601,6 +615,44 @@ export const i18n: Record<Lang, TDict> = {
     removeFilterA11y: (name: string) => `Remove filter: ${name}`,
     byListedHours: "according to listed hours",
     savedStation: "Saved",
+    compareKicker: (fuel: string, count: number) => `${fuel} · ${count} ${count === 1 ? "market" : "markets"}`,
+    cheapestIn: (country: string) => `${country} is cheapest`,
+    costsMore: (country: string, amount: string) => `${country} costs ${amount} more per litre`,
+    samePriceEverywhere: "Same price in every selected market",
+    tankEstimate: (amount: string) => `≈ ${amount} more for a 50 L tank (estimate)`,
+    addOneMore: "Add one more market to see the price gap.",
+    compareEmptyTitle: "Compare fuel prices",
+    compareEmptyBody: (max: number) => `Pick up to ${max} markets to see which is cheaper, by how much, and how prices are moving.`,
+    quickPicks: "Quick picks",
+    moreThanCheapest: (amount: string) => `${amount} more than the cheapest`,
+    europeRank: (rank: number, total: number) => `#${rank} of ${total} in Europe`,
+    noWeekData: "No weekly data",
+    fuelNotReported: (fuel: string) => `${fuel} not reported`,
+    removeMarketA11y: (country: string) => `Remove ${country} from comparison`,
+    removedMarket: (country: string) => `${country} removed`,
+    undo: "Undo",
+    marketsCount: (count: number, max: number) => `${count} of ${max} markets`,
+    unlockMoreMarkets: "Compare up to 5 markets",
+    unlockMoreDetail: "Watch a short video to add 2 more slots for 30 min.",
+    allSlotsUsed: (max: number) => `All ${max} slots in use`,
+    hiddenMarkets: (count: number) =>
+      `${count} saved ${count === 1 ? "market is" : "markets are"} hidden until extras are unlocked again.`,
+    removeHidden: "Remove hidden",
+    added: "Added",
+    noCountryResults: "No countries match your search.",
+    savedComparisons: "Saved comparisons",
+    saveThisComparison: "Save this comparison",
+    setNameReplaces: "A saved comparison with this name will be replaced.",
+    openSetA11y: (name: string) => `Open ${name}`,
+    deleteSetA11y: (name: string) => `Delete ${name}`,
+    setTrimmed: (count: number) => `Opened the first ${count} markets`,
+    setSaved: (name: string) => `Saved “${name}”`,
+    setUnavailable: "None of these markets are in the current data.",
+    trendNoData: "Not enough price history to compare movement yet.",
+    trendChangeOver: (amount: string, days: number) => `${amount} over ${days} days`,
+    trendPeriodA11y: (days: number) => `Show last ${days} days`,
+    secondaryPriceA11y: (amount: string) => `also ${amount}`,
+    selectFuel: "Fuel type",
   },
   sq: {
     title: "Karburanti Sot",
@@ -635,10 +687,6 @@ export const i18n: Record<Lang, TDict> = {
     rankUnavailable: "Renditja s’është e mundur (mungojnë të dhënat).",
 
     compareTitle: "Krahaso",
-    compareEmpty: "Shto shtete për të filluar krahasimin.",
-    compareSubtitle: (fuel: string) => `Krahaso ${fuel} në 2–3 shtete`,
-    addCountry: "Shto shtet",
-    compareHint: "Zgjidh 2–3 shtete për krahasim.",
     maxCompareReached: "Mund të krahasosh deri në 3 shtete.",
     remove: "Hiqe",
 
@@ -676,7 +724,6 @@ export const i18n: Record<Lang, TDict> = {
     unlockRankings: "Renditja: shfaq edhe më të shtrenjtat",
     watchVideo: "Shiko video",
     continueWithout: "Jo faleminderit",
-    maxCompareReachedN: (n: number) => `Mund të krahasosh deri në ${n} shtete.`,
     rateTitle: "Po të pëlqen aplikacioni?",
     rateBody: "Një vlerësim i shpejtë na ndihmon shumë dhe mbështet përditësimet.",
     rateNow: "Vlerëso tani",
@@ -748,9 +795,6 @@ export const i18n: Record<Lang, TDict> = {
     allFuelPrices: "Të gjitha çmimet",
     homeEuropeAverage: "Mesatarja evropiane",
     best: "Më i miri",
-    savedSets: "Të ruajtura",
-    compareSetsTitle: "Grupet e krahasimit",
-    saveCurrentSet: "Ruaj grupin aktual",
     setNamePlaceholder: "Emri",
     save: "Ruaj",
     noSavedSets: "Ende nuk ka grupe të ruajtura.",
@@ -762,7 +806,6 @@ export const i18n: Record<Lang, TDict> = {
     keepCurrent: "Ruaj aktualin",
     loading: "Po ngarkohet…",
     fxUnavailable: "Kursi s'disponohet",
-    premiumInsights: "Inteligjencë e tregut në kohë reale",
     searchStations: "Kërko pika",
     stationSearchPlaceholder: "Kërko emër ose markë",
     filters: "Filtrat",
@@ -771,10 +814,7 @@ export const i18n: Record<Lang, TDict> = {
     withinRadius: (radius: number) => `Brenda ${radius} km`,
     noStationMatches: "Asnjë pikë nuk përputhet me filtrat.",
     clearFilters: "Pastro filtrat",
-    compareOverview: "Përmbledhja e krahasimit",
-    bestValue: "Vlera më e mirë",
     selectedCountries: "Shtetet e zgjedhura",
-    differenceFromBest: "Mbi më të mirën",
     sevenDays: "7 ditë",
     thirtyDays: "30 ditë",
     trendComparison: "Lëvizja e çmimeve",
@@ -897,5 +937,45 @@ export const i18n: Record<Lang, TDict> = {
     removeFilterA11y: (name: string) => `Hiq filtrin: ${name}`,
     byListedHours: "sipas orarit të shënuar",
     savedStation: "E ruajtur",
+    compareKicker: (fuel: string, count: number) => `${fuel} · ${count} ${count === 1 ? "treg" : "tregje"}`,
+    cheapestIn: (country: string) => `${country} ka çmimin më të ulët`,
+    costsMore: (country: string, amount: string) => `${country} kushton ${amount} më shumë për litër`,
+    samePriceEverywhere: "I njëjti çmim në të gjitha tregjet e zgjedhura",
+    tankEstimate: (amount: string) => `≈ ${amount} më shumë për një depozitë 50 L (vlerësim)`,
+    addOneMore: "Shto edhe një treg për të parë diferencën e çmimit.",
+    compareEmptyTitle: "Krahaso çmimet e karburantit",
+    compareEmptyBody: (max: number) => `Zgjidh deri në ${max} tregje për të parë cili është më i lirë, sa më i lirë dhe si lëvizin çmimet.`,
+    quickPicks: "Zgjedhje të shpejta",
+    moreThanCheapest: (amount: string) => `${amount} më shumë se më i liri`,
+    europeRank: (rank: number, total: number) => `#${rank} nga ${total} në Europë`,
+    noWeekData: "Pa të dhëna javore",
+    fuelNotReported: (fuel: string) => `${fuel} nuk raportohet`,
+    removeMarketA11y: (country: string) => `Hiq ${country} nga krahasimi`,
+    removedMarket: (country: string) => `${country} u hoq`,
+    undo: "Zhbëj",
+    marketsCount: (count: number, max: number) => `${count} nga ${max} tregje`,
+    unlockMoreMarkets: "Krahaso deri në 5 tregje",
+    unlockMoreDetail: "Shiko një video të shkurtër për 2 vende më shumë për 30 min.",
+    allSlotsUsed: (max: number) => `Të ${max} vendet janë në përdorim`,
+    hiddenMarkets: (count: number) =>
+      count === 1
+        ? "1 treg i ruajtur është i fshehur derisa të zhbllokohen sërish shtesat."
+        : `${count} tregje të ruajtura janë të fshehura derisa të zhbllokohen sërish shtesat.`,
+    removeHidden: "Hiq të fshehurat",
+    added: "Shtuar",
+    noCountryResults: "Asnjë shtet nuk përputhet me kërkimin.",
+    savedComparisons: "Krahasimet e ruajtura",
+    saveThisComparison: "Ruaj këtë krahasim",
+    setNameReplaces: "Krahasimi i ruajtur me këtë emër do të zëvendësohet.",
+    openSetA11y: (name: string) => `Hap ${name}`,
+    deleteSetA11y: (name: string) => `Fshi ${name}`,
+    setTrimmed: (count: number) => `U hapën ${count} tregjet e para`,
+    setSaved: (name: string) => `U ruajt “${name}”`,
+    setUnavailable: "Asnjë nga këto tregje nuk është në të dhënat aktuale.",
+    trendNoData: "Ende s’ka histori të mjaftueshme çmimesh për të krahasuar lëvizjen.",
+    trendChangeOver: (amount: string, days: number) => `${amount} në ${days} ditë`,
+    trendPeriodA11y: (days: number) => `Shfaq ${days} ditët e fundit`,
+    secondaryPriceA11y: (amount: string) => `gjithashtu ${amount}`,
+    selectFuel: "Lloji i karburantit",
   },
 };
