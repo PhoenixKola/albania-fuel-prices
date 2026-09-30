@@ -338,6 +338,18 @@ export type TDict = {
   marketSet: (country: string) => string;
   addedToCompare: (country: string) => string;
   favoritesRankNote: string;
+  // System messages
+  alertSavedTitle: string;
+  alertSavedBody: (fuel: string, country: string, direction: "below" | "above", amount: string) => string;
+  alertFiredTitle: string;
+  alertFiredBody: (fuel: string, country: string, direction: "below" | "above", amount: string) => string;
+  noEmailTitle: string;
+  noEmailBody: (email: string) => string;
+  storeUnavailableTitle: string;
+  storeUnavailableBody: string;
+  feedbackSubject: string;
+  feedbackBody: string;
+  tabHomeShort: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -680,6 +692,19 @@ export const i18n: Record<Lang, TDict> = {
     marketSet: (country: string) => `${country} is now your market`,
     addedToCompare: (country: string) => `${country} added to compare`,
     favoritesRankNote: "Ranked only among your favorites, not all of Europe.",
+    alertSavedTitle: "Price alert saved",
+    alertSavedBody: (fuel: string, country: string, direction: "below" | "above", amount: string) =>
+      `${fuel} in ${country}: we’ll notify you when it is ${direction === "below" ? "at or below" : "at or above"} ${amount}/L.`,
+    alertFiredTitle: "Fuel price alert",
+    alertFiredBody: (fuel: string, country: string, direction: "below" | "above", amount: string) =>
+      `${fuel} in ${country} is now ${direction === "below" ? "at or below" : "at or above"} ${amount}/L.`,
+    noEmailTitle: "No email app found",
+    noEmailBody: (email: string) => `Please send your feedback to ${email}.`,
+    storeUnavailableTitle: "Couldn’t open the store",
+    storeUnavailableBody: "Open Google Play and search for Karburanti Sot.",
+    feedbackSubject: "Feedback for Karburanti Sot",
+    feedbackBody: "Hi! I have feedback:\n\n",
+    tabHomeShort: "Home",
   },
   sq: {
     title: "Karburanti Sot",
@@ -1017,5 +1042,18 @@ export const i18n: Record<Lang, TDict> = {
     marketSet: (country: string) => `${country} është tani tregu yt`,
     addedToCompare: (country: string) => `${country} u shtua te krahasimi`,
     favoritesRankNote: "Renditur vetëm mes të preferuarave, jo në gjithë Europën.",
+    alertSavedTitle: "Alarmi i çmimit u ruajt",
+    alertSavedBody: (fuel: string, country: string, direction: "below" | "above", amount: string) =>
+      `${fuel} në ${country}: do të njoftohesh kur çmimi të jetë ${direction === "below" ? "në ose nën" : "në ose mbi"} ${amount}/L.`,
+    alertFiredTitle: "Alarm për çmimin e karburantit",
+    alertFiredBody: (fuel: string, country: string, direction: "below" | "above", amount: string) =>
+      `${fuel} në ${country} tani është ${direction === "below" ? "në ose nën" : "në ose mbi"} ${amount}/L.`,
+    noEmailTitle: "Nuk u gjet aplikacion email-i",
+    noEmailBody: (email: string) => `Të lutem dërgoje komentin te ${email}.`,
+    storeUnavailableTitle: "Dyqani nuk u hap",
+    storeUnavailableBody: "Hap Google Play dhe kërko Karburanti Sot.",
+    feedbackSubject: "Koment për Karburanti Sot",
+    feedbackBody: "Përshëndetje! Kam një koment:\n\n",
+    tabHomeShort: "Kreu",
   },
 };

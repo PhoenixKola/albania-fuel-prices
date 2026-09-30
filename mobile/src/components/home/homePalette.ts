@@ -13,7 +13,7 @@ export function homePalette(theme: Theme) {
       deckBorder: "#1B2B3F",
       ink: "#102033",
       inkSoft: "#4A5A6C",
-      inkFaint: "#6B7888",
+      inkFaint: "#5F6B7A",
       lane: "rgba(16,32,51,0.26)",
       rule: "rgba(16,32,51,0.12)",
       module: "#102033",

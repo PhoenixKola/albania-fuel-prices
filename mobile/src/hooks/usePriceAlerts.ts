@@ -85,7 +85,7 @@ export function usePriceAlerts(data: LatestEurope | null, t: any) {
       };
 
       await saveRules([nextRule, ...rules.filter((rule) => rule.id !== nextRule.id)].slice(0, 30));
-      await notify("Price alert saved", `${fuelLabel(fuelType, t)} in ${country}: ${direction} ${targetEur.toFixed(3)} EUR/L`);
+      await notify(t.alertSavedTitle, t.alertSavedBody(fuelLabel(fuelType, t), country, direction, `€${targetEur.toFixed(3)}`));
     },
     [rules, saveRules, t]
   );
@@ -126,10 +126,7 @@ export function usePriceAlerts(data: LatestEurope | null, t: any) {
 
     saveRules(next).catch(() => {});
     triggered.forEach((rule) => {
-      notify(
-        "Fuel price alert",
-        `${fuelLabel(rule.fuelType, t)} in ${rule.country} is ${rule.direction} ${rule.targetEur.toFixed(3)} EUR/L.`
-      );
+      notify(t.alertFiredTitle, t.alertFiredBody(fuelLabel(rule.fuelType, t), rule.country, rule.direction, `€${rule.targetEur.toFixed(3)}`));
     });
   }, [data, rules, saveRules, t]);
 

@@ -28,6 +28,7 @@ export const makeHomeStyles = (theme: Theme) => {
     topBar: {
       minHeight: compact ? 36 : 40,
       flexDirection: "row",
+      flexWrap: theme.m.isLargeText ? "wrap" : "nowrap",
       alignItems: "center",
       justifyContent: "space-between",
       gap: 10,

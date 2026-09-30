@@ -10,6 +10,7 @@ import AnimatedPressable from "../components/ui/AnimatedPressable";
 import { makeSettingsStyles } from "./SettingsTab.styles";
 import { PLAY_STORE_URL } from "../constants/urls";
 import { ADS_ENABLED } from "../constants/ads";
+import { formatShortDate } from "../hooks/useHomeMarket";
 
 declare const require: (name: string) => any;
 const PRIVACY_URL = "https://karburantisot.com/privacy";
@@ -61,14 +62,14 @@ export default function SettingsTab() {
 
         <View style={s.appearanceCard}>
           <View style={s.appearanceHeader}>
-            <View><Text style={s.cardKicker}>{ctx.t.appearance}</Text><Text style={s.cardTitle}>{ctx.themePreference === "system" ? ctx.t.followDeviceTheme : ctx.themePreference === "dark" ? ctx.t.themeDark : ctx.t.themeLight}</Text></View>
+            <View style={s.headerCopy}><Text style={s.cardKicker}>{ctx.t.appearance}</Text><Text style={s.cardTitle}>{ctx.themePreference === "system" ? ctx.t.followDeviceTheme : ctx.themePreference === "dark" ? ctx.t.themeDark : ctx.t.themeLight}</Text></View>
             <View style={s.appearanceIcon}><Ionicons name={ctx.themeName === "dark" ? "moon" : "sunny"} size={27} color={ctx.theme.colors.primary} /></View>
           </View>
           <View style={s.themeOptions} accessibilityRole="tablist">
             {themeOptions.map((option) => {
               const active = ctx.themePreference === option.value;
               return <AnimatedPressable key={option.value} onPress={() => ctx.setThemePreference(option.value)} style={s.themeItem} contentStyle={[s.themeButton, active ? s.themeButtonActive : null]} accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={option.label} reduceMotion={ctx.theme.motion.reduced}>
-                <Ionicons name={option.icon} size={18} color={active ? ctx.theme.colors.primary : ctx.theme.colors.muted} /><Text style={[s.themeText, active ? s.themeTextActive : null]} numberOfLines={1}>{option.label}</Text>
+                <Ionicons name={option.icon} size={18} color={active ? ctx.theme.colors.primary : ctx.theme.colors.muted} /><Text style={[s.themeText, active ? s.themeTextActive : null]}>{option.label}</Text>
               </AnimatedPressable>;
             })}
           </View>
@@ -82,13 +83,13 @@ export default function SettingsTab() {
 
         <View style={s.dataCard}>
           <View style={s.dataHeader}>
-            <View style={s.dataTitleRow}><View style={[s.healthDot, { backgroundColor: healthColor }]} /><View><Text style={s.cardKicker}>{ctx.t.dataHealth}</Text><Text style={s.dataStatus}>{dataStatus}</Text></View></View>
+            <View style={s.dataTitleRow}><View style={[s.healthDot, { backgroundColor: healthColor }]} /><View style={s.headerCopy}><Text style={s.cardKicker}>{ctx.t.dataHealth}</Text><Text style={s.dataStatus}>{dataStatus}</Text></View></View>
             <AnimatedPressable onPress={ctx.refreshAll} disabled={ctx.refreshing} contentStyle={s.refreshButton} accessibilityLabel={ctx.t.refresh} accessibilityState={{ disabled: ctx.refreshing }} reduceMotion={ctx.theme.motion.reduced}><Ionicons name="refresh" size={19} color={ctx.theme.colors.primary} /></AnimatedPressable>
           </View>
           <View style={s.dataRows}>
             <DataRow label={ctx.t.source} value={ctx.data?.source ?? "—"} />
             <DataRow label={ctx.t.lastUpdated} value={ctx.data?.as_of ?? "—"} />
-            <DataRow label={ctx.t.lastSync} value={ctx.data?.fetched_at_utc ? new Date(ctx.data.fetched_at_utc).toLocaleString() : "—"} />
+            <DataRow label={ctx.t.lastSync} value={ctx.data?.fetched_at_utc ? formatShortDate(ctx.data.fetched_at_utc, ctx.t, true) : "—"} />
           </View>
           {sourceUrl ? <AnimatedPressable onPress={() => openExternal(sourceUrl)} contentStyle={s.sourceButton} accessibilityLabel={ctx.t.openSource}><Ionicons name="open-outline" size={17} color={ctx.theme.colors.text} /><Text style={s.sourceButtonText}>{ctx.t.openSource}</Text></AnimatedPressable> : null}
         </View>
@@ -146,11 +147,16 @@ export default function SettingsTab() {
     const tones = toneStyle();
     return <AnimatedPressable onPress={props.onPress} contentStyle={s.row} accessibilityLabel={`${props.label}${props.value ? `, ${props.value}` : ""}`} reduceMotion={ctx.theme.motion.reduced}>
       <View style={[s.rowIcon, { backgroundColor: tones[props.tone].bg }]}><Ionicons name={props.icon} size={20} color={tones[props.tone].fg} /></View>
-      <View style={s.rowCopy}><Text style={s.rowLabel}>{props.label}</Text><Text style={s.rowDetail} numberOfLines={2}>{props.detail}</Text></View>
-      {props.value ? <Text style={s.rowValue} numberOfLines={1}>{props.value}</Text> : null}<Ionicons name={props.external ? "open-outline" : "chevron-forward"} size={17} color={ctx.theme.colors.muted} />
+      <View style={s.rowCopy}>
+        <Text style={s.rowLabel}>{props.label}</Text>
+        <Text style={s.rowDetail} numberOfLines={ctx.theme.m.isLargeText ? undefined : 2}>{props.detail}</Text>
+        {/* At large text the value moves under the label instead of being squeezed into a narrow right column. */}
+        {props.value && ctx.theme.m.isLargeText ? <Text style={[s.rowValue, s.rowValueStacked]}>{props.value}</Text> : null}
+      </View>
+      {props.value && !ctx.theme.m.isLargeText ? <Text style={s.rowValue} numberOfLines={1}>{props.value}</Text> : null}<Ionicons name={props.external ? "open-outline" : "chevron-forward"} size={17} color={ctx.theme.colors.muted} />
     </AnimatedPressable>;
   }
-  function DataRow({ label, value }: { label: string; value: string }) { return <View style={s.dataRow}><Text style={s.dataLabel}>{label}</Text><Text style={s.dataValue} numberOfLines={2}>{value}</Text></View>; }
+  function DataRow({ label, value }: { label: string; value: string }) { return <View style={s.dataRow}><Text style={s.dataLabel}>{label}</Text><Text style={s.dataValue}>{value}</Text></View>; }
   function SheetOption(props: { label: string; detail: string; selected: boolean; disabled?: boolean; helper?: string; onPress: () => void }) {
     return <AnimatedPressable onPress={props.onPress} disabled={props.disabled} contentStyle={[s.sheetOption, props.selected ? s.sheetSelected : null, props.disabled ? s.disabled : null]} accessibilityLabel={`${props.label}, ${props.detail}${props.helper ? `, ${props.helper}` : ""}`} accessibilityState={{ selected: props.selected, disabled: props.disabled }}>
       <View style={s.sheetOptionCopy}><Text style={s.sheetOptionLabel}>{props.label}</Text><Text style={s.sheetOptionDetail}>{props.helper ?? props.detail}</Text></View>{props.selected ? <Ionicons name="checkmark-circle" size={23} color={ctx.theme.colors.primary} /> : <Ionicons name="ellipse-outline" size={23} color={ctx.theme.colors.muted} />}

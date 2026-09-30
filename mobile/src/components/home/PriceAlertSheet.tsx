@@ -50,18 +50,18 @@ export default function PriceAlertSheet({ theme, t, open, subtitle, currentEur, 
     <View style={s.actions}>
       {rule ? (
         <AnimatedPressable onPress={onRemove} style={s.actionItem} contentStyle={s.ghost} reduceMotion={theme.motion.reduced} accessibilityLabel={t.remove}>
-          <Text style={s.ghostText} numberOfLines={1}>{t.remove}</Text>
+          <Text style={s.ghostText}>{t.remove}</Text>
         </AnimatedPressable>
       ) : null}
       <AnimatedPressable onPress={save} style={s.actionItem} contentStyle={s.primary} reduceMotion={theme.motion.reduced} accessibilityLabel={t.saveAlert}>
         <Ionicons name="notifications" size={17} color={onPrimary(theme)} />
-        <Text style={s.primaryText} numberOfLines={1}>{t.saveAlert}</Text>
+        <Text style={s.primaryText}>{t.saveAlert}</Text>
       </AnimatedPressable>
     </View>
   );
 
   return (
-    <BottomSheet theme={theme} open={open} title={t.priceAlert} closeLabel={t.close} onClose={onClose} footer={footer} scroll={false} avoidKeyboard>
+    <BottomSheet theme={theme} open={open} title={t.priceAlert} closeLabel={t.close} onClose={onClose} footer={footer} avoidKeyboard>
       <View style={s.body}>
         <Text style={s.subtitle}>{subtitle}</Text>
 
@@ -121,8 +121,7 @@ export default function PriceAlertSheet({ theme, t, open, subtitle, currentEur, 
   );
 }
 
-/** White on the dark theme's light teal fails contrast, so dark mode uses ink. */
-const onPrimary = (theme: Theme) => (theme.name === "dark" ? "#06201D" : theme.colors.primaryText);
+const onPrimary = (theme: Theme) => theme.colors.primaryText;
 
 const makeStyles = (theme: Theme) =>
   StyleSheet.create({
@@ -138,9 +137,9 @@ const makeStyles = (theme: Theme) =>
       borderColor: theme.colors.border,
     },
     segmentItem: { flex: 1 },
-    segmentButton: { minHeight: 44, flexDirection: "row", gap: 6, alignItems: "center", justifyContent: "center", borderRadius: 12 },
+    segmentButton: { minHeight: 48, flexDirection: "row", gap: 6, alignItems: "center", justifyContent: "center", paddingHorizontal: 8, paddingVertical: 6, borderRadius: 12 },
     segmentActive: { backgroundColor: theme.colors.primary },
-    segmentText: { color: theme.colors.muted, fontSize: theme.m.f(14), fontWeight: "800" },
+    segmentText: { flexShrink: 1, color: theme.colors.muted, fontSize: theme.m.f(14), fontWeight: "800", textAlign: "center" },
     segmentTextActive: { color: onPrimary(theme) },
     rule: { color: theme.colors.text, fontSize: theme.m.f(15), fontWeight: "700" },
     inputLabel: { color: theme.colors.muted, fontSize: theme.m.f(12), fontWeight: "800", marginBottom: 6 },
@@ -161,10 +160,12 @@ const makeStyles = (theme: Theme) =>
     unit: { color: theme.colors.muted, fontSize: theme.m.f(15), fontWeight: "800" },
     helper: { minHeight: 18, marginTop: 6, color: theme.colors.muted, fontSize: theme.m.f(12), fontWeight: "700" },
     helperInvalid: { color: theme.colors.danger },
-    actions: { flexDirection: "row", gap: 10 },
-    actionItem: { flex: 1 },
+    actions: { flexDirection: theme.m.isLargeText ? "column-reverse" : "row", gap: 10 },
+    actionItem: theme.m.isLargeText ? {} : { flex: 1 },
     ghost: {
       minHeight: 50,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
       alignItems: "center",
       justifyContent: "center",
       borderRadius: 16,
@@ -173,6 +174,6 @@ const makeStyles = (theme: Theme) =>
       borderColor: theme.colors.border,
     },
     ghostText: { color: theme.colors.text, fontSize: theme.m.f(14), fontWeight: "800" },
-    primary: { minHeight: 50, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", borderRadius: 16, backgroundColor: theme.colors.primary },
-    primaryText: { color: onPrimary(theme), fontSize: theme.m.f(14), fontWeight: "900" },
+    primary: { minHeight: 50, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, backgroundColor: theme.colors.primary },
+    primaryText: { flexShrink: 1, color: onPrimary(theme), fontSize: theme.m.f(14), fontWeight: "900", textAlign: "center" },
   });

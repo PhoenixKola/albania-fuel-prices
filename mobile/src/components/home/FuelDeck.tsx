@@ -87,7 +87,7 @@ export default function FuelDeck(props: Props) {
           hitSlop={4}
         >
           <Text style={s.flag} maxFontSizeMultiplier={1.2}>{props.flag || "•"}</Text>
-          <Text style={s.countryName} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+          <Text style={s.countryName} numberOfLines={theme.m.isLargeText ? undefined : 1}>
             {props.country}
           </Text>
           <Ionicons name="chevron-down" size={16} color={p.inkSoft} />
@@ -105,13 +105,13 @@ export default function FuelDeck(props: Props) {
       </View>
 
       <View style={s.module} accessible accessibilityLabel={moduleLabel}>
-        <Text style={s.moduleFuel} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+        <Text style={s.moduleFuel}>
           {selectedName}
         </Text>
         {current == null ? (
           // Same height as the numeral so switching to an unreported fuel doesn't move the board.
           <View style={{ height: Math.round(numeralSize * 1.08), justifyContent: "center" }}>
-            <Text style={s.missing} maxFontSizeMultiplier={1.3}>{t.notReported}</Text>
+            <Text style={s.missing}>{t.notReported}</Text>
           </View>
         ) : (
           <PriceNumeral
@@ -128,7 +128,7 @@ export default function FuelDeck(props: Props) {
           {props.diff ? (
             <View style={s.signalRow}>
               <Ionicons name={toneIcon(props.diff.tone, "diff")} size={14} color={toneColor(props.diff.tone)} />
-              <Text style={[s.signalText, { color: toneColor(props.diff.tone) }]} maxFontSizeMultiplier={1.4}>
+              <Text style={[s.signalText, { color: toneColor(props.diff.tone) }]}>
                 {props.diff.text}
               </Text>
             </View>
@@ -136,13 +136,13 @@ export default function FuelDeck(props: Props) {
           {props.week ? (
             <View style={s.signalRow}>
               <Ionicons name={toneIcon(props.week.tone, "week")} size={14} color={p.moduleSoft} />
-              <Text style={s.signalText} maxFontSizeMultiplier={1.4}>
+              <Text style={s.signalText}>
                 {props.week.text}
               </Text>
             </View>
           ) : null}
           {props.note ? (
-            <Text style={[s.signalText, s.signalNote]} maxFontSizeMultiplier={1.4}>{props.note}</Text>
+            <Text style={[s.signalText, s.signalNote]}>{props.note}</Text>
           ) : null}
         </View>
       </View>
@@ -164,13 +164,13 @@ export default function FuelDeck(props: Props) {
               accessibilityState={{ selected: false }}
               accessibilityLabel={`${name}, ${price == null ? t.notReported : `${text} ${t.perLitre}`}`}
             >
-              <Text style={s.rowFuel} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+              <Text style={s.rowFuel} numberOfLines={theme.m.isLargeText ? undefined : 1}>
                 {name}
               </Text>
               {price == null ? (
-                <Text style={s.rowMissing} maxFontSizeMultiplier={1.4}>{text}</Text>
+                <Text style={s.rowMissing}>{text}</Text>
               ) : (
-                <PriceNumeral text={text} raised={props.raisedDigit} size={compact ? 20 : theme.m.f(23)} color={p.ink} reduceMotion={reduce} maxFontSizeMultiplier={1.4} />
+                <PriceNumeral text={text} raised={props.raisedDigit} size={compact ? 20 : theme.m.f(23)} color={p.ink} reduceMotion={reduce} maxFontSizeMultiplier={0} />
               )}
             </Pressable>
           </View>
@@ -205,14 +205,14 @@ function FreshnessStamp(props: {
     <View style={s.stamp}>
       <View style={s.stampLine}>
         <View style={[s.dot, { backgroundColor: dot }]} />
-        <Text style={s.stampText} maxFontSizeMultiplier={1.4}>{label}</Text>
+        <Text style={s.stampText}>{label}</Text>
       </View>
       {props.refreshFailed ? (
         <View style={s.stampLine}>
           <Ionicons name="cloud-offline-outline" size={13} color={p.warn} />
-          <Text style={s.stampText} maxFontSizeMultiplier={1.4}>{t.refreshFailed}</Text>
-          <Pressable onPress={props.onRetry} accessibilityRole="button" accessibilityLabel={t.tryAgain} hitSlop={10}>
-            <Text style={s.retry} maxFontSizeMultiplier={1.4}>{t.tryAgain}</Text>
+          <Text style={s.stampText}>{t.refreshFailed}</Text>
+          <Pressable onPress={props.onRetry} accessibilityRole="button" accessibilityLabel={t.tryAgain} hitSlop={10} style={{ minHeight: 44, justifyContent: "center" }}>
+            <Text style={s.retry}>{t.tryAgain}</Text>
           </Pressable>
         </View>
       ) : null}
@@ -295,7 +295,7 @@ const makeStyles = (theme: Theme, p: HomePalette, compact: boolean) =>
       fontWeight: "900",
       letterSpacing: -0.2,
     },
-    star: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: 14 },
+    star: { width: 48, height: 48, alignItems: "center", justifyContent: "center", borderRadius: 14 },
     module: {
       borderRadius: 18,
       backgroundColor: p.module,
@@ -319,12 +319,14 @@ const makeStyles = (theme: Theme, p: HomePalette, compact: boolean) =>
     signalText: { flexShrink: 1, color: p.moduleSoft, fontSize: theme.m.f(13), lineHeight: theme.m.f(19), fontWeight: "700" },
     missing: { color: p.moduleSoft, fontSize: theme.m.f(compact ? 22 : 26), fontWeight: "900", letterSpacing: -0.3 },
     signalNote: { fontSize: theme.m.f(12), fontWeight: "600" },
+    // From 1.6× text the fuel name and its price stack instead of colliding.
     row: {
       minHeight: compact ? 46 : 52,
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: theme.m.isXLText ? "column" : "row",
+      alignItems: theme.m.isXLText ? "flex-start" : "center",
       justifyContent: "space-between",
-      gap: 12,
+      gap: theme.m.isXLText ? 2 : 12,
+      paddingVertical: theme.m.isXLText ? 8 : 0,
       paddingHorizontal: 14,
       borderRadius: 12,
     },

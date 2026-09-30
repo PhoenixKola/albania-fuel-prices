@@ -393,8 +393,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const openFeedback = useCallback(async () => {
     showToast(t.toastOpeningFeedback);
-    const subject = encodeURIComponent("Fuel app feedback");
-    const body = encodeURIComponent("Hi! I have feedback:\n\n");
+    const subject = encodeURIComponent(t.feedbackSubject);
+    const body = encodeURIComponent(t.feedbackBody);
     const to = "fenixkola@gmail.com";
     const mailto = `mailto:${to}?subject=${subject}&body=${body}`;
     const opened = await tryOpenUrl(mailto);
@@ -403,7 +403,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const gmailCompose = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${subject}&body=${body}`;
     const openedGmail = await tryOpenUrl(gmailCompose);
     if (!openedGmail) {
-      Alert.alert("No email app found", "Please send feedback manually to fenixkola@gmail.com.");
+      Alert.alert(t.noEmailTitle, t.noEmailBody(to));
     }
   }, [showToast, t, tryOpenUrl]);
 
@@ -414,7 +414,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const url = PLAY_STORE_URL;
     const opened = await tryOpenUrl(url);
     if (!opened) {
-      Alert.alert("Could not open store", "Please open Google Play and search for Karburanti Sot.");
+      Alert.alert(t.storeUnavailableTitle, t.storeUnavailableBody);
     }
   }, [rate, showToast, t, tryOpenUrl]);
 

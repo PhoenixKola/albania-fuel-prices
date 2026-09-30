@@ -43,19 +43,19 @@ export default function MarketPulse(props: Props) {
 
   return (
     <View style={s.section}>
-      <Text style={s.kicker} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
+      <Text style={s.kicker} accessibilityRole="header">
         {t.marketPulse} · {props.fuelName}
       </Text>
 
       <View style={s.block} accessible accessibilityLabel={`${t.movement(props.series?.days ?? 30)}. ${movementSummary}`}>
-        <Text style={s.blockTitle} maxFontSizeMultiplier={1.4}>{t.movement(props.series?.days ?? 30)}</Text>
+        <Text style={s.blockTitle}>{t.movement(props.series?.days ?? 30)}</Text>
         {props.series ? <Sparkline points={props.series.points} min={props.series.min} max={props.series.max} p={p} /> : null}
-        <Text style={s.summary} maxFontSizeMultiplier={1.4}>{movementSummary}</Text>
+        <Text style={s.summary}>{movementSummary}</Text>
       </View>
 
       {rows.length > 1 && low != null && high != null ? (
         <View style={[s.block, s.blockDivided]} accessible accessibilityLabel={`${t.positionInEurope}. ${positionSummary}`}>
-          <Text style={s.blockTitle} maxFontSizeMultiplier={1.4}>{t.positionInEurope}</Text>
+          <Text style={s.blockTitle}>{t.positionInEurope}</Text>
           <PositionStrip
             rows={rows}
             low={low}
@@ -66,10 +66,10 @@ export default function MarketPulse(props: Props) {
             p={p}
           />
           <View style={s.ends}>
-            <Text style={s.endText} maxFontSizeMultiplier={1.3}>{t.cheapestShort} {props.format(low)}</Text>
-            <Text style={s.endText} maxFontSizeMultiplier={1.3}>{t.dearestShort} {props.format(high)}</Text>
+            <Text style={s.endText}>{t.cheapestShort} {props.format(low)}</Text>
+            <Text style={s.endText}>{t.dearestShort} {props.format(high)}</Text>
           </View>
-          <Text style={s.summary} maxFontSizeMultiplier={1.4}>{positionSummary}</Text>
+          <Text style={s.summary}>{positionSummary}</Text>
         </View>
       ) : null}
     </View>
@@ -174,6 +174,6 @@ const makeStyles = (theme: Theme, p: HomePalette) =>
     blockDivided: { borderTopWidth: 1, borderTopColor: p.rule },
     blockTitle: { color: p.ink, fontSize: theme.m.f(15), fontWeight: "900" },
     summary: { color: p.inkSoft, fontSize: theme.m.f(13), fontWeight: "700", lineHeight: theme.m.f(19) },
-    ends: { flexDirection: "row", justifyContent: "space-between", gap: 12, marginBottom: 6 },
+    ends: { flexDirection: theme.m.isLargeText ? "column" : "row", justifyContent: "space-between", columnGap: 12, rowGap: 2, marginBottom: 6 },
     endText: { color: p.inkFaint, fontSize: theme.m.f(11), fontWeight: "800", fontVariant: ["tabular-nums"] },
   });

@@ -38,7 +38,8 @@ export const makeErrorCardStyles = (theme: Theme) =>
     msg: {
       marginTop: theme.m.s(6),
       color: theme.colors.subText,
-      lineHeight: 18,
+      fontSize: theme.m.f(14),
+      lineHeight: theme.m.f(20),
       fontWeight: "700"
     },
 
@@ -46,12 +47,16 @@ export const makeErrorCardStyles = (theme: Theme) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+      minHeight: 48,
       backgroundColor: theme.colors.primary,
       paddingVertical: theme.m.s(12),
+      paddingHorizontal: theme.m.s(12),
       borderRadius: 16
     },
 
     btnText: {
+      flexShrink: 1,
+      textAlign: "center",
       color: theme.colors.primaryText,
       fontWeight: "900"
     }

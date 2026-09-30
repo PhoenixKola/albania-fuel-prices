@@ -29,7 +29,7 @@ export default function SavedMarketsRail({ theme, t, markets, current, format, o
     return (
       <AnimatedPressable onPress={onAdd} contentStyle={s.empty} reduceMotion={theme.motion.reduced} accessibilityLabel={`${t.savedMarketsEmpty}. ${t.addMarket}`}>
         <Ionicons name="star-outline" size={18} color={p.accent} />
-        <Text style={s.emptyText} maxFontSizeMultiplier={1.4}>{t.savedMarketsEmpty}</Text>
+        <Text style={s.emptyText}>{t.savedMarketsEmpty}</Text>
         <Ionicons name="add" size={20} color={p.inkSoft} />
       </AnimatedPressable>
     );
@@ -37,7 +37,7 @@ export default function SavedMarketsRail({ theme, t, markets, current, format, o
 
   return (
     <View>
-      <Text style={s.kicker} accessibilityRole="header" maxFontSizeMultiplier={1.4}>{t.savedMarkets}</Text>
+      <Text style={s.kicker} accessibilityRole="header">{t.savedMarkets}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.bleed} contentContainerStyle={s.rail}>
         {markets.map((m) => {
           const active = m.country === current;
@@ -56,10 +56,10 @@ export default function SavedMarketsRail({ theme, t, markets, current, format, o
             >
               <View style={s.chipTop}>
                 <Text style={s.chipFlag}>{getFlagForCountry(m.country) || "•"}</Text>
-                <Text style={s.chipName} numberOfLines={1} maxFontSizeMultiplier={1.3}>{m.country}</Text>
+                <Text style={s.chipName} numberOfLines={theme.m.isLargeText ? undefined : 1}>{m.country}</Text>
               </View>
               <View style={s.chipBottom}>
-                <Text style={s.chipPrice} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                <Text style={s.chipPrice} numberOfLines={theme.m.isLargeText ? undefined : 1}>
                   {m.price == null ? "—" : format(m.price)}
                 </Text>
                 {m.price == null ? null : <Ionicons name={arrow} size={13} color={arrowColor} />}
@@ -91,7 +91,7 @@ const makeStyles = (theme: Theme, p: HomePalette) =>
     rail: { gap: 8, paddingHorizontal: theme.m.gutter },
     chip: {
       minWidth: 112,
-      maxWidth: 164,
+      maxWidth: theme.m.isLargeText ? 260 : 164,
       minHeight: 60,
       justifyContent: "center",
       gap: 4,

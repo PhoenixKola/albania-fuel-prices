@@ -18,6 +18,7 @@ type Props = {
  * that differ slide up into place, so switching Diesel → Petrol reads as the
  * board changing rather than the whole number blinking.
  */
+/** Defaults to a 1.2× ceiling for the hero numeral (already ~4× body size); pass 0 to lift it. */
 export default function PriceNumeral({ text, raised, size, color, unit, unitColor, reduceMotion, maxFontSizeMultiplier = 1.2 }: Props) {
   const roll = useRef(new Animated.Value(1)).current;
   const prevText = useRef(text);

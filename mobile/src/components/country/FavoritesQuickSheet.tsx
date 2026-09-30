@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Theme } from "../../theme/theme";
 import type { TDict } from "../../i18n";
 import { getFlagForCountry } from "../../utils/countryFlag";
@@ -27,6 +28,7 @@ export default function FavoritesQuickSheet({
   onClose,
 }: Props) {
   const s = useMemo(() => makeStyles(theme), [theme]);
+  const insets = useSafeAreaInsets();
 
   // Favorites excluding the current country (current always shown separately at top)
   const favList = useMemo(
@@ -46,8 +48,8 @@ export default function FavoritesQuickSheet({
           onClose();
         }}
       >
-        <Text style={s.rowFlag}>{getFlagForCountry(country) || "•"}</Text>
-        <Text style={s.rowName} numberOfLines={1}>{country}</Text>
+        <Text style={s.rowFlag} accessibilityElementsHidden importantForAccessibility="no">{getFlagForCountry(country) || "•"}</Text>
+        <Text style={s.rowName} numberOfLines={theme.m.isLargeText ? undefined : 1}>{country}</Text>
         {isCurrent ? (
           <View style={s.currentBadge}>
             <Text style={s.currentBadgeText}>{t.selected}</Text>
@@ -58,13 +60,13 @@ export default function FavoritesQuickSheet({
   }
 
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={s.overlay} onPress={onClose}>
-        <Pressable style={s.sheet} onPress={() => {}}>
+    <Modal visible={open} transparent animationType={theme.motion.reduced ? "none" : "slide"} statusBarTranslucent onRequestClose={onClose}>
+      <Pressable style={s.overlay} onPress={onClose} accessibilityLabel={t.close}>
+        <Pressable style={[s.sheet, { paddingBottom: theme.m.s(20) + insets.bottom }]} onPress={() => {}} accessibilityViewIsModal>
           <View style={s.handle} />
 
           <View style={s.headerRow}>
-            <Text style={s.title}>{t.quickSwitch}</Text>
+            <Text style={s.title} accessibilityRole="header">{t.quickSwitch}</Text>
             <Pressable onPress={onClose} style={s.closeBtn} accessibilityRole="button" accessibilityLabel={t.close}>
               <Text style={s.closeText}>{t.close}</Text>
             </Pressable>
@@ -116,7 +118,6 @@ const makeStyles = (theme: Theme) =>
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       padding: theme.m.s(16),
-      paddingBottom: theme.m.s(36),
       borderTopWidth: 1,
       borderColor: theme.colors.border,
       maxHeight: "70%",
@@ -133,14 +134,18 @@ const makeStyles = (theme: Theme) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+      gap: 12,
       marginBottom: theme.m.s(16),
     },
     title: {
+      flex: 1,
       fontSize: theme.m.f(16),
       fontWeight: "800",
       color: theme.colors.text,
     },
     closeBtn: {
+      minHeight: 48,
+      justifyContent: "center",
       paddingVertical: theme.m.s(6),
       paddingHorizontal: theme.m.s(12),
       borderRadius: 12,
@@ -176,6 +181,7 @@ const makeStyles = (theme: Theme) =>
       marginHorizontal: theme.m.s(12),
     },
     row: {
+      minHeight: 52,
       flexDirection: "row",
       alignItems: "center",
       paddingVertical: theme.m.s(13),
@@ -215,6 +221,7 @@ const makeStyles = (theme: Theme) =>
       paddingHorizontal: theme.m.s(8),
     },
     searchBtn: {
+      minHeight: 52,
       flexDirection: "row",
       alignItems: "center",
       gap: theme.m.s(8),

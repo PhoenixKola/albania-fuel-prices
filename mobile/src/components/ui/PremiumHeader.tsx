@@ -30,7 +30,13 @@ export default function PremiumHeader(props: {
 }
 
 const makeStyles = (theme: Theme) => StyleSheet.create({
-  header: { flexDirection: "row", alignItems: "center", gap: theme.m.s(12), paddingVertical: theme.m.s(4) },
+  // From 1.6× text the icon sits above the title and any action drops below, so the title keeps the full width.
+  header: {
+    flexDirection: theme.m.isXLText ? "column" : "row",
+    alignItems: theme.m.isXLText ? "flex-start" : "center",
+    gap: theme.m.s(12),
+    paddingVertical: theme.m.s(4),
+  },
   iconWrap: {
     width: 48,
     height: 48,
@@ -41,7 +47,7 @@ const makeStyles = (theme: Theme) => StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.name === "light" ? "rgba(15,118,110,0.14)" : "rgba(45,212,191,0.18)",
   },
-  copy: { flex: 1, minWidth: 0 },
+  copy: theme.m.isXLText ? { alignSelf: "stretch" } : { flex: 1, minWidth: 0 },
   eyebrow: { color: theme.colors.primary, fontSize: theme.m.f(10), fontWeight: "900", letterSpacing: 1.1, textTransform: "uppercase" },
   title: { marginTop: 2, color: theme.colors.text, fontSize: theme.m.f(24), lineHeight: theme.m.f(29), fontWeight: "900" },
   subtitle: { marginTop: 3, color: theme.colors.muted, fontSize: theme.m.f(12), lineHeight: theme.m.f(17), fontWeight: "700" },

@@ -40,7 +40,7 @@ export default function HomeActions({ theme, actions }: { theme: Theme; actions:
           accessibilityState={a.active ? { selected: true } : undefined}
         >
           <Ionicons name={a.icon} size={18} color={a.active ? p.accent : p.ink} />
-          <Text style={[s.label, tall ? s.labelTall : null, a.active ? s.labelActive : null]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} maxFontSizeMultiplier={1.5}>
+          <Text style={[s.label, tall ? s.labelTall : null, a.active ? s.labelActive : null]} numberOfLines={2}>
             {a.label}
           </Text>
         </AnimatedPressable>
@@ -70,6 +70,6 @@ const makeStyles = (theme: Theme, p: HomePalette) =>
     labelTall: { fontSize: theme.m.f(12) },
     buttonActive: { backgroundColor: p.accentSoft, borderColor: p.accent },
     disabled: { opacity: 0.45 },
-    label: { flexShrink: 1, color: p.ink, fontSize: theme.m.f(13), fontWeight: "800" },
+    label: { flexShrink: 1, color: p.ink, fontSize: theme.m.f(13), fontWeight: "800", textAlign: "center" },
     labelActive: { color: p.accent },
   });

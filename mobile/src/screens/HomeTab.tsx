@@ -100,12 +100,12 @@ export default function HomeTab() {
   const rewardChip = !ADS_ENABLED ? null : ctx.reward.unlocked ? (
     <View style={s.rewardChip} accessible accessibilityLabel={t.extrasActive(ctx.reward.minutesLeft)}>
       <Ionicons name="checkmark-circle" size={15} color={p.accent} />
-      <Text style={s.rewardText} numberOfLines={1} maxFontSizeMultiplier={1.3}>{t.extrasActive(ctx.reward.minutesLeft)}</Text>
+      <Text style={s.rewardText} numberOfLines={theme.m.isLargeText ? undefined : 1}>{t.extrasActive(ctx.reward.minutesLeft)}</Text>
     </View>
   ) : ctx.canAskReward ? (
     <AnimatedPressable onPress={() => ctx.openRewardModal()} contentStyle={s.rewardChip} reduceMotion={theme.motion.reduced} accessibilityLabel={t.unlockExtras}>
       <Ionicons name="gift-outline" size={15} color={p.accent} />
-      <Text style={s.rewardText} numberOfLines={1} maxFontSizeMultiplier={1.3}>{t.unlockExtras}</Text>
+      <Text style={s.rewardText} numberOfLines={theme.m.isLargeText ? undefined : 1}>{t.unlockExtras}</Text>
     </AnimatedPressable>
   ) : null;
 
@@ -133,7 +133,7 @@ export default function HomeTab() {
   ) : ctx.loading ? (
     <FuelDeckSkeleton theme={theme} label={t.loadingPrices} />
   ) : (
-    <ErrorCard theme={theme} title={t.couldntLoad} message={ctx.error || t.dataUnavailable} cta={t.tryAgain} onPress={ctx.refreshAll} />
+    <ErrorCard theme={theme} title={t.couldntLoad} message={t.dataUnavailable} cta={t.tryAgain} onPress={ctx.refreshAll} />
   );
 
   const primary = (
@@ -167,9 +167,9 @@ export default function HomeTab() {
         format={market.fmt}
       />
       <View style={s.sourceNote}>
-        <Text style={s.sourceText} maxFontSizeMultiplier={1.4}>{t.sourceIs(ctx.data.source)}</Text>
+        <Text style={s.sourceText}>{t.sourceIs(ctx.data.source)}</Text>
         {ctx.cacheSavedAtUtc ? (
-          <Text style={s.sourceText} maxFontSizeMultiplier={1.4}>{t.lastSyncAt(formatShortDate(ctx.cacheSavedAtUtc, t, true))}</Text>
+          <Text style={s.sourceText}>{t.lastSyncAt(formatShortDate(ctx.cacheSavedAtUtc, t, true))}</Text>
         ) : null}
       </View>
     </View>
@@ -187,6 +187,7 @@ export default function HomeTab() {
             <View style={s.brandMark}>
               <MaterialCommunityIcons name="gas-station" size={16} color={p.moduleText} />
             </View>
+            {/* Wordmark, not content: the header already exposes the full name to screen readers. */}
             <Text style={s.brandText} numberOfLines={1} maxFontSizeMultiplier={1.3}>Karburanti Sot</Text>
           </View>
           {rewardChip}
