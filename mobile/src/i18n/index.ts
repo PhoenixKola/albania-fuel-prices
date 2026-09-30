@@ -26,11 +26,8 @@ export type TDict = {
 
   stationsTitle: string;
   rankingsTitle: string;
-  rankingsSubtitle: (fuel: string) => string;
-  rankingsExpensiveTitle: string;
   rankingsExpensiveSubtitle: (fuel: string) => string;
   yourRank: (n: number) => string;
-  rankUnavailable: string;
 
   compareTitle: string;
   maxCompareReached: string;
@@ -89,11 +86,9 @@ export type TDict = {
   themeDark: string;
 
   trendStableWeek: string;
-  trendVsLastWeek: string;
 
   scopeEurope: string;
   scopeWorld: string;
-  rankingsCheapTitle: string;
   rankingsCheapSubtitle: (fuel: string) => string;
   rankingsFavoritesTitle: string;
   rankingsFavoritesSubtitle: (fuel: string) => string;
@@ -102,7 +97,6 @@ export type TDict = {
   yourRankInFavorites: (n: number) => string;
   notInFavoritesRank: string;
   addFavoritesToUseFavoritesRanking: string;
-  you: string;
   locked: string;
   unlocked: string;
 
@@ -139,7 +133,6 @@ export type TDict = {
   favorites: string;
   homeVerified: string;
   allFuelPrices: string;
-  homeEuropeAverage: string;
 
   // Compare sets, alerts and quick-switch labels
   best: string;
@@ -171,12 +164,7 @@ export type TDict = {
   trendHeldSteady: string;
   saveTwoCountries: string;
   compareLimitHint: (n: number) => string;
-  leaderboard: string;
-  cheapestMode: string;
-  expensiveMode: string;
-  yourPosition: string;
   manageFavorites: string;
-  toastCountrySelected: (country: string) => string;
   preferences: string;
   dataHealth: string;
   liveData: string;
@@ -324,6 +312,32 @@ export type TDict = {
   trendPeriodA11y: (days: number) => string;
   secondaryPriceA11y: (amount: string) => string;
   selectFuel: string;
+  // Rankings
+  yourMarket: string;
+  rankOfEurope: (total: number) => string;
+  rankOfFavorites: (total: number) => string;
+  notRanked: (fuel: string) => string;
+  notInFavorites: string;
+  addToFavorites: string;
+  removeFromFavorites: string;
+  vsCheapest: (amount: string, country: string) => string;
+  cheapestInScope: string;
+  jumpToPosition: string;
+  scopeLabel: string;
+  orderCheapestFirst: string;
+  orderExpensiveFirst: string;
+  orderSwitchHint: string;
+  orderLockedHint: string;
+  ladderEurope: string;
+  ladderFavorites: string;
+  marketsInScope: (count: number) => string;
+  rankRowA11y: (rank: number, total: number, country: string, price: string) => string;
+  setAsMyMarket: string;
+  addToCompare: string;
+  inCompare: string;
+  marketSet: (country: string) => string;
+  addedToCompare: (country: string) => string;
+  favoritesRankNote: string;
 };
 
 export const i18n: Record<Lang, TDict> = {
@@ -353,11 +367,8 @@ export const i18n: Record<Lang, TDict> = {
 
     stationsTitle: "Stations",
     rankingsTitle: "Rankings",
-    rankingsSubtitle: (fuel: string) => `Cheapest countries for ${fuel}`,
-    rankingsExpensiveTitle: "Most expensive",
     rankingsExpensiveSubtitle: (fuel: string) => `Most expensive countries for ${fuel}`,
     yourRank: (n: number) => `Your country rank: #${n}`,
-    rankUnavailable: "Rank unavailable (missing data).",
 
     compareTitle: "Compare",
     maxCompareReached: "You can compare up to 3 countries.",
@@ -416,11 +427,9 @@ export const i18n: Record<Lang, TDict> = {
     themeDark: "Dark",
 
     trendStableWeek: "Stable this week",
-    trendVsLastWeek: "vs last week",
 
     scopeEurope: "Europe",
     scopeWorld: "World",
-    rankingsCheapTitle: "Cheapest",
     rankingsCheapSubtitle: (fuel: string) => `Cheapest countries for ${fuel}`,
     rankingsFavoritesTitle: "Favorites ranking",
     rankingsFavoritesSubtitle: (fuel: string) => `Your favorites ranked by ${fuel}`,
@@ -429,7 +438,6 @@ export const i18n: Record<Lang, TDict> = {
     yourRankInFavorites: (n: number) => `Your favorites rank: #${n}`,
     notInFavoritesRank: "Your country is not in your favorites list.",
     addFavoritesToUseFavoritesRanking: "Add at least 2 favorites to use Favorites ranking.",
-    you: "You",
     locked: "Locked",
     unlocked: "Unlocked",
 
@@ -466,7 +474,6 @@ export const i18n: Record<Lang, TDict> = {
     favorites: "Favorites",
     homeVerified: "Verified",
     allFuelPrices: "All fuel prices",
-    homeEuropeAverage: "Europe average",
     best: "Best",
     setNamePlaceholder: "Name",
     save: "Save",
@@ -496,12 +503,7 @@ export const i18n: Record<Lang, TDict> = {
     trendHeldSteady: "Prices were broadly stable in this period.",
     saveTwoCountries: "Select at least two countries to save this set.",
     compareLimitHint: (n: number) => `Compare up to ${n} countries in this session.`,
-    leaderboard: "European leaderboard",
-    cheapestMode: "Cheapest",
-    expensiveMode: "Most expensive",
-    yourPosition: "Your position",
     manageFavorites: "Manage favorites",
-    toastCountrySelected: (country: string) => `${country} selected`,
     preferences: "Preferences",
     dataHealth: "Data health",
     liveData: "Live data",
@@ -653,6 +655,31 @@ export const i18n: Record<Lang, TDict> = {
     trendPeriodA11y: (days: number) => `Show last ${days} days`,
     secondaryPriceA11y: (amount: string) => `also ${amount}`,
     selectFuel: "Fuel type",
+    yourMarket: "Your market",
+    rankOfEurope: (total: number) => `of ${total} in Europe`,
+    rankOfFavorites: (total: number) => `of ${total} favorites`,
+    notRanked: (fuel: string) => `No ${fuel} price is reported here, so it has no rank.`,
+    notInFavorites: "Not in your favorites, so it isn’t ranked here.",
+    addToFavorites: "Add to favorites",
+    removeFromFavorites: "Remove from favorites",
+    vsCheapest: (amount: string, country: string) => `${amount} more than ${country}, the cheapest`,
+    cheapestInScope: "Cheapest in this ranking",
+    jumpToPosition: "Jump to my position",
+    scopeLabel: "Ranking scope",
+    orderCheapestFirst: "Cheapest first",
+    orderExpensiveFirst: "Most expensive first",
+    orderSwitchHint: "Reverses the order of the ladder",
+    orderLockedHint: "Most expensive first unlocks for 30 min with a short video.",
+    ladderEurope: "Europe ladder",
+    ladderFavorites: "Favorites ladder",
+    marketsInScope: (count: number) => `${count} ${count === 1 ? "market" : "markets"}`,
+    rankRowA11y: (rank: number, total: number, country: string, price: string) => `Rank ${rank} of ${total}, ${country}, ${price} per litre`,
+    setAsMyMarket: "Set as my market",
+    addToCompare: "Add to compare",
+    inCompare: "Already in compare",
+    marketSet: (country: string) => `${country} is now your market`,
+    addedToCompare: (country: string) => `${country} added to compare`,
+    favoritesRankNote: "Ranked only among your favorites, not all of Europe.",
   },
   sq: {
     title: "Karburanti Sot",
@@ -680,11 +707,8 @@ export const i18n: Record<Lang, TDict> = {
 
     stationsTitle: "Pikat",
     rankingsTitle: "Renditja",
-    rankingsSubtitle: (fuel: string) => `Shtetet më të lira për ${fuel}`,
-    rankingsExpensiveTitle: "Më të shtrenjtët",
     rankingsExpensiveSubtitle: (fuel: string) => `Shtetet më të shtrenjta për ${fuel}`,
     yourRank: (n: number) => `Renditja e shtetit: #${n}`,
-    rankUnavailable: "Renditja s’është e mundur (mungojnë të dhënat).",
 
     compareTitle: "Krahaso",
     maxCompareReached: "Mund të krahasosh deri në 3 shtete.",
@@ -743,11 +767,9 @@ export const i18n: Record<Lang, TDict> = {
     themeDark: "E errët",
 
     trendStableWeek: "Stabil këtë javë",
-    trendVsLastWeek: "krahasuar me javën e kaluar",
 
     scopeEurope: "Europa",
     scopeWorld: "Bota",
-    rankingsCheapTitle: "Më të lirat",
     rankingsCheapSubtitle: (fuel: string) => `Shtetet më të lira për ${fuel}`,
     rankingsFavoritesTitle: "Renditja e të preferuarave",
     rankingsFavoritesSubtitle: (fuel: string) => `Të preferuarat sipas ${fuel}`,
@@ -756,7 +778,6 @@ export const i18n: Record<Lang, TDict> = {
     yourRankInFavorites: (n: number) => `Renditja në të preferuarat: #${n}`,
     notInFavoritesRank: "Shteti juaj nuk është në listën e të preferuarave.",
     addFavoritesToUseFavoritesRanking: "Shto të paktën 2 të preferuara për këtë renditje.",
-    you: "Ju",
     locked: "E kyçur",
     unlocked: "E zhbllokuar",
 
@@ -793,7 +814,6 @@ export const i18n: Record<Lang, TDict> = {
     favorites: "Të preferuarat",
     homeVerified: "Verifikuar",
     allFuelPrices: "Të gjitha çmimet",
-    homeEuropeAverage: "Mesatarja evropiane",
     best: "Më i miri",
     setNamePlaceholder: "Emri",
     save: "Ruaj",
@@ -823,12 +843,7 @@ export const i18n: Record<Lang, TDict> = {
     trendHeldSteady: "Çmimet mbetën përgjithësisht të qëndrueshme.",
     saveTwoCountries: "Zgjidh të paktën dy shtete për ta ruajtur grupin.",
     compareLimitHint: (n: number) => `Krahaso deri në ${n} shtete në këtë sesion.`,
-    leaderboard: "Renditja evropiane",
-    cheapestMode: "Më të lirat",
-    expensiveMode: "Më të shtrenjtat",
-    yourPosition: "Pozicioni yt",
     manageFavorites: "Menaxho të preferuarat",
-    toastCountrySelected: (country: string) => `${country} u zgjodh`,
     preferences: "Preferencat",
     dataHealth: "Gjendja e të dhënave",
     liveData: "Të dhëna live",
@@ -977,5 +992,30 @@ export const i18n: Record<Lang, TDict> = {
     trendPeriodA11y: (days: number) => `Shfaq ${days} ditët e fundit`,
     secondaryPriceA11y: (amount: string) => `gjithashtu ${amount}`,
     selectFuel: "Lloji i karburantit",
+    yourMarket: "Tregu yt",
+    rankOfEurope: (total: number) => `nga ${total} në Europë`,
+    rankOfFavorites: (total: number) => `nga ${total} të preferuarat`,
+    notRanked: (fuel: string) => `Këtu nuk raportohet çmim për ${fuel}, ndaj s’ka renditje.`,
+    notInFavorites: "Nuk është te të preferuarat, ndaj nuk renditet këtu.",
+    addToFavorites: "Shto te të preferuarat",
+    removeFromFavorites: "Hiq nga të preferuarat",
+    vsCheapest: (amount: string, country: string) => `${amount} më shumë se ${country}, më i liri`,
+    cheapestInScope: "Më i liri në këtë renditje",
+    jumpToPosition: "Shko te pozicioni im",
+    scopeLabel: "Fusha e renditjes",
+    orderCheapestFirst: "Më të lirat së pari",
+    orderExpensiveFirst: "Më të shtrenjtat së pari",
+    orderSwitchHint: "Kthen renditjen e shkallës",
+    orderLockedHint: "“Më të shtrenjtat së pari” zhbllokohet për 30 min me një video të shkurtër.",
+    ladderEurope: "Shkalla e Europës",
+    ladderFavorites: "Shkalla e të preferuarave",
+    marketsInScope: (count: number) => `${count} ${count === 1 ? "treg" : "tregje"}`,
+    rankRowA11y: (rank: number, total: number, country: string, price: string) => `Vendi ${rank} nga ${total}, ${country}, ${price} për litër`,
+    setAsMyMarket: "Vendose si tregun tim",
+    addToCompare: "Shto te krahasimi",
+    inCompare: "Është tashmë në krahasim",
+    marketSet: (country: string) => `${country} është tani tregu yt`,
+    addedToCompare: (country: string) => `${country} u shtua te krahasimi`,
+    favoritesRankNote: "Renditur vetëm mes të preferuarave, jo në gjithë Europën.",
   },
 };
