@@ -33,6 +33,11 @@ export function homePalette(theme: Theme) {
       spark: "#0F766E",
       sparkFill: "rgba(15,118,110,0.10)",
       warn: "#B45309",
+      journeySurface: "#E9E1D4",
+      journeySurfaceBorder: "rgba(16,32,51,0.18)",
+      journeyRoad: "#233545",
+      journeyLane: "rgba(255,252,246,0.72)",
+      journeyAmber: "#B45309",
       shadow: 0.08,
     };
   }
@@ -63,6 +68,11 @@ export function homePalette(theme: Theme) {
     spark: "#2DD4BF",
     sparkFill: "rgba(45,212,191,0.12)",
     warn: "#FCD34D",
+    journeySurface: "#091724",
+    journeySurfaceBorder: "rgba(226,232,240,0.14)",
+    journeyRoad: "#172C3D",
+    journeyLane: "rgba(244,239,230,0.54)",
+    journeyAmber: "#FBBF24",
     shadow: 0,
   };
 }

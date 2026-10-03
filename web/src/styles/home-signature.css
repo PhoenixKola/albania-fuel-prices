@@ -1,40 +1,23 @@
-/* Batch 2 signature experience: roadside price board + connected fuel pulse. */
+/* Signature hero: "the fuel becomes the journey". A nozzle's fuel pulse runs
+   down a channel that flattens into the road, passes real markets and resolves
+   into the roadside price board. Depth comes from the scene, not decoration. */
 .homeJourneyHero {
   position: relative;
   width: 100vw;
   min-width: 0;
-  min-height: min(720px, calc(100svh - 104px));
+  min-height: min(740px, calc(100svh - 104px));
   margin: -22px calc(50% - 50vw) 0;
-  padding: clamp(56px, 6.5vw, 92px) max(18px, calc((100vw - var(--container)) / 2 + 18px)) clamp(72px, 7vw, 98px);
+  padding: clamp(56px, 6.5vw, 92px) max(18px, calc((100vw - var(--container)) / 2 + 18px)) clamp(80px, 8vw, 116px);
   overflow: hidden;
   color: #f5f1e8;
   border-bottom: 1px solid rgba(119, 236, 190, 0.15);
   background: #07110f;
 }
 
-.homeJourneyHero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  background:
-    linear-gradient(112deg, transparent 0 55%, rgba(96, 239, 189, 0.035) 55.1% 55.35%, transparent 55.45% 100%),
-    repeating-radial-gradient(ellipse at 80% 68%, transparent 0 34px, rgba(126, 234, 193, 0.045) 35px 36px, transparent 37px 65px);
-  mask-image: linear-gradient(90deg, transparent 24%, #000 62%);
-}
-
 :root[data-theme="light"] .homeJourneyHero {
   color: #10231d;
   border-bottom-color: rgba(8, 91, 65, 0.16);
   background: #f2f0e8;
-}
-
-:root[data-theme="light"] .homeJourneyHero::before {
-  opacity: 0.62;
-  background:
-    linear-gradient(112deg, transparent 0 55%, rgba(6, 110, 77, 0.055) 55.1% 55.35%, transparent 55.45% 100%),
-    repeating-radial-gradient(ellipse at 80% 68%, transparent 0 34px, rgba(7, 104, 74, 0.055) 35px 36px, transparent 37px 65px);
 }
 
 .homeJourneyGrid {
@@ -44,15 +27,104 @@
   min-height: 540px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(500px, 1.12fr);
+  grid-template-columns: minmax(0, 0.88fr) minmax(480px, 1.12fr);
   align-items: center;
   gap: clamp(42px, 6vw, 92px);
 }
 
 .homeHeroCopy {
+  position: relative;
+  z-index: 2;
   min-width: 0;
   animation: home-road-copy-in 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+
+/* Stage: the route scene sits behind the board and bleeds into the gutter,
+   so the road visibly runs into the board it becomes. */
+.homeHeroStage {
+  position: relative;
+  min-width: 0;
+}
+
+.homeHeroScene {
+  position: absolute;
+  z-index: 0;
+  inset: -16% -14% -30% -40%;
+  pointer-events: none;
+}
+
+/* Desktop: a slightly narrower board leaves room for the spout and the road's approach. */
+@media (min-width: 1025px) {
+  .homeJourneyHero .homeRoadBoard { max-width: 540px; margin-left: auto; }
+}
+
+.homeHeroCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.homeJourneyHero.is-scene-ready .homeHeroCanvas { opacity: 1; }
+
+.homeHeroFallback {
+  position: absolute;
+  inset: 0;
+  transition: opacity 420ms ease;
+}
+
+.homeJourneyHero.is-scene-ready .homeHeroFallback { opacity: 0; }
+
+.homeHeroFallbackRoad { fill: #141d1c; }
+.homeHeroFallbackCentre { fill: none; stroke: #5ff2bd; stroke-width: 2; stroke-dasharray: 10 12; opacity: 0.7; }
+.homeHeroFallbackChannel { fill: none; stroke: #1d2826; stroke-width: 9; stroke-linecap: round; }
+.homeHeroFallbackNozzle rect, .homeHeroFallbackNozzle path { fill: #2b3634; }
+.homeHeroFallbackPulse { fill: #ffb84d; }
+.homeHeroFallbackSign rect { fill: #0f2620; stroke: #4fe3ad; stroke-width: 2; }
+.homeHeroFallbackSign line { stroke: #46524e; stroke-width: 3; }
+.homeHeroFallbackSign text { fill: #f5f1e8; font-size: 14px; font-weight: 800; }
+.homeHeroFallbackSign .homeHeroFallbackPrice { fill: #4fe3ad; font-size: 12px; font-weight: 700; }
+:root[data-theme="light"] .homeHeroFallbackRoad { fill: #c4c1b7; }
+:root[data-theme="light"] .homeHeroFallbackCentre { stroke: #0b7a56; }
+:root[data-theme="light"] .homeHeroFallbackChannel { stroke: #2b3a35; }
+:root[data-theme="light"] .homeHeroFallbackNozzle rect, :root[data-theme="light"] .homeHeroFallbackNozzle path { fill: #3a4744; }
+:root[data-theme="light"] .homeHeroFallbackSign rect { fill: #fbfaf4; stroke: #0a7a56; }
+:root[data-theme="light"] .homeHeroFallbackSign text { fill: #10231d; }
+:root[data-theme="light"] .homeHeroFallbackSign .homeHeroFallbackPrice { fill: #0a7a56; }
+
+/* Handoff: until the destination marker rises, the board waits at the marker's
+   position, collapsed, then grows out of it. Rows settle in sequence. */
+.homeJourneyHero .homeRoadBoard {
+  transform-origin: 50% 50%;
+  transition: opacity 360ms ease, transform 680ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.homeJourneyHero.is-cinematic:is([data-stage="boot"], [data-stage="source"], [data-stage="road"], [data-stage="markets"]) .homeRoadBoard {
+  opacity: 0;
+  transform: translate(var(--handoff-x, 0px), var(--handoff-y, 0px)) scale(0.14);
+  transition: none;
+  pointer-events: none;
+}
+
+.homeJourneyHero.is-cinematic .homeRoadBoard > * {
+  transition: opacity 320ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.homeJourneyHero.is-cinematic:is([data-stage="boot"], [data-stage="source"], [data-stage="road"], [data-stage="markets"]) .homeRoadBoard > * {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: none;
+}
+
+.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(2) { transition-delay: 90ms; }
+.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(3) { transition-delay: 170ms; }
+.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(4) { transition-delay: 250ms; }
+.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(5) { transition-delay: 330ms; }
+
+/* A market or fuel change resolves the values in place, without replaying the intro. */
+.homeBoardResolve { animation: home-value-resolve 380ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 .homeEyebrow {
   display: inline-flex;
@@ -166,6 +238,7 @@
 
 .homeRoadBoard {
   position: relative;
+  z-index: 1;
   min-width: 0;
   padding: 25px 26px 22px;
   border: 2px solid rgba(160, 235, 207, 0.28);
@@ -173,7 +246,6 @@
   color: #f4f2e9;
   background: #102720;
   box-shadow: 0 34px 80px rgba(0, 0, 0, 0.33), inset 0 0 0 5px rgba(5, 13, 11, 0.32);
-  animation: home-road-board-in 720ms 90ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .homeRoadBoard::after {
   content: "";
@@ -190,27 +262,6 @@
   box-shadow: 0 30px 62px rgba(34, 62, 52, 0.16), inset 0 0 0 5px rgba(255, 255, 255, 0.48);
 }
 :root[data-theme="light"] .homeRoadBoard::after { border-color: rgba(7, 91, 66, 0.12); }
-
-.homeRoadBoardRoute {
-  position: absolute;
-  top: -34px;
-  left: 28px;
-  right: 28px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: rgba(223, 241, 232, 0.52);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.homeRoadBoardRoute span { width: 25px; height: 25px; display: grid; place-items: center; border: 1px solid rgba(99, 237, 184, 0.38); border-radius: 50%; color: #70edbd; }
-.homeRoadBoardRoute i { height: 1px; flex: 1; overflow: hidden; background: rgba(116, 229, 187, 0.22); }
-.homeRoadBoardRoute i::after { content: ""; display: block; width: 28%; height: 1px; background: #6ceab9; animation: home-route-draw 900ms 400ms ease both; }
-.homeRoadBoardRoute small { font: inherit; }
-:root[data-theme="light"] .homeRoadBoardRoute { color: rgba(8, 76, 56, 0.58); }
 
 .homeRoadBoardHeader {
   position: relative;
@@ -307,12 +358,6 @@
 :root[data-theme="light"] .homeBoardProvenance b { color: #173b30; }
 :root[data-theme="light"] .homeBoardProvenance a { color: #086c4d; }
 
-.homeRouteTrace { position: absolute; left: 0; right: 0; bottom: 25px; height: 16px; display: flex; align-items: center; gap: 0; opacity: 0.55; }
-.homeRouteTrace::before, .homeRouteTrace::after { content: ""; height: 1px; flex: 1; background: rgba(101, 233, 184, 0.17); }
-.homeRouteTrace i { width: 7px; height: 7px; margin-inline: clamp(40px, 10vw, 170px); border: 1px solid rgba(109, 239, 190, 0.46); border-radius: 50%; background: #07110f; }
-:root[data-theme="light"] .homeRouteTrace::before, :root[data-theme="light"] .homeRouteTrace::after { background: rgba(7, 104, 74, 0.18); }
-:root[data-theme="light"] .homeRouteTrace i { background: #f2f0e8; }
-
 /* Fuel pulse: one connected instrument rather than separate price and trend cards. */
 .homeFuelPulse { position: relative; scroll-margin-top: 110px; }
 .homePulseIntro { margin-bottom: 30px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.7fr); align-items: end; gap: 40px; }
@@ -377,21 +422,29 @@
 .homePulseFooter a { color: var(--home-emerald); text-decoration: underline; text-underline-offset: 3px; }
 
 @keyframes home-road-copy-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes home-road-board-in { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes home-route-draw { from { width: 0; } to { width: 28%; } }
+@keyframes home-value-resolve { from { opacity: 0.25; transform: translateY(5px); filter: blur(2px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
 
 @media (max-width: 1080px) {
-  .homeJourneyGrid { grid-template-columns: minmax(0, 0.82fr) minmax(450px, 1.18fr); gap: 34px; }
-  .homeHeroTitle { font-size: clamp(49px, 7vw, 72px); }
   .homePulseBody { grid-template-columns: minmax(300px, 0.68fr) minmax(0, 1.32fr); }
   .homePulsePriceRow { padding-inline: 18px; }
 }
 
-@media (max-width: 820px) {
-  .homeJourneyHero { min-height: auto; padding-top: 68px; }
-  .homeJourneyGrid { grid-template-columns: minmax(0, 1fr); gap: 76px; }
+/* Tablet and below: copy, then a shortened route band, then the full board. */
+@media (max-width: 1024px) {
+  .homeJourneyHero { min-height: auto; padding-top: 64px; padding-bottom: 64px; }
+  .homeJourneyGrid { grid-template-columns: minmax(0, 1fr); gap: 10px; min-height: 0; }
   .homeHeroCopy { max-width: 700px; }
-  .homeRoadBoard { width: min(100%, 650px); margin: 0 auto; }
+  .homeHeroStage { width: min(100%, 680px); margin: 0 auto; }
+  .homeHeroScene {
+    position: relative;
+    inset: auto;
+    height: clamp(190px, 30vw, 260px);
+    margin: 0 calc(-1 * max(18px, (100vw - min(100vw, 680px)) / 2));
+  }
+  .homeRoadBoard { margin-top: -18px; }
+}
+
+@media (max-width: 820px) {
   .homePulseIntro { grid-template-columns: 1fr; gap: 16px; }
   .homePulseToolbar { align-items: flex-end; }
   .homePulseControls { flex-wrap: wrap; justify-content: flex-end; }
@@ -403,9 +456,10 @@
 }
 
 @media (max-width: 620px) {
-  .homeJourneyHero { width: 100vw; max-width: 100vw; margin-top: -16px; padding: 48px 16px 64px; }
-  .homeJourneyHero::before { mask-image: none; opacity: 0.28; }
-  .homeJourneyGrid { gap: 67px; }
+  .homeJourneyHero { width: 100vw; max-width: 100vw; margin-top: -16px; padding: 48px 16px 56px; }
+  .homeJourneyGrid { gap: 6px; }
+  .homeHeroScene { height: 168px; margin: 0 -16px; }
+  .homeRoadBoard { margin-top: -14px; }
   .homeHeroEyebrow { margin-bottom: 17px; font-size: 9px; }
   .homeHeroTitle { max-width: 540px; font-size: clamp(43px, 13.5vw, 58px); line-height: 0.96; }
   .homeHeroText { margin-top: 20px; font-size: 15px; line-height: 1.62; }
@@ -414,7 +468,6 @@
   .homeHeroQuickLinks { gap: 9px 15px; }
   .homeHeroScope { margin-top: 22px; }
   .homeRoadBoard { padding: 20px 17px 17px; }
-  .homeRoadBoardRoute { left: 18px; right: 18px; }
   .homeRoadBoardHeader { gap: 12px; }
   .homeRoadBoardHeader strong { font-size: 27px; }
   .homeFreshnessBadge { max-width: 126px; }
@@ -426,7 +479,6 @@
   .homeBoardSignals div:first-child { border-top: 0; }
   .homeBoardSignals dd { margin-top: 0; }
   .homeBoardProvenance { display: grid; gap: 5px; }
-  .homeRouteTrace { display: none; }
   .homePulseIntro h2 { font-size: clamp(36px, 11vw, 47px); }
   .homePulseShell { margin-inline: -2px; border-radius: 8px; }
   .homePulseToolbar { align-items: stretch; flex-direction: column; padding: 20px 16px; }
@@ -466,6 +518,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .homeHeroCopy, .homeRoadBoard, .homeRoadBoardRoute i::after, .navRefreshButton.is-refreshing svg { animation: none; }
-  .homeButton, .homeBoardPrice, .homePulsePriceRow { transition: none; }
+  .homeHeroCopy, .homeRoadBoard, .homeBoardResolve, .navRefreshButton.is-refreshing svg { animation: none; }
+  .homeButton, .homeBoardPrice, .homePulsePriceRow, .homeJourneyHero .homeRoadBoard, .homeJourneyHero .homeRoadBoard > *, .homeHeroCanvas, .homeHeroFallback { transition: none; }
 }

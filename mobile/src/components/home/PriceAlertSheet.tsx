@@ -18,7 +18,7 @@ type Props = {
   subtitle: string;
   currentEur: number | null;
   rule: PriceAlertRule | null;
-  onSave: (direction: Direction, targetEur: number) => void;
+  onSave: (direction: Direction, targetEur: number) => boolean | Promise<boolean>;
   onRemove: () => void;
   onClose: () => void;
 };
@@ -28,22 +28,27 @@ export default function PriceAlertSheet({ theme, t, open, subtitle, currentEur, 
   const [direction, setDirection] = useState<Direction>("below");
   const [target, setTarget] = useState("");
   const [invalid, setInvalid] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setDirection(rule?.direction ?? "below");
     setTarget((rule?.targetEur ?? currentEur ?? 0).toFixed(3));
     setInvalid(false);
+    setSaving(false);
   }, [open, rule, currentEur]);
 
-  const save = () => {
+  const save = async () => {
     const value = Number(target.replace(",", "."));
     if (!Number.isFinite(value) || value <= 0) {
       setInvalid(true);
       return;
     }
-    hapticSuccess();
-    onSave(direction, value);
+    if (saving) return;
+    setSaving(true);
+    const saved = await onSave(direction, value);
+    if (saved) hapticSuccess();
+    else setSaving(false);
   };
 
   const footer = (
@@ -53,7 +58,7 @@ export default function PriceAlertSheet({ theme, t, open, subtitle, currentEur, 
           <Text style={s.ghostText}>{t.remove}</Text>
         </AnimatedPressable>
       ) : null}
-      <AnimatedPressable onPress={save} style={s.actionItem} contentStyle={s.primary} reduceMotion={theme.motion.reduced} accessibilityLabel={t.saveAlert}>
+      <AnimatedPressable onPress={save} disabled={saving} style={s.actionItem} contentStyle={[s.primary, saving ? s.disabled : null]} reduceMotion={theme.motion.reduced} accessibilityLabel={t.saveAlert}>
         <Ionicons name="notifications" size={17} color={onPrimary(theme)} />
         <Text style={s.primaryText}>{t.saveAlert}</Text>
       </AnimatedPressable>
@@ -176,4 +181,5 @@ const makeStyles = (theme: Theme) =>
     ghostText: { color: theme.colors.text, fontSize: theme.m.f(14), fontWeight: "800" },
     primary: { minHeight: 50, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, backgroundColor: theme.colors.primary },
     primaryText: { flexShrink: 1, color: onPrimary(theme), fontSize: theme.m.f(14), fontWeight: "900", textAlign: "center" },
+    disabled: { opacity: 0.58 },
   });

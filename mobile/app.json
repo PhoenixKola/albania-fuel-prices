@@ -40,7 +40,9 @@
           "iosAppId": "ca-app-pub-3940256099942544~1458002511"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-notifications",
+      "expo-background-task"
     ],
     "extra": {
       "eas": {

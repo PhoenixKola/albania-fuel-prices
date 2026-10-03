@@ -19,3 +19,5 @@ export const STORAGE_REWARD_UNTIL_UTC = "rewardUnlockUntilUtc";
 export const STORAGE_RATE_EVENTS_KEY = "rate_prompt_events_v1";
 export const STORAGE_RATE_COOLDOWN_UNTIL_KEY = "rate_prompt_cooldown_until_utc_ms_v1";
 export const STORAGE_RATE_DONE_KEY = "rate_prompt_done_v1";
+
+export const STORAGE_PRICE_ALERTS_KEY = "price_alert_rules_v1";

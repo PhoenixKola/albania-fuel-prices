@@ -186,6 +186,8 @@ export type TDict = {
   linkUnavailable: string;
   dataUnavailable: string;
   // Home fuel deck
+  journeyLiveRoute: string;
+  journeyYourMarket: string;
   monthsShort: string[];
   ordinalCheapest: (rank: number, total: number) => string;
   changeCountryA11y: (country: string) => string;
@@ -217,6 +219,7 @@ export type TDict = {
   alertTargetLabel: string;
   alertNow: (amount: string) => string;
   alertInvalid: string;
+  alertPermissionDenied: string;
   shareAction: string;
   shareMessage: (fuel: string, country: string, price: string, date: string) => string;
   compareAction: string;
@@ -536,6 +539,8 @@ export const i18n: Record<Lang, TDict> = {
     stationsTimeoutCached: "The station service timed out. Cached results are shown.",
     linkUnavailable: "This link is unavailable right now.",
     dataUnavailable: "Data unavailable",
+    journeyLiveRoute: "Fuel route",
+    journeyYourMarket: "Your market",
     monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     ordinalCheapest: (rank: number, total: number) => {
       const mod100 = rank % 100;
@@ -572,6 +577,7 @@ export const i18n: Record<Lang, TDict> = {
     alertTargetLabel: "Target price, EUR per litre",
     alertNow: (amount: string) => `Now ${amount}`,
     alertInvalid: "Enter a price above zero.",
+    alertPermissionDenied: "Notifications are off. Enable them in your phone settings to use price alerts.",
     shareAction: "Share",
     shareMessage: (fuel: string, country: string, price: string, date: string) => `${fuel} in ${country}: ${price}\nPrices of ${date}`,
     compareAction: "Compare",
@@ -889,6 +895,8 @@ export const i18n: Record<Lang, TDict> = {
     stationsTimeoutCached: "Shërbimi i pikave nuk u përgjigj në kohë. Po shfaqen rezultatet e ruajtura.",
     linkUnavailable: "Kjo lidhje nuk është e disponueshme tani.",
     dataUnavailable: "Të dhënat nuk disponohen",
+    journeyLiveRoute: "Rruga e karburantit",
+    journeyYourMarket: "Tregu yt",
     monthsShort: ["jan", "shk", "mar", "pri", "maj", "qer", "korr", "gush", "sht", "tet", "nën", "dhj"],
     ordinalCheapest: (rank: number, total: number) => `Vendi ${rank} nga ${total} për çmim më të lirë`,
     changeCountryA11y: (country: string) => `${country}, ndrysho shtetin`,
@@ -920,6 +928,7 @@ export const i18n: Record<Lang, TDict> = {
     alertTargetLabel: "Çmimi i synuar, EUR për litër",
     alertNow: (amount: string) => `Tani ${amount}`,
     alertInvalid: "Shkruaj një çmim mbi zero.",
+    alertPermissionDenied: "Njoftimet janë çaktivizuar. Aktivizoji te cilësimet e telefonit për alarmet e çmimeve.",
     shareAction: "Shpërndaj",
     shareMessage: (fuel: string, country: string, price: string, date: string) => `${fuel} në ${country}: ${price}\nÇmimet e ${date}`,
     compareAction: "Krahaso",

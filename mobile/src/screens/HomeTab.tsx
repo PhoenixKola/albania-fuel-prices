@@ -12,6 +12,7 @@ import FavoritesQuickSheet from "../components/country/FavoritesQuickSheet";
 import ErrorCard from "../components/feedback/ErrorCard";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
 import FuelDeck, { FuelDeckSkeleton } from "../components/home/FuelDeck";
+import FuelJourneyIntro from "../components/home/FuelJourneyIntro";
 import HomeActions, { type HomeAction } from "../components/home/HomeActions";
 import SavedMarketsRail from "../components/home/SavedMarketsRail";
 import MarketPulse from "../components/home/MarketPulse";
@@ -193,6 +194,17 @@ export default function HomeTab() {
           {rewardChip}
         </View>
 
+        <FuelJourneyIntro
+          theme={theme}
+          t={t}
+          country={ctx.country}
+          flag={flag}
+          fuelType={ctx.fuelType}
+          fuelName={fuelName}
+          priceText={current == null ? t.notReported : `${market.fmt(current)}/L`}
+          loading={ctx.loading && !ctx.data}
+        />
+
         {isTwoColumnHome(theme) ? (
           <View style={s.columns}>
             <View style={s.columnSlot}>{primary}</View>
@@ -250,9 +262,11 @@ export default function HomeTab() {
         subtitle={`${ctx.country} · ${fuelName}`}
         currentEur={current}
         rule={alertRule}
-        onSave={(direction, target) => {
-          ctx.priceAlerts.upsertRule(ctx.country, ctx.fuelType, direction, target);
-          setAlertOpen(false);
+        onSave={async (direction, target) => {
+          const saved = await ctx.priceAlerts.upsertRule(ctx.country, ctx.fuelType, direction, target);
+          if (saved) setAlertOpen(false);
+          else ctx.showToast(t.alertPermissionDenied, 3200);
+          return saved;
         }}
         onRemove={() => {
           if (alertRule) ctx.priceAlerts.removeRule(alertRule.id);
