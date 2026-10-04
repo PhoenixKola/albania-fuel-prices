@@ -1,241 +1,175 @@
-/* Signature hero: "the fuel becomes the journey". A nozzle's fuel pulse runs
-   down a channel that flattens into the road, passes real markets and resolves
-   into the roadside price board. Depth comes from the scene, not decoration. */
+/* Signature hero: fuel becomes the road, and the road resolves into live market data. */
 .homeJourneyHero {
   position: relative;
   width: 100vw;
   min-width: 0;
-  min-height: min(740px, calc(100svh - 104px));
-  margin: -22px calc(50% - 50vw) 0;
-  padding: clamp(56px, 6.5vw, 92px) max(18px, calc((100vw - var(--container)) / 2 + 18px)) clamp(80px, 8vw, 116px);
+  min-height: min(820px, calc(100svh - 76px));
+  margin: -8px calc(50% - 50vw) 0;
+  padding: clamp(62px, 7vw, 104px) max(18px, calc((100vw - var(--container)) / 2 + 18px)) clamp(82px, 8vw, 118px);
   overflow: hidden;
-  color: #f5f1e8;
-  border-bottom: 1px solid rgba(119, 236, 190, 0.15);
+  isolation: isolate;
+  color: #f7f5ed;
+  border-bottom: 1px solid rgba(119, 236, 190, 0.16);
   background: #07110f;
 }
-
 :root[data-theme="light"] .homeJourneyHero {
   color: #10231d;
   border-bottom-color: rgba(8, 91, 65, 0.16);
-  background: #f2f0e8;
+  background: #ecefe9;
 }
+
+.homeHeroArt { position: absolute; z-index: -2; inset: 0; overflow: hidden; }
+.homeHeroArt::before,
+.homeHeroArt::after { content: ""; position: absolute; z-index: 1; inset: 0; pointer-events: none; }
+.homeHeroArt::before {
+  background:
+    linear-gradient(90deg, rgba(3, 10, 8, 0.94) 0%, rgba(3, 10, 8, 0.76) 30%, rgba(3, 10, 8, 0.16) 60%, rgba(3, 10, 8, 0.48) 100%),
+    linear-gradient(180deg, rgba(3, 10, 8, 0.26), rgba(3, 10, 8, 0.08) 52%, rgba(3, 10, 8, 0.82));
+}
+.homeHeroArt::after {
+  opacity: 0.3;
+  background-image: linear-gradient(rgba(117, 242, 193, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(117, 242, 193, 0.06) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to right, #000, transparent 48%);
+}
+:root[data-theme="light"] .homeHeroArt::before {
+  background:
+    linear-gradient(90deg, rgba(247, 247, 241, 0.96) 0%, rgba(247, 247, 241, 0.82) 31%, rgba(247, 247, 241, 0.08) 61%, rgba(236, 239, 233, 0.36) 100%),
+    linear-gradient(180deg, rgba(247, 247, 241, 0.16), transparent 50%, rgba(236, 239, 233, 0.9));
+}
+:root[data-theme="light"] .homeHeroArt::after { opacity: 0.2; background-image: linear-gradient(rgba(5, 92, 65, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(5, 92, 65, 0.08) 1px, transparent 1px); }
+.homeHeroArtImage,
+.homeHeroNozzleLayer img,
+.homeHeroRoadLayer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 51% 50%;
+  filter: saturate(0.9) contrast(1.04);
+}
+:root[data-theme="light"] :is(.homeHeroArtImage, .homeHeroNozzleLayer img, .homeHeroRoadLayer img) { filter: saturate(0.78) contrast(0.98); }
+
+.homeHeroNozzleLayer,
+.homeHeroRoadLayer {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.homeHeroNozzleLayer { clip-path: polygon(0 0, 58% 0, 53% 62%, 0 72%); }
+:root[data-theme="light"] .homeHeroNozzleLayer { clip-path: polygon(52% 0, 100% 0, 100% 44%, 55% 62%); }
+.homeHeroRoadLayer { clip-path: polygon(46% 56%, 57% 52%, 57% 58%, 45% 66%); }
+
+.homeHeroFuelTrail {
+  --fuel-x: 44vw;
+  --fuel-y: 37%;
+  --fuel-dx: 18vw;
+  --fuel-dy: 35vh;
+  position: absolute;
+  z-index: 2;
+  left: var(--fuel-x);
+  top: var(--fuel-y);
+  width: min(31vw, 470px);
+  height: 5px;
+  border-radius: 99px;
+  opacity: 0;
+  transform: rotate(50deg) scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(255, 196, 98, 0.15), rgba(105, 245, 190, 0.86) 52%, rgba(255, 199, 110, 0.92));
+  box-shadow: 0 0 18px rgba(88, 238, 181, 0.28);
+}
+:root[data-theme="light"] .homeHeroFuelTrail {
+  --fuel-x: 57vw;
+  --fuel-y: 34%;
+  --fuel-dx: -10vw;
+  --fuel-dy: 39vh;
+  transform: rotate(116deg) scaleX(0);
+  background: linear-gradient(90deg, rgba(173, 112, 34, 0.12), rgba(8, 123, 88, 0.7) 55%, rgba(177, 103, 17, 0.82));
+}
+.homeHeroFuelTrail i {
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  border: 1px solid rgba(255, 232, 188, 0.72);
+  border-radius: 50% 58% 48% 62%;
+  transform: translateY(-50%) rotate(35deg);
+  background: radial-gradient(circle at 35% 28%, #fff8d9, #f2b453 38%, #4ee3ad 76%);
+  box-shadow: 0 0 18px rgba(92, 241, 184, 0.52);
+}
+
+.homeJourneyHero.is-intro-running .homeHeroArtImage { animation: home-atmosphere-open 2050ms cubic-bezier(0.2, 0.75, 0.2, 1) both; }
+.homeJourneyHero.is-intro-running .homeHeroNozzleLayer { animation: home-nozzle-emerge 720ms 140ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.homeJourneyHero.is-intro-running .homeHeroRoadLayer { animation: home-road-reveal 1150ms 520ms cubic-bezier(0.2, 0.75, 0.2, 1) both; }
+.homeJourneyHero.is-intro-running .homeHeroFuelTrail { animation: home-fuel-create-road 900ms 360ms cubic-bezier(0.3, 0.72, 0.2, 1) both; }
+
+.homeJourneyHero.is-intro-running .homeHeroArt::before { animation: home-vignette-open 1900ms ease-out both; }
+.homeJourneyHero.is-intro-running .homeHeroArt::after { animation: home-grid-resolve 1100ms 850ms ease-out both; }
+
+.homeHeroTitle span { display: block; }
+.homeJourneyHero.is-intro-running .homeHeroEyebrow { animation: home-copy-detail-in 430ms 1000ms ease-out both; }
+.homeJourneyHero.is-intro-running .homeHeroTitle span { animation: home-title-line-in 670ms 1030ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.homeJourneyHero.is-intro-running .homeHeroTitle span:nth-child(2) { animation-delay: 1160ms; }
+.homeJourneyHero.is-intro-running .homeHeroText { animation: home-copy-detail-in 520ms 1380ms ease-out both; }
+.homeJourneyHero.is-intro-running .homeHeroActions { animation: home-controls-in 520ms 1550ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.homeJourneyHero.is-intro-running :is(.homeHeroQuickLinks, .homeJourneySequence, .homeHeroScope) { animation: home-copy-detail-in 430ms 1680ms ease-out both; }
 
 .homeJourneyGrid {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: var(--container);
-  min-height: 540px;
+  min-height: 610px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(480px, 1.12fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(480px, 0.78fr);
   align-items: center;
-  gap: clamp(42px, 6vw, 92px);
+  gap: clamp(46px, 6vw, 96px);
 }
-
-.homeHeroCopy {
-  position: relative;
-  z-index: 2;
-  min-width: 0;
-  animation: home-road-copy-in 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-/* Stage: the route scene sits behind the board and bleeds into the gutter,
-   so the road visibly runs into the board it becomes. */
-.homeHeroStage {
-  position: relative;
-  min-width: 0;
-}
-
-.homeHeroScene {
-  position: absolute;
-  z-index: 0;
-  inset: -16% -14% -30% -40%;
-  pointer-events: none;
-}
-
-/* Desktop: a slightly narrower board leaves room for the spout and the road's approach. */
-@media (min-width: 1025px) {
-  .homeJourneyHero .homeRoadBoard { max-width: 540px; margin-left: auto; }
-}
-
-.homeHeroCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 420ms ease;
-}
-
-.homeJourneyHero.is-scene-ready .homeHeroCanvas { opacity: 1; }
-
-.homeHeroFallback {
-  position: absolute;
-  inset: 0;
-  transition: opacity 420ms ease;
-}
-
-.homeJourneyHero.is-scene-ready .homeHeroFallback { opacity: 0; }
-
-.homeHeroFallbackRoad { fill: #141d1c; }
-.homeHeroFallbackCentre { fill: none; stroke: #5ff2bd; stroke-width: 2; stroke-dasharray: 10 12; opacity: 0.7; }
-.homeHeroFallbackChannel { fill: none; stroke: #1d2826; stroke-width: 9; stroke-linecap: round; }
-.homeHeroFallbackNozzle rect, .homeHeroFallbackNozzle path { fill: #2b3634; }
-.homeHeroFallbackPulse { fill: #ffb84d; }
-.homeHeroFallbackSign rect { fill: #0f2620; stroke: #4fe3ad; stroke-width: 2; }
-.homeHeroFallbackSign line { stroke: #46524e; stroke-width: 3; }
-.homeHeroFallbackSign text { fill: #f5f1e8; font-size: 14px; font-weight: 800; }
-.homeHeroFallbackSign .homeHeroFallbackPrice { fill: #4fe3ad; font-size: 12px; font-weight: 700; }
-:root[data-theme="light"] .homeHeroFallbackRoad { fill: #c4c1b7; }
-:root[data-theme="light"] .homeHeroFallbackCentre { stroke: #0b7a56; }
-:root[data-theme="light"] .homeHeroFallbackChannel { stroke: #2b3a35; }
-:root[data-theme="light"] .homeHeroFallbackNozzle rect, :root[data-theme="light"] .homeHeroFallbackNozzle path { fill: #3a4744; }
-:root[data-theme="light"] .homeHeroFallbackSign rect { fill: #fbfaf4; stroke: #0a7a56; }
-:root[data-theme="light"] .homeHeroFallbackSign text { fill: #10231d; }
-:root[data-theme="light"] .homeHeroFallbackSign .homeHeroFallbackPrice { fill: #0a7a56; }
-
-/* Handoff: until the destination marker rises, the board waits at the marker's
-   position, collapsed, then grows out of it. Rows settle in sequence. */
-.homeJourneyHero .homeRoadBoard {
-  transform-origin: 50% 50%;
-  transition: opacity 360ms ease, transform 680ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.homeJourneyHero.is-cinematic:is([data-stage="boot"], [data-stage="source"], [data-stage="road"], [data-stage="markets"]) .homeRoadBoard {
-  opacity: 0;
-  transform: translate(var(--handoff-x, 0px), var(--handoff-y, 0px)) scale(0.14);
-  transition: none;
-  pointer-events: none;
-}
-
-.homeJourneyHero.is-cinematic .homeRoadBoard > * {
-  transition: opacity 320ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.homeJourneyHero.is-cinematic:is([data-stage="boot"], [data-stage="source"], [data-stage="road"], [data-stage="markets"]) .homeRoadBoard > * {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: none;
-}
-
-.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(2) { transition-delay: 90ms; }
-.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(3) { transition-delay: 170ms; }
-.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(4) { transition-delay: 250ms; }
-.homeJourneyHero.is-cinematic .homeRoadBoard > :nth-child(5) { transition-delay: 330ms; }
-
-/* A market or fuel change resolves the values in place, without replaying the intro. */
+.homeHeroCopy { min-width: 0; }
+.homeHeroBoardDock { min-width: 0; display: flex; justify-content: flex-end; align-items: center; perspective: 1000px; }
+.homeJourneyHero .homeRoadBoard { width: min(100%, 520px); }
+.homeJourneyHero.is-intro-running .homeRoadBoard { animation: home-board-arrive 760ms 1300ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.homeJourneyHero.is-intro-running .homeRoadBoard > * { animation: home-board-row-in 420ms 1510ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.homeJourneyHero.is-intro-running .homeRoadBoard > :nth-child(2) { animation-delay: 1570ms; }
+.homeJourneyHero.is-intro-running .homeRoadBoard > :nth-child(3) { animation-delay: 1630ms; }
+.homeJourneyHero.is-intro-running .homeRoadBoard > :nth-child(4) { animation-delay: 1690ms; }
+.homeJourneyHero.is-intro-running .homeRoadBoard > :nth-child(5) { animation-delay: 1750ms; }
 .homeBoardResolve { animation: home-value-resolve 380ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 
-.homeEyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--home-emerald);
-  font-size: 11px;
-  line-height: 1.2;
-  font-weight: 800;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-}
-
+.homeEyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--home-emerald); font-size: 11px; line-height: 1.2; font-weight: 800; letter-spacing: 0.17em; text-transform: uppercase; }
 .homeHeroEyebrow { margin-bottom: 22px; }
 :root[data-theme="light"] .homeHeroEyebrow { color: #086f50; }
-
-.homeStatusDot {
-  width: 8px;
-  height: 8px;
-  flex: none;
-  border-radius: 50%;
-  background: #6ceab9;
-  box-shadow: 0 0 0 4px rgba(108, 234, 185, 0.11);
-}
+.homeStatusDot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: #6ceab9; box-shadow: 0 0 0 4px rgba(108, 234, 185, 0.11); }
 .homeStatusDot-stale { background: #ffb84d; box-shadow: 0 0 0 4px rgba(255, 184, 77, 0.12); }
 .homeStatusDot-unknown { background: #9ca9a3; box-shadow: none; }
-
-.homeHeroTitle {
-  max-width: 690px;
-  margin: 0;
-  color: #faf7ef;
-  font-size: clamp(52px, 6.3vw, 88px);
-  line-height: 0.93;
-  font-weight: 760;
-  letter-spacing: -0.071em;
-  text-wrap: balance;
-}
-:root[data-theme="light"] .homeHeroTitle { color: #10231d; }
-
-.homeHeroText {
-  max-width: 610px;
-  margin: 27px 0 0;
-  color: rgba(233, 244, 238, 0.72);
-  font-size: clamp(16px, 1.35vw, 19px);
-  line-height: 1.7;
-  letter-spacing: -0.015em;
-}
-:root[data-theme="light"] .homeHeroText { color: rgba(16, 43, 34, 0.72); }
-
-.homeHeroActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 11px;
-  margin-top: 32px;
-}
-
-.homeButton {
-  min-height: 50px;
-  padding: 0 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 7px;
-  color: #eef8f3;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-}
-.homeButtonPrimary { color: #07130f; border-color: #64efba; background: #64efba; box-shadow: 0 12px 26px rgba(34, 190, 137, 0.16); }
-.homeButtonGhost { background: transparent; }
+.homeHeroTitle { max-width: 700px; margin: 0; color: #faf7ef; font-size: clamp(54px, 6.5vw, 92px); line-height: 0.91; font-weight: 760; letter-spacing: -0.071em; text-wrap: balance; text-shadow: 0 4px 28px rgba(0, 0, 0, 0.25); }
+:root[data-theme="light"] .homeHeroTitle { color: #10231d; text-shadow: 0 3px 22px rgba(255, 255, 255, 0.5); }
+.homeHeroText { max-width: 590px; margin: 27px 0 0; color: rgba(236, 245, 240, 0.76); font-size: clamp(16px, 1.35vw, 19px); line-height: 1.7; letter-spacing: -0.015em; }
+:root[data-theme="light"] .homeHeroText { color: rgba(16, 43, 34, 0.76); }
+.homeHeroActions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 32px; }
+.homeButton { min-height: 50px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 7px; color: #eef8f3; font-size: 13px; font-weight: 800; letter-spacing: 0.01em; transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease; }
+.homeButtonPrimary { color: #07130f; border-color: #64efba; background: #64efba; box-shadow: 0 12px 26px rgba(34, 190, 137, 0.19); }
+.homeButtonGhost { background: rgba(4, 13, 10, 0.28); backdrop-filter: blur(8px); }
 .homeButton:hover { transform: translateY(-2px); }
-.homeButtonPrimary:hover { background: #83f5cd; box-shadow: 0 16px 32px rgba(34, 190, 137, 0.2); }
-.homeButtonGhost:hover { border-color: rgba(101, 238, 187, 0.48); background: rgba(101, 238, 187, 0.06); }
+.homeButtonPrimary:hover { background: #83f5cd; box-shadow: 0 16px 32px rgba(34, 190, 137, 0.24); }
+.homeButtonGhost:hover { border-color: rgba(101, 238, 187, 0.48); background: rgba(101, 238, 187, 0.08); }
 .homeButton:active { transform: translateY(0); }
 .homeButton:focus-visible { outline: 3px solid #ffbd59; outline-offset: 4px; }
-:root[data-theme="light"] .homeButtonGhost { color: #15392f; border-color: rgba(10, 84, 63, 0.28); }
-:root[data-theme="light"] .homeButtonGhost:hover { background: rgba(8, 123, 88, 0.07); }
-
-.homeHeroQuickLinks {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px 20px;
-}
-.homeHeroQuickLinks a {
-  color: rgba(230, 244, 237, 0.67);
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: underline;
-  text-decoration-color: rgba(97, 239, 189, 0.34);
-  text-underline-offset: 5px;
-}
+:root[data-theme="light"] .homeButtonGhost { color: #15392f; border-color: rgba(10, 84, 63, 0.28); background: rgba(255, 255, 255, 0.42); }
+.homeHeroQuickLinks { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 9px 20px; }
+.homeHeroQuickLinks a { color: rgba(230, 244, 237, 0.72); font-size: 12px; font-weight: 700; text-decoration: underline; text-decoration-color: rgba(97, 239, 189, 0.34); text-underline-offset: 5px; }
 .homeHeroQuickLinks a:hover { color: #fff; text-decoration-color: #61efbd; }
 .homeHeroQuickLinks a:focus-visible { border-radius: 3px; outline: 3px solid #ffbd59; outline-offset: 4px; }
-:root[data-theme="light"] .homeHeroQuickLinks a { color: rgba(13, 58, 44, 0.7); }
+:root[data-theme="light"] .homeHeroQuickLinks a { color: rgba(13, 58, 44, 0.74); }
 :root[data-theme="light"] .homeHeroQuickLinks a:hover { color: #075f46; }
-
-.homeHeroScope {
-  max-width: 540px;
-  margin: 26px 0 0;
-  padding-top: 17px;
-  border-top: 1px solid rgba(149, 224, 196, 0.14);
-  color: rgba(226, 239, 233, 0.5);
-  font-size: 11px;
-  line-height: 1.55;
-}
-:root[data-theme="light"] .homeHeroScope { border-color: rgba(8, 94, 68, 0.14); color: rgba(15, 57, 44, 0.59); }
-
+.homeJourneySequence { max-width: 470px; margin-top: 28px; display: grid; grid-template-columns: auto 1fr auto 1fr auto; align-items: center; gap: 10px; color: rgba(225, 242, 234, 0.5); font-size: 8px; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; }
+.homeJourneySequence i { height: 1px; overflow: hidden; background: linear-gradient(90deg, rgba(95, 239, 185, 0.28), rgba(95, 239, 185, 0.8)); }
+:root[data-theme="light"] .homeJourneySequence { color: rgba(11, 68, 50, 0.56); }
+:root[data-theme="light"] .homeJourneySequence i { background: linear-gradient(90deg, rgba(7, 112, 79, 0.18), rgba(7, 112, 79, 0.66)); }
+.homeHeroScope { max-width: 540px; margin: 15px 0 0; color: rgba(226, 239, 233, 0.52); font-size: 11px; line-height: 1.55; }
+:root[data-theme="light"] .homeHeroScope { color: rgba(15, 57, 44, 0.62); }
 .homeRoadBoard {
   position: relative;
   z-index: 1;
@@ -421,27 +355,54 @@
 .homePulseFooter b { color: var(--home-cream); }
 .homePulseFooter a { color: var(--home-emerald); text-decoration: underline; text-underline-offset: 3px; }
 
-@keyframes home-road-copy-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes home-value-resolve { from { opacity: 0.25; transform: translateY(5px); filter: blur(2px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+@keyframes home-atmosphere-open {
+  0% { opacity: 0.2; transform: scale(1.055); filter: saturate(0.55) brightness(0.42) contrast(1.12); }
+  46% { opacity: 0.48; }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes home-nozzle-emerge { from { opacity: 0; transform: translate3d(-2.5%, -1.5%, 0) scale(1.035); } to { opacity: 1; transform: none; } }
+@keyframes home-road-reveal {
+  0% { opacity: 0; clip-path: polygon(47% 57%, 52% 55%, 52% 58%, 46% 62%); filter: brightness(1.18) saturate(1.18); }
+  30% { opacity: 0.72; }
+  100% { opacity: 1; clip-path: polygon(34% 50%, 100% 39%, 100% 100%, 27% 100%); filter: none; }
+}
+@keyframes home-fuel-create-road {
+  0% { opacity: 0; transform: rotate(50deg) scaleX(0); }
+  18% { opacity: 1; }
+  76% { opacity: 0.94; }
+  100% { opacity: 0; transform: rotate(50deg) scaleX(1); }
+}
+:root[data-theme="light"] .homeJourneyHero.is-intro-running .homeHeroFuelTrail { animation-name: home-fuel-create-road-light; }
+@keyframes home-fuel-create-road-light {
+  0% { opacity: 0; transform: rotate(116deg) scaleX(0); }
+  18% { opacity: 1; }
+  76% { opacity: 0.88; }
+  100% { opacity: 0; transform: rotate(116deg) scaleX(1); }
+}
+@keyframes home-vignette-open { from { opacity: 1; filter: brightness(0.56); } to { opacity: 1; filter: none; } }
+@keyframes home-grid-resolve { from { opacity: 0; } to { opacity: 0.3; } }
+@keyframes home-title-line-in { from { opacity: 0; clip-path: inset(100% 0 0); transform: translateY(24px); } to { opacity: 1; clip-path: inset(0); transform: translateY(0); } }
+@keyframes home-copy-detail-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes home-controls-in { from { opacity: 0; transform: translateY(12px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes home-board-arrive { from { opacity: 0; transform: translateY(24px) rotateX(4deg); } to { opacity: 1; transform: translateY(0) rotateX(0); } }
+@keyframes home-board-row-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 1080px) {
   .homePulseBody { grid-template-columns: minmax(300px, 0.68fr) minmax(0, 1.32fr); }
   .homePulsePriceRow { padding-inline: 18px; }
 }
 
-/* Tablet and below: copy, then a shortened route band, then the full board. */
+/* Tablet and below: the artwork becomes atmosphere and the board stays fully usable. */
 @media (max-width: 1024px) {
-  .homeJourneyHero { min-height: auto; padding-top: 64px; padding-bottom: 64px; }
-  .homeJourneyGrid { grid-template-columns: minmax(0, 1fr); gap: 10px; min-height: 0; }
+  .homeJourneyHero { min-height: auto; padding-top: 64px; padding-bottom: 72px; }
+  .homeJourneyGrid { grid-template-columns: minmax(0, 1fr); gap: 44px; min-height: 0; }
   .homeHeroCopy { max-width: 700px; }
-  .homeHeroStage { width: min(100%, 680px); margin: 0 auto; }
-  .homeHeroScene {
-    position: relative;
-    inset: auto;
-    height: clamp(190px, 30vw, 260px);
-    margin: 0 calc(-1 * max(18px, (100vw - min(100vw, 680px)) / 2));
-  }
-  .homeRoadBoard { margin-top: -18px; }
+  .homeHeroBoardDock { width: min(100%, 680px); justify-self: center; }
+  .homeJourneyHero .homeRoadBoard { width: 100%; }
+  :is(.homeHeroArtImage, .homeHeroNozzleLayer img, .homeHeroRoadLayer img) { object-position: 62% 50%; }
+  .homeHeroArt::before { background: linear-gradient(180deg, rgba(3, 10, 8, 0.76), rgba(3, 10, 8, 0.25) 38%, rgba(3, 10, 8, 0.88) 78%); }
+  :root[data-theme="light"] .homeHeroArt::before { background: linear-gradient(180deg, rgba(247, 247, 241, 0.86), rgba(247, 247, 241, 0.25) 36%, rgba(236, 239, 233, 0.92) 78%); }
 }
 
 @media (max-width: 820px) {
@@ -456,17 +417,22 @@
 }
 
 @media (max-width: 620px) {
-  .homeJourneyHero { width: 100vw; max-width: 100vw; margin-top: -16px; padding: 48px 16px 56px; }
-  .homeJourneyGrid { gap: 6px; }
-  .homeHeroScene { height: 168px; margin: 0 -16px; }
-  .homeRoadBoard { margin-top: -14px; }
+  .homeJourneyHero { width: 100vw; max-width: 100vw; margin-top: -8px; padding: 46px 16px 56px; }
+  .homeJourneyGrid { gap: 38px; }
+  .homeHeroArt { height: 590px; }
+  :is(.homeHeroArtImage, .homeHeroNozzleLayer img, .homeHeroRoadLayer img) { object-position: 61% center; }
+  .homeHeroArt::after { display: none; }
+  .homeHeroFuelTrail { left: 39%; top: 36%; width: 56vw; }
+  :root[data-theme="light"] .homeHeroFuelTrail { left: 58%; top: 33%; width: 48vw; }
+  .homeJourneyHero .homeRoadBoard { margin-top: 0; }
   .homeHeroEyebrow { margin-bottom: 17px; font-size: 9px; }
   .homeHeroTitle { max-width: 540px; font-size: clamp(43px, 13.5vw, 58px); line-height: 0.96; }
   .homeHeroText { margin-top: 20px; font-size: 15px; line-height: 1.62; }
   .homeHeroActions { display: grid; margin-top: 27px; }
   .homeButton { width: 100%; }
   .homeHeroQuickLinks { gap: 9px 15px; }
-  .homeHeroScope { margin-top: 22px; }
+  .homeJourneySequence { margin-top: 23px; }
+  .homeHeroScope { margin-top: 13px; }
   .homeRoadBoard { padding: 20px 17px 17px; }
   .homeRoadBoardHeader { gap: 12px; }
   .homeRoadBoardHeader strong { font-size: 27px; }
@@ -502,6 +468,8 @@
 @media (max-width: 390px) {
   .homeJourneyHero { padding-inline: 14px; }
   .homeHeroTitle { font-size: 43px; }
+  .homeHeroQuickLinks { font-size: 11px; }
+  .homeJourneySequence { gap: 7px; letter-spacing: 0.11em; }
   .homeRoadBoard { padding-inline: 14px; }
   .homeBoardPrice { gap: 10px; }
   .homeBoardPrice strong { font-size: 25px; }
@@ -518,6 +486,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .homeHeroCopy, .homeRoadBoard, .homeBoardResolve, .navRefreshButton.is-refreshing svg { animation: none; }
+  .homeHeroCopy, .homeRoadBoard, .homeBoardResolve, .homeHeroArtImage, .homeHeroRoutePulse, .navRefreshButton.is-refreshing svg { animation: none; }
+  .homeHeroRoutePulse { display: none; }
   .homeButton, .homeBoardPrice, .homePulsePriceRow, .homeJourneyHero .homeRoadBoard, .homeJourneyHero .homeRoadBoard > *, .homeHeroCanvas, .homeHeroFallback { transition: none; }
 }

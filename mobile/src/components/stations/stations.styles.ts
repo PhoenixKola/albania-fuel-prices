@@ -30,11 +30,45 @@ export const makeStationStyles = (theme: Theme) => {
 
   return StyleSheet.create({
     // Status line
-    statusRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", columnGap: 8, rowGap: 2 },
-    dot: { width: 8, height: 8, borderRadius: 4 },
+    statusRow: { minHeight: 34, flexDirection: "row", alignItems: "center", columnGap: 8 },
+    statusReadyIcon: { width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: p.accent },
     statusText: { flexShrink: 1, color: p.inkSoft, fontSize: f(13), lineHeight: f(19), fontWeight: "700" },
-    retry: { minHeight: 44, justifyContent: "center", paddingHorizontal: 4 },
-    retryText: { color: p.accent, fontSize: f(13), fontWeight: "900", textDecorationLine: "underline" },
+    statusCard: {
+      flexDirection: large ? "column" : "row",
+      alignItems: large ? "stretch" : "center",
+      gap: 12,
+      padding: 13,
+      borderRadius: 18,
+      backgroundColor: theme.name === "light" ? "rgba(180,83,9,0.065)" : "rgba(252,211,77,0.07)",
+      borderWidth: 1,
+      borderColor: theme.name === "light" ? "rgba(180,83,9,0.20)" : "rgba(252,211,77,0.18)",
+    },
+    statusIcon: {
+      width: 42,
+      height: 42,
+      borderRadius: 13,
+      alignItems: "center",
+      justifyContent: "center",
+      alignSelf: large ? "flex-start" : "auto",
+      backgroundColor: theme.name === "light" ? "rgba(180,83,9,0.10)" : "rgba(252,211,77,0.10)",
+    },
+    statusCopy: { flex: 1, minWidth: 0, gap: 2 },
+    statusTitle: { color: p.ink, fontSize: f(14), lineHeight: f(19), fontWeight: "900" },
+    statusPrimary: { color: p.inkSoft, fontSize: f(13), lineHeight: f(19), fontWeight: "800" },
+    statusMeta: { color: p.inkFaint, fontSize: f(12), lineHeight: f(17), fontWeight: "600" },
+    retryButton: {
+      minHeight: 44,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingHorizontal: 13,
+      borderRadius: 13,
+      backgroundColor: p.deck,
+      borderWidth: 1,
+      borderColor: p.chipBorder,
+    },
+    retryText: { color: p.accent, fontSize: f(13), fontWeight: "900" },
 
     // Next stop
     deck: {

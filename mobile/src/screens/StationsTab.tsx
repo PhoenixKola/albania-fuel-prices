@@ -58,7 +58,7 @@ export default function StationsTab() {
   const nextStop = filtered[0] ?? null;
   const feed = useMemo(() => filtered.slice(1), [filtered]);
 
-  // Stable handlers keep memoised rows from re-rendering on unrelated context changes (toasts, ads…).
+  // Stable handlers keep memoised rows from re-rendering on unrelated context changes (toasts, ads).
   const latest = useRef({ markMapsOpened: ctx.markMapsOpened, t });
   latest.current = { markMapsOpened: ctx.markMapsOpened, t };
   const onDirections = useCallback((st: Station) => {
@@ -109,7 +109,7 @@ export default function StationsTab() {
   const stamp = formatStamp(nearby.cacheSavedAtUtc, t);
   const refreshFailed = !!nearby.error && nearby.fromCache;
 
-  // ── Blocks ────────────────────────────────────────────────────────────────
+  // Home sections
 
   const refreshAction =
     loc.permission === "granted" && loc.coords ? (
@@ -127,25 +127,42 @@ export default function StationsTab() {
 
   const statusLine =
     phase === "ready" ? (
-      <View style={s.statusRow}>
-        <View style={[s.dot, { backgroundColor: refreshFailed ? p.warn : p.accent }]} />
-        <Text style={s.statusText} accessibilityLiveRegion="polite">
-          {[
-            t.stationsWithin(nearby.totalCount, km),
-            stamp ? (refreshFailed ? t.stationsSavedList(stamp) : t.stationsUpdatedAt(stamp)) : null,
-            refreshFailed ? (nearby.error === "timeout" ? t.stationsTimeoutCached : t.refreshFailed) : null,
-          ]
-            .filter(Boolean)
-            .join(" · ")}
-        </Text>
-        {refreshFailed ? (
-          <AnimatedPressable onPress={refreshStations} disabled={busy} contentStyle={s.retry} haptic={false} reduceMotion={reduce} accessibilityLabel={t.tryAgain}>
+      refreshFailed ? (
+        <View style={s.statusCard} accessibilityLiveRegion="polite">
+          <View style={s.statusIcon}>
+            <Ionicons name="cloud-offline-outline" size={20} color={p.warn} />
+          </View>
+          <View style={s.statusCopy}>
+            <Text style={s.statusTitle}>{t.showingCached}</Text>
+            <Text style={s.statusPrimary}>{t.stationsWithin(nearby.totalCount, km)}</Text>
+            <Text style={s.statusMeta}>
+              {[stamp ? t.stationsSavedList(stamp) : null, nearby.error === "timeout" ? t.stationsTimeoutCached : t.refreshFailed]
+                .filter(Boolean)
+                .join(" · ")}
+            </Text>
+          </View>
+          <AnimatedPressable
+            onPress={refreshStations}
+            disabled={busy}
+            contentStyle={s.retryButton}
+            haptic={false}
+            reduceMotion={reduce}
+            accessibilityLabel={t.tryAgain}
+            accessibilityState={{ busy }}
+          >
+            {busy ? <ActivityIndicator size="small" color={p.accent} /> : <Ionicons name="refresh" size={17} color={p.accent} />}
             <Text style={s.retryText}>{t.tryAgain}</Text>
           </AnimatedPressable>
-        ) : null}
-      </View>
+        </View>
+      ) : (
+        <View style={s.statusRow} accessibilityLiveRegion="polite">
+          <View style={s.statusReadyIcon}><Ionicons name="checkmark" size={13} color={p.onAccent} /></View>
+          <Text style={s.statusText}>
+            {[t.stationsWithin(nearby.totalCount, km), stamp ? t.stationsUpdatedAt(stamp) : null].filter(Boolean).join(" · ")}
+          </Text>
+        </View>
+      )
     ) : null;
-
   const controls =
     phase === "ready" ? (
       <View style={{ gap: 10 }}>

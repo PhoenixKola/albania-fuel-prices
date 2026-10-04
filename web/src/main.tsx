@@ -2,8 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./app/App";
+import { prepareInitialHomeIntro } from "./utils/homeIntro";
 import "./styles/global.css";
 import "./styles/road.css";
+
+prepareInitialHomeIntro();
 
 // A directly loaded page already has useful prerendered HTML in #root. Keep it
 // visible until its route chunk is ready instead of briefly replacing it with

@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Share, Text, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Animated, Easing, Pressable, RefreshControl, ScrollView, Share, Text, View } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { NavigationProp, ParamListBase, useNavigation } from "@react-navigation/native";
 
@@ -12,7 +12,6 @@ import FavoritesQuickSheet from "../components/country/FavoritesQuickSheet";
 import ErrorCard from "../components/feedback/ErrorCard";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
 import FuelDeck, { FuelDeckSkeleton } from "../components/home/FuelDeck";
-import FuelJourneyIntro from "../components/home/FuelJourneyIntro";
 import HomeActions, { type HomeAction } from "../components/home/HomeActions";
 import SavedMarketsRail from "../components/home/SavedMarketsRail";
 import MarketPulse from "../components/home/MarketPulse";
@@ -25,6 +24,7 @@ import { fuelLabel } from "../utils/fuel";
 import { getFlagForCountry } from "../utils/countryFlag";
 
 const FLAT = 0.0005;
+let homeOpeningPlayedThisSession = false;
 
 export default function HomeTab() {
   const ctx = useApp();
@@ -37,6 +37,26 @@ export default function HomeTab() {
   const [quickSheetOpen, setQuickSheetOpen] = useState(false);
   const [countryModalOpen, setCountryModalOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [introRun, setIntroRun] = useState(() => {
+    const play = !homeOpeningPlayedThisSession;
+    homeOpeningPlayedThisSession = true;
+    return play ? 1 : 0;
+  });
+  const opening = useRef(new Animated.Value(introRun > 0 && !theme.motion.reduced && !theme.m.isLargeText ? 0 : 1)).current;
+
+  useEffect(() => {
+    opening.stopAnimation();
+    if (introRun === 0 || theme.motion.reduced || theme.m.isLargeText) {
+      opening.setValue(1);
+      return;
+    }
+    Animated.timing(opening, {
+      toValue: 1,
+      duration: 1760,
+      easing: Easing.inOut(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [introRun, opening, theme.m.isLargeText, theme.motion.reduced]);
 
   const fuelName = fuelLabel(ctx.fuelType, t);
   const flag = useMemo(() => getFlagForCountry(ctx.country), [ctx.country]);
@@ -126,6 +146,8 @@ export default function HomeTab() {
       note={market.localRequestedButMissing ? t.localRateUnavailable : null}
       freshness={market.freshness}
       refreshFailed={market.refreshFailed}
+      refreshing={ctx.refreshing}
+      introRun={introRun}
       onRetry={ctx.refreshAll}
       onOpenCountry={() => setQuickSheetOpen(true)}
       onToggleFavorite={() => ctx.toggleFavorite(ctx.country)}
@@ -140,39 +162,58 @@ export default function HomeTab() {
   const primary = (
     <View style={s.column}>
       {deck}
-      {ctx.data ? <HomeActions theme={theme} actions={actions} /> : null}
+      {ctx.data ? (
+        <Animated.View style={{
+          opacity: opening.interpolate({ inputRange: [0, 0.68, 0.84], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+          transform: [{ translateX: opening.interpolate({ inputRange: [0.68, 0.86], outputRange: [-10, 0], extrapolate: "clamp" }) }],
+        }}>
+          <HomeActions theme={theme} actions={actions} />
+        </Animated.View>
+      ) : null}
     </View>
   );
 
   const secondary = ctx.data ? (
     <View style={s.column}>
-      <SavedMarketsRail
-        theme={theme}
-        t={t}
-        markets={market.saved}
-        current={ctx.country}
-        format={market.fmt}
-        onSelect={ctx.setCountryTracked}
-        onAdd={() => setCountryModalOpen(true)}
-      />
-      <MarketPulse
-        theme={theme}
-        t={t}
-        fuelName={fuelName}
-        country={ctx.country}
-        series={market.series}
-        weekText={week?.text ?? null}
-        europe={market.europe}
-        current={current}
-        rank={signal.rank}
-        format={market.fmt}
-      />
-      <View style={s.sourceNote}>
+      <Animated.View style={{
+        opacity: opening.interpolate({ inputRange: [0, 0.74, 0.88], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+        transform: [{ translateX: opening.interpolate({ inputRange: [0.74, 0.9], outputRange: [14, 0], extrapolate: "clamp" }) }],
+      }}>
+        <SavedMarketsRail
+          theme={theme}
+          t={t}
+          markets={market.saved}
+          current={ctx.country}
+          format={market.fmt}
+          onSelect={ctx.setCountryTracked}
+          onAdd={() => setCountryModalOpen(true)}
+        />
+      </Animated.View>
+      <Animated.View style={{
+        opacity: opening.interpolate({ inputRange: [0, 0.82, 0.96], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+        transform: [{ scale: opening.interpolate({ inputRange: [0.82, 0.98], outputRange: [0.985, 1], extrapolate: "clamp" }) }],
+      }}>
+        <MarketPulse
+          theme={theme}
+          t={t}
+          fuelName={fuelName}
+          country={ctx.country}
+          series={market.series}
+          weekText={week?.text ?? null}
+          europe={market.europe}
+          current={current}
+          rank={signal.rank}
+          format={market.fmt}
+        />
+      </Animated.View>
+      <Animated.View style={[s.sourceNote, {
+        opacity: opening.interpolate({ inputRange: [0, 0.91, 1], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+      }]}>
         <Text style={s.sourceText}>{t.sourceIs(ctx.data.source)}</Text>
         {ctx.cacheSavedAtUtc ? (
           <Text style={s.sourceText}>{t.lastSyncAt(formatShortDate(ctx.cacheSavedAtUtc, t, true))}</Text>
         ) : null}
-      </View>
+      </Animated.View>
     </View>
   ) : null;
 
@@ -183,7 +224,13 @@ export default function HomeTab() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={ctx.refreshing} onRefresh={ctx.refreshAll} tintColor={p.accent} colors={[p.accent]} />}
       >
-        <View style={s.topBar}>
+        <Animated.View style={[s.topBar, {
+          opacity: opening.interpolate({ inputRange: [0, 0.18, 0.32], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+          transform: [
+            { translateX: opening.interpolate({ inputRange: [0.1, 0.34], outputRange: [-8, 0], extrapolate: "clamp" }) },
+            { scale: opening.interpolate({ inputRange: [0, 0.32], outputRange: [0.985, 1], extrapolate: "clamp" }) },
+          ],
+        }]}>
           <View style={s.brand} accessible accessibilityRole="header" accessibilityLabel="Karburanti Sot">
             <View style={s.brandMark}>
               <MaterialCommunityIcons name="gas-station" size={16} color={p.moduleText} />
@@ -192,18 +239,19 @@ export default function HomeTab() {
             <Text style={s.brandText} numberOfLines={1} maxFontSizeMultiplier={1.3}>Karburanti Sot</Text>
           </View>
           {rewardChip}
-        </View>
+        </Animated.View>
 
-        <FuelJourneyIntro
-          theme={theme}
-          t={t}
-          country={ctx.country}
-          flag={flag}
-          fuelType={ctx.fuelType}
-          fuelName={fuelName}
-          priceText={current == null ? t.notReported : `${market.fmt(current)}/L`}
-          loading={ctx.loading && !ctx.data}
-        />
+        {__DEV__ ? (
+          <Pressable
+            onPress={() => setIntroRun((run) => Math.max(1, run + 1))}
+            accessibilityRole="button"
+            accessibilityLabel="Replay Home Intro"
+            style={({ pressed }) => [s.devReplay, pressed ? s.devReplayPressed : null]}
+          >
+            <Ionicons name="play-back" size={13} color={p.accent} />
+            <Text style={s.devReplayText}>Replay Home Intro</Text>
+          </Pressable>
+        ) : null}
 
         {isTwoColumnHome(theme) ? (
           <View style={s.columns}>

@@ -30,6 +30,8 @@ type Props = {
   note: string | null;
   freshness: Freshness;
   refreshFailed: boolean;
+  refreshing: boolean;
+  introRun: number;
   onRetry: () => void;
   onOpenCountry: () => void;
   onToggleFavorite: () => void;
@@ -42,6 +44,43 @@ export default function FuelDeck(props: Props) {
   const compact = isCompactHome(theme);
   const s = useMemo(() => makeStyles(theme, p, compact), [theme, p, compact]);
   const reduce = theme.motion.reduced;
+  const shouldIgnite = props.introRun > 0 && !reduce && !theme.m.isLargeText;
+  const routeTravel = Math.min(330, Math.max(170, theme.m.width * 0.64));
+
+  // The opening lives inside the instrument: source energises the route rail,
+  // the market locks, then the actual price module becomes the destination.
+  const ignition = useRef(new Animated.Value(shouldIgnite ? 0 : 1)).current;
+  const routePulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    ignition.stopAnimation();
+    if (!shouldIgnite) {
+      ignition.setValue(1);
+      return;
+    }
+    ignition.setValue(0);
+    Animated.timing(ignition, {
+      toValue: 1,
+      duration: 1600,
+      easing: Easing.inOut(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [ignition, props.introRun, shouldIgnite]);
+
+  const lastSignal = useRef({ key: `${props.country}|${props.fuelType}`, refreshing: props.refreshing });
+  useEffect(() => {
+    const key = `${props.country}|${props.fuelType}`;
+    const stateChanged = lastSignal.current.key !== key;
+    const refreshStarted = !lastSignal.current.refreshing && props.refreshing;
+    lastSignal.current = { key, refreshing: props.refreshing };
+    if (!stateChanged && !refreshStarted) return;
+    if (reduce) return;
+    routePulse.stopAnimation();
+    routePulse.setValue(0);
+    Animated.timing(routePulse, { toValue: 1, duration: 460, easing: Easing.inOut(Easing.cubic), useNativeDriver: true })
+      .start(({ finished }) => {
+        if (finished) routePulse.setValue(0);
+      });
+  }, [props.country, props.fuelType, props.refreshing, reduce, routePulse]);
 
   // Country switch: the board fades back in so the change registers.
   const fade = useRef(new Animated.Value(1)).current;
@@ -78,7 +117,50 @@ export default function FuelDeck(props: Props) {
 
   return (
     <Animated.View style={[s.deck, { opacity: fade }]}>
-      <View style={s.header}>
+      <View style={s.ignition} accessible={false} importantForAccessibility="no-hide-descendants">
+        <View style={s.ignitionMeta}>
+          <View style={s.ignitionSource}>
+            <Ionicons name="flash" size={11} color={p.accent} />
+            <Text style={s.ignitionLabel}>{t.journeyLiveRoute}</Text>
+          </View>
+          <Animated.View style={[s.marketLock, {
+            opacity: ignition.interpolate({ inputRange: [0, 0.55, 0.76], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+            transform: [
+              { translateX: ignition.interpolate({ inputRange: [0.55, 0.78], outputRange: [12, 0], extrapolate: "clamp" }) },
+              { scale: ignition.interpolate({ inputRange: [0.55, 0.78], outputRange: [0.92, 1], extrapolate: "clamp" }) },
+            ],
+          }]}>
+            <View style={s.marketLockPin} />
+            <Text style={s.marketLockFlag} maxFontSizeMultiplier={1.2}>{props.flag || "•"}</Text>
+            <Text style={s.marketLockText} numberOfLines={1}>{props.country}</Text>
+          </Animated.View>
+        </View>
+        <View style={s.routeRail}>
+          <View style={s.routeOrigin} />
+          <View style={s.routeTrack}>
+            <Animated.View style={[s.routeFill, {
+              transform: [{ scaleX: ignition.interpolate({ inputRange: [0.14, 0.7], outputRange: [0.01, 1], extrapolate: "clamp" }) }],
+            }]} />
+            <Animated.View style={[s.routeIgnitionHead, {
+              opacity: ignition.interpolate({ inputRange: [0.16, 0.22, 0.68, 0.75], outputRange: [0, 1, 1, 0], extrapolate: "clamp" }),
+              transform: [{ translateX: ignition.interpolate({ inputRange: [0.16, 0.72], outputRange: [-24, routeTravel], extrapolate: "clamp" }) }],
+            }]} />
+            <Animated.View style={[s.routeSignal, {
+              opacity: routePulse.interpolate({ inputRange: [0, 0.12, 0.82, 1], outputRange: [0, 1, 1, 0] }),
+              transform: [{ translateX: routePulse.interpolate({ inputRange: [0, 1], outputRange: [-90, routeTravel] }) }],
+            }]} />
+          </View>
+          <Animated.View style={[s.routeDestination, {
+            opacity: ignition.interpolate({ inputRange: [0.62, 0.86], outputRange: [0.18, 1], extrapolate: "clamp" }),
+            transform: [{ scale: ignition.interpolate({ inputRange: [0.62, 0.86, 1], outputRange: [0.6, 1.22, 1], extrapolate: "clamp" }) }],
+          }]}><View style={s.routeDestinationCore} /></Animated.View>
+        </View>
+      </View>
+
+      <Animated.View style={[s.header, {
+        opacity: ignition.interpolate({ inputRange: [0, 0.48, 0.7], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+        transform: [{ translateX: ignition.interpolate({ inputRange: [0.48, 0.72], outputRange: [-8, 0], extrapolate: "clamp" }) }],
+      }]}>
         <Pressable
           onPress={props.onOpenCountry}
           style={({ pressed }) => [s.countryButton, pressed ? { backgroundColor: p.pressed } : null]}
@@ -102,9 +184,15 @@ export default function FuelDeck(props: Props) {
         >
           <Ionicons name={props.isFavorite ? "star" : "star-outline"} size={20} color={props.isFavorite ? p.accent : p.inkSoft} />
         </AnimatedPressable>
-      </View>
+      </Animated.View>
 
-      <View style={s.module} accessible accessibilityLabel={moduleLabel}>
+      <Animated.View style={[s.module, {
+        opacity: ignition.interpolate({ inputRange: [0, 0.64, 0.86], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+        transform: [
+          { translateY: ignition.interpolate({ inputRange: [0.64, 0.88], outputRange: [6, 0], extrapolate: "clamp" }) },
+          { scale: ignition.interpolate({ inputRange: [0.64, 0.9], outputRange: [0.985, 1], extrapolate: "clamp" }) },
+        ],
+      }]} accessible accessibilityLabel={moduleLabel}>
         <Text style={s.moduleFuel}>
           {selectedName}
         </Text>
@@ -122,6 +210,7 @@ export default function FuelDeck(props: Props) {
             unit="/L"
             unitColor={p.moduleSoft}
             reduceMotion={reduce}
+            revealKey={props.introRun}
           />
         )}
         <View style={s.signals}>
@@ -145,8 +234,12 @@ export default function FuelDeck(props: Props) {
             <Text style={[s.signalText, s.signalNote]}>{props.note}</Text>
           ) : null}
         </View>
-      </View>
+      </Animated.View>
 
+      <Animated.View style={{
+        opacity: ignition.interpolate({ inputRange: [0, 0.78, 1], outputRange: [0, 0, 1], extrapolate: "clamp" }),
+        transform: [{ translateX: ignition.interpolate({ inputRange: [0.78, 1], outputRange: [6, 0], extrapolate: "clamp" }) }],
+      }}>
       {others.map((fuel, index) => {
         const price = props.prices[fuel];
         const name = fuelLabel(fuel, t);
@@ -178,6 +271,7 @@ export default function FuelDeck(props: Props) {
       })}
 
       <FreshnessStamp t={t} p={p} s={s} freshness={props.freshness} refreshFailed={props.refreshFailed} onRetry={props.onRetry} />
+      </Animated.View>
     </Animated.View>
   );
 }
@@ -242,6 +336,17 @@ export function FuelDeckSkeleton({ theme, label }: { theme: Theme; label: string
   const s = makeStyles(theme, p, isCompactHome(theme));
   return (
     <View style={s.deck} accessible accessibilityLabel={label}>
+      <View style={s.ignition}>
+        <View style={s.ignitionMeta}>
+          <View style={[s.skeletonBar, { width: 96, height: 9, backgroundColor: p.rule }]} />
+          <View style={[s.skeletonBar, { width: 62, height: 11, backgroundColor: p.rule }]} />
+        </View>
+        <View style={s.routeRail}>
+          <View style={s.routeOrigin} />
+          <View style={s.routeTrack}><View style={[StyleSheet.absoluteFillObject, { backgroundColor: p.rule }]} /></View>
+          <View style={s.routeDestination} />
+        </View>
+      </View>
       <View style={s.header}>
         <View style={[s.skeletonBar, { width: 140, backgroundColor: p.rule }]} />
       </View>
@@ -269,6 +374,39 @@ const makeStyles = (theme: Theme, p: HomePalette, compact: boolean) =>
       shadowOffset: { width: 0, height: 8 },
       elevation: theme.name === "light" ? 2 : 0,
     },
+    ignition: {
+      paddingHorizontal: compact ? 10 : 12,
+      paddingTop: compact ? 9 : 11,
+      paddingBottom: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: p.rule,
+    },
+    ignitionMeta: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+    ignitionSource: { minWidth: 0, flexDirection: "row", alignItems: "center", gap: 6 },
+    ignitionLabel: { flexShrink: 1, color: p.inkSoft, fontSize: theme.m.f(9), fontWeight: "900", letterSpacing: 1.2, textTransform: "uppercase" },
+    marketLock: {
+      maxWidth: "48%",
+      minHeight: 28,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: p.accent,
+      backgroundColor: p.accentSoft,
+      borderRadius: 8,
+    },
+    marketLockPin: { width: 5, height: 5, borderRadius: 3, backgroundColor: p.accent },
+    marketLockFlag: { fontSize: 13, color: p.inkSoft },
+    marketLockText: { flexShrink: 1, color: p.ink, fontSize: theme.m.f(11), fontWeight: "900" },
+    routeRail: { height: 18, marginTop: 4, flexDirection: "row", alignItems: "center" },
+    routeOrigin: { width: 7, height: 7, borderRadius: 4, backgroundColor: p.accent, shadowColor: p.accent, shadowOpacity: 0.4, shadowRadius: 5 },
+    routeTrack: { flex: 1, height: 4, marginHorizontal: 5, overflow: "hidden", backgroundColor: p.rule },
+    routeFill: { ...StyleSheet.absoluteFillObject, backgroundColor: p.accent, transformOrigin: "left center" },
+    routeIgnitionHead: { position: "absolute", left: 0, top: 0, bottom: 0, width: 36, borderRadius: 2, backgroundColor: p.moduleText },
+    routeSignal: { position: "absolute", left: 0, top: 0, bottom: 0, width: 42, borderRadius: 2, backgroundColor: p.moduleBad },
+    routeDestination: { width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: p.accent, backgroundColor: p.deck, alignItems: "center", justifyContent: "center" },
+    routeDestinationCore: { width: 4, height: 4, borderRadius: 2, backgroundColor: p.accent },
     header: {
       minHeight: compact ? 44 : 50,
       flexDirection: "row",

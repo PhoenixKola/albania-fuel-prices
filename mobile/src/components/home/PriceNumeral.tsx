@@ -10,6 +10,8 @@ type Props = {
   unit?: string;
   unitColor?: string;
   reduceMotion: boolean;
+  /** Replays the real price resolve during the development/cold-start Home sequence. */
+  revealKey?: number;
   maxFontSizeMultiplier?: number;
 };
 
@@ -19,25 +21,36 @@ type Props = {
  * board changing rather than the whole number blinking.
  */
 /** Defaults to a 1.2× ceiling for the hero numeral (already ~4× body size); pass 0 to lift it. */
-export default function PriceNumeral({ text, raised, size, color, unit, unitColor, reduceMotion, maxFontSizeMultiplier = 1.2 }: Props) {
+export default function PriceNumeral({ text, raised, size, color, unit, unitColor, reduceMotion, revealKey = 0, maxFontSizeMultiplier = 1.2 }: Props) {
   const roll = useRef(new Animated.Value(1)).current;
   const prevText = useRef(text);
+  const prevRevealKey = useRef(0);
   const [changed, setChanged] = useState<boolean[]>([]);
 
   useLayoutEffect(() => {
     const prev = prevText.current;
+    const replaying = revealKey > 0 && revealKey !== prevRevealKey.current;
     prevText.current = text;
-    if (prev === text || reduceMotion) {
+    prevRevealKey.current = revealKey;
+    if ((!replaying && prev === text) || reduceMotion) {
       setChanged([]);
       roll.setValue(1);
       return;
     }
     // Align from the right so "€2.409" → "€12.409" still rolls the right digits.
     const offset = text.length - prev.length;
-    setChanged(Array.from(text, (ch, i) => prev[i - offset] !== ch));
+    setChanged(Array.from(text, (ch, i) => replaying || prev[i - offset] !== ch));
     roll.setValue(0);
-    Animated.timing(roll, { toValue: 1, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
-  }, [text, reduceMotion, roll]);
+    const timing = Animated.timing(roll, {
+      toValue: 1,
+      duration: replaying ? 420 : 260,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    const animation = replaying ? Animated.sequence([Animated.delay(930), timing]) : timing;
+    animation.start();
+    return () => animation.stop();
+  }, [text, revealKey, reduceMotion, roll]);
 
   const main = raised ? text.slice(0, -1) : text;
   const last = raised ? text.slice(-1) : "";
