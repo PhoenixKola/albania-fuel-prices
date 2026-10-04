@@ -51,7 +51,8 @@
             "enableShrinkResourcesInReleaseBuilds": true
           }
         }
-      ]
+      ],
+      "./plugins/withAndroidReleaseOptimization"
     ],
     "extra": {
       "eas": {
