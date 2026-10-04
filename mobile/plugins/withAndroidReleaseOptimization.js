@@ -6,7 +6,6 @@ const LEGACY_DEFAULT = 'getDefaultProguardFile("proguard-android.txt")';
 const OPTIMIZED_DEFAULT = 'getDefaultProguardFile("proguard-android-optimize.txt")';
 const FULL_MODE_PROPERTY = "android.enableR8.fullMode";
 const OPTIMIZED_RESOURCE_SHRINKING_PROPERTY = "android.r8.optimizedResourceShrinking";
-const TEMPLATE_BROAD_KEEP_RULES = /# react-native-reanimated\s*\r?\n-keep class com\.swmansion\.reanimated\.\*\* \{ \*; \}\s*\r?\n-keep class com\.facebook\.react\.turbomodule\.\*\* \{ \*; \}\s*\r?\n?/;
 
 function withOptimizedProguardDefault(config) {
   return withAppBuildGradle(config, (modConfig) => {
@@ -51,15 +50,13 @@ function withR8GradleProperties(config) {
   });
 }
 
-function withLeanProjectProguardRules(config) {
+function withValidatedProjectProguardRules(config) {
   return withDangerousMod(config, [
     "android",
     async (modConfig) => {
       const rulesPath = path.join(modConfig.modRequest.platformProjectRoot, "app", "proguard-rules.pro");
       const original = await fs.promises.readFile(rulesPath, "utf8");
-      const updated = original
-        .replaceAll("proguard-android.txt", "proguard-android-optimize.txt")
-        .replace(TEMPLATE_BROAD_KEEP_RULES, "");
+      const updated = original.replaceAll("proguard-android.txt", "proguard-android-optimize.txt");
 
       const hasDontOptimize = updated
         .split(/\r?\n/)
@@ -77,6 +74,6 @@ function withLeanProjectProguardRules(config) {
 module.exports = function withAndroidReleaseOptimization(config) {
   config = withOptimizedProguardDefault(config);
   config = withR8GradleProperties(config);
-  config = withLeanProjectProguardRules(config);
+  config = withValidatedProjectProguardRules(config);
   return config;
 };
