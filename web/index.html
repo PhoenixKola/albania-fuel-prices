@@ -83,6 +83,22 @@
       })();
     </script>
 
+    <style>
+      /* The homepage prerender is crawlable/no-JS content, but its editorial
+         layout does not match the cinematic React hero. Hide that handoff only
+         when JavaScript is active so it cannot flash before the real UI mounts. */
+      html.home-app-booting #root { opacity: 0; }
+    </style>
+    <script>
+      (function () {
+        if (window.location.pathname !== "/") return;
+        document.documentElement.classList.add("home-app-booting");
+        window.setTimeout(function () {
+          document.documentElement.classList.remove("home-app-booting");
+        }, 4000);
+      })();
+    </script>
+
   </head>
   <body>
     <div id="root"></div>

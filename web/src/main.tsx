@@ -8,9 +8,24 @@ import "./styles/road.css";
 
 prepareInitialHomeIntro();
 
-// A directly loaded page already has useful prerendered HTML in #root. Keep it
-// visible until its route chunk is ready instead of briefly replacing it with
-// the Suspense skeleton (which also pushed the footer across the viewport).
+function revealMountedHomepage() {
+  if (window.location.pathname !== "/") return;
+  let attempts = 0;
+  const revealWhenReady = () => {
+    if (document.querySelector(".homeJourneyHero") || attempts >= 60) {
+      document.documentElement.classList.remove("home-app-booting");
+      return;
+    }
+    attempts += 1;
+    window.requestAnimationFrame(revealWhenReady);
+  };
+  window.requestAnimationFrame(revealWhenReady);
+}
+
+// Directly loaded content routes already have useful prerendered HTML in #root.
+// Keep those visible until their route chunk is ready. The homepage alone uses
+// the boot guard above because its static editorial shell and cinematic hero
+// intentionally have different layouts.
 function preloadInitialRoute(path: string): Promise<unknown> {
   if (path.startsWith("/fuel-prices/")) return import("./pages/CountryFuelPricesPage");
   if (path.startsWith("/road-status")) return import("./pages/RoadStatusPage");
@@ -48,4 +63,5 @@ void preloadInitialRoute(window.location.pathname).catch(() => undefined).then((
       </BrowserRouter>
     </React.StrictMode>
   );
+  revealMountedHomepage();
 });
