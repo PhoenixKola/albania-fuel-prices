@@ -104,6 +104,10 @@
 .homeJourneyHero.is-intro-running .homeHeroNozzleLayer { animation: home-nozzle-emerge 720ms 140ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 .homeJourneyHero.is-intro-running .homeHeroRoadLayer { animation: home-road-reveal 1150ms 520ms cubic-bezier(0.2, 0.75, 0.2, 1) both; }
 .homeJourneyHero.is-intro-running .homeHeroFuelTrail { animation: home-fuel-create-road 900ms 360ms cubic-bezier(0.3, 0.72, 0.2, 1) both; }
+.homeJourneyHero.is-intro-running :is(.homeHeroArtImage, .homeHeroNozzleLayer, .homeHeroRoadLayer, .homeHeroFuelTrail) {
+  backface-visibility: hidden;
+  will-change: opacity, transform, filter, clip-path;
+}
 
 .homeJourneyHero.is-intro-running .homeHeroArt::before { animation: home-vignette-open 1900ms ease-out both; }
 .homeJourneyHero.is-intro-running .homeHeroArt::after { animation: home-grid-resolve 1100ms 850ms ease-out both; }

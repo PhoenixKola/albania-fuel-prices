@@ -116,35 +116,54 @@ export default function HeroIntro({
   const theme = useDocumentTheme();
   const [playIntro] = useState(claimHomeIntro);
   const [introComplete, setIntroComplete] = useState(!playIntro);
+  const [readyTheme, setReadyTheme] = useState<"dark" | "light" | null>(null);
   const iso2 = getIso2ForCountry(model.country);
   const average = signed(model.averageDifference);
   const week = signed(model.weeklyDelta);
   const date = formatDate(data?.as_of, lang, t.notAvailable);
   const valueKey = `${model.country}|${model.fuelType}`;
 
+  const heroReady = readyTheme === theme;
+  const introRunning = playIntro && heroReady && !introComplete;
+
   useEffect(() => {
-    if (!playIntro) return;
+    if (!introRunning) return;
     const timer = window.setTimeout(() => {
       setIntroComplete(true);
       settleHomeIntro();
     }, 2380);
+    return () => window.clearTimeout(timer);
+  }, [introRunning]);
+
+  useEffect(() => {
     return () => {
-      window.clearTimeout(timer);
       // Strict Mode performs a development-only setup/cleanup cycle. Defer the
       // route-unmount check so that cycle does not settle the navbar early.
       window.requestAnimationFrame(() => {
-        if (!document.querySelector(".homeJourneyHero.is-intro-running")) settleHomeIntro();
+        if (!document.querySelector(".homeJourneyHero")) settleHomeIntro();
       });
     };
-  }, [playIntro]);
+  }, []);
 
-  const introRunning = playIntro && !introComplete;
   const heroImage = theme === "light" ? heroLight : heroDark;
+  const markHeroReady = () => {
+    const loadedTheme = theme;
+    window.requestAnimationFrame(() => setReadyTheme(loadedTheme));
+  };
 
   return (
-    <section className={`homeJourneyHero${introRunning ? " is-intro-running" : ""}`} aria-labelledby="home-hero-title">
+    <section className={`homeJourneyHero${heroReady ? " is-intro-ready" : ""}${introRunning ? " is-intro-running" : ""}`} aria-labelledby="home-hero-title">
       <div className="homeHeroArt" aria-hidden="true">
-        <img key={theme} className="homeHeroArtImage" src={heroImage} alt="" fetchPriority="high" decoding="async" />
+        <img
+          key={theme}
+          className="homeHeroArtImage"
+          src={heroImage}
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+          onLoad={markHeroReady}
+          onError={markHeroReady}
+        />
         {introRunning ? (
           <>
             <span className="homeHeroNozzleLayer"><img src={heroImage} alt="" /></span>

@@ -12,7 +12,15 @@ function revealMountedHomepage() {
   if (window.location.pathname !== "/") return;
   let attempts = 0;
   const revealWhenReady = () => {
-    if (document.querySelector(".homeJourneyHero") || attempts >= 60) {
+    if (document.querySelector(".homeJourneyHero.is-intro-ready")) {
+      // Let the decoded artwork and the animation's initial compositor state
+      // settle together before exposing the first frame.
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => document.documentElement.classList.remove("home-app-booting"));
+      });
+      return;
+    }
+    if (attempts >= 240) {
       document.documentElement.classList.remove("home-app-booting");
       return;
     }

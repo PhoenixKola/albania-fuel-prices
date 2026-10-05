@@ -196,7 +196,7 @@ input {
   margin-left: auto;
 }
 
-html[data-home-intro="running"] .navbar {
+html[data-home-intro="running"]:has(.homeJourneyHero.is-intro-running) .navbar {
   animation: home-navbar-resolve 520ms 1780ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
