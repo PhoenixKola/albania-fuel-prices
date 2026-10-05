@@ -330,36 +330,6 @@ const laneStyles = StyleSheet.create({
   dash: { width: 12, height: 1.5, borderRadius: 1 },
 });
 
-/** Static placeholder while the very first dataset loads. No shimmer loop. */
-export function FuelDeckSkeleton({ theme, label }: { theme: Theme; label: string }) {
-  const p = homePalette(theme);
-  const s = makeStyles(theme, p, isCompactHome(theme));
-  return (
-    <View style={s.deck} accessible accessibilityLabel={label}>
-      <View style={s.ignition}>
-        <View style={s.ignitionMeta}>
-          <View style={[s.skeletonBar, { width: 96, height: 9, backgroundColor: p.rule }]} />
-          <View style={[s.skeletonBar, { width: 62, height: 11, backgroundColor: p.rule }]} />
-        </View>
-        <View style={s.routeRail}>
-          <View style={s.routeOrigin} />
-          <View style={s.routeTrack}><View style={[StyleSheet.absoluteFillObject, { backgroundColor: p.rule }]} /></View>
-          <View style={s.routeDestination} />
-        </View>
-      </View>
-      <View style={s.header}>
-        <View style={[s.skeletonBar, { width: 140, backgroundColor: p.rule }]} />
-      </View>
-      <View style={[s.module, { minHeight: 150, justifyContent: "center" }]}>
-        <View style={[s.skeletonBar, { width: "60%", height: 44, backgroundColor: p.moduleRule }]} />
-      </View>
-      <View style={s.stamp}>
-        <Text style={s.stampText}>{label}</Text>
-      </View>
-    </View>
-  );
-}
-
 const makeStyles = (theme: Theme, p: HomePalette, compact: boolean) =>
   StyleSheet.create({
     deck: {
@@ -490,5 +460,4 @@ const makeStyles = (theme: Theme, p: HomePalette, compact: boolean) =>
     dot: { width: 7, height: 7, borderRadius: 4 },
     stampText: { flexShrink: 1, color: p.inkSoft, fontSize: theme.m.f(12), fontWeight: "700" },
     retry: { color: p.accent, fontSize: theme.m.f(12), fontWeight: "900", textDecorationLine: "underline" },
-    skeletonBar: { height: 18, borderRadius: 8 },
   });

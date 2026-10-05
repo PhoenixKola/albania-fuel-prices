@@ -11,7 +11,7 @@ import CountrySearchModal from "../components/country/CountrySearchModal";
 import FavoritesQuickSheet from "../components/country/FavoritesQuickSheet";
 import ErrorCard from "../components/feedback/ErrorCard";
 import AnimatedPressable from "../components/ui/AnimatedPressable";
-import FuelDeck, { FuelDeckSkeleton } from "../components/home/FuelDeck";
+import FuelDeck from "../components/home/FuelDeck";
 import HomeActions, { type HomeAction } from "../components/home/HomeActions";
 import SavedMarketsRail from "../components/home/SavedMarketsRail";
 import MarketPulse from "../components/home/MarketPulse";
@@ -130,7 +130,7 @@ export default function HomeTab() {
     </AnimatedPressable>
   ) : null;
 
-  const deck = ctx.data ? (
+  const deck = ctx.data || ctx.loading ? (
     <FuelDeck
       theme={theme}
       t={t}
@@ -153,8 +153,6 @@ export default function HomeTab() {
       onToggleFavorite={() => ctx.toggleFavorite(ctx.country)}
       onSelectFuel={ctx.setFuelType}
     />
-  ) : ctx.loading ? (
-    <FuelDeckSkeleton theme={theme} label={t.loadingPrices} />
   ) : (
     <ErrorCard theme={theme} title={t.couldntLoad} message={t.dataUnavailable} cta={t.tryAgain} onPress={ctx.refreshAll} />
   );
