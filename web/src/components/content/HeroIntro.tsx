@@ -164,13 +164,7 @@ export default function HeroIntro({
           onLoad={markHeroReady}
           onError={markHeroReady}
         />
-        {introRunning ? (
-          <>
-            <span className="homeHeroNozzleLayer"><img src={heroImage} alt="" /></span>
-            <span className="homeHeroRoadLayer"><img src={heroImage} alt="" /></span>
-            <span className="homeHeroFuelTrail"><i /></span>
-          </>
-        ) : null}
+        {introRunning ? <span className="homeHeroFuelTrail"><i /></span> : null}
       </div>
 
       <div className="homeJourneyGrid">
