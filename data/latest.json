@@ -1,9 +1,9 @@
 {
   "region": "Europe",
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-17",
   "source": "cargopedia.net",
   "source_url": "https://www.cargopedia.net/europe-fuel-prices",
-  "fetched_at_utc": "2026-10-16T11:15:36.327Z",
+  "fetched_at_utc": "2026-10-17T10:34:57.930Z",
   "unit": "EUR_per_liter",
   "countries": [
     {
@@ -187,7 +187,7 @@
       "lpg_eur": 0.958
     },
     {
-      "country": "Türkiye",
+      "country": "Turkey",
       "gasoline95_eur": 1.508,
       "diesel_eur": 1.739,
       "lpg_eur": 0.659
