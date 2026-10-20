@@ -68,7 +68,7 @@ export default function ComparePage({
           <p className="contentBody">{lang === "sq"
             ? "Shtoni vendet e rrugës në listën tuaj, krahasoni të njëjtin karburant dhe kontrolloni datën e secilit treg. Diferenca orientuese nuk përfshin çmimin real në pompë, devijimet apo pagesat e rrugës."
             : "Add the countries on your route to the watchlist, compare the same fuel and check each market's source date. Reference-price differences exclude actual pumps, detours and tolls."}</p>
-          <p className="contentBody"><Link className="inlineLink" to="/trip-cost-calculator">{lang === "sq" ? "Llogarit koston e udhëtimit" : "Calculate trip fuel cost"}</Link> · <Link className="inlineLink" to="/methodology">{lang === "sq" ? "Metodologjia" : "Methodology"}</Link></p>
+          <p className="contentBody"><Link className="inlineLink" to="/trip-cost-calculator">{lang === "sq" ? "Llogarit koston e udhëtimit" : "Calculate trip fuel cost"}</Link> · <Link className="inlineLink" to="/fuel-detour-calculator">{lang === "sq" ? "Llogarit karburantin për devijimin" : "Account for extra detour fuel"}</Link> · <Link className="inlineLink" to="/methodology">{lang === "sq" ? "Metodologjia" : "Methodology"}</Link></p>
         </section>
       </article>
     </>

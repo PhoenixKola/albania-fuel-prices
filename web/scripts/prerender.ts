@@ -22,6 +22,8 @@ import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
 import { countryPageContent } from "../src/config/countryPageContent";
 import { countryMetaDescription } from "../src/config/countryMetaDescription";
 import { compareCountries, comparisonSentence } from "../src/models/countryComparison";
+import { calculateFuelDetour, DEFAULT_DETOUR } from "../src/models/fuelDetour";
+import { fuelDetourCopy } from "../src/config/fuelDetourCopy";
 import { STATIC_ROUTES as ROUTE_CONFIGS } from "../src/config/routes";
 import { i18n } from "../src/locales";
 import { getPublishedArticles } from "../src/config/articles";
@@ -154,12 +156,40 @@ function redesignedStaticContent(route: RouteEntry): RouteEntry {
 }
 
 const revenueConfig = readMonetizationConfig({ ...loadEnv("production", resolve(__dirname, ".."), "VITE_"), ...process.env });
+function fuelDetourStaticContent(ctx: PriceContext): string {
+  const c = fuelDetourCopy.en;
+  const result = calculateFuelDetour(DEFAULT_DETOUR, ctx.latest);
+  const money = (value: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(value);
+  const decimal = (value: number) => new Intl.NumberFormat("en-GB", { maximumFractionDigits: 2 }).format(value);
+  const dates = result?.comparison.sourceDateA === result?.comparison.sourceDateB
+    ? result?.comparison.sourceDateA : `${result?.comparison.sourceDateA ?? "?"} / ${result?.comparison.sourceDateB ?? "?"}`;
+  return `<main class="contentPage detourPage">
+    <header class="detourHero"><p class="travelEyebrow">${escapeHtml(c.eyebrow)}</p><h1>${escapeHtml(c.title)}</h1><p>${escapeHtml(c.lede)}</p></header>
+    <p class="contentBody">Example: ${DEFAULT_DETOUR.litres} L of ${c.diesel} in ${c.Greece} versus ${c.Albania}, with ${DEFAULT_DETOUR.extraKm} extra km at ${DEFAULT_DETOUR.consumption} L/100 km. Enable JavaScript to change these inputs or restore a shared calculation.</p>
+    <section class="contentSection" aria-label="${escapeHtml(c.calculate)}"><h2>${escapeHtml(c.calculate)}</h2>
+    ${result ? `<p class="contentBody"><strong>${escapeHtml(c.net)}: ${money(result.netDifference)}</strong>. ${escapeHtml(result.netDifference > 0.005 ? c.positive : result.netDifference < -0.005 ? c.negative : c.equal)}.</p>
+      <dl><div><dt>${escapeHtml(c.gross)}</dt><dd>${money(result.grossDifference)}</dd></div><div><dt>${escapeHtml(c.extraLitres)}</dt><dd>${decimal(result.extraLitres)} L</dd></div><div><dt>${escapeHtml(c.extraCost)}</dt><dd>${money(result.extraFuelCost)}</dd></div></dl>
+      <p class="contentBody">${escapeHtml(c.date)}: ${escapeHtml(dates ?? "?")}. ${c.Albania}: ${money(result.comparison.priceA)}/L; ${c.Greece}: ${money(result.comparison.priceB)}/L.</p>
+      ${result.comparison.stale ? `<p class="staleNotice">${escapeHtml(c.stale)}</p>` : ""}
+      ${result.comparison.provisional ? `<p class="staleNotice">${escapeHtml(c.unverified)}</p>` : ""}` : `<p class="contentBody">${escapeHtml(c.unavailable)}</p>`}
+    </section>
+    <section class="contentSection"><h2>${escapeHtml(c.methodTitle)}</h2><p class="contentBody">${escapeHtml(c.method)}</p><h2>${escapeHtml(c.limitsTitle)}</h2><p class="contentBody">${escapeHtml(c.limits)}</p><p class="contentBody">${escapeHtml(c.source)}: ${ctx.sourceUrl ? `<a href="${escapeHtml(ctx.sourceUrl)}" rel="noopener noreferrer">${escapeHtml(ctx.source)}</a>` : `<a href="/methodology">${escapeHtml(c.methodology)}</a>`}</p></section>
+    <nav aria-label="Related tools"><a href="/compare">${escapeHtml(c.compare)}</a> · <a href="/trip-cost-calculator">${escapeHtml(c.trip)}</a> · <a href="/methodology">${escapeHtml(c.methodology)}</a></nav>
+  </main>`;
+}
 const STATIC_ROUTES: RouteEntry[] = [
   ...ROUTE_CONFIGS.filter((route) => ["/trip-cost-calculator", "/albania-car-rental-guide"].includes(route.path)).map((route): RouteEntry => ({
     path: route.path, title: route.title, description: route.description, jsonLdType: route.jsonLdType,
     priceBearing: true, datePublished: "2026-09-09", dateModified: "2026-09-09",
     content: (ctx) => travelStaticContent(route.path, ctx, revenueConfig),
   })),
+  {
+    path: "/fuel-detour-calculator",
+    title: "Fuel Detour Calculator | Extra Driving vs Price Gap | Fuel Today",
+    description: "Compare dated Albania, Greece or Kosovo fuel reference prices, then subtract fuel used by a user-entered detour. See the fuel-only difference and source-date caveats.",
+    jsonLdType: "WebPage", datePublished: "2026-10-20", priceBearing: true,
+    content: fuelDetourStaticContent,
+  },
   {
     path: "/",
     title: "Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG",
@@ -263,6 +293,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         <section class="contentSection">
           <h2 class="contentHeading">How to use country comparisons effectively</h2>
           <p class="contentBody">Compare the same fuel in EUR/L, check the market dates, then use actual station prices and route costs for a trip decision. A national price gap alone does not prove a detour saves money.</p>
+          <p class="contentBody"><a href="/fuel-detour-calculator">Account for the extra fuel used by a detour</a> with your own distance and consumption.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Practical comparison examples</h2>

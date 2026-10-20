@@ -7,6 +7,8 @@ import { countryPageContent } from "../src/config/countryPageContent";
 import { countryMetaDescription } from "../src/config/countryMetaDescription";
 import { isCountryIndexable } from "../src/generated/indexableCountries";
 import type { LatestEurope } from "../src/models/fuel";
+import { calculateFuelDetour, DEFAULT_DETOUR } from "../src/models/fuelDetour";
+import { fuelDetourCopy } from "../src/config/fuelDetourCopy";
 
 const dist = resolve(import.meta.dirname, "../dist");
 const data = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../data/latest.json"), "utf8")) as LatestEurope;
@@ -14,7 +16,7 @@ const sitemap = readFileSync(resolve(dist, "sitemap.xml"), "utf8");
 const required = [
   "/", "/fuel-prices/albania", "/fuel-prices/kosovo", "/fuel-prices/greece",
   "/fuel-prices/italy", "/fuel-prices/croatia", "/fuel-prices/portugal",
-  "/compare", "/trip-cost-calculator", "/stations", "/road-status",
+  "/compare", "/trip-cost-calculator", "/fuel-detour-calculator", "/stations", "/road-status",
   "/insights/cross-border-fill-up-math", "/insights/six-months-of-balkan-fuel-prices",
 ];
 const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -33,6 +35,16 @@ for (const route of required) {
   const canonical = `https://karburantisot.com${route === "/" ? "" : route}`;
   assert.ok(html.includes(`<link rel="canonical" href="${canonical}"`), `${route}: canonical destination`);
   assert.ok(sitemap.includes(`<loc>${canonical}</loc>`), `${route}: sitemap`);
+  if (route === "/fuel-detour-calculator") {
+    const copy = fuelDetourCopy.en;
+    const result = calculateFuelDetour(DEFAULT_DETOUR, data);
+    assert.ok(result, "detour: default source pair available");
+    for (const phrase of [copy.title, copy.lede, copy.method, copy.limits, ...(result.comparison.stale ? [copy.stale] : []),
+      new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(result.netDifference)]) {
+      assert.ok(html.includes(escapeHtml(phrase)), `detour: visible shared content: ${phrase.slice(0, 24)}`);
+    }
+    assert.ok(readFileSync(resolve(dist, "compare.html"), "utf8").includes("/fuel-detour-calculator"), "detour: discoverable from Compare");
+  }
   if (!route.startsWith("/fuel-prices/")) continue;
   const editorial = COUNTRY_EDITORIAL.find((country) => route.endsWith(`/${country.slug}`));
   assert.ok(editorial);

@@ -51,9 +51,11 @@ const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
 import RouteSeo from "./RouteSeo";
 import { MonetizationProvider } from "../components/ads/MonetizationProvider";
 const TripCostCalculatorPage = lazy(() => import("../pages/TripCostCalculatorPage"));
+const FuelDetourCalculatorPage = lazy(() => import("../pages/FuelDetourCalculatorPage"));
 const AlbaniaCarRentalGuidePage = lazy(() => import("../pages/AlbaniaCarRentalGuidePage"));
 const RoadStatusPage = lazy(() => import("../pages/RoadStatusPage"));
 import "../styles/travel.css";
+import "../styles/fuel-detour.css";
 import "../styles/editorial.css";
 
 import logo from "../assets/Logo.webp";
@@ -296,6 +298,7 @@ export default function App() {
           <Route path="/how-fuel-prices-work" element={<HowFuelPricesWorkPage t={t} />} />
           <Route path="/europe-fuel-comparison" element={<EuropeFuelComparisonPage t={t} />} />
           <Route path="/trip-cost-calculator" element={<TripCostCalculatorPage lang={lang} data={data} fxRates={fx.rates} loading={loading} />} />
+          <Route path="/fuel-detour-calculator" element={<FuelDetourCalculatorPage lang={lang} data={data} />} />
           <Route path="/albania-car-rental-guide" element={<AlbaniaCarRentalGuidePage lang={lang} data={data} />} />
           <Route path="/road-trip-fuel-guide" element={<RoadTripFuelGuidePage t={t} lang={lang} />} />
           <Route path="/road-status" element={<RoadStatusRoute lang={lang} />} />

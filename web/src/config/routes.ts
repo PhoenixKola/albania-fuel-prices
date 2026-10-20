@@ -34,6 +34,12 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.9, changefreq: "daily", jsonLdType: "WebPage", priceBearing: true, lastmod: "2026-09-09",
   },
   {
+    path: "/fuel-detour-calculator",
+    title: "Fuel Detour Calculator | Extra Driving vs Price Gap | Fuel Today",
+    description: "Compare dated Albania, Greece or Kosovo fuel reference prices, then subtract fuel used by a user-entered detour. See the fuel-only difference and source-date caveats.",
+    priority: 0.7, changefreq: "daily", jsonLdType: "WebPage", priceBearing: true, lastmod: "2026-10-20",
+  },
+  {
     path: "/albania-car-rental-guide",
     title: "Renting a Car in Albania: Fuel Budget & Rental Checklist | Fuel Today",
     description: "Plan an Albania car rental with a dated fuel-budget example and practical questions about fuel policies, deposits, protection and cross-border journeys.",

@@ -52,6 +52,45 @@ async function isolate(page: Page, options: { blockedAds?: boolean; noFx?: boole
   });
   return counters;
 }
+test("detour tool shows dated arithmetic, translates, and remains usable on narrow screens", async ({ page }) => {
+  const counters = await isolate(page, { advertising: false });
+  await page.goto(`${origin}/fuel-detour-calculator`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fuel detour calculator");
+  await expect(page.locator(".detourTotal")).toContainText("€");
+  await expect(page.locator(".detourResult")).toContainText("Source dates");
+  await expect(page.locator(".detourExplainer")).toContainText("not a guaranteed saving");
+  await expect(page.locator(".adsterraPlacement")).toHaveCount(0);
+  await page.screenshot({ path: "test-results/detour-desktop.png", fullPage: true });
+  await expect(page.getByRole("combobox", { name: "Start market" })).toBeVisible();
+  await page.getByRole("button", { name: "Toggle theme", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Switch to Albanian" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Llogaritësi i devijimit për karburant");
+  await expect(page.getByRole("combobox", { name: "Tregu i nisjes" })).toBeVisible();
+  await page.setViewportSize({ width: 320, height: 800 });
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  await page.screenshot({ path: "test-results/detour-mobile-sq-dark.png", fullPage: true });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator(".detourHero")).toBeVisible();
+  expect(counters.adsenseScripts).toBe(0);
+  expect(counters.errors).toEqual([]);
+});
+test("detour page has a dated first answer without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.route("**/*", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.origin !== origin) return route.abort();
+    const file = url.pathname.startsWith("/assets/") ? `dist${url.pathname}` : `dist${url.pathname}.html`;
+    try { return route.fulfill({ path: resolve(file) }); } catch { return route.abort(); }
+  });
+  await page.goto(`${origin}/fuel-detour-calculator`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fuel detour calculator");
+  await expect(page.locator(".detourPage")).toContainText("Fuel-only difference after detour");
+  await expect(page.locator(".detourPage")).toContainText("Source dates");
+  await expect(page.locator(".detourPage")).toContainText("not a guaranteed saving");
+  await context.close();
+});
 test("homepage and Albania price page expose the travel entry points and bounded ad placements", async ({ page }) => {
   const counters = await isolate(page, { advertising: true });
   await page.goto(origin);

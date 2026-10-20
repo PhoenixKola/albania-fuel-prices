@@ -1,0 +1,32 @@
+.detourPage { max-width: 1060px; margin: 36px auto 72px; }
+.detourHero { position: relative; overflow: hidden; padding: clamp(28px, 5vw, 54px); border: 1px solid var(--border); border-radius: 28px; background: radial-gradient(ellipse at 90% 15%, color-mix(in srgb, var(--primary) 17%, var(--card)), var(--card) 70%); }
+.detourHero h1 { max-width: 13ch; margin: 12px 0; font-size: clamp(37px, 6vw, 70px); line-height: 1.04; letter-spacing: -.055em; }
+.detourHero > p:not(.travelEyebrow) { max-width: 68ch; margin: 16px 0 30px; color: var(--muted); font-size: clamp(15px, 2vw, 18px); line-height: 1.7; }
+.detourRoute { display: flex; align-items: center; gap: 16px; width: min(100%, 460px); color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.detourRoute i { position: relative; flex: 1; height: 2px; background: repeating-linear-gradient(90deg, var(--primary) 0 10px, transparent 10px 17px); }
+.detourRoute i::after { content: ""; position: absolute; right: 0; top: -4px; width: 10px; height: 10px; border: 2px solid var(--primary); border-radius: 50%; background: var(--card); }
+.detourWorkspace { display: grid; grid-template-columns: 1.08fr 1fr; align-items: start; gap: 22px; margin-top: 24px; }
+.detourForm h2 { margin: 0 0 20px; font-size: 21px; }
+.detourFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.detourForm label { align-self: start; }
+.detourResult { min-width: 0; padding: 30px; border: 1px solid var(--border); border-radius: 24px; background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--primary) 14%, var(--card)), var(--card-2)); box-shadow: var(--shadow-soft); }
+.detourTotal { display: block; margin: 10px 0 0; font-size: clamp(42px, 5vw, 64px); line-height: 1.1; letter-spacing: -.05em; overflow-wrap: anywhere; }
+.detourOutcome { margin: 8px 0 24px; color: var(--muted); font-size: 14px; }
+.detourBreakdown { margin: 0 0 24px; border-block: 1px solid var(--border); }
+.detourBreakdown div { display: flex; justify-content: space-between; gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--border); }
+.detourBreakdown div:last-child { border-bottom: 0; }
+.detourBreakdown dt { color: var(--muted); font-size: 13px; }
+.detourBreakdown dd { margin: 0; font-size: 16px; font-weight: 750; white-space: nowrap; }
+.detourDate { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.detourResult .btn { width: 100%; justify-content: center; margin-top: 18px; }
+.detourExplainer { max-width: 76ch; margin: 46px 0; }
+.detourExplainer h2 { margin: 32px 0 10px; font-size: clamp(23px, 3vw, 31px); letter-spacing: -.025em; }
+.detourExplainer p { color: var(--muted); line-height: 1.85; }
+.detourExplainer a, .detourRelated a { color: var(--primary); }
+.detourRelated { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 24px; border-top: 1px solid var(--border); }
+.detourRelated a { display: inline-flex; padding: 11px 16px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700; transition: background .15s, border-color .15s, transform .15s; }
+.detourRelated a:hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 9%, var(--card)); transform: translateY(-2px); }
+.detourPage :is(a, button, input):focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+@media (max-width: 760px) { .detourPage { margin-top: 18px; } .detourWorkspace { grid-template-columns: 1fr; } }
+@media (max-width: 440px) { .detourHero, .detourResult, .detourForm { padding: 22px; border-radius: 18px; } .detourFields { grid-template-columns: 1fr; } .detourBreakdown div { align-items: baseline; } .detourRoute { gap: 8px; font-size: 10px; } }
+@media (prefers-reduced-motion: reduce) { .detourRelated a { transition: none; } }
