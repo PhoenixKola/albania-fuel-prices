@@ -23,7 +23,9 @@ export const makeCompareStyles = (theme: Theme) => {
 
   return StyleSheet.create({
     statusRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", columnGap: 8, rowGap: 2 },
+    statusLead: { flexDirection: "row", alignItems: "center", gap: 7, flexShrink: 0 },
     dot: { width: 8, height: 8, borderRadius: 4 },
+    statusDate: { color: p.inkSoft, fontSize: f(13), lineHeight: f(19), fontWeight: "700" },
     statusText: { flexShrink: 1, color: p.inkSoft, fontSize: f(13), lineHeight: f(19), fontWeight: "700" },
     retry: { minHeight: 44, justifyContent: "center", paddingHorizontal: 4 },
     retryText: { color: p.accent, fontSize: f(13), fontWeight: "900", textDecorationLine: "underline" },

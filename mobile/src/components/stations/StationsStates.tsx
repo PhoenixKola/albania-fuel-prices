@@ -15,6 +15,7 @@ export function StationsState(props: {
   icon: IconName;
   title: string;
   body?: string;
+  loading?: boolean;
   primary?: Action;
   secondary?: Action;
 }) {
@@ -22,7 +23,7 @@ export function StationsState(props: {
   return (
     <View style={s.state}>
       <View style={s.stateIcon} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        <Ionicons name={props.icon} size={26} color={p.accent} />
+        {props.loading ? <ActivityIndicator color={p.accent} /> : <Ionicons name={props.icon} size={26} color={p.accent} />}
       </View>
       <Text style={s.stateTitle} accessibilityRole="header">{props.title}</Text>
       {props.body ? <Text style={s.stateBody}>{props.body}</Text> : null}

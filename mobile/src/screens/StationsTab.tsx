@@ -15,6 +15,7 @@ import { StationsSkeleton, StationsState } from "../components/stations/Stations
 import { makeStationStyles, stationsPalette } from "../components/stations/stations.styles";
 import { formatStamp, searchKey, stationTitle } from "../components/stations/stationFormat";
 import { openMaps } from "../utils/maps";
+import { STATION_CITIES } from "../data/stationCities";
 import { isTwoPaneStations, makeStationsTabStyles } from "./StationsTab.styles";
 
 type Phase = "checking" | "permission" | "blocked" | "locating" | "locationError" | "loading" | "loadError" | "empty" | "ready";
@@ -84,11 +85,12 @@ export default function StationsTab() {
 
   const busy = nearby.loading || loc.loading;
   const refreshStations = useCallback(async () => {
-    if (loc.permission !== "granted") return;
+    if (!loc.coords) { if (loc.permission === "granted") await loc.locate(); return; }
+    if (loc.mode === "city") { await nearby.refresh(); return; }
     // Re-read the position first: a station finder should answer for where the driver is now.
     const moved = await loc.locate();
     if (!moved) await nearby.refresh();
-  }, [loc.permission, loc.locate, nearby.refresh]);
+  }, [loc.coords, loc.mode, loc.permission, loc.locate, nearby.refresh]);
 
   const onPull = useCallback(() => {
     setPulling(true);
@@ -97,8 +99,8 @@ export default function StationsTab() {
 
   const hasStations = nearby.stations.length > 0;
   let phase: Phase;
-  if (!loc.checked) phase = "checking";
-  else if (loc.permission !== "granted") phase = loc.permission === "denied" && !loc.canAskAgain ? "blocked" : "permission";
+  if (!loc.checked && !loc.coords) phase = "checking";
+  else if (loc.mode !== "city" && loc.permission !== "granted") phase = loc.permission === "denied" && !loc.canAskAgain ? "blocked" : "permission";
   else if (!loc.coords) phase = loc.loading ? "locating" : "locationError";
   else if (hasStations) phase = "ready";
   else if (nearby.loading) phase = "loading";
@@ -112,7 +114,7 @@ export default function StationsTab() {
   // Home sections
 
   const refreshAction =
-    loc.permission === "granted" && loc.coords ? (
+    loc.coords ? (
       <AnimatedPressable
         onPress={refreshStations}
         disabled={busy}
@@ -125,9 +127,21 @@ export default function StationsTab() {
       </AnimatedPressable>
     ) : null;
 
+  const locationContext = loc.mode === "city" && loc.city ? (
+    <View style={s.centerCard} accessibilityLiveRegion="polite">
+      <View style={s.centerIcon}><Ionicons name="map-outline" size={20} color={p.accent} /></View>
+      <View style={s.statusCopy}><Text style={s.statusTitle}>{t.stationsAroundCity(loc.city[lang])}</Text><Text style={s.statusMeta}>{t.cityCenterDistanceNote}</Text></View>
+      {loc.permission === "granted" ? <AnimatedPressable onPress={loc.locate} contentStyle={s.centerAction} reduceMotion={reduce} accessibilityLabel={t.useDeviceLocation}><Ionicons name="locate-outline" size={18} color={p.accent} /><Text style={s.centerActionText}>{t.useDeviceLocation}</Text></AnimatedPressable> : null}
+    </View>
+  ) : loc.mode === "lastKnown" && loc.coords ? (
+    <View style={s.centerCard}><Ionicons name="time-outline" size={20} color={p.accent} /><Text style={s.centerHint}>{t.recentPositionNote}</Text></View>
+  ) : null;
+
   const statusLine =
     phase === "ready" ? (
-      refreshFailed ? (
+      <>
+      {locationContext}
+      {refreshFailed ? (
         <View style={s.statusCard} accessibilityLiveRegion="polite">
           <View style={s.statusIcon}>
             <Ionicons name="cloud-offline-outline" size={20} color={p.warn} />
@@ -136,7 +150,7 @@ export default function StationsTab() {
             <Text style={s.statusTitle}>{t.showingCached}</Text>
             <Text style={s.statusPrimary}>{t.stationsWithin(nearby.totalCount, km)}</Text>
             <Text style={s.statusMeta}>
-              {[stamp ? t.stationsSavedList(stamp) : null, nearby.error === "timeout" ? t.stationsTimeoutCached : t.refreshFailed]
+              {[stamp ? t.stationsSavedList(stamp) : null, nearby.fromBackup ? t.stationsBackupSource : null, nearby.error === "timeout" ? t.stationsTimeoutCached : t.refreshFailed]
                 .filter(Boolean)
                 .join(" · ")}
             </Text>
@@ -158,10 +172,11 @@ export default function StationsTab() {
         <View style={s.statusRow} accessibilityLiveRegion="polite">
           <View style={s.statusReadyIcon}><Ionicons name="checkmark" size={13} color={p.onAccent} /></View>
           <Text style={s.statusText}>
-            {[t.stationsWithin(nearby.totalCount, km), stamp ? t.stationsUpdatedAt(stamp) : null].filter(Boolean).join(" · ")}
+            {[t.stationsWithin(nearby.totalCount, km), stamp ? t.stationsUpdatedAt(stamp) : null, nearby.fromBackup ? t.stationsBackupSource : null].filter(Boolean).join(" · ")}
           </Text>
         </View>
-      )
+      )}
+      </>
     ) : null;
   const controls =
     phase === "ready" ? (
@@ -210,14 +225,27 @@ export default function StationsTab() {
       </View>
     ) : null;
 
+  const showCities = ["permission", "blocked", "locationError", "locating", "loadError", "empty"].includes(phase) || loc.mode === "city";
+  const cityPicker = showCities ? (
+    <View style={s.cityCard}>
+      <View style={s.cityHeading}><Ionicons name="map-outline" size={19} color={p.accent} /><Text style={s.cityTitle} accessibilityRole="header">{t.browseCityTitle}</Text></View>
+      <Text style={s.cityHint}>{t.browseCityHint}</Text>
+      <View style={s.cityGrid}>{STATION_CITIES.map((city) => (
+        <AnimatedPressable key={city.id} onPress={() => loc.selectCity(city)} contentStyle={[s.cityChip, loc.city?.id === city.id ? s.cityChipActive : null]} reduceMotion={reduce} accessibilityLabel={city[lang]} accessibilityState={{ selected: loc.city?.id === city.id }}>
+          <Text style={[s.cityChipText, loc.city?.id === city.id ? s.cityChipTextActive : null]}>{city[lang]}</Text>
+        </AnimatedPressable>
+      ))}</View>
+    </View>
+  ) : null;
+
   const stage = (() => {
     switch (phase) {
       case "checking":
         return <StationsSkeleton s={s} label={t.loading} />;
       case "locating":
-        return <StationsSkeleton s={s} label={t.stationsNearbyGettingLocation} />;
+        return <StationsState s={s} p={p} reduceMotion={reduce} icon="locate-outline" loading title={t.stationsNearbyGettingLocation} body={t.browseCityHint} />;
       case "loading":
-        return <StationsSkeleton s={s} label={t.stationsLookingWithin(km)} />;
+        return <StationsState s={s} p={p} reduceMotion={reduce} icon="map-outline" loading title={t.stationsLookingWithin(km)} body={t.stationsLookupHint} />;
       case "permission":
         return (
           <StationsState
@@ -249,8 +277,8 @@ export default function StationsTab() {
             p={p}
             reduceMotion={reduce}
             icon="warning-outline"
-            title={t.locationUnavailable}
-            body={t.locationUnavailableHint}
+            title={loc.issue === "servicesOff" ? t.locationServicesOffTitle : t.locationUnavailable}
+            body={loc.issue === "servicesOff" ? t.locationServicesOffHint : t.locationUnavailableHint}
             primary={{ label: t.tryAgain, icon: "refresh", onPress: () => loc.locate(), loading: loc.loading }}
           />
         );
@@ -354,7 +382,7 @@ export default function StationsTab() {
   const Separator = useCallback(() => <View style={s.separator} />, [s]);
 
   const refreshControl =
-    loc.permission === "granted" ? (
+    loc.coords ? (
       <RefreshControl refreshing={pulling} onRefresh={onPull} tintColor={p.accent} colors={[p.accent]} />
     ) : undefined;
 
@@ -414,6 +442,7 @@ export default function StationsTab() {
             {statusLine}
             {controls}
             {stage}
+            {cityPicker}
             {note}
           </ScrollView>
           <View style={layout.feedPane}>{list(feedHeader, layout.feedContent, null)}</View>
@@ -431,6 +460,7 @@ export default function StationsTab() {
           {statusLine}
           {controls}
           {stage}
+          {cityPicker}
           {feedHeader}
         </View>,
         layout.listContent,

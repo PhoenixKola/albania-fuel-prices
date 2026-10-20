@@ -143,7 +143,7 @@ const en: EditorialCopy = {
       eyebrow: "Privacy dossier",
       title: "Privacy, in plain language.",
       lede: "Karburanti Sot works without an account and is designed to keep personal-data collection to a minimum.",
-      updated: "Effective 15 September 2026",
+      updated: "Effective 21 October 2026",
       calloutLabel: "Current advertising status",
       callout: commercialCopy.en.status,
       sections: [
@@ -153,7 +153,7 @@ const en: EditorialCopy = {
           id: "location",
           title: "Location and nearby stations",
           paragraphs: [
-            "The station finder requests device location only after you choose to use it. Your coordinates are sent to our station lookup service and may be processed by OpenStreetMap/Overpass services to retrieve nearby stations and calculate distance. Location is not used to build a profile or for advertising. Permission can be denied or withdrawn; the rest of the service remains available."
+            "The station finder requests device location only after you choose to use it. Your coordinates are sent to our station lookup service to retrieve mapped stations and calculate distance. The Android app can also search from a selected city centre without device-location permission. If the station lookup service cannot respond, Android searches within 10 km may send the selected search coordinates directly to the public OpenStreetMap/Overpass API as a backup. Location is not used to build a profile or for advertising. Permission can be denied or withdrawn; the rest of the service remains available."
           ]
         },{ id: "external-data", title: "External data services", paragraphs: ["The website fetches fuel, exchange-rate, map, and related public data from third-party services. Those providers receive the network information required to answer the request and apply their own privacy terms."] },
         { id: "advertising", title: "Advertising and consent", paragraphs: [commercialCopy.en.ads] },
@@ -311,11 +311,11 @@ const sq: EditorialCopy = {
   },
   policies: {
     privacy: {
-      eyebrow: "Dosja e privatësisë", title: "Privatësia, me fjalë të qarta.", lede: "Karburanti Sot funksionon pa llogari dhe është projektuar të mbledhë sa më pak të dhëna personale.", updated: "Në fuqi nga 15 shtator 2026", calloutLabel: "Statusi aktual i reklamave", callout: commercialCopy.sq.status,
+      eyebrow: "Dosja e privatësisë", title: "Privatësia, me fjalë të qarta.", lede: "Karburanti Sot funksionon pa llogari dhe është projektuar të mbledhë sa më pak të dhëna personale.", updated: "Në fuqi nga 21 tetor 2026", calloutLabel: "Statusi aktual i reklamave", callout: commercialCopy.sq.status,
       sections: [
         { id: "collection", title: "Informacioni që mbledhim", paragraphs: ["Nuk kërkojmë emër, numër telefoni, kredenciale llogarie apo informacion pagese. Shërbimi përdoret pa regjistrim.", "Kërkesat teknike standarde mund t’u ekspozojnë ofruesve të hostimit dhe të dhënave adresën IP, llojin e shfletuesit, pajisjen dhe URL-në e kërkuar për të ofruar shërbimin dhe parandaluar abuzimin."] },
         { id: "local-storage", title: "Preferencat në pajisjen tënde", paragraphs: ["Shteti, karburanti, monedha, tema, lista e ndjekjes dhe progresi i lojërave ruhen në shfletues. Një preferencë privatësie me version regjistron nëse reklamat opsionale janë lejuar, refuzuar apo ende të pavendosura. Këto cilësime nuk janë llogari dhe zakonisht mbeten në pajisje derisa të pastrosh të dhënat."] },
-        { id: "location", title: "Vendndodhja dhe pikat afër", paragraphs: ["Gjetësi i pikave kërkon vendndodhjen vetëm pasi zgjedh ta përdorësh. Koordinatat përdoren për të kërkuar të dhëna harte dhe llogaritur largësinë. Leja mund të refuzohet ose hiqet; pjesa tjetër vazhdon të punojë."] },
+        { id: "location", title: "Vendndodhja dhe pikat afër", paragraphs: ["Gjetësi i pikave kërkon vendndodhjen e pajisjes vetëm pasi zgjedh ta përdorësh. Koordinatat dërgohen te shërbimi ynë i kërkimit të pikave për të marrë të dhëna harte dhe për të llogaritur largësinë. Aplikacioni Android mund të kërkojë edhe nga qendra e një qyteti të zgjedhur pa leje për vendndodhjen. Nëse shërbimi ynë nuk përgjigjet, kërkimet Android deri në 10 km mund t'i dërgojnë koordinatat e kërkimit drejtpërdrejt te API-ja publike OpenStreetMap/Overpass si rezervë. Vendndodhja nuk përdoret për profilizim ose reklama. Leja mund të refuzohet ose hiqet; pjesa tjetër vazhdon të punojë."] },
         { id: "external-data", title: "Shërbimet e jashtme të të dhënave", paragraphs: ["Faqja merr të dhëna publike për karburantin, kursin e këmbimit, hartat dhe shërbime të lidhura. Ofruesit marrin informacionin e rrjetit që nevojitet për t’iu përgjigjur kërkesës dhe zbatojnë politikat e tyre."] },
         { id: "advertising", title: "Reklamat dhe pëlqimi", paragraphs: [commercialCopy.sq.ads] },
         { id: "analytics", title: "Cloudflare Web Analytics", paragraphs: [commercialCopy.sq.analytics] },

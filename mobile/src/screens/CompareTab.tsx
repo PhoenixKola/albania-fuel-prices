@@ -112,14 +112,14 @@ export default function CompareTab() {
 
   // ── Blocks ────────────────────────────────────────────────────────────────
 
+  const statusNotes = ctx.data ? [
+    ctx.data.countries.filter((row) => model.visible.includes(row.country) && (row.provenance || (row.source_as_of && row.source_as_of !== ctx.data?.as_of))).map((row) => `${row.country}: ${row.provenance ? t.sourceDateUnverified : t.pricesOf(formatShortDate(row.source_as_of, t))}`).join(", ") || null,
+    ctx.error ? t.refreshFailed : null,
+  ].filter(Boolean).join(" · ") : "";
   const status = ctx.data ? (
     <View style={s.statusRow}>
-      <View style={[s.dot, { backgroundColor: ctx.error ? p.warn : p.accent }]} />
-      <Text style={s.statusText}>
-        {[t.pricesOf(formatShortDate(ctx.data.as_of, t)),
-          ctx.data.countries.filter((row) => model.visible.includes(row.country) && (row.provenance || (row.source_as_of && row.source_as_of !== ctx.data?.as_of))).map((row) => `${row.country}: ${row.provenance ? t.sourceDateUnverified : t.pricesOf(formatShortDate(row.source_as_of, t))}`).join(", ") || null,
-          ctx.error ? t.refreshFailed : null].filter(Boolean).join(" · ")}
-      </Text>
+      <View style={s.statusLead}><View style={[s.dot, { backgroundColor: ctx.error ? p.warn : p.accent }]} /><Text style={s.statusDate}>{t.pricesOf(formatShortDate(ctx.data.as_of, t))}</Text></View>
+      {statusNotes ? <Text style={s.statusText}>{statusNotes}</Text> : null}
       {ctx.error ? (
         <AnimatedPressable onPress={ctx.refreshAll} contentStyle={s.retry} haptic={false} reduceMotion={reduce} accessibilityLabel={t.tryAgain}>
           <Text style={s.retryText}>{t.tryAgain}</Text>

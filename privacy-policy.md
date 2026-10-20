@@ -1,6 +1,6 @@
 # Privacy Policy — Karburanti Sot
 
-_Last updated: 2026-09-06_
+_Last updated: 2026-10-21_
 
 Karburanti Sot (“the App”) displays public fuel price information, allows you to save basic preferences, and provides an optional feature for finding fuel stations near your location.
 
@@ -18,7 +18,7 @@ If you grant permission, your device coordinates are sent securely to our statio
 
 `fuel-proxy.fenixkola.workers.dev`
 
-The coordinates may also be processed by third-party mapping and geographic data services, such as OpenStreetMap / Overpass, in order to find fuel stations near your location and calculate their distance from you.
+If that service cannot respond, nearby searches of up to 10 km may send the requested coordinates directly to the public OpenStreetMap / Overpass API as a backup. You can also choose an Albanian city centre without granting device-location permission; in that case the city-centre coordinates, not your phone's location, are used. Station results and the chosen search centre may be cached locally on your device.
 
 Your location is used only to provide nearby station results. We do not use your location to create a user profile, track your movements, or personalize advertising.
 

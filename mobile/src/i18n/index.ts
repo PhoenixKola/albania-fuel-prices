@@ -181,6 +181,16 @@ export type TDict = {
   locationPermissionDeniedHint: string;
   locationUnavailable: string;
   locationUnavailableHint: string;
+  locationServicesOffTitle: string;
+  locationServicesOffHint: string;
+  browseCityTitle: string;
+  browseCityHint: string;
+  stationsAroundCity: (city: string) => string;
+  cityCenterDistanceNote: string;
+  useDeviceLocation: string;
+  recentPositionNote: string;
+  stationsBackupSource: string;
+  stationsLookupHint: string;
   stationsLoadError: string;
   stationsTimeoutCached: string;
   linkUnavailable: string;
@@ -535,8 +545,18 @@ export const i18n: Record<Lang, TDict> = {
     locationPermissionDenied: "Location access is off",
     locationPermissionDeniedHint: "Enable location in device settings to find stations near you.",
     locationUnavailable: "Location unavailable",
-    locationUnavailableHint: "We could not determine your location. Check your connection and try again.",
-    stationsLoadError: "Stations could not be loaded. Pull to refresh or try again.",
+    locationUnavailableHint: "Your phone did not provide a position. Try again outdoors, or browse stations around a city centre below.",
+    locationServicesOffTitle: "Device location is off",
+    locationServicesOffHint: "Turn on Location in your phone settings, then try again. You can also browse by city without device location.",
+    browseCityTitle: "Browse by city",
+    browseCityHint: "Search from a city centre instead. Distances will be measured from that centre, not your phone.",
+    stationsAroundCity: (city: string) => `Stations around ${city}`,
+    cityCenterDistanceNote: "Distances are from the city centre.",
+    useDeviceLocation: "Use my location",
+    recentPositionNote: "Using a recent device position; refresh to try for a new fix.",
+    stationsBackupSource: "OpenStreetMap backup lookup",
+    stationsLookupHint: "Checking mapped stations. If the main lookup is unavailable, a bounded OpenStreetMap backup is tried automatically.",
+    stationsLoadError: "The map lookup is unavailable right now. Check your connection and retry; saved results appear when available.",
     stationsTimeoutCached: "Live station search is taking longer than usual. Your saved results are ready.",
     linkUnavailable: "This link is unavailable right now.",
     dataUnavailable: "Data unavailable",
@@ -892,8 +912,18 @@ export const i18n: Record<Lang, TDict> = {
     locationPermissionDenied: "Qasja në vendndodhje është çaktivizuar",
     locationPermissionDeniedHint: "Aktivizo vendndodhjen te cilësimet e pajisjes për të gjetur pikat pranë teje.",
     locationUnavailable: "Vendndodhja nuk disponohet",
-    locationUnavailableHint: "Nuk mundëm ta përcaktonim vendndodhjen. Kontrollo lidhjen dhe provo përsëri.",
-    stationsLoadError: "Pikat nuk mund të ngarkoheshin. Tërhiq për të rifreskuar ose provo përsëri.",
+    locationUnavailableHint: "Telefoni nuk dha një pozicion. Provo sërish jashtë ose shfleto pikat rreth qendrës së një qyteti më poshtë.",
+    locationServicesOffTitle: "Vendndodhja e pajisjes është fikur",
+    locationServicesOffHint: "Aktivizo Vendndodhjen te cilësimet e telefonit dhe provo sërish. Mund të shfletosh edhe sipas qytetit pa vendndodhjen e pajisjes.",
+    browseCityTitle: "Shfleto sipas qytetit",
+    browseCityHint: "Kërko nga qendra e një qyteti. Distancat maten nga ajo qendër, jo nga telefoni yt.",
+    stationsAroundCity: (city: string) => `Pikat rreth ${city}`,
+    cityCenterDistanceNote: "Distancat janë nga qendra e qytetit.",
+    useDeviceLocation: "Përdor vendndodhjen time",
+    recentPositionNote: "Po përdoret një pozicion i fundit i pajisjes; rifresko për një pozicion të ri.",
+    stationsBackupSource: "Kërkim rezervë në OpenStreetMap",
+    stationsLookupHint: "Po kontrollohen pikat në hartë. Nëse kërkimi kryesor nuk punon, provohet automatikisht një kërkim rezervë i kufizuar në OpenStreetMap.",
+    stationsLoadError: "Kërkimi në hartë nuk disponohet tani. Kontrollo lidhjen dhe provo sërish; rezultatet e ruajtura shfaqen kur janë të disponueshme.",
     stationsTimeoutCached: "Kërkimi i drejtpërdrejtë po zgjat më shumë se zakonisht. Rezultatet e ruajtura janë gati.",
     linkUnavailable: "Kjo lidhje nuk është e disponueshme tani.",
     dataUnavailable: "Të dhënat nuk disponohen",

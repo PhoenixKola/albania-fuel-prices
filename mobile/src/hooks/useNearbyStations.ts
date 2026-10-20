@@ -30,10 +30,14 @@ type CacheEnvelope = {
   center: { lat: number; lon: number };
   radiusM: number;
   stations: Station[];
+  source?: "proxy" | "backup";
 };
 
 const CACHE_TTL_MS = 15 * 60 * 1000;
-const FETCH_TIMEOUT_MS = 12 * 1000;
+const FETCH_TIMEOUT_MS = 8 * 1000;
+const BACKUP_TIMEOUT_MS = 15 * 1000;
+const BACKUP_MAX_RADIUS_M = 10000;
+const OVERPASS_BACKUP_URL = "https://overpass-api.de/api/interpreter";
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** Placeholder older app versions wrote into the cache for unnamed stations. */
 const LEGACY_UNNAMED = "Fuel station";
@@ -102,6 +106,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<StationsError>(null);
   const [fromCache, setFromCache] = useState(false);
+  const [fromBackup, setFromBackup] = useState(false);
   const [cacheSavedAtUtc, setCacheSavedAtUtc] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -109,7 +114,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
   // strict=true enforces the TTL; strict=false accepts any age for the same centre and radius.
   const loadCache = useCallback(async (strict: boolean) => {
     if (centerLat === null || centerLon === null) return null;
-    const env = safeParse(await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY));
+    const env = safeParse(await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY).catch(() => null));
     if (!env) return null;
 
     if (strict && Date.now() - new Date(env.savedAtUtc).getTime() > CACHE_TTL_MS) return null;
@@ -119,6 +124,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
 
     setStations(withFreshHours(env.stations));
     setFromCache(true);
+    setFromBackup(env.source === "backup");
     setCacheSavedAtUtc(env.savedAtUtc);
     return env;
   }, [centerLat, centerLon, radiusM]);
@@ -127,19 +133,40 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     if (centerLat === null || centerLon === null) return;
 
     abortRef.current?.abort();
-    const controller = new AbortController();
+    let controller = new AbortController();
     abortRef.current = controller;
 
     setLoading(true);
     setError(null);
 
-    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    let timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    let timedOut = false;
 
     try {
       const url = `${OVERPASS_URL}?lat=${encodeURIComponent(centerLat)}&lon=${encodeURIComponent(centerLon)}&radiusM=${encodeURIComponent(radiusM)}`;
-      const r = await fetch(url, { method: "GET", signal: controller.signal });
-      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-      const json = await r.json();
+      let json: { elements?: unknown[] };
+      let usedBackup = false;
+      try {
+        const r = await fetch(url, { method: "GET", signal: controller.signal });
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+        json = await r.json();
+        if (!Array.isArray(json?.elements)) throw new Error("Invalid station response");
+      } catch (primaryError) {
+        if (abortRef.current !== controller) return;
+        timedOut = controller.signal.aborted;
+        if (radiusM > BACKUP_MAX_RADIUS_M) throw primaryError;
+        // Public Overpass is a bounded backup for ordinary nearby searches only.
+        clearTimeout(timeoutId);
+        controller = new AbortController();
+        abortRef.current = controller;
+        timeoutId = setTimeout(() => controller.abort(), BACKUP_TIMEOUT_MS);
+        const query = `[out:json][timeout:15];(node["amenity"="fuel"](around:${radiusM},${centerLat},${centerLon});way["amenity"="fuel"](around:${radiusM},${centerLat},${centerLon}););out center;`;
+        const backup = await fetch(`${OVERPASS_BACKUP_URL}?data=${encodeURIComponent(query)}`, { signal: controller.signal });
+        if (!backup.ok) throw new Error(`${backup.status} ${backup.statusText}`);
+        json = await backup.json();
+        if (!Array.isArray(json?.elements)) throw new Error("Invalid backup response");
+        usedBackup = true;
+      }
       if (abortRef.current !== controller) return;
 
       const elements: any[] = Array.isArray(json?.elements) ? json.elements : [];
@@ -175,20 +202,22 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
       const savedAtUtc = new Date().toISOString();
       setStations(parsed);
       setFromCache(false);
+      setFromBackup(usedBackup);
       setCacheSavedAtUtc(savedAtUtc);
 
-      const env: CacheEnvelope = { savedAtUtc, center: { lat: centerLat, lon: centerLon }, radiusM, stations: parsed };
+      const env: CacheEnvelope = { savedAtUtc, center: { lat: centerLat, lon: centerLon }, radiusM, stations: parsed, source: usedBackup ? "backup" : "proxy" };
       AsyncStorage.setItem(STORAGE_STATIONS_CACHE_KEY, JSON.stringify(env)).catch(() => {});
     } catch {
       // A superseded request (newer refresh or changed centre/radius) is dropped silently.
       if (abortRef.current !== controller) return;
 
-      const kind: StationsError = controller.signal.aborted ? "timeout" : "failed";
+      const kind: StationsError = controller.signal.aborted || timedOut ? "timeout" : "failed";
       const usedCache = await loadCache(false);
       if (abortRef.current !== controller) return;
       if (!usedCache) {
         setStations([]);
         setFromCache(false);
+        setFromBackup(false);
         setCacheSavedAtUtc(null);
       }
       setError(kind);
@@ -203,6 +232,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     // A new centre or radius must never keep showing the previous result set.
     setStations([]);
     setFromCache(false);
+    setFromBackup(false);
     setCacheSavedAtUtc(null);
     setError(null);
     (async () => {
@@ -230,5 +260,5 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     return () => sub.remove();
   }, [recheckHours]);
 
-  return { stations, totalCount: stations.length, loading, error, refresh, recheckHours, fromCache, cacheSavedAtUtc };
+  return { stations, totalCount: stations.length, loading, error, refresh, recheckHours, fromCache, fromBackup, cacheSavedAtUtc };
 }

@@ -43,7 +43,6 @@ export default function SettingsTab() {
   const healthColor = dataUnavailable ? ctx.theme.colors.danger : ctx.isFromCache ? ctx.theme.colors.warning : ctx.theme.colors.success;
 
   const themeOptions: Array<{ value: ThemePreference; label: string; icon: React.ComponentProps<typeof Ionicons>["name"] }> = [
-    { value: "system", label: ctx.t.themeSystem, icon: "phone-portrait-outline" },
     { value: "light", label: ctx.t.themeLight, icon: "sunny-outline" },
     { value: "dark", label: ctx.t.themeDark, icon: "moon-outline" },
   ];
@@ -62,7 +61,7 @@ export default function SettingsTab() {
 
         <View style={s.appearanceCard}>
           <View style={s.appearanceHeader}>
-            <View style={s.headerCopy}><Text style={s.cardKicker}>{ctx.t.appearance}</Text><Text style={s.cardTitle}>{ctx.themePreference === "system" ? ctx.t.followDeviceTheme : ctx.themePreference === "dark" ? ctx.t.themeDark : ctx.t.themeLight}</Text></View>
+            <View style={s.headerCopy}><Text style={s.cardKicker}>{ctx.t.appearance}</Text><Text style={s.cardTitle}>{ctx.themePreference === "dark" ? ctx.t.themeDark : ctx.t.themeLight}</Text></View>
             <View style={s.appearanceIcon}><Ionicons name={ctx.themeName === "dark" ? "moon" : "sunny"} size={27} color={ctx.theme.colors.primary} /></View>
           </View>
           <View style={s.themeOptions} accessibilityRole="tablist">

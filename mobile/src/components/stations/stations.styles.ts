@@ -69,6 +69,20 @@ export const makeStationStyles = (theme: Theme) => {
       borderColor: p.chipBorder,
     },
     retryText: { color: p.accent, fontSize: f(13), fontWeight: "900" },
+    centerCard: { flexDirection: large ? "column" : "row", flexWrap: "wrap", alignItems: large ? "flex-start" : "center", gap: 10, padding: 13, borderRadius: 17, backgroundColor: p.accentSoft, borderWidth: 1, borderColor: p.chipBorder },
+    centerIcon: { width: 38, height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: p.deck },
+    centerHint: { flex: 1, color: p.inkSoft, fontSize: f(13), lineHeight: f(19), fontWeight: "700" },
+    centerAction: { minHeight: 44, flexDirection: "row", flexShrink: 1, alignItems: "center", justifyContent: "center", gap: 5, paddingHorizontal: 10, borderRadius: 12, backgroundColor: p.deck },
+    centerActionText: { color: p.accent, fontSize: f(12), fontWeight: "900" },
+    cityCard: { gap: 11, padding: 17, borderRadius: 20, backgroundColor: p.deck, borderWidth: 1, borderColor: p.chipBorder },
+    cityHeading: { flexDirection: "row", alignItems: "center", gap: 8 },
+    cityTitle: { color: p.ink, fontSize: f(17), lineHeight: f(23), fontWeight: "900" },
+    cityHint: { color: p.inkSoft, fontSize: f(13), lineHeight: f(19), fontWeight: "600" },
+    cityGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+    cityChip: { minWidth: 88, minHeight: 44, flexGrow: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 12, borderRadius: 12, borderWidth: 1, borderColor: p.chipBorder, backgroundColor: p.chip },
+    cityChipActive: { borderColor: p.accent, backgroundColor: p.accentSoft },
+    cityChipText: { color: p.ink, fontSize: f(13), fontWeight: "800" },
+    cityChipTextActive: { color: p.accent },
 
     // Next stop
     deck: {

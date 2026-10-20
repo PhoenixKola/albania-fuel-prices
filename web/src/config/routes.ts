@@ -153,7 +153,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     priority: 0.4,
     changefreq: "yearly",
     jsonLdType: "WebPage",
-    lastmod: "2026-09-09",
+    lastmod: "2026-10-21",
   },
   {
     path: "/terms",
