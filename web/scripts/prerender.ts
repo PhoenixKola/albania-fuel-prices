@@ -171,7 +171,7 @@ function fuelDetourStaticContent(ctx: PriceContext): string {
       <dl><div><dt>${escapeHtml(c.gross)}</dt><dd>${money(result.grossDifference)}</dd></div><div><dt>${escapeHtml(c.extraLitres)}</dt><dd>${decimal(result.extraLitres)} L</dd></div><div><dt>${escapeHtml(c.extraCost)}</dt><dd>${money(result.extraFuelCost)}</dd></div></dl>
       <p class="contentBody">${escapeHtml(c.date)}: ${escapeHtml(dates ?? "?")}. ${c.Albania}: ${money(result.comparison.priceA)}/L; ${c.Greece}: ${money(result.comparison.priceB)}/L.</p>
       ${result.comparison.stale ? `<p class="staleNotice">${escapeHtml(c.stale)}</p>` : ""}
-      ${result.comparison.provisional ? `<p class="staleNotice">${escapeHtml(c.unverified)}</p>` : ""}` : `<p class="contentBody">${escapeHtml(c.unavailable)}</p>`}
+      ${result.comparison.provisional ? `<p class="staleNotice">${escapeHtml(c.unverified)}</p>` : ""}` : `<p class="contentBody">${escapeHtml(ctx.latest ? c.unavailable : c.noData)}</p>`}
     </section>
     <section class="contentSection"><h2>${escapeHtml(c.methodTitle)}</h2><p class="contentBody">${escapeHtml(c.method)}</p><h2>${escapeHtml(c.limitsTitle)}</h2><p class="contentBody">${escapeHtml(c.limits)}</p><p class="contentBody">${escapeHtml(c.source)}: ${ctx.sourceUrl ? `<a href="${escapeHtml(ctx.sourceUrl)}" rel="noopener noreferrer">${escapeHtml(ctx.source)}</a>` : `<a href="/methodology">${escapeHtml(c.methodology)}</a>`}</p></section>
     <nav aria-label="Related tools"><a href="/compare">${escapeHtml(c.compare)}</a> · <a href="/trip-cost-calculator">${escapeHtml(c.trip)}</a> · <a href="/methodology">${escapeHtml(c.methodology)}</a></nav>

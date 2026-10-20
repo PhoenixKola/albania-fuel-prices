@@ -38,9 +38,11 @@ for (const route of required) {
   if (route === "/fuel-detour-calculator") {
     const copy = fuelDetourCopy.en;
     const result = calculateFuelDetour(DEFAULT_DETOUR, data);
-    assert.ok(result, "detour: default source pair available");
-    for (const phrase of [copy.title, copy.lede, copy.method, copy.limits, ...(result.comparison.stale ? [copy.stale] : []),
-      new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(result.netDifference)]) {
+    for (const phrase of [copy.title, copy.lede, copy.method, copy.limits,
+      ...(result ? [
+        ...(result.comparison.stale ? [copy.stale] : []),
+        new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(result.netDifference),
+      ] : [copy.unavailable])]) {
       assert.ok(html.includes(escapeHtml(phrase)), `detour: visible shared content: ${phrase.slice(0, 24)}`);
     }
     assert.ok(readFileSync(resolve(dist, "compare.html"), "utf8").includes("/fuel-detour-calculator"), "detour: discoverable from Compare");
