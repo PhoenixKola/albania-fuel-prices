@@ -170,6 +170,7 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
     refresh();
   }, [key, refresh]);
 
-  const top = useMemo(() => stations.slice(0, 100), [stations]);
-  return { stations: top, totalCount: stations.length, loading, error, refresh };
+  // The view paginates eight results and renders only that page on the map.
+  // Do not silently hide valid results beyond the first hundred.
+  return { stations, totalCount: stations.length, loading, error, refresh };
 }

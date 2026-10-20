@@ -118,7 +118,7 @@ test("polished travel UI follows the active theme and keeps compact CTAs", async
   await expect(page.locator(".travelExample .editorialAction")).toHaveCSS("color", "rgb(237, 248, 243)");
 
   await page.goto(`${origin}/fuel-prices/albania`);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Albania fuel prices today");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Albania fuel prices");
   await expect(page.locator(".countryDecisionGrid")).toContainText("€100.00");
   await expect(page.locator(".countryDecisionGrid")).toContainText("Kosovo");
   expect(counters.errors).toEqual([]);
@@ -129,7 +129,7 @@ test("station search states its real data scope and exposes one page heading", a
   await page.goto(`${origin}/stations`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fuel stations near me");
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-  await expect(page.locator("body")).toContainText("does not report each station's current pump price");
+  await expect(page.locator("body")).toContainText("does not show current prices at individual pumps");
   expect(counters.errors).toEqual([]);
 });
 
@@ -649,10 +649,10 @@ test("Road Reality metrics, sections and warning are responsive and theme-aware 
 test("priority landing pages ship unique metadata, one H1 and slashless canonicals", async () => {
   const pages = [
     { path: "/", file: "dist/index.html", title: "Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG" },
-    { path: "/fuel-prices/albania", file: "dist/fuel-prices/albania.html", title: "Fuel Prices in Albania Today | Petrol, Diesel & LPG" },
-    { path: "/fuel-prices/croatia", file: "dist/fuel-prices/croatia.html", title: "Croatia Fuel Prices Today | Petrol, Diesel & LPG per Litre" },
-    { path: "/fuel-prices/greece", file: "dist/fuel-prices/greece.html", title: "Greece Fuel Prices Today | Petrol & Diesel per Litre" },
-    { path: "/fuel-prices/portugal", file: "dist/fuel-prices/portugal.html", title: "Portugal Fuel Prices Today | Petrol & Diesel per Litre" },
+    { path: "/fuel-prices/albania", file: "dist/fuel-prices/albania.html", title: "Albania Fuel Prices | Petrol, Diesel & LPG per Litre" },
+    { path: "/fuel-prices/croatia", file: "dist/fuel-prices/croatia.html", title: "Croatia Fuel Prices | Petrol, Diesel & LPG per Litre" },
+    { path: "/fuel-prices/greece", file: "dist/fuel-prices/greece.html", title: "Greece Fuel Prices | Petrol & Diesel vs Albania" },
+    { path: "/fuel-prices/portugal", file: "dist/fuel-prices/portugal.html", title: "Portugal Fuel Prices | Petrol, Diesel & LPG per Litre" },
     { path: "/insights", file: "dist/insights.html", title: "Albania Fuel Price Analysis & Balkan Market Insights" },
     { path: "/stations", file: "dist/stations.html", title: "Fuel Stations Near Me | Map, Distance & Opening Hours" },
   ];

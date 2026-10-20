@@ -17,6 +17,7 @@ const FLAT_EPSILON = 0.0005;
 export type Freshness =
   | { kind: "loading" }
   | { kind: "none" }
+  | { kind: "unverified"; savedAt: string | null }
   | { kind: "fresh"; asOf: string; stale: boolean }
   | { kind: "offline"; asOf: string; savedAt: string | null; checking: boolean };
 
@@ -143,6 +144,12 @@ export function useHomeMarket() {
 
   const freshness: Freshness = useMemo(() => {
     if (!data) return ctx.loading ? { kind: "loading" } : { kind: "none" };
+    if (selected?.provenance === "date-unverified" || selected?.provenance === "historical-fallback") {
+      return { kind: "unverified", savedAt: selected.source_as_of ? formatShortDate(selected.source_as_of, t) : null };
+    }
+    if (selected?.source_as_of && selected.source_as_of !== data.as_of) {
+      return { kind: "fresh", asOf: formatShortDate(selected.source_as_of, t), stale: true };
+    }
     if (ctx.isFromCache) {
       return {
         kind: "offline",
@@ -154,7 +161,7 @@ export function useHomeMarket() {
     const asOfMs = new Date(`${data.as_of}T12:00:00`).getTime();
     const ageDays = Number.isFinite(asOfMs) ? (Date.now() - asOfMs) / 86400000 : 0;
     return { kind: "fresh", asOf: formatShortDate(data.as_of, t), stale: ageDays > STALE_AFTER_DAYS };
-  }, [data, ctx.loading, ctx.refreshing, ctx.isFromCache, ctx.cacheSavedAtUtc, t]);
+  }, [data, selected, ctx.loading, ctx.refreshing, ctx.isFromCache, ctx.cacheSavedAtUtc, t]);
 
   const fmt = (eur: number | null) => formatAmount(eur, mode, currency, fxRates);
   const fmtSigned = (eur: number) => formatSignedAmount(eur, mode, currency, fxRates);

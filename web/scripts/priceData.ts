@@ -15,6 +15,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
 import { isEuropeanCountry } from "../src/utils/regions";
+import type { LatestEurope } from "../src/models/fuel";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "../../data");
@@ -34,6 +35,7 @@ type TrendSeries = {
 export type PriceContext = {
   /** False when the data files could not be read; renderers return "". */
   ok: boolean;
+  latest: LatestEurope | null;
   /** ISO date the prices refer to, e.g. "2026-07-06". */
   asOf: string;
   /** Human-readable form, e.g. "6 July 2026". */
@@ -52,6 +54,7 @@ export type PriceContext = {
 export async function loadPriceContext(): Promise<PriceContext> {
   const empty: PriceContext = {
     ok: false,
+    latest: null,
     asOf: "",
     asOfLabel: "",
     source: "",
@@ -62,12 +65,7 @@ export async function loadPriceContext(): Promise<PriceContext> {
     trends: {},
   };
 
-  let latest: {
-    as_of?: string;
-    source?: string;
-    source_url?: string;
-    countries?: { country: string; gasoline95_eur: number | null; diesel_eur: number | null; lpg_eur: number | null }[];
-  };
+  let latest: LatestEurope;
   try {
     latest = JSON.parse(readFileSync(resolve(DATA_DIR, "latest.json"), "utf-8"));
   } catch (err) {
@@ -102,6 +100,7 @@ export async function loadPriceContext(): Promise<PriceContext> {
 
   return {
     ok: true,
+    latest,
     asOf: latest.as_of,
     asOfLabel: formatDate(latest.as_of),
     source: latest.source ?? "public fuel price aggregators",
@@ -149,7 +148,7 @@ function formatDate(iso: string): string {
 }
 
 export function fmtEur(value: number | null): string {
-  return value == null ? "n/a" : `€${value.toFixed(2)}`;
+  return value == null ? "n/a" : `€${value.toFixed(3)}`;
 }
 
 function fmtAll(valueEur: number | null, allPerEur: number | null): string {
@@ -201,6 +200,10 @@ export function renderCountryPriceSection(
 ): string {
   if (!ctx.ok) return "";
   const prices = ctx.prices.get(country.dataCountryName);
+  const market = ctx.latest?.countries.find((row) => row.country === country.dataCountryName);
+  const marketDate = market?.provenance === "historical-fallback" || market?.provenance === "date-unverified"
+    ? market.source_as_of ?? "date unverified"
+    : market?.source_as_of ?? ctx.asOfLabel;
 
   if (!prices) {
     return `
@@ -226,7 +229,7 @@ export function renderCountryPriceSection(
 
   return `
         <section class="contentSection">
-          <h2 class="contentHeading">Current fuel prices in ${esc(country.label)} (${ctx.asOfLabel})</h2>
+          <h2 class="contentHeading">Fuel reference prices in ${esc(country.label)} (${esc(marketDate)})</h2>
           <table class="contentTable">
             <thead>
               <tr>
@@ -239,7 +242,7 @@ export function renderCountryPriceSection(
             </tbody>
           </table>
           <p class="contentBody">${renderTrendSentence(ctx, country)}</p>
-          <p class="contentBodyMuted">Country-level average as of ${ctx.asOfLabel}, sourced from ${esc(ctx.source)}${showAll ? ". ALL values are indicative conversions at a mid-market exchange rate" : ""}. Individual station prices vary — see <a href="/methodology">our methodology</a>.</p>
+          <p class="contentBodyMuted">Country-level reference reading; source date ${esc(marketDate)}, from ${esc(market?.source ?? (market?.provenance ? "previous collected value; market source unverified" : ctx.source))}${showAll ? ". ALL values are indicative conversions at a mid-market exchange rate" : ""}. Individual station prices vary — see <a href="/methodology">our methodology</a>.</p>
         </section>`;
 }
 
@@ -376,7 +379,7 @@ export function renderComparePairs(ctx: PriceContext): string {
         if (theirs == null || ours == null) return "n/a";
         const d = theirs - ours;
         const sign = d > 0 ? "+" : d < 0 ? "−" : "±";
-        return `${sign}€${Math.abs(d).toFixed(2)}`;
+        return `${sign}€${Math.abs(d).toFixed(3)}`;
       };
       return `
             <tr>
@@ -389,8 +392,8 @@ export function renderComparePairs(ctx: PriceContext): string {
 
   return `
         <section class="contentSection">
-          <h2 class="contentHeading">Albania vs neighbors today (${ctx.asOfLabel})</h2>
-          <p class="contentBody">Live differences against Albania's current averages of ${fmtEur(albania.petrol)}/L petrol and ${fmtEur(albania.diesel)}/L diesel. A positive delta means fuel there costs more than in Albania.</p>
+          <h2 class="contentHeading">Albania versus nearby reference markets</h2>
+          <p class="contentBody">Using the main source reading dated ${ctx.asOfLabel}, Albania's petrol reference is ${fmtEur(albania.petrol)}/L and diesel ${fmtEur(albania.diesel)}/L. Positive differences mean a higher reference in the listed market. Kosovo may have a different or unverified source date; check its country page. Individual pumps vary.</p>
           <table class="contentTable">
             <thead>
               <tr>
@@ -403,20 +406,4 @@ export function renderComparePairs(ctx: PriceContext): string {
             </tbody>
           </table>
         </section>`;
-}
-
-/** Short live-price line for meta descriptions, or "" when unavailable. */
-/** Joins the live-price prefix to a base description, capped for SERP display. */
-export function composeDescription(prefix: string, base: string, max = 158): string {
-  const full = prefix + base;
-  if (full.length <= max) return full;
-  const cut = full.slice(0, max);
-  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\s]+$/, "") + "…";
-}
-
-export function priceMetaPrefix(ctx: PriceContext, dataCountryName: string): string {
-  if (!ctx.ok) return "";
-  const p = ctx.prices.get(dataCountryName);
-  if (!p || p.petrol == null || p.diesel == null) return "";
-  return `Petrol ${fmtEur(p.petrol)}/L, diesel ${fmtEur(p.diesel)}/L as of ${ctx.asOfLabel}. `;
 }

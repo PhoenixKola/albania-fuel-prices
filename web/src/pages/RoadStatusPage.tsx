@@ -113,6 +113,7 @@ export default function RoadStatusPage({ lang, initialSlug }: { lang: Lang; init
           <p className="roadStatusExplanation">{lang === "sq" ? (route.overallStatus === "RESTRICTED" ? "Një njoftim i Policisë së Shtetit kufizon mjetet e rënda dhe autobusët në Arrat e Gurrës deri në një njoftim tjetër. Gjatë këtij kontrolli nuk u verifikua njoftim më i ri për rihapjen." : "Në burimet e kontrolluara nuk u verifikua njoftim aktual i autoriteteve për këtë itinerar. Kjo nuk provon se rruga është e hapur.") : route.statusExplanation}</p>
           <p className="roadConditionWarning">{c.warning}</p>
           <p className="roadStoredReviewNote">{c.storedReview}</p>
+          {freshness.state === "stale" ? <p className="roadNotice" role="status">{lang === "sq" ? `Ky rishikim është ${freshness.ageDays} ditë i vjetër. Statusi aktual i rrugës nuk është verifikuar; kontrolloni burimet zyrtare para nisjes.` : `This stored source review is ${freshness.ageDays} days old. Current road conditions have not been verified; check official updates before departure.`}</p> : null}
           <dl className="roadResultFacts">
             <div className="roadMetricTimestamp"><dt>{c.lastChecked}</dt><dd><strong>{checkedAt.date}</strong><span>{checkedAt.time}</span></dd></div>
             <div><dt>{c.confidence}</dt><dd><strong>{lang === "sq" && route.confidence === "LOW" ? "E ULËT" : route.confidence}</strong></dd></div>

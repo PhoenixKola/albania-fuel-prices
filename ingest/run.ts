@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { pathToFileURL } from "url";
 import * as cheerio from "cheerio";
-import { PDFParse } from "pdf-parse";
 import { buildTrends } from "./trends";
+import { parseDateFromText, validSourceDate } from "./sourceDate";
 
 const SOURCES = [
   {
@@ -18,14 +19,18 @@ const SOURCES = [
 ];
 
 const KOSOVO_FUELO_URL = "https://gr.fuelo.net/world/country/27?lang=en";
-const TCS_EUROPE_FUEL_PDF_URL =
-  "https://www.tcs.ch/mam/Digital-Media/PDF/Info-Sheet/benzinpreise-in-der-schweiz-und-in-europa.pdf";
 
 type CountryPrices = {
   country: string;
   gasoline95_eur: number | null;
   diesel_eur: number | null;
   lpg_eur: number | null;
+  /** Optional provenance for a market supplied outside the main Europe table. */
+  source?: string;
+  source_url?: string;
+  source_as_of?: string;
+  last_observed_at?: string;
+  provenance?: "historical-fallback" | "date-unverified";
 };
 
 type LatestEurope = {
@@ -49,10 +54,11 @@ type HistoryEurope = {
 };
 
 function toNum(v: string) {
-  const s = String(v).trim();
+  const s = String(v).trim().replace(/^€\s*/, "");
   if (!s || s === "-" || s.toLowerCase() === "n/a") return null;
-  const n = Number(s.replace(",", ".").replace(/[^0-9.]/g, ""));
-  return Number.isFinite(n) ? n : null;
+  if (!/^\d+(?:[.,]\d+)?$/.test(s)) return null;
+  const n = Number(s.replace(",", "."));
+  return Number.isFinite(n) && n >= 0.1 && n <= 10 ? n : null;
 }
 
 async function fetchHtml(url: string) {
@@ -63,51 +69,8 @@ async function fetchHtml(url: string) {
   return await res.text();
 }
 
-async function fetchBuffer(url: string) {
-  const res = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; albania-fuel-prices/1.0)" },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-  return Buffer.from(await res.arrayBuffer());
-}
-
-function isoTodayUTC() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 function ensureDir(p: string) {
   fs.mkdirSync(p, { recursive: true });
-}
-
-function parseDateFromText(text: string) {
-  const m = text.match(/(\d{1,2})\.\s*([A-Za-z]+)\s*(\d{4})/);
-  if (!m) return isoTodayUTC();
-
-  const day = Number(m[1]);
-  const monName = m[2].toLowerCase();
-  const year = Number(m[3]);
-
-  const map: Record<string, number> = {
-    january: 1,
-    february: 2,
-    march: 3,
-    april: 4,
-    may: 5,
-    june: 6,
-    july: 7,
-    august: 8,
-    september: 9,
-    october: 10,
-    november: 11,
-    december: 12,
-  };
-
-  const month = map[monName];
-  if (!month) return isoTodayUTC();
-
-  const mm = String(month).padStart(2, "0");
-  const dd = String(day).padStart(2, "0");
-  return `${year}-${mm}-${dd}`;
 }
 
 function normalizeCountry(s: string) {
@@ -118,18 +81,27 @@ function sameCountry(a: string, b: string) {
   return normalizeCountry(a).toLowerCase() === normalizeCountry(b).toLowerCase();
 }
 
-function upsertCountry(countries: CountryPrices[], country: CountryPrices): CountryPrices[] {
+function uniqueSourceCountries(rows: CountryPrices[]): CountryPrices[] {
+  const unique = new Map<string, CountryPrices>();
+  for (const row of rows) {
+    const key = row.country.toLocaleLowerCase("en");
+    const previous = unique.get(key);
+    if (previous && (["gasoline95_eur", "diesel_eur", "lpg_eur"] as const).some((fuel) => previous[fuel] !== row[fuel])) {
+      throw new Error(`Conflicting source rows for ${row.country}`);
+    }
+    unique.set(key, previous ?? row);
+  }
+  return [...unique.values()].sort((a, b) => a.country.localeCompare(b.country));
+}
+
+export function upsertCountry(countries: CountryPrices[], country: CountryPrices): CountryPrices[] {
   return countries
     .filter((item) => !sameCountry(item.country, country.country))
     .concat(country)
     .sort((a, b) => a.country.localeCompare(b.country));
 }
 
-function upsertCountries(countries: CountryPrices[], additions: CountryPrices[]): CountryPrices[] {
-  return additions.reduce((next, country) => upsertCountry(next, country), countries);
-}
-
-function getLastCountryFromHistory(history: HistoryEurope, countryName: string): CountryPrices | null {
+export function getLastCountryFromHistory(history: HistoryEurope, countryName: string): CountryPrices | null {
   const newestFirst = [...history.series].sort((a, b) => b.as_of.localeCompare(a.as_of));
 
   for (const point of newestFirst) {
@@ -141,6 +113,8 @@ function getLastCountryFromHistory(history: HistoryEurope, countryName: string):
       gasoline95_eur: found.gasoline95_eur,
       diesel_eur: found.diesel_eur,
       lpg_eur: found.lpg_eur,
+      last_observed_at: point.as_of,
+      provenance: "historical-fallback",
     };
   }
 
@@ -152,7 +126,7 @@ function positivePrice(value: string) {
   return parsed != null && parsed > 0 ? parsed : null;
 }
 
-function parseKosovoFromFuelo(html: string): CountryPrices | null {
+export function parseKosovoFromFuelo(html: string): CountryPrices | null {
   const $ = cheerio.load(html);
   const candidates: CountryPrices[] = [];
 
@@ -163,12 +137,18 @@ function parseKosovoFromFuelo(html: string): CountryPrices | null {
       .get();
 
     if (cells.length < 3 || !/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(cells[0])) return;
+    const [day, month, year] = cells[0].split(".");
+    const sourceDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    if (!validSourceDate(sourceDate)) return;
 
     const candidate: CountryPrices = {
       country: "Kosovo",
       gasoline95_eur: positivePrice(cells[1] ?? ""),
       diesel_eur: positivePrice(cells[2] ?? ""),
       lpg_eur: positivePrice(cells[3] ?? ""),
+      source: "fuelo.net",
+      source_url: KOSOVO_FUELO_URL,
+      source_as_of: sourceDate,
     };
 
     if (candidate.gasoline95_eur != null || candidate.diesel_eur != null || candidate.lpg_eur != null) {
@@ -176,45 +156,7 @@ function parseKosovoFromFuelo(html: string): CountryPrices | null {
     }
   });
 
-  return candidates.at(-1) ?? null;
-}
-
-function parseKosovoFromTcsPdfText(text: string): CountryPrices | null {
-  const line = text
-    .split(/\r?\n/)
-    .map((item) => item.replace(/\s+/g, " ").trim())
-    .find((item) => /^XXK\s+Kosovo\s+EUR\s+/i.test(item));
-
-  if (!line) return null;
-
-  const parts = line.split(/\s+/);
-  if (parts.length < 10 || parts[0] !== "XXK" || parts[1] !== "Kosovo" || parts[2] !== "EUR") return null;
-
-  const candidate: CountryPrices = {
-    country: "Kosovo",
-    gasoline95_eur: positivePrice(parts[7] ?? ""),
-    diesel_eur: positivePrice(parts[9] ?? ""),
-    lpg_eur: null,
-  };
-
-  if (candidate.gasoline95_eur == null && candidate.diesel_eur == null) return null;
-  return candidate;
-}
-
-async function fetchKosovoFromTcsPdf(): Promise<CountryPrices | null> {
-  let parser: InstanceType<typeof PDFParse> | null = null;
-
-  try {
-    const data = await fetchBuffer(TCS_EUROPE_FUEL_PDF_URL);
-    parser = new PDFParse({ data });
-    const parsed = await parser.getText();
-    return parseKosovoFromTcsPdfText(parsed.text);
-  } catch (error) {
-    console.warn("Kosovo TCS PDF fetch failed:", error instanceof Error ? error.message : error);
-    return null;
-  } finally {
-    await parser?.destroy();
-  }
+  return candidates.sort((a, b) => (a.source_as_of ?? "").localeCompare(b.source_as_of ?? "")).at(-1) ?? null;
 }
 
 async function fetchKosovoPrices(): Promise<CountryPrices | null> {
@@ -226,17 +168,21 @@ async function fetchKosovoPrices(): Promise<CountryPrices | null> {
     console.warn("Kosovo Fuelo fetch failed:", error instanceof Error ? error.message : error);
   }
 
-  return await fetchKosovoFromTcsPdf();
+  // The secondary PDF row has no per-price publication date. It cannot
+  // establish a current reading, so we retain a labelled historical fallback.
+  return null;
 }
 
-function parseCargopediaEurope(html: string) {
+export function parseCargopediaEurope(html: string) {
   const $ = cheerio.load(html);
   const pageText = $("body").text().replace(/\s+/g, " ").trim();
   const as_of = parseDateFromText(pageText);
+  if (!as_of) throw new Error("Cargopedia publication date is missing or invalid");
 
   const rows: string[] = [];
   $("tr").each((_, el) => {
-    const t = $(el).text().replace(/\s+/g, " ").trim();
+    const cells = $(el).find("th,td").toArray().map((cell) => $(cell).text().trim());
+    const t = (cells.length ? cells.join(" ") : $(el).text()).replace(/\s+/g, " ").trim();
     if (t) rows.push(t);
   });
 
@@ -261,18 +207,19 @@ function parseCargopediaEurope(html: string) {
 
   if (!countries.length) throw new Error("Could not parse Europe table from cargopedia");
 
-  countries.sort((a, b) => a.country.localeCompare(b.country));
-  return { as_of, countries };
+  return { as_of, countries: uniqueSourceCountries(countries) };
 }
 
-function parseTollsEurope(html: string) {
+export function parseTollsEurope(html: string) {
   const $ = cheerio.load(html);
   const pageText = $("body").text().replace(/\s+/g, " ").trim();
   const as_of = parseDateFromText(pageText);
+  if (!as_of) throw new Error("Tolls publication date is missing or invalid");
 
   const rows: string[] = [];
   $("tr").each((_, el) => {
-    const t = $(el).text().replace(/\s+/g, " ").trim();
+    const cells = $(el).find("th,td").toArray().map((cell) => $(cell).text().trim());
+    const t = (cells.length ? cells.join(" ") : $(el).text()).replace(/\s+/g, " ").trim();
     if (t) rows.push(t);
   });
 
@@ -296,8 +243,7 @@ function parseTollsEurope(html: string) {
 
   if (!countries.length) throw new Error("Could not parse Europe table from tolls.eu");
 
-  countries.sort((a, b) => a.country.localeCompare(b.country));
-  return { as_of, countries };
+  return { as_of, countries: uniqueSourceCountries(countries) };
 }
 
 async function main() {
@@ -308,13 +254,17 @@ async function main() {
   for (const s of SOURCES) {
     try {
       const html = await fetchHtml(s.url);
-      const parsed = s.parser(html) as any;
+      const parsed = s.parser(html);
       picked = { source: s.name, url: s.url, as_of: parsed.as_of, countries: parsed.countries };
       break;
     } catch {}
   }
 
   if (!picked) throw new Error("All sources failed (cargopedia.net and tolls.eu).");
+  if (picked.countries.filter((country) => country.gasoline95_eur != null || country.diesel_eur != null).length < 20 ||
+      !picked.countries.some((country) => sameCountry(country.country, "Albania"))) {
+    throw new Error("Source table lacks sufficient valid European prices; keeping the previous public snapshot.");
+  }
 
   const outDir = path.join(process.cwd(), "..", "data");
   ensureDir(outDir);
@@ -332,6 +282,22 @@ async function main() {
       throw new Error("data/history.json exists but has no valid series — refusing to overwrite it.");
     }
     history = { region: "Europe", unit: "EUR_per_liter", series: parsed.series };
+  }
+
+  if (fs.existsSync(latestPath)) {
+    const previous = JSON.parse(fs.readFileSync(latestPath, "utf8")) as LatestEurope;
+    if (validSourceDate(previous.as_of) && picked.as_of < previous.as_of) {
+      throw new Error(`Source date ${picked.as_of} predates published snapshot ${previous.as_of}; keeping the previous data.`);
+    }
+    if (picked.as_of === previous.as_of) {
+      const mainCountries = previous.countries.filter((country) => !sameCountry(country.country, "Kosovo"));
+      const sourceCountries = picked.countries.filter((country) => !sameCountry(country.country, "Kosovo"));
+      if (JSON.stringify(mainCountries) === JSON.stringify(sourceCountries)) {
+        console.log(`Source publication ${picked.as_of} is unchanged; no new observation written.`);
+        return;
+      }
+      throw new Error(`Source values changed without a newer publication date (${picked.as_of}); manual review required.`);
+    }
   }
 
   const kosovoLive = await fetchKosovoPrices();
@@ -372,7 +338,8 @@ async function main() {
   history.series.push({
     as_of: latest.as_of,
     source: latest.source,
-    countries: latest.countries,
+    // A historical Kosovo fallback is not a new Kosovo observation.
+    countries: latest.countries.filter((country) => country.provenance !== "historical-fallback"),
   });
   history.series.sort((a, b) => a.as_of.localeCompare(b.as_of));
 
@@ -386,7 +353,9 @@ async function main() {
   console.log("Countries:", latest.countries.length);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

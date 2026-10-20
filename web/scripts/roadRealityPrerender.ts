@@ -31,6 +31,7 @@ export function renderRoadRealityStatic(route: RoadRoute, includeRouteIndex = fa
           <p class="contentBody">${escapeHtml(route.statusExplanation)}</p>
           <p class="contentBody"><strong>Source reviewed:</strong> ${escapeHtml(formatRoadTimestamp(route.lastCheckedAt))}. <strong>Confidence:</strong> ${route.confidence}. <strong>Known restricted or closed sections:</strong> ${counts.RESTRICTED + counts.CLOSED}. <strong>Unknown sections:</strong> ${counts.UNKNOWN}.</p>
           <p class="contentBodyMuted">Check route displays the latest stored source review. It does not query road authorities in real time.</p>
+          ${freshness.state === "stale" ? `<p class="roadNotice" role="status">This stored review is ${freshness.ageDays} days old. Current road conditions are unverified; check official updates before departure.</p>` : ""}
           <p class="contentBody"><a href="/trip-cost-calculator">Calculate fuel cost</a></p>
         </section>
         <section class="contentSection">

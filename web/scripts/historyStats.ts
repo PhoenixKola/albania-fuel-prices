@@ -319,40 +319,36 @@ export function spreadSeries(
 
 // ─── Interpretation helpers ─────────────────────────────────────────────────
 
-/**
- * Plain-language verdict on where today's price sits in the observed range.
- * This is the site's most practically useful original output: "is now a good
- * time to fill up, relative to everything we have recorded?"
- */
+/** Descriptive position within the collected observations; no price forecast. */
 export function fillUpVerdict(s: FuelStats): { label: string; detail: string } {
   const p = s.percentile;
   if (p <= 15) {
     return {
-      label: "Unusually cheap",
-      detail: `Today is cheaper than ${100 - p}% of the days we have recorded. If your tank is low, this is a good time to fill it.`,
+      label: "Near the lower end",
+      detail: `${p}% of recorded observations were strictly below this value. This describes past observations, not future prices.`,
     };
   }
   if (p <= 40) {
     return {
-      label: "Below average",
-      detail: `Today sits in the cheaper ${p === 0 ? "end" : `${p}%`} of our recorded range — a reasonable time to refuel.`,
+      label: "Lower part of the record",
+      detail: `${p}% of recorded observations were strictly below this value. This is not a forecast.`,
     };
   }
   if (p < 60) {
     return {
-      label: "About average",
-      detail: "Today's price is close to the middle of everything we have recorded. No strong reason to wait or rush.",
+      label: "Middle of the record",
+      detail: `${p}% of recorded observations were strictly below this value. Equal observations are not counted as lower.`,
     };
   }
   if (p < 85) {
     return {
-      label: "Above average",
-      detail: `Today is more expensive than ${p}% of recorded days. Consider filling only what you need if you can wait.`,
+      label: "Upper part of the record",
+      detail: `${p}% of recorded observations were strictly below this value. This is not a forecast.`,
     };
   }
   return {
-    label: "Near record high",
-    detail: `Today is more expensive than ${p}% of the days we have recorded. Unless your tank is empty, waiting may pay off.`,
+    label: "Near the upper end",
+    detail: `${p}% of recorded observations were strictly below this value. This describes past observations, not future prices.`,
   };
 }
 

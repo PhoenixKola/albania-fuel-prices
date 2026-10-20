@@ -5,6 +5,11 @@ export type CountryPrices = {
   gasoline95_eur: number | null;
   diesel_eur: number | null;
   lpg_eur: number | null;
+  source?: string;
+  source_url?: string;
+  source_as_of?: string;
+  last_observed_at?: string;
+  provenance?: "historical-fallback" | "date-unverified";
 };
 
 export type LatestEurope = {

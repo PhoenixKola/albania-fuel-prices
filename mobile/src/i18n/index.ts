@@ -197,6 +197,7 @@ export type TDict = {
   freshSynced: string;
   freshChecking: string;
   freshStale: string;
+  sourceDateUnverified: string;
   offlineCopy: (saved: string) => string;
   refreshFailed: string;
   loadingPrices: string;
@@ -555,6 +556,7 @@ export const i18n: Record<Lang, TDict> = {
     freshSynced: "synced",
     freshChecking: "checking for updates",
     freshStale: "no newer publication",
+    sourceDateUnverified: "Source date unverified",
     offlineCopy: (saved: string) => `Offline copy · saved ${saved}`,
     refreshFailed: "Couldn’t refresh",
     loadingPrices: "Loading prices…",
@@ -906,6 +908,7 @@ export const i18n: Record<Lang, TDict> = {
     freshSynced: "sinkronizuar",
     freshChecking: "po kontrollohet",
     freshStale: "pa publikim më të ri",
+    sourceDateUnverified: "Data e burimit e paverifikuar",
     offlineCopy: (saved: string) => `Kopje offline · ruajtur ${saved}`,
     refreshFailed: "Rifreskimi dështoi",
     loadingPrices: "Po ngarkohen çmimet…",

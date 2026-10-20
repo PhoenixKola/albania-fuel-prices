@@ -2,25 +2,13 @@ import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Seo from "../components/meta/Seo";
 import { getCountryEditorial } from "../config/countryContent";
+import { countryMetaDescription } from "../config/countryMetaDescription";
 import { getRouteConfig } from "../config/routes";
 import { getArticle } from "../config/articles";
 import type { LatestEurope } from "../models/fuel";
 import { normalizeCanonicalPath } from "../utils/canonical";
 import { getRoadRoute } from "../data/roadRoutes";
 import { roadRouteDescription, roadRouteTitle } from "../utils/roadSeo";
-
-function countryDescription(base: string, country: string, data: LatestEurope | null) {
-  const row = data?.countries.find((item) => item.country === country);
-  if (row?.gasoline95_eur == null || row.diesel_eur == null || !data?.as_of) return base;
-  const date = new Date(`${data.as_of}T00:00:00Z`).toLocaleDateString("en-GB", {
-    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
-  });
-  const prefix = `Petrol €${row.gasoline95_eur.toFixed(3)}/L, diesel €${row.diesel_eur.toFixed(3)}/L as of ${date}. `;
-  const full = prefix + base;
-  if (full.length <= 158) return full;
-  const cut = full.slice(0, 158);
-  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\s]+$/, "")}…`;
-}
 
 export default function RouteSeo({ data }: { data: LatestEurope | null }) {
   const { pathname } = useLocation();
@@ -53,7 +41,7 @@ export default function RouteSeo({ data }: { data: LatestEurope | null }) {
       if (editorial) {
         return {
           title: editorial.metaTitle,
-          description: countryDescription(editorial.metaDescription, editorial.dataCountryName, data),
+          description: countryMetaDescription(editorial.metaDescription, editorial.dataCountryName, data),
           path: canonicalPath,
         };
       }

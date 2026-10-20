@@ -93,7 +93,7 @@ export function renderCountryAnalysis(
       ? ` ${label} ${FUEL_SHORT[primary.fuel]} has now moved ${primary.streak.direction === "up" ? "higher" : "lower"} for ${primary.streak.days} consecutive readings.`
       : "";
 
-  const narrative = `Since ${hist.startLabel} we have recorded ${primary.daysObserved} daily ${FUEL_SHORT[primary.fuel]} readings for ${label}. Over that period the price ${trendWord(primary.changePct.all)} ${pct(primary.changePct.all)}, ranging from a low of ${eur3(primary.min)} on ${formatDate(primary.minDate)} to a high of ${eur3(primary.max)} on ${formatDate(primary.maxDate)}. Today's ${eur3(primary.current)} is ${primary.percentile >= 50 ? `more expensive than ${primary.percentile}%` : `cheaper than ${100 - primary.percentile}%`} of the days in that record.${streakSentence}`;
+  const narrative = `From ${hist.startLabel} to ${hist.endLabel} we collected ${primary.daysObserved} ${FUEL_SHORT[primary.fuel]} observations for ${label}. Over that record the price ${trendWord(primary.changePct.all)} ${pct(primary.changePct.all)}, ranging from ${eur3(primary.min)} on ${formatDate(primary.minDate)} to ${eur3(primary.max)} on ${formatDate(primary.maxDate)}. The last recorded ${eur3(primary.current)} was above ${primary.percentile}% of observations; equal observations are excluded.${streakSentence}`;
 
   return `
         <section class="contentSection">
@@ -101,7 +101,7 @@ export function renderCountryAnalysis(
           <p class="contentBody">${narrative}</p>
           ${chart}
           <div class="verdictBox">
-            <p class="verdictLabel">Refuelling verdict: ${esc(verdict.label)}</p>
+            <p class="verdictLabel">Historical position: ${esc(verdict.label)}</p>
             <p class="contentBody contentBodyNoMargin">${esc(verdict.detail)}</p>
           </div>
           <div class="tableScroll">
@@ -110,7 +110,7 @@ export function renderCountryAnalysis(
             <thead>
               <tr>
                 <th scope="col">Fuel</th>
-                <th scope="col">Today</th>
+                <th scope="col">Last observed</th>
                 <th scope="col">Period low</th>
                 <th scope="col">Period high</th>
                 <th scope="col">Average</th>
@@ -123,7 +123,7 @@ export function renderCountryAnalysis(
             </tbody>
           </table>
           </div>
-          <p class="contentBodyMuted">Range, average, percentile and volatility figures are calculated by Karburanti Sot from our own daily observations — they are not published by the upstream price source. See <a href="/methodology">how we collect and compute this</a>.</p>
+          <p class="contentBodyMuted">These are our collection-day observations, not verified upstream publication dates. Repeated source values may appear on multiple days. See <a href="/methodology">how we collect and compute this</a>.</p>
         </section>`;
 }
 
@@ -155,9 +155,9 @@ export function renderSpreadSection(
   return `
         <section class="contentSection">
           <h2 class="contentHeading">${label} vs Albania: how the gap has moved</h2>
-          <p class="contentBody">Diesel in ${label} is currently ${eur3(Math.abs(current))} per liter ${dearer ? "more expensive than" : "cheaper than"} in Albania. Across the ${series.length} days we have tracked both markets, the average gap was ${eur3(Math.abs(avg))} per liter ${avg > 0 ? "in Albania's favour" : `in ${country.label}'s favour`}, and the widest gap recorded was ${eur3(Math.abs(widest.value))} on ${formatDate(widest.date)}.</p>
+          <p class="contentBody">On the last matched observation (${formatDate(series[series.length - 1].date)}), diesel in ${label} was ${eur3(Math.abs(current))} per liter ${dearer ? "more expensive than" : "cheaper than"} in Albania. Across ${series.length} matched collection dates, the average gap was ${eur3(Math.abs(avg))} per liter ${avg > 0 ? "in Albania's favour" : `in ${country.label}'s favour`}, and the widest gap recorded was ${eur3(Math.abs(widest.value))} on ${formatDate(widest.date)}.</p>
           ${chart}
-          <p class="contentBody">On a 50-litre tank, today's difference is worth about ${eur(Math.abs(current) * 50)} — ${dearer ? `fill up in Albania before crossing into ${label}` : `worth waiting to refuel in ${label}`}. Use the <a href="/compare">comparison tool</a> to check this against other neighbouring markets before you travel.</p>
+          <p class="contentBody">At those dated national reference prices, the difference for 50 litres would be about ${eur(Math.abs(current) * 50)}. This is an illustration, not a recommendation to detour or delay refuelling; actual pumps, route and consumption differ. Check the <a href="/compare">comparison tool</a> before travel.</p>
         </section>`;
 }
 
@@ -171,11 +171,8 @@ function albanianDate(iso: string): string {
 }
 
 function albanianVerdict(percentile: number): { label: string; detail: string } {
-  if (percentile <= 15) return { label: "Jashtëzakonisht lirë", detail: `Sot është më lirë se ${100 - percentile}% e ditëve të regjistruara. Nëse rezervuari është bosh, ky është një moment i mirë për ta mbushur.` };
-  if (percentile <= 40) return { label: "Nën mesatare", detail: `Sot gjendet në pjesën më të lirë të intervalit tonë të regjistruar — një moment i arsyeshëm për t'u furnizuar.` };
-  if (percentile < 60) return { label: "Rreth mesatares", detail: "Çmimi i sotëm është pranë mesit të të gjitha vlerave të regjistruara. Nuk ka arsye të fortë për të pritur ose nxituar." };
-  if (percentile < 85) return { label: "Mbi mesatare", detail: `Sot është më shtrenjtë se ${percentile}% e ditëve të regjistruara. Nëse mund të presësh, konsidero të furnizosh vetëm aq sa të duhet.` };
-  return { label: "Pranë rekordit maksimal", detail: `Sot është më shtrenjtë se ${percentile}% e ditëve të regjistruara. Nëse rezervuari nuk është bosh, pritja mund të vlejë.` };
+  const label = percentile <= 15 ? "Pranë fundit të poshtëm" : percentile <= 40 ? "Në pjesën e poshtme" : percentile < 60 ? "Në mes të intervalit" : percentile < 85 ? "Në pjesën e sipërme" : "Pranë fundit të sipërm";
+  return { label, detail: `${percentile}% e vëzhgimeve të regjistruara ishin rreptësisht më të ulëta. Kjo përshkruan të kaluarën, nuk parashikon çmimin e ardhshëm.` };
 }
 
 export function renderHomeMarketSummary(hist: HistoryContext, lang: "en" | "sq" = "en"): string {
@@ -203,26 +200,26 @@ export function renderHomeMarketSummary(hist: HistoryContext, lang: "en" | "sq" 
 
   if (lang === "sq") return `
         <section class="contentSection">
-          <h2 class="contentHeading">Tregu i sotëm në një paragraf</h2>
-          <p class="contentBody">Nafta në Shqipëri kushton sot ${eur3(alb.current)} për litër, ${pct(alb.changePct.d30)} gjatë 30 ditëve të fundit dhe ${pct(alb.changePct.all)} që prej fillimit të regjistrimit më ${startLabel}.${albRank ? ` Kjo e vendos Shqipërinë në vendin e ${albRank} si tregu më i lirë ndër ${ranked.length} tregjet evropiane që ndjekim.` : ""}${vsAvg != null ? ` Mesatarja evropiane sot është ${eur3(euAvg!)}, prandaj drejtuesit në Shqipëri paguajnë ${eur3(Math.abs(vsAvg))} ${vsAvg > 0 ? "mbi" : "nën"} mesataren e kontinentit.` : ""}</p>
+          <h2 class="contentHeading">Leximi i fundit në një paragraf</h2>
+          <p class="contentBody">Në vëzhgimin e fundit të mbledhur më ${endLabel}, nafta në Shqipëri ishte ${eur3(alb.current)} për litër, ${pct(alb.changePct.d30)} kundrejt vëzhgimit rreth 30 ditë më parë dhe ${pct(alb.changePct.all)} që prej ${startLabel}.${albRank ? ` Kjo e vendos Shqipërinë në vendin e ${albRank} ndër ${ranked.length} tregjet evropiane të ndjekura.` : ""}${vsAvg != null ? ` Mesatarja e tregjeve të ndjekura ishte ${eur3(euAvg!)}, ${eur3(Math.abs(vsAvg))} ${vsAvg > 0 ? "nën" : "mbi"} vlerën e Shqipërisë.` : ""}</p>
           <div class="verdictBox">
-            <p class="verdictLabel">Vlerësimi për furnizimin në Shqipëri: ${esc(verdict.label)}</p>
+            <p class="verdictLabel">Pozicioni historik: ${esc(verdict.label)}</p>
             <p class="contentBody contentBodyNoMargin">${esc(verdict.detail)}</p>
           </div>
           ${chart}
-          <p class="contentBodyMuted">Llogaritur nga ${hist.daysObserved} ditë vëzhgimesh tona të çmimeve. Analizën e plotë e gjeni te <a href="/market-report">raporti ditor i tregut</a>.</p>
+          <p class="contentBodyMuted">Llogaritur nga ${hist.daysObserved} vëzhgime sipas ditës së mbledhjes, jo domosdoshmërisht sipas ditës së publikimit nga burimi. Shihni <a href="/market-report">raportin e tregut</a>.</p>
         </section>`;
 
   return `
         <section class="contentSection">
-          <h2 class="contentHeading">Today's market in one paragraph</h2>
-          <p class="contentBody">Albanian diesel stands at ${eur3(alb.current)} per liter today, ${pct(alb.changePct.d30)} over the past 30 days and ${pct(alb.changePct.all)} since we began recording on ${startLabel}.${albRank ? ` That places Albania ${ordinal(albRank)} cheapest of the ${ranked.length} European markets we track.` : ""}${vsAvg != null ? ` The European average today is ${eur3(euAvg!)}, so Albanian drivers are paying ${eur3(Math.abs(vsAvg))} ${vsAvg > 0 ? "above" : "below"} the continental average.` : ""}</p>
+          <h2 class="contentHeading">Latest collected market reading</h2>
+          <p class="contentBody">In the last collection-day observation (${endLabel}), Albanian diesel was ${eur3(alb.current)} per litre, ${pct(alb.changePct.d30)} against the observation around 30 days earlier and ${pct(alb.changePct.all)} since ${startLabel}.${albRank ? ` That put Albania ${ordinal(albRank)} of ${ranked.length} tracked European markets, cheapest first.` : ""}${vsAvg != null ? ` The tracked-market average was ${eur3(euAvg!)}, ${eur3(Math.abs(vsAvg))} ${vsAvg > 0 ? "below" : "above"} the Albanian value.` : ""}</p>
           <div class="verdictBox">
-            <p class="verdictLabel">Albania refuelling verdict: ${esc(verdict.label)}</p>
+            <p class="verdictLabel">Historical position: ${esc(verdict.label)}</p>
             <p class="contentBody contentBodyNoMargin">${esc(verdict.detail)}</p>
           </div>
           ${chart}
-          <p class="contentBodyMuted">Computed from ${hist.daysObserved} days of our own price observations. Full breakdown in the <a href="/market-report">daily market report</a>.</p>
+          <p class="contentBodyMuted">Computed from ${hist.daysObserved} collection-day observations, which can repeat an unchanged source value. See the <a href="/market-report">market report</a>.</p>
         </section>`;
 }
 
@@ -289,23 +286,23 @@ export function renderMarketReport(
   return `
       <article class="contentPage marketReportArticle">
         <h1 class="contentPageTitle">European Fuel Market Report — ${hist.endLabel}</h1>
-        <p class="contentBody">An automatically generated analysis of the European diesel market, recomputed every day from ${hist.daysObserved} days of price observations collected by Karburanti Sot since ${hist.startLabel}. Unlike the raw price snapshots published elsewhere, every figure below — ranges, 30-day moves, volatility and percentile positions — is derived from our own historical record.</p>
+        <p class="contentBody">An analysis of ${hist.daysObserved} collection-day fuel observations from ${hist.startLabel} to ${hist.endLabel}. A collected value may repeat when its source has not published a new price. The dates below are collection dates, not verified upstream publication dates.</p>
 
         <section class="contentSection reportLeadSection" id="market-summary">
           <h2 class="contentHeading">Market summary</h2>
-          <p class="contentBody">The average diesel price across the ${ranked.length} European markets we track is ${eur3(euAvg ?? 0)} per liter${euChange != null ? `, ${euChange >= 0 ? "up" : "down"} ${pct(Math.abs(euChange))} over the past 30 days` : ""}. ${slugLink(slugByCountry, cheapest.country)} is currently the cheapest market at ${eur3(cheapest.value)}, while ${slugLink(slugByCountry, dearest.country)} is the most expensive at ${eur3(dearest.value)} — a spread of ${eur3(dearest.value - cheapest.value)} per liter, or about ${eur((dearest.value - cheapest.value) * 50)} on a single 50-litre tank.</p>
+          <p class="contentBody">On the last collection date, the average diesel reference price across ${ranked.length} tracked European markets was ${eur3(euAvg ?? 0)} per litre${euChange != null ? `, ${euChange >= 0 ? "up" : "down"} ${pct(Math.abs(euChange))} against the observation around 30 collection days earlier` : ""}. ${slugLink(slugByCountry, cheapest.country)} had the lowest reference at ${eur3(cheapest.value)}, and ${slugLink(slugByCountry, dearest.country)} the highest at ${eur3(dearest.value)}. The ${eur3(dearest.value - cheapest.value)} per-litre gap illustrates about ${eur((dearest.value - cheapest.value) * 50)} over 50 litres; individual pump prices differ.</p>
           ${chart}
         </section>
 
         <section class="contentSection" id="market-movers">
-          <h2 class="contentHeading">The markets moving now</h2>
+          <h2 class="contentHeading">Recorded market movement</h2>
           <p class="contentBody">Thirty-day movement shows where the latest diesel reading has materially changed, with the exact value beside every direction.</p>
           <div class="reportPairGrid">
             <div class="reportPanel">
               <h3>Biggest fallers</h3>
               <div class="tableScroll">
               <table class="contentTable">
-                <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Today</th></tr></thead>
+                <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Last observed</th></tr></thead>
                 <tbody>${fallers.map(moverRow).join("") || '<tr><td colspan="3">No market fell over the past 30 days.</td></tr>'}
                 </tbody>
               </table>
@@ -315,7 +312,7 @@ export function renderMarketReport(
               <h3>Biggest risers</h3>
               <div class="tableScroll">
               <table class="contentTable">
-                <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Today</th></tr></thead>
+                <thead><tr><th scope="col">Country</th><th scope="col">30-day change</th><th scope="col">Last observed</th></tr></thead>
                 <tbody>${risers.map(moverRow).join("") || '<tr><td colspan="3">No market rose over the past 30 days.</td></tr>'}
                 </tbody>
               </table>
@@ -326,7 +323,7 @@ export function renderMarketReport(
 
         <section class="contentSection" id="market-volatility">
           <h2 class="contentHeading">Which markets move the most?</h2>
-          <p class="contentBody">Volatility here is the standard deviation of daily percentage price moves across our full record — a measure of how unpredictable each market is from one day to the next. Stable markets are usually those with administered or slow-moving retail pricing; volatile ones tend to track wholesale costs closely.</p>
+          <p class="contentBody">Volatility here is the standard deviation of percentage changes between collected readings. It describes variation in this sample, not future price predictability or the cause of any movement. Unchanged upstream values can reduce the measure.</p>
           <div class="reportPairGrid">
             <div class="tableScroll">
             <table class="contentTable">
@@ -349,13 +346,13 @@ export function renderMarketReport(
 
         <section class="contentSection" id="market-rankings">
           <h2 class="contentHeading">Full European diesel table</h2>
-          <p class="contentBody">Every market we track, ranked cheapest first. "Position in range" shows where today's price sits within everything we have recorded for that country: 0% means it is at its cheapest observed level, 100% its most expensive.</p>
+          <p class="contentBody">Tracked markets ranked by the last collected reference price, cheapest first. "Observations below" is the share of recorded readings strictly below that value; ties are not counted. Each market may have a different source date.</p>
           <div class="tableScroll">
           <table class="contentTable">
             <thead>
               <tr>
-                <th scope="col">#</th><th scope="col">Country</th><th scope="col">Today</th>
-                <th scope="col">30-day</th><th scope="col">Observed range</th><th scope="col">Position in range</th>
+                <th scope="col">#</th><th scope="col">Country</th><th scope="col">Last observed</th>
+                <th scope="col">30-day</th><th scope="col">Observed range</th><th scope="col">Observations below</th>
               </tr>
             </thead>
             <tbody>${rankRows}
@@ -366,7 +363,7 @@ export function renderMarketReport(
 
         <section class="contentSection" id="market-methodology">
           <h2 class="contentHeading">How this report is produced</h2>
-          <p class="contentBody">Every figure is recomputed on each build from the daily price record this site has been appending to since ${hist.startLabel} — ${hist.daysObserved} consecutive readings with no gaps. Raw daily prices originate from public aggregators as described in our <a href="/methodology">methodology</a>, which also documents exactly how each figure here is calculated; the analysis, ranges, volatility measures and interpretations are our own.</p>
+          <p class="contentBody">Figures are computed from ${hist.daysObserved} collection-day records since ${hist.startLabel}. Older records did not verify upstream publication dates, so repeated values are possible. The <a href="/methodology">methodology</a> explains the source and calculations; do not treat this report as live pump pricing or a forecast.</p>
         </section>
       </article>`;
 }

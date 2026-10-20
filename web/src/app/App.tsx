@@ -238,6 +238,7 @@ export default function App() {
             element={
               <ComparePage
                 t={t}
+                lang={lang}
                 data={data}
                 watchlist={watchlist}
                 has={has}

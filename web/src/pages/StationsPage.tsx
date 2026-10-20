@@ -5,84 +5,38 @@ import RoadStatusLink from "../components/road/RoadStatusLink";
 import type { Lang } from "../models/i18n";
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
 
-type Props = {
-  t: TDict;
-  lang: Lang;
-  radiusM: number;
-  setRadiusM: (v: number) => void;
-};
+type Props = { t: TDict; lang: Lang; radiusM: number; setRadiusM: (value: number) => void };
 
 export default function StationsPage({ t, lang, radiusM, setRadiusM }: Props) {
+  const sq = lang === "sq";
   return (
     <>
       <NearbyStationsCard t={t} radiusM={radiusM} setRadiusM={setRadiusM} />
       <RoadStatusLink lang={lang} />
       <AdsterraNativeAd location="stations-after-map-tool" />
-
       <article className="contentPage">
         <section className="contentSection">
-          <h2 className="contentHeading">{t.stationsEditorialTitle}</h2>
-          <p className="contentBody">{t.stationsEditorialP1}</p>
-          <p className="contentBody">{t.stationsEditorialP2}</p>
-          <p className="contentBody">{t.stationsEditorialP3}</p>
+          <h2 className="contentHeading">{sq ? "Çfarë tregon harta" : "What the map shows"}</h2>
+          <p className="contentBody">{sq
+            ? "Me lejen tuaj për vendndodhjen, mjeti kërkon pika karburanti të shënuara në OpenStreetMap brenda rrezes së zgjedhur. Distancat janë afërsisht në vijë të drejtë, jo itinerare drejtimi. Orari shfaqet vetëm kur është listuar dhe mund të jetë i vjetruar."
+            : "With your location permission, the tool looks for fuel stations mapped in OpenStreetMap within your chosen radius. Distances are approximate straight-line distances, not driving routes. Opening hours appear only when listed and may be outdated."}</p>
+          <p className="contentBody">{sq
+            ? "Kjo faqe nuk shfaq çmime aktuale në pompa të veçanta. Vlerat në faqen kryesore dhe në renditje janë referenca kombëtare të datuara. Konfirmoni çmimin dhe orarin te pika përpara një devijimi të posaçëm."
+            : "This page does not show current prices at individual pumps. Home and ranking values are dated country-level references. Confirm the station's price and hours before making a special detour."}</p>
         </section>
         <section className="contentSection">
-          <h3 className="contentHeading">{t.stationsEditorialTipTitle}</h3>
-          <p className="contentBody">{t.stationsEditorialTip}</p>
+          <h2 className="contentHeading">{sq ? "Vendndodhja dhe privatësia" : "Location and privacy"}</h2>
+          <p className="contentBody">{sq
+            ? "Kur zgjidhni kërkimin pranë, shfletuesi dërgon koordinatat te shërbimi ynë i kërkimit të pikave. Ky shërbim mund të pyesë OpenStreetMap/Overpass për vendndodhje të hartuara. Nuk e përdorim vendndodhjen për reklama apo për të ndërtuar një historik vendndodhjesh. Mund të refuzoni lejen dhe të përdorni pjesën tjetër të faqes."
+            : "When you choose a nearby search, your browser sends coordinates to our station lookup service. That service may query OpenStreetMap/Overpass for mapped locations. We do not use your location for advertising or to build a location history. You can decline permission and still use the rest of the site."}</p>
         </section>
-
         <section className="contentSection">
-          <h2 className="contentHeading">How to use this page</h2>
-          <p className="contentBody">
-            The nearby stations feature uses your device&apos;s geolocation (if you grant permission) to find fuel stations within a chosen radius. You can select 2 km, 5 km, or 10 km depending on how far you are willing to drive. The tool queries OpenStreetMap data for fuel station locations and displays them sorted by distance from your position.
-          </p>
-          <p className="contentBody">
-            Each station result shows the station name (if mapped), approximate distance, and opening hours when available in the map data. You can use the station name and location to look up detailed directions in your preferred navigation app.
-          </p>
-        </section>
-
-        <section className="contentSection">
-          <h2 className="contentHeading">Station data vs country averages</h2>
-          <p className="contentBody">
-            The country-level fuel prices shown on the <Link className="inlineLink" to="/">homepage</Link> and <Link className="inlineLink" to="/rankings">rankings page</Link> represent national average reference values from public data aggregators. Individual stations near you may price above or below this average depending on competition, location, brand, and delivery timing.
-          </p>
-          <p className="contentBody">
-            This page does NOT show real-time pump prices for each station — that would require each station to publish its current price digitally, which most stations in Albania and the Balkans do not do. Instead, use the station finder as a location tool, and the country-level prices as a reasonable estimate of what you will pay.
-          </p>
-        </section>
-
-        <section className="contentSection">
-          <h2 className="contentHeading">Privacy and location</h2>
-          <p className="contentBody">
-            Your location data is used only in your browser to calculate distances to nearby stations. It is sent to the Overpass API (OpenStreetMap) to find stations in your area.
-            Location is used only when you choose to use the nearby stations
-            feature. Your coordinates are sent securely to our station lookup
-            service and may be processed by OpenStreetMap/Overpass services to
-            find stations near you. We do not use your location for advertising
-            or to build a location history.
-          </p>
-          <p className="contentBody">
-            If you deny location permission or your device does not support geolocation, this tool simply will not display results. It is entirely optional — the rest of the site (country comparisons, rankings, guides) works without any location data.
-          </p>
-        </section>
-
-        <section className="contentSection">
-          <h2 className="contentHeading">Limitations of station data</h2>
-          <p className="contentBody">
-            The station data comes from OpenStreetMap, a community-maintained map. This means coverage varies by region: urban areas in Western Europe tend to have excellent station mapping, while rural areas in the Balkans may have incomplete coverage. Some stations may appear in the results that have since closed, changed brand, or modified their opening hours.
-          </p>
-          <p className="contentBody">
-            Opening hours shown are based on community-contributed data and may not reflect recent changes. Always verify critical information (especially for late-night or holiday refueling) before making a special trip to a station.
-          </p>
-        </section>
-
-        <section className="contentSection">
-          <h2 className="contentHeading">Related tools</h2>
+          <h2 className="contentHeading">{sq ? "Planifikoni me kontekst" : "Plan with context"}</h2>
           <ul className="contentList">
-            <li><Link className="inlineLink" to="/">Homepage fuel dashboard</Link> — country-level price data</li>
-            <li><Link className="inlineLink" to="/rankings">Rankings</Link> — which countries are cheapest and most expensive</li>
-            <li><Link className="inlineLink" to="/road-trip-fuel-guide">Road trip guide</Link> — plan refueling stops on multi-country drives</li>
-            <li><Link className="inlineLink" to="/methodology">Methodology</Link> — how data is collected and what station data means</li>
+            <li><Link className="inlineLink" to="/fuel-prices/albania">{sq ? "Çmimet orientuese në Shqipëri" : "Albania reference prices"}</Link></li>
+            <li><Link className="inlineLink" to="/trip-cost-calculator">{sq ? "Llogaritësi i udhëtimit" : "Trip cost calculator"}</Link></li>
+            <li><Link className="inlineLink" to="/road-status">{sq ? "Gjendja e rrugëve" : "Road status"}</Link></li>
+            <li><Link className="inlineLink" to="/methodology">{sq ? "Metodologjia e të dhënave" : "Data methodology"}</Link></li>
           </ul>
         </section>
       </article>

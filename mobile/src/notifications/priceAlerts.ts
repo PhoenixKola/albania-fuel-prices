@@ -58,11 +58,20 @@ export function parsePriceAlertRules(raw: string | null): PriceAlertRule[] {
   }
 }
 
-export function evaluatePriceAlerts(data: LatestEurope, rules: PriceAlertRule[]) {
+export function evaluatePriceAlerts(data: LatestEurope, rules: PriceAlertRule[], now = new Date()) {
+  const publishedAt = new Date(`${data.as_of}T00:00:00Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data.as_of) || !Number.isFinite(publishedAt.getTime()) ||
+      publishedAt.toISOString().slice(0, 10) !== data.as_of || publishedAt.getTime() > now.getTime() ||
+      now.getTime() - publishedAt.getTime() > 3 * 86_400_000) {
+    return { next: rules, triggered: [] as PriceAlertRule[] };
+  }
   const byCountry = new Map(data.countries.map((row) => [row.country, row]));
   const triggered: PriceAlertRule[] = [];
   const next = rules.map((rule) => {
-    const price = getFuelPrice(byCountry.get(rule.country) ?? null, rule.fuelType);
+    const market = byCountry.get(rule.country);
+    if (!market || market.provenance === "historical-fallback" || market.provenance === "date-unverified" ||
+        (market.source_as_of && market.source_as_of !== data.as_of)) return rule;
+    const price = getFuelPrice(market, rule.fuelType);
     if (price == null) return rule;
     const hit = rule.direction === "below" ? price <= rule.targetEur : price >= rule.targetEur;
     const triggerKey = `${data.as_of}_${price.toFixed(3)}`;

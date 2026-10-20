@@ -411,14 +411,14 @@ export const en = {
   // ── Compare page editorial ──
   compareEditorialTitle: "How to use country comparisons effectively",
   compareEditorialP1:
-    "Comparing fuel prices across countries is not just about finding the cheapest number in a table. Exchange rates, local purchasing power, tax structures, and even data reporting schedules all affect how meaningful a direct comparison is. A country with a nominally lower price in EUR may still feel expensive to its residents if local wages are also lower.",
+    "Compare the same fuel and unit across markets. These are country-level EUR/L reference prices, not pump quotes; check the date shown for each source reading.",
   compareEditorialP2:
-    "The watchlist feature is designed for drivers and travelers who regularly cross borders or plan road trips that span multiple countries. By keeping a small set of countries in your comparison list, you can quickly spot when price gaps widen or narrow — which is useful for choosing where to refuel along a cross-border route.",
+    "Keep relevant countries in your watchlist for trip planning. A changing gap in the collected readings can help you budget, but the next source update may revise the comparison.",
   compareEditorialP3:
-    "When reading the comparison, pay attention to the fuel type selected. Diesel and petrol prices do not always move in the same direction. Some countries tax diesel more lightly than petrol to support commercial transport, while others have equalized or even reversed that pattern. LPG availability and pricing is even more varied, with some countries actively subsidizing autogas and others offering very few stations.",
+    "Petrol, diesel and LPG can point in different directions. If a fuel price is missing, the comparison is unavailable; it does not prove that fuel is unavailable at stations.",
   compareEditorialTipTitle: "Cross-border tip",
   compareEditorialTip:
-    "If you are planning a multi-country drive through the Balkans or Central Europe, refueling strategy matters. Fill up in countries where prices are consistently lower and carry only enough fuel in expensive countries to reach the next cheap refueling point. The comparison tool makes this strategy visible at a glance.",
+    "For a cross-border route, compare dated reference prices and then check reachable pumps, detours, tolls and your vehicle's consumption. A lower national reference alone does not prove a detour saves money.",
 
   // ── Rankings page editorial ──
   rankingsEditorialTitle: "Understanding fuel price rankings across Europe",
@@ -458,11 +458,11 @@ export const en = {
   methodologyAccuracyP1:
     "Country-level fuel prices represent broad reference values from available datasets. They do not reflect the exact pump price at any specific station. Several factors can cause the price at a station near you to differ from the displayed figure: local competition, brand markups, time-of-day pricing, promotions, and how recently the station received a wholesale delivery.",
   methodologyAccuracyP2:
-    "The \"Nearby Stations\" feature uses a different data source (map/location APIs) and may show prices that are more current for a specific location but less consistent in format than the country-level data. Both views are useful for different purposes: country data for broad comparisons, station data for immediate local decisions.",
+    "The Nearby Stations feature uses mapped station locations and any listed opening hours. It does not show station-level pump prices. Use it for locations, and treat country fuel values as dated planning references.",
 
   methodologyUpdateTitle: "Update frequency",
   methodologyUpdateP1:
-    "Data is refreshed automatically based on a schedule aligned with how often upstream sources publish. For countries that publish weekly, the site will typically show new data within hours of a publication. For countries with more infrequent reporting, the data may remain static for longer periods. The \"last updated\" timestamp on every page tells you exactly when the most recent data was fetched.",
+    "Our fetch job runs on a schedule, but the upstream publisher may update less often. The source date describes the published reading; the fetch time describes when our job retrieved it. A recent fetch does not make an older source reading current.",
 
   methodologyEditorialTitle: "Editorial layer",
   methodologyEditorialP1:
@@ -556,7 +556,7 @@ export const en = {
   europeCompBorderP1:
     "Price differences at national borders create practical opportunities for drivers. In border regions, it is common to see drivers crossing to the cheaper side for cheaper fuel. Classic examples include Luxembourg (cheap fuel surrounded by more expensive neighbors), Slovenia vs. Italy, and Kosovo vs. neighboring countries.",
   europeCompBorderP2:
-    "The compare tool on this site is designed to make border strategies visible. By keeping your home country and its neighbors in the watchlist, you can see at a glance whether a cross-border refueling run is worthwhile on any given day.",
+    "Keep your home country and nearby markets in the watchlist to compare dated prices for the same fuel. The result cannot establish whether a separate border trip is worthwhile without actual pump prices, fuel already in the tank and route costs.",
 
   europeCompExchangeTitle: "Exchange rate effects for travelers",
   europeCompExchangeP1:
@@ -564,7 +564,7 @@ export const en = {
 
   europeCompSummaryTitle: "How to use this information",
   europeCompSummaryP1:
-    "For daily commuters, the most relevant data is your own country's price and the nearby station view. For road-trip planners, the country comparison and rankings tell you where to fill up cheaply and where to avoid refueling if possible. For anyone interested in energy policy, the data reveals how government choices translate directly into what drivers pay.",
+    "Use dated country references for broad budgeting, station locations for possible stops, and the trip calculator for your own distance and consumption. None of these tools verifies a station's current price or isolates the policy cause of a price gap.",
 
   // ── Road Trip Fuel Guide page ──
   roadTripTitle: "Road Trip Fuel Cost Guide: How to Estimate and Reduce Your Fuel Expenses",
@@ -575,7 +575,7 @@ export const en = {
   roadTripCalcP1:
     "The estimated fuel cost for a trip is calculated using three inputs: the distance you plan to drive (in kilometers), your vehicle's fuel consumption (in liters per 100 km), and the fuel price per liter. The formula is simple: (distance ÷ 100) × consumption × price per liter = estimated fuel cost.",
   roadTripCalcP2:
-    "The trip tool on the home page applies this formula using the displayed fuel price for your selected country and fuel type. If your route crosses multiple countries, you can estimate each segment separately by changing the country selection.",
+    "The trip calculator applies this formula to each country leg you enter using its available dated fuel reference. A return journey doubles the entered route distance; missing fuel data leaves the total incomplete.",
 
   roadTripConsumptionTitle: "Understanding fuel consumption",
   roadTripConsumptionP1:
@@ -587,9 +587,9 @@ export const en = {
 
   roadTripCrossBorderTitle: "Cross-border refueling strategy",
   roadTripCrossBorderP1:
-    "On a multi-country drive, the cheapest approach is to fill your tank in the country with the lowest fuel price and carry as little fuel as possible through expensive countries. The country comparison and ranking tools on this site make this strategy easy to plan.",
+    "On a multi-country drive, compare the same fuel across the markets on your route, then check the pumps you can reach. National references alone do not determine the cheapest practical stop.",
   roadTripCrossBorderP2:
-    "For example, if you are driving from Germany through Austria to Slovenia and then into Italy, you might notice that fuel is cheapest in Austria or Slovenia. The optimal strategy would be to fill up before entering Italy, where prices are typically higher due to higher excise duties.",
+    "For example, a Germany–Austria–Slovenia–Italy route crosses several fuel markets. Add each country's planned distance to the calculator and inspect the source dates before comparing estimated fuel costs.",
   roadTripCrossBorderP3:
     "Keep in mind that some countries have legal limits on how much fuel you can carry in portable containers across borders. Stick to filling your vehicle's built-in tank and avoid carrying jerry cans across EU borders unless you have checked the regulations.",
 
@@ -613,11 +613,11 @@ export const en = {
 
   roadTripExampleTitle: "Example: Estimating a Balkans road trip",
   roadTripExampleP1:
-    "Suppose you are driving from Tirana, Albania to Thessaloniki, Greece — roughly 300 km. Your car consumes 7.5 L/100km in real-world conditions. Based on the current Albanian diesel price shown on this site:",
+    "For a purely illustrative 300 km drive at an assumed 7.5 L/100 km, the vehicle would use 22.5 litres. Enter the distance for each actual country leg rather than treating this example as a route measurement.",
   roadTripExampleP2:
-    "Fuel needed: (300 ÷ 100) × 7.5 = 22.5 liters. At a diesel price of approximately €1.45/L (Albania), the estimated fuel cost is about €32.60. If the Greek leg averages €1.60/L, the cost for the same distance in Greece would be about €36.00. This €3.40 difference on a 300 km segment shows why cross-border price awareness matters.",
+    "At a hypothetical €2.000/L, 22.5 litres would cost €45.00. This is arithmetic, not an Albania or Greece price quote. Use the live calculator's dated references and verify pump prices before travelling.",
   roadTripExampleP3:
-    "For a longer multi-country road trip, these differences compound. A 2,000 km drive through five countries could see fuel cost differences of €30–50 depending on where you choose to fill up.",
+    "On a longer trip, differences depend on distance driven in each country, consumption, source age and the pumps used. The calculator shows each leg separately so you can adjust those assumptions.",
 
   roadTripSummaryTitle: "Summary",
   roadTripSummaryP1:

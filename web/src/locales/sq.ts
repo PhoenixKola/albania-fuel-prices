@@ -410,14 +410,14 @@ export const sq = {
   // Compare page editorial
   compareEditorialTitle: "Si të përdorni krahasimet mes vendeve në mënyrë efektive",
   compareEditorialP1:
-    "Krahasimi i çmimeve mes vendeve nuk ka të bëjë vetëm me gjetjen e numrit më të ulët. Kurset e këmbimit, fuqia blerëse lokale, strukturat tatimore dhe even oraret e raportimit ndikojnë kuptimësinë e krahasimit.",
+    "Krahasoni të njëjtin karburant dhe njësi mes vendeve. Këto janë çmime orientuese kombëtare në EUR/L, jo çmime pompe; kontrolloni datën e leximit të burimit.",
   compareEditorialP2:
-    "Veçoria e listës së të preferuarave është dizajnuar për drejtuesit që kalojnë rregullisht kufij ose planifikojnë udhëtime në disa vende. Duke mbajtur një grup të vogël vendesh, mund të vini re shpejt kur hendekët e çmimeve zgjerohen ose ngushtohen.",
+    "Ruani në listë vendet që lidhen me udhëtimin tuaj. Ndryshimi i diferencës në leximet e mbledhura ndihmon buxhetin, por burimi mund ta ndryshojë krahasimin në publikimin tjetër.",
   compareEditorialP3:
-    "Kur lexoni krahasimin, kushtojini vëmendje llojit të karburantit të zgjedhur. Nafta dhe benzina nuk levizin gjithmonë në të njëjtin drejtim. Disa vende e taksojnë naftën më lehtë, ndërsa të tjerë kanë barazuar ose përmbysur atë model.",
+    "Benzina, nafta dhe LPG mund të tregojnë drejtime të ndryshme. Mungesa e një çmimi e bën krahasimin të padisponueshëm; nuk provon se karburanti mungon në stacione.",
   compareEditorialTipTitle: "Këshillë ndërkufitare",
   compareEditorialTip:
-    "Nëse po planifikoni një udhëtim mes disa vendeve, mbushni rezervuarin ku çmimet janë më të ulëta dhe mbani vetëm sa mjafton karburant në vendet e shtrenjta.",
+    "Për një rrugë ndërkufitare, krahasoni leximet e datuara dhe më pas kontrolloni pompat e arritshme, devijimet, pagesat rrugore dhe konsumin e automjetit. Një çmim orientues më i ulët nuk provon se devijimi kursen para.",
 
   // Rankings page editorial
   rankingsEditorialTitle: "Kuptimi i renditjeve të çmimeve të karburantit në Europë",
@@ -453,10 +453,10 @@ export const sq = {
   methodologyAccuracyP1:
     "Çmimet në nivel vendi përfaqësojnë vlera orientuese nga dataset-et e disponueshme. Nuk pasqyrojnë çmimin e saktë të çdo pike.",
   methodologyAccuracyP2:
-    "Veçoria e pikave afër përdor burime të ndryshme të dhënash dhe mund të tregojë çmime më aktuale por më pak konsistente.",
+    "Veçoria e pikave afër përdor vendndodhje të hartuara dhe oraret e listuara kur ka. Nuk shfaq çmime pompe për secilën pikë. Vlerat kombëtare janë referenca të datuara për planifikim.",
   methodologyUpdateTitle: "Frekuenca e përditësimit",
   methodologyUpdateP1:
-    "Të dhënat rifreskohen automatikisht bazuar në orarin e publikimit të burimeve. Data e përditësimit tregon saktësisht kur u morën të dhënat.",
+    "Sistemi i merr të dhënat sipas një orari, por burimi mund të publikojë më rrallë. Data e burimit tregon leximin e publikuar; koha e marrjes tregon kur e shkarkuam. Një shkarkim i ri nuk e bën aktual një lexim të vjetër.",
   methodologyEditorialTitle: "Shtresa editoriale",
   methodologyEditorialP1:
     "Përtej të dhënave, faqja shton kontekst editorial. Përmbledhja ditore thekson vendet dhe diferencat. Guidat shpjegojnë tematika më të gjera.",
@@ -562,9 +562,9 @@ export const sq = {
     "Për vlerësim realist, shtoni 15–20% figure së prodhuesit. Një makinë me 6.0 L/100km do të mesatarizojë 7.0–7.5 L/100km.",
   roadTripCrossBorderTitle: "Strategjia e mbushjeve ndërkufitare",
   roadTripCrossBorderP1:
-    "Mbushni në vendin me çmimin më të ulët dhe mbani sa më pak karburant në vendet e shtrenjta.",
+    "Krahasoni të njëjtin karburant në vendet e rrugës dhe kontrolloni pompat që mund të arrini. Referencat kombëtare nuk përcaktojnë vetë ndalesën më të lirë praktike.",
   roadTripCrossBorderP2:
-    "P.sh. nëse udhëtoni nga Gjermania përmes Austrisë në Slloveni dhe Itali, mbushni para se të hyni në Itali ku çmimet janë zakonisht më të larta.",
+    "Për shembull, një rrugë Gjermani–Austri–Slloveni–Itali kalon në disa tregje. Shtoni distancën e planifikuar për secilin vend në llogaritës dhe kontrolloni datat e burimeve.",
   roadTripCrossBorderP3:
     "Kini parasysh se disa vende kanë kufizime ligjore për sa karburant mund të transportoni në enë portative.",
   roadTripPaymentTitle: "Këshilla pagese dhe valute",
@@ -585,11 +585,11 @@ export const sq = {
     "Planifikoni ndalesat e mbushjeve duke përdorur të dhënat e renditjeve dhe krahasimit.",
   roadTripExampleTitle: "Shembull: vlerësimi i udhëtimit në Ballkan",
   roadTripExampleP1:
-    "Supozoni se udhëtoni nga Tirana, Shqipëri në Selanik, Greqi — rreth 300 km. Makina konsunon 7.5 L/100km.",
+    "Për një shembull të thjeshtë prej 300 km me konsum të supozuar 7.5 L/100 km, makina do të përdorte 22.5 litra. Vendosni distancën reale për çdo pjesë të rrugës suaj.",
   roadTripExampleP2:
-    "Karburanti i nevojshëm: (300 ÷ 100) × 7.5 = 22.5 litëv. Me çmim nafte rreth €1.45/L, kosto vlerësohet rreth €32.60. Diferenca me Greqinë tregon pse njohja e çmimeve ndërkufitare ka rëndësi.",
+    "Me çmim krejt hipotetik €2.000/L, 22.5 litra do të kushtonin €45.00. Kjo është aritmetikë, jo çmim i Shqipërisë apo Greqisë. Përdorni leximet e datuara në llogaritës dhe verifikoni çmimin në pompë.",
   roadTripExampleP3:
-    "Për udhëtime më të gjata, këto diferenca akumulohen. Një udhëtim 2,000 km përmes 5 vendeve mund të ketë diferenca €30–50.",
+    "Në një udhëtim më të gjatë, kostoja varet nga distanca në secilin vend, konsumi, data e burimit dhe pompat e përdorura. Llogaritësi i ndan pjesët e udhëtimit që t'i ndryshoni supozimet.",
   roadTripSummaryTitle: "Përmbledhje",
   roadTripSummaryP1:
     "Vlerësimi i kostos së karburantit nuk është i komplikuar, por ndërgjegjësimi për dallimet ndërkufitare mund të kursejë para kuptimplota.",

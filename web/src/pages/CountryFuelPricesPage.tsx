@@ -11,9 +11,11 @@ import type { Trends } from "../models/trends";
 import type { TDict } from "../locales";
 import type { FxRates } from "../utils/currency";
 import { getCountryEditorial } from "../config/countryContent";
+import { countryPageContent } from "../config/countryPageContent";
 import { editorialCopy } from "../config/editorialCopy";
 import { getCountryAnalysis } from "../generated/countryAnalysis";
 import { ANALYSIS_META } from "../generated/analysisMeta";
+import { compareCountries } from "../models/countryComparison";
 import { getTrendSeries } from "../models/trends";
 import { fuelLabel, getEurPrice } from "../utils/fuel";
 import { isEuropeanCountry } from "../utils/regions";
@@ -83,8 +85,8 @@ export default function CountryFuelPricesPage({
   }
 
   const countryName = editorial.dataCountryName;
+  const safe = countryPageContent(editorial, data, lang);
   const row = data?.countries.find((item) => item.country === countryName) ?? null;
-  const albania = data?.countries.find((item) => item.country === "Albania") ?? null;
   const hasAnyPrice = !!row && FUELS.some((fuel) => typeof eurPrice(row, fuel) === "number");
   const selectedPrice = eurPrice(row, fuelType);
   const markets = data?.countries
@@ -98,13 +100,14 @@ export default function CountryFuelPricesPage({
   const localCurrency = getCurrencyForCountry(countryName);
   const localValue = hasRate(localCurrency, fxRates) ? convertEur(selectedPrice, localCurrency, fxRates) : null;
   const userValue = currency === "local" && localValue != null ? formatMoney(localValue, localCurrency) : formatMoney(selectedPrice, "EUR");
-  const updated = data?.fetched_at_utc
-    ? new Date(data.fetched_at_utc).toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", { dateStyle: "medium" })
-    : ANALYSIS_META.endLabel;
+  const updated = row?.provenance === "date-unverified" || row?.provenance === "historical-fallback"
+    ? (lang === "sq" ? "datë e paverifikuar" : "date unverified")
+    : data?.as_of ?? (lang === "sq" ? "datë e panjohur" : "date unknown");
+  const sourceStale = ANALYSIS_META.stale || !data?.as_of || row?.provenance === "date-unverified" || row?.provenance === "historical-fallback";
   const analysisHtml = getCountryAnalysis(slug);
   const decisionCopy = lang === "sq" ? {
     fillTitle: "Kostoja e një furnizimi prej 50 L",
-    fillText: (fuel: string) => `Me çmimin aktual orientues të ${fuel.toLowerCase()}, 50 litra kushtojnë:`,
+    fillText: (fuel: string) => `Me çmimin orientues të datuar të ${fuel.toLowerCase()}, 50 litra kushtojnë:`,
     neighborTitle: "Krahasimi i furnizimit me shtetet fqinje",
     cheaper: (country: string, amount: string) => `${country} kushton ${amount} më pak për 50 L.`,
     dearer: (country: string, amount: string) => `${country} kushton ${amount} më shumë për 50 L.`,
@@ -112,19 +115,19 @@ export default function CountryFuelPricesPage({
     unavailable: (country: string) => `Krahasimi me ${country} nuk disponohet për këtë karburant.`,
     calculator: "Llogarit koston për rrugën tënde",
     related: "Planifiko me çmimet aktuale të Shqipërisë",
-    relatedText: "Përdor vlerat e sotme për një distancë dhe konsum konkret, ose kontrollo çmimet e Shqipërisë para se të krahasosh kufirin.",
+    relatedText: "Përdor vlerat orientuese të datuara për një distancë dhe konsum konkret, ose kontrollo çmimet e Shqipërisë para se të krahasosh kufirin.",
     albaniaPrices: "Shiko çmimet e Shqipërisë",
   } : {
     fillTitle: "What a 50 L fill-up costs",
-    fillText: (fuel: string) => `At the current ${fuel.toLowerCase()} reference price, 50 litres cost:`,
+    fillText: (fuel: string) => `At the dated ${fuel.toLowerCase()} reference price, 50 litres cost:`,
     neighborTitle: "Fill-up comparison with nearby countries",
     cheaper: (country: string, amount: string) => `${country} costs ${amount} less per 50 L.`,
     dearer: (country: string, amount: string) => `${country} costs ${amount} more per 50 L.`,
-    level: (country: string) => `${country} is currently almost level per 50 L.`,
+    level: (country: string) => `${country} matches Albania at published precision per 50 L.`,
     unavailable: (country: string) => `The ${country} comparison is unavailable for this fuel.`,
     calculator: "Calculate your route cost",
-    related: "Plan with today's Albania prices",
-    relatedText: "Use today's values for a specific distance and consumption, or check Albania's prices before comparing a border crossing.",
+    related: "Plan with dated Albania prices",
+    relatedText: "Use dated reference values for a specific distance and consumption, or check Albania's prices before comparing a border crossing.",
     albaniaPrices: "View Albania fuel prices",
   };
 
@@ -141,10 +144,9 @@ export default function CountryFuelPricesPage({
 
   const compareLine = (fuel: FuelType) => {
     const label = fuelLabel(t, fuel);
-    const base = eurPrice(albania, fuel);
-    const value = eurPrice(row, fuel);
-    if (base == null || value == null) return c.comparisonMissing(label);
-    const diff = value - base;
+    const comparison = compareCountries(data, countryName, "Albania", fuel);
+    if (!comparison) return c.comparisonMissing(label);
+    const diff = comparison.differencePerLitre;
     if (Math.abs(diff) < 0.001) return c.close(label);
     return diff > 0 ? c.higher(label, Math.abs(diff).toFixed(3)) : c.lower(label, Math.abs(diff).toFixed(3));
   };
@@ -155,7 +157,7 @@ export default function CountryFuelPricesPage({
       eyebrow={c.eyebrow}
       title={c.title(editorial.label)}
       lede={c.lede(editorial.label)}
-      status={ANALYSIS_META.stale ? c.stale : c.fresh}
+      status={sourceStale ? c.stale : c.fresh}
       updated={c.dataUpdated(updated)}
       sections={sections}
       contentsLabel={copy.contents}
@@ -173,7 +175,7 @@ export default function CountryFuelPricesPage({
       }
       actions={<><Link className="editorialAction editorialActionPrimary" to="/" onClick={() => setCountry(countryName)}>{c.openDashboard(editorial.label)}</Link><Link className="editorialAction" to="/compare">{c.compareCta}</Link></>}
     >
-      {ANALYSIS_META.stale ? <p className="editorialStaleNotice" role="status">{lang === "sq" ? `Leximi burimor është i datës ${ANALYSIS_META.asOf}; përdore si referencë.` : `The source reading is dated ${ANALYSIS_META.asOf}; use it as a reference while the next update arrives.`}</p> : null}
+      {sourceStale ? <p className="editorialStaleNotice" role="status">{lang === "sq" ? `Leximi burimor është i datës ${updated}; kontrollo çmimet në pompë para udhëtimit.` : `The source reading is dated ${updated}; check pump prices before travelling.`}</p> : null}
 
       <EditorialSection id="country-prices" index="01" title={c.currentPrices(editorial.label)} intro={c.currentIntro} tone="accent">
         {loading ? <p role="status">{c.loading}</p> : null}
@@ -199,7 +201,7 @@ export default function CountryFuelPricesPage({
 
       {analysisHtml ? <EditorialSection id="country-history" index="03" title={lang === "sq" ? "Çfarë tregon historiku" : "What the history says"}><div className="countryAnalysisHtml" dangerouslySetInnerHTML={{ __html: analysisHtml }} /></EditorialSection> : null}
 
-      <EditorialSection id="country-market" index={analysisHtml ? "04" : "03"} title={c.market(editorial.label)}><p>{editorial.marketOverview}</p></EditorialSection>
+      <EditorialSection id="country-market" index={analysisHtml ? "04" : "03"} title={c.market(editorial.label)}><p>{safe.marketOverview}</p></EditorialSection>
 
       <EditorialSection id="country-comparison" index={analysisHtml ? "05" : "04"} title={countryName === "Albania" ? c.albaniaReference : c.comparison(editorial.label)}>
         {countryName === "Albania" ? (
@@ -215,8 +217,8 @@ export default function CountryFuelPricesPage({
               <b>{decisionCopy.neighborTitle}</b>
               <div className="countryNeighborLinks">
                 {[{ name: "Kosovo", slug: "kosovo" }, { name: "Greece", slug: "greece" }].map((neighbor) => {
-                  const value = eurPrice(data?.countries.find((item) => item.country === neighbor.name) ?? null, fuelType);
-                  const difference = value == null || selectedPrice == null ? null : (value - selectedPrice) * 50;
+                  const comparisonResult = compareCountries(data, neighbor.name, "Albania", fuelType);
+                  const difference = comparisonResult?.differenceForTank ?? null;
                   const comparison = difference == null
                     ? decisionCopy.unavailable(neighbor.name)
                     : Math.abs(difference) < 0.05
@@ -232,24 +234,24 @@ export default function CountryFuelPricesPage({
         ) : (
           <div className="countryComparisonGrid">{FUELS.map((fuel) => <div className="editorialCard" key={fuel}><b>{fuelLabel(t, fuel)}</b><p>{compareLine(fuel)}</p></div>)}</div>
         )}
-        <p>{editorial.albaniaContext}</p>
+        <p>{safe.albaniaContext}</p>
         {countryName === "Albania" ? null : <EditorialCallout label={decisionCopy.related}><p>{decisionCopy.relatedText}</p><div className="editorialHeroActions"><Link className="editorialAction editorialActionPrimary" to="/fuel-prices/albania">{decisionCopy.albaniaPrices}</Link><Link className="editorialAction" to="/trip-cost-calculator">{decisionCopy.calculator}</Link></div></EditorialCallout>}
       </EditorialSection>
 
       <EditorialSection id="country-travel" index={analysisHtml ? "06" : "05"} title={c.travel}>
-        <div className="editorialCardGrid"><div className="editorialCard"><b>{c.travel}</b><p>{editorial.travelRelevance}</p></div><div className="editorialCard"><b>{c.borders}</b><p>{editorial.borderAdvice}</p></div><div className="editorialCard"><b>{c.fuels(editorial.label)}</b><p>{editorial.fuelInterpretation}</p></div></div>
+        <div className="editorialCardGrid"><div className="editorialCard"><b>{c.travel}</b><p>{safe.travelRelevance}</p></div><div className="editorialCard"><b>{c.borders}</b><p>{safe.borderAdvice}</p></div><div className="editorialCard"><b>{c.fuels(editorial.label)}</b><p>{safe.fuelInterpretation}</p></div></div>
       </EditorialSection>
 
       {countryName === "Albania" ? <><TravelLinks lang={lang} /><RoadStatusLink lang={lang} /><RentalReferral lang={lang} placement="albania" /></> : null}
       <EditorialSection id="country-coverage" index={analysisHtml ? "07" : "06"} title={c.limitations}>
-        <p>{editorial.dataLimitations}</p><p>{editorial.sourceTransparency}</p>
+        <p>{safe.dataLimitations}</p><p>{safe.sourceTransparency}</p>
         {data?.source ? <EditorialCallout label={copy.source}>{data.source} · {c.dataUpdated(updated)}</EditorialCallout> : null}
       </EditorialSection>
 
       <AdsterraBannerAd location="country-after-coverage" enabled={hasAnyPrice && !loading} />
 
       <EditorialSection id="country-faq" index={analysisHtml ? "08" : "07"} title={c.faq(editorial.label)}>
-        {editorial.faqs.map((faq) => <details className="editorialFaq" key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}
+        {safe.faqs.map((faq) => <details className="editorialFaq" key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}
       </EditorialSection>
 
       <EditorialSection id="country-explore" title={c.explore} tone="accent">

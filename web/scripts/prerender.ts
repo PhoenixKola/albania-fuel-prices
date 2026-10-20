@@ -19,6 +19,9 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
+import { countryPageContent } from "../src/config/countryPageContent";
+import { countryMetaDescription } from "../src/config/countryMetaDescription";
+import { compareCountries, comparisonSentence } from "../src/models/countryComparison";
 import { STATIC_ROUTES as ROUTE_CONFIGS } from "../src/config/routes";
 import { i18n } from "../src/locales";
 import { getPublishedArticles } from "../src/config/articles";
@@ -34,8 +37,6 @@ import {
   renderHomeSnapshot,
   renderRankingsTable,
   renderComparePairs,
-  priceMetaPrefix,
-  composeDescription,
   type PriceContext,
 } from "./priceData";
 
@@ -111,7 +112,7 @@ function localeSections(
 function freshnessNotice(): string {
   if (!ANALYSIS_META.stale) return "";
   return `
-        <p class="staleNotice" role="status">Our price feed was last updated on ${ANALYSIS_META.asOf} (${ANALYSIS_META.dataAgeDays} days ago). Figures below may be out of date while we restore the daily update.</p>`;
+        <p class="staleNotice" role="status">The upstream source reading is dated ${ANALYSIS_META.asOf} (${ANALYSIS_META.dataAgeDays} days ago). A recent download does not make these prices current; check pump prices before travel.</p>`;
 }
 
 function renderEditorialSections(sections: EditorialTextSection[]): string {
@@ -162,7 +163,7 @@ const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/",
     title: "Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG",
-    description: "Check current petrol, diesel and LPG prices in Albania and across Europe, compare countries, and calculate your trip fuel cost from daily-updated data.",
+    description: "Check source-dated petrol, diesel and LPG reference prices in Albania and Europe. Compare countries, find stations and estimate a trip's fuel cost.",
     jsonLdType: "WebSite",
     datePublished: "2026-02-14",
     priceBearing: true,
@@ -234,7 +235,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         <section class="contentSection">
           <h2 class="contentHeading">How this page works</h2>
           <p class="contentBody">The nearby stations feature uses your device's geolocation (if you grant permission) to find fuel stations within a chosen radius (2 km, 5 km, or 10 km). Results show station names, approximate distances, and opening hours when available.</p>
-          <p class="contentBody">This page does NOT show real-time pump prices for each station. Use the station finder as a location tool, and the country-level prices on the homepage as a reasonable estimate of what you will pay.</p>
+          <p class="contentBody">This page does not show real-time pump prices for each station. Use the station finder as a location tool and the dated country-level references as a budgeting starting point.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Why station prices differ from national averages</h2>
@@ -242,7 +243,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Privacy and location</h2>
-          <p class="contentBody">Your location data is used only in your browser to calculate distances. It is never sent to our servers, stored, or shared with advertisers. If you deny location permission, the tool simply won't display results — the rest of the site works without any location data.</p>
+          <p class="contentBody">When you choose to search nearby, your browser sends coordinates to the station lookup service, which may query OpenStreetMap/Overpass. We do not use your location for advertising or to build a location history. If you deny permission, the rest of the site remains available.</p>
         </section>
       </article>
     `,
@@ -250,25 +251,22 @@ const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/compare",
     title: "Compare Fuel Prices Across Countries | Fuel Today",
-    description: "Build a country watchlist and compare petrol, diesel, and LPG prices across Albania and Europe for practical trip and budget planning.",
+    description: "Select countries and fuel type to compare dated petrol, diesel and LPG reference prices across Europe. See EUR/L differences; individual pump prices vary.",
     jsonLdType: "WebPage",
     datePublished: "2026-04-01",
     priceBearing: true,
     content: (ctx) => `
       <article class="contentPage">
         <h1 class="contentPageTitle">Compare Fuel Prices</h1>
-        <p class="contentBody">Build a watchlist of countries you care about and compare petrol, diesel, and LPG prices side by side for practical trip planning and cross-border refueling decisions.</p>
+        <p class="contentBody">Choose countries and a fuel type to compare source-dated national reference prices. Each market can have a different publication date; no individual pump prices are shown.</p>
         ${renderComparePairs(ctx)}
         <section class="contentSection">
           <h2 class="contentHeading">How to use country comparisons effectively</h2>
-          <p class="contentBody">Comparing fuel prices across countries is not just about finding the cheapest number. Exchange rates, tax structures, and data reporting schedules all affect how meaningful a direct comparison is. The watchlist feature is designed for drivers who regularly cross borders or plan multi-country road trips.</p>
+          <p class="contentBody">Compare the same fuel in EUR/L, check the market dates, then use actual station prices and route costs for a trip decision. A national price gap alone does not prove a detour saves money.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Practical comparison examples</h2>
-          <p class="contentBody"><strong>Albania vs Kosovo:</strong> Prices are typically very close (within 0.02–0.05 EUR/L). The refueling decision often comes down to convenience on the Tirana-Pristina corridor.</p>
-          <p class="contentBody"><strong>Albania vs Greece:</strong> One of the largest price differences in the Balkans. Greek fuel is typically 0.20–0.40 EUR/L more expensive. Fill up in Albania before crossing south.</p>
-          <p class="contentBody"><strong>Albania vs Italy:</strong> Italian fuel is 0.40–0.60 EUR/L above Albanian prices. Fill up before the ferry and minimize Italian refueling.</p>
-          <p class="contentBody"><strong>Albania vs Montenegro:</strong> A moderate difference (0.05–0.15 EUR/L). Albanian fuel is usually slightly cheaper.</p>
+          ${["Kosovo", "Greece", "Italy", "Montenegro"].map((country) => `<p class="contentBody"><strong>${country} diesel:</strong> ${escapeHtml(comparisonSentence(compareCountries(ctx.latest, country, "Albania", "diesel"), country, "Albania", "diesel"))}</p>`).join("")}
         </section>
       </article>
     `,
@@ -478,17 +476,17 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">How we build our historical record</h2>
-          <p class="contentBody">Public price aggregators publish a snapshot of today and nothing else. Since ${ANALYSIS_META.startLabel || "February 2026"} we have captured that snapshot once a day and appended it to our own history file, which now holds ${ANALYSIS_META.daysObserved || 0} consecutive daily readings across ${ANALYSIS_META.countriesAnalysed || 0} markets, with no gaps. That record is what makes the analysis on this site possible: the upstream sources publish only today's snapshot, so ranges, records and trends simply do not exist unless someone keeps the history. The exact calculations applied to it are described below.</p>
+          <p class="contentBody">Since ${ANALYSIS_META.startLabel || "February 2026"}, the site has collected public source readings into its own history. Older collection-day records did not always verify the upstream publication date; repeated values may therefore appear across days. The current snapshot separates its source date from the time our job fetched it. We calculate ranges and trends from the collected record with these limits in mind.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">How the analysis is calculated</h2>
           <p class="contentBody">Every derived figure on this site is computed from that history file at build time. None of it comes from the upstream source.</p>
           <ul class="contentList">
             <li><strong>Period low, high and average</strong> — the minimum, maximum and arithmetic mean of all daily readings we hold for that country and fuel, with the dates on which the extremes occurred.</li>
-            <li><strong>Position in range (percentile)</strong> — the share of recorded days that were cheaper than today. 0% means today is the cheapest price we have recorded; 100% the most expensive.</li>
+            <li><strong>Observations below (percentile)</strong> — the share of collected readings strictly cheaper than the last recorded value. Equal readings are not counted as lower.</li>
             <li><strong>Volatility</strong> — the standard deviation of day-to-day percentage price changes across the full record. Higher values mean a market that reprices frequently and unpredictably.</li>
-            <li><strong>30/90-day change</strong> — the percentage difference between today's price and the reading from 30 or 90 observations earlier.</li>
-            <li><strong>Refuelling verdict</strong> — a plain-language reading of the percentile figure. It describes where today sits in our recorded range; it is not a price forecast.</li>
+            <li><strong>30/90-observation change</strong> — the percentage difference between the last recorded price and earlier collected readings.</li>
+            <li><strong>Historical position</strong> — a description of where the last reading sits in our collected range, not a price forecast or refuelling recommendation.</li>
             <li><strong>Cross-border spread history</strong> — the daily difference between two countries' prices, tracked over time.</li>
           </ul>
           <p class="contentBody">Statistics are only produced once we hold at least 30 daily readings for a country and fuel; below that threshold we show nothing rather than something unreliable. Countries absent from the upstream feed are excluded from search indexing rather than padded with placeholder content.</p>
@@ -658,11 +656,8 @@ function renderAlbaniaDecisionSupport(ctx: PriceContext): string {
     { label: "Kosovo", slug: "kosovo" },
     { label: "Greece", slug: "greece" },
   ].map((neighbor) => {
-    const prices = ctx.prices.get(neighbor.label);
-    const comparison = prices?.diesel == null || albania.diesel == null
-      ? "Unavailable"
-      : `${money(Math.abs((prices.diesel - albania.diesel) * 50))} ${prices.diesel < albania.diesel ? "less" : "more"} per 50 L of diesel`;
-    return `<li><a href="/fuel-prices/${neighbor.slug}">${neighbor.label} fuel prices</a> — ${comparison}</li>`;
+    const comparison = comparisonSentence(compareCountries(ctx.latest, neighbor.label, "Albania", "diesel"), neighbor.label, "Albania", "diesel");
+    return `<li><a href="/fuel-prices/${neighbor.slug}">${neighbor.label} fuel prices</a> — ${escapeHtml(comparison)}</li>`;
   }).join("");
 
   return `<section class="contentSection" id="albania-fill-up-cost">
@@ -677,7 +672,8 @@ function renderAlbaniaDecisionSupport(ctx: PriceContext): string {
 
 function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
   return COUNTRY_EDITORIAL.map((c) => {
-    const faqItems = c.faqs
+    const safe = countryPageContent(c, ctx.latest, "en");
+    const faqItems = safe.faqs
       .map(
         (faq) => `
         <div class="faqItem">
@@ -694,7 +690,7 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
     return {
       path: `/fuel-prices/${c.slug}`,
       title: c.metaTitle,
-      description: composeDescription(priceMetaPrefix(ctx, c.dataCountryName), c.metaDescription),
+      description: countryMetaDescription(c.metaDescription, c.dataCountryName, ctx.latest),
       jsonLdType: "FAQPage",
       datePublished: "2026-05-26",
       priceBearing: true,
@@ -703,8 +699,8 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
       <article class="contentPage editorialExperience editorialExperience-newsroom">
         <header class="contentHero editorialHero">
           <p class="contentHeroBadge">Country market briefing</p>
-          <h1 class="contentHeroTitle">${escapeHtml(c.label)} fuel prices today</h1>
-          <p class="contentHeroText">Current petrol, diesel, and LPG reference prices in ${escapeHtml(c.label)}, with 30-day movement, European ranking, and practical driving context.</p>
+          <h1 class="contentHeroTitle">${escapeHtml(c.label)} fuel prices</h1>
+          <p class="contentHeroText">Dated petrol, diesel and LPG reference prices in ${escapeHtml(c.label)}. Source reading: ${escapeHtml(ctx.asOf)}; check each market's provenance below.</p>
         </header>
         ${freshnessNotice()}
         <section id="country-prices">${renderCountryPriceSection(ctx, c)}</section>
@@ -712,33 +708,33 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
         <section id="country-history">${getCountryAnalysis(c.slug)}</section>
         <section class="contentSection editorialSection" id="country-market">
           <h2 class="contentHeading">${escapeHtml(c.label)} fuel market overview</h2>
-          <p class="contentBody">${escapeHtml(c.marketOverview)}</p>
+          <p class="contentBody">${escapeHtml(safe.marketOverview)}</p>
         </section>
 
         <section class="contentSection editorialSection" id="country-comparison">
           <h2 class="contentHeading">${c.dataCountryName === "Albania" ? "Albania as the reference market" : `How ${escapeHtml(c.label)} compares with Albania`}</h2>
-          <p class="contentBody">${escapeHtml(c.albaniaContext)}</p>
+          <p class="contentBody">${escapeHtml(safe.albaniaContext)}</p>
         </section>
 
         <section class="contentSection editorialSection" id="country-travel">
           <h2 class="contentHeading">Travel and driving context</h2>
-          <p class="contentBody">${escapeHtml(c.travelRelevance)}</p>
+          <p class="contentBody">${escapeHtml(safe.travelRelevance)}</p>
         </section>
 
         <section class="contentSection editorialSection" id="country-fuels">
           <h2 class="contentHeading">Understanding petrol, diesel, and LPG prices</h2>
-          <p class="contentBody">${escapeHtml(c.fuelInterpretation)}</p>
+          <p class="contentBody">${escapeHtml(safe.fuelInterpretation)}</p>
         </section>
 
         <section class="contentSection editorialSection" id="country-borders">
-          <h2 class="contentHeading">Border crossings and refueling advice</h2>
-          <p class="contentBody">${escapeHtml(c.borderAdvice)}</p>
+          <h2 class="contentHeading">Cross-border reference comparison</h2>
+          <p class="contentBody">${escapeHtml(safe.borderAdvice)}</p>
         </section>
 
         <section class="contentSection editorialSection" id="country-coverage">
           <h2 class="contentHeading">Data coverage and limitations</h2>
-          <p class="contentBody">${escapeHtml(c.dataLimitations)}</p>
-          <p class="contentBody">${escapeHtml(c.sourceTransparency)}</p>
+          <p class="contentBody">${escapeHtml(safe.dataLimitations)}</p>
+          <p class="contentBody">${escapeHtml(safe.sourceTransparency)}</p>
         </section>
 
         <section class="contentSection editorialSection" id="country-faq">
@@ -841,7 +837,7 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
       (c) => `/fuel-prices/${c.slug}` === route.path
     );
     const mainEntity = editorial
-      ? editorial.faqs.map((faq) => ({
+      ? countryPageContent(editorial, ctx.latest, "en").faqs.map((faq) => ({
           "@type": "Question",
           name: faq.question,
           acceptedAnswer: {
@@ -864,17 +860,20 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
       },
     ];
 
-    // Country pages carry an actual daily-updated dataset — say so explicitly.
+    // The crawler sees the same source-dated reference values as the visible page.
+    const marketRow = editorial ? ctx.latest?.countries.find((row) => row.country === editorial.dataCountryName) : null;
+    const marketDate = marketRow?.provenance === "historical-fallback" || marketRow?.provenance === "date-unverified"
+      ? marketRow.source_as_of ?? null : marketRow?.source_as_of ?? ctx.asOf;
     if (editorial && ctx.ok && ctx.prices.has(editorial.dataCountryName)) {
       graph.push({
         "@type": "Dataset",
-        name: `Daily fuel prices in ${editorial.label}`,
-        description: `Country-level average petrol (gasoline 95), diesel, and LPG prices in ${editorial.label}, in EUR per liter, updated daily from public aggregators.`,
+        name: `Fuel reference prices in ${editorial.label}`,
+        description: `Country-level petrol (gasoline 95), diesel, and LPG reference prices in ${editorial.label}, in EUR per liter. Source date ${marketDate ?? "unverified"}; source publication schedules vary.`,
         url: canonical,
-        dateModified: ctx.asOf,
-        isBasedOn: ctx.sourceUrl || undefined,
+        dateModified: marketDate ?? undefined,
+        isBasedOn: marketRow?.source_url ?? (marketRow?.provenance ? undefined : ctx.sourceUrl || undefined),
         creator: publisher,
-        temporalCoverage: `${ANALYSIS_META.startDate}/${ctx.asOf}`,
+        temporalCoverage: marketDate ? `${ANALYSIS_META.startDate}/${marketDate}` : undefined,
         measurementTechnique:
           "Daily capture of published country-level average fuel prices, normalised to EUR per liter",
       });

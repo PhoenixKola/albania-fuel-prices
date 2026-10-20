@@ -30,7 +30,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
   {
     path: "/trip-cost-calculator",
     title: "Trip Fuel Cost Calculator | Albania & Europe | Fuel Today",
-    description: "Calculate road-trip fuel costs across Albania and Europe. Add country distances, compare petrol, diesel and LPG, and share an estimate in EUR and ALL.",
+    description: "Estimate fuel cost across Albania and Europe: enter distance by country, vehicle consumption and fuel type. See dated EUR/ALL reference prices and share a route.",
     priority: 0.9, changefreq: "daily", jsonLdType: "WebPage", priceBearing: true, lastmod: "2026-09-09",
   },
   {
@@ -43,7 +43,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     path: "/",
     title: "Fuel Prices Today in Albania & Europe | Petrol, Diesel & LPG",
     description:
-      "Check current petrol, diesel and LPG prices in Albania and across Europe, compare countries, and calculate your trip fuel cost from daily-updated data.",
+      "Check source-dated petrol, diesel and LPG reference prices in Albania and Europe. Compare countries, find stations and estimate a trip's fuel cost.",
     priority: 1.0,
     changefreq: "daily",
     jsonLdType: "WebSite",
@@ -53,17 +53,17 @@ export const STATIC_ROUTES: RouteConfig[] = [
     path: "/stations",
     title: "Fuel Stations Near Me | Map, Distance & Opening Hours",
     description:
-      "Find nearby fuel stations by location, distance and available opening hours. Pair the map with current country-level fuel prices for trip planning.",
+      "Find mapped fuel stations nearby, approximate straight-line distance and available listed opening hours. Station-level pump prices are not provided.",
     priority: 0.8,
     changefreq: "daily",
     jsonLdType: "WebPage",
-    lastmod: "2026-04-01",
+    lastmod: "2026-10-20",
   },
   {
     path: "/compare",
     title: "Compare Fuel Prices Across Countries | Fuel Today",
     description:
-      "Build a country watchlist and compare petrol, diesel, and LPG prices across Albania and Europe for practical trip and budget planning.",
+      "Select countries and fuel type to compare dated petrol, diesel and LPG reference prices across Europe. See EUR/L differences; individual pump prices vary.",
     priority: 0.8,
     changefreq: "daily",
     jsonLdType: "WebPage",

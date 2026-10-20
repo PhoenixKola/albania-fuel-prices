@@ -1,310 +1,112 @@
 /**
- * Insights articles — dated, authored editorial pieces.
- *
- * Single source of truth consumed by BOTH the React pages
- * (InsightsIndexPage / InsightArticlePage) and the prerender + sitemap
- * scripts, so crawlers and client navigation always agree.
- *
- * House rules for these pieces:
- *  - Every price quoted carries an explicit "as of" date, because prices move.
- *  - Claims about ranges, records and percentages come from our own dataset
- *    (data/history.json) and are reproducible from our published method.
- *  - Market-structure background is framed as context, not as a scoop.
- *
- * When prices move materially, refresh the figures and bump `dateModified`.
- *
- * Body HTML uses the same content classes as the rest of the site
- * (contentSection / contentHeading / contentBody / contentList).
+ * Dated editorial, shared by the client, prerenderer and sitemap.
+ * Historical readings are collection-day observations; the old archive did
+ * not consistently verify the upstream publication date.
  */
-
 export type InsightArticle = {
   slug: string;
   title: string;
-  /** Shorter title for <title>/SERP when the headline would be truncated. */
   seoTitle?: string;
-  /** Meta description + index-card teaser. */
   description: string;
   datePublished: string;
   dateModified?: string;
   published: boolean;
-  /** Approximate reading time in minutes, shown on the index. */
   readMinutes: number;
   html: string;
 };
 
+const archiveNote = `<p class="contentBodyMuted">Historical values below are dated collection records, not a claim about the price available at every pump on that date. Older records did not separately verify the upstream publication date. For a newer source-dated reference, use the <a href="/fuel-prices/albania">Albania page</a> and check its displayed source date.</p>`;
+
 export const INSIGHT_ARTICLES: InsightArticle[] = [
   {
     slug: "six-months-of-balkan-fuel-prices",
-    title: "Six Months of Balkan Fuel Prices: What 173 Days of Our Own Data Show",
-    seoTitle: "Six Months of Balkan Fuel Price Data: Key Findings",
-    description:
-      "We have recorded European fuel prices every day since February 2026. Albanian diesel is up 22.5%, and Albania now costs more than Greece and Italy.",
-    datePublished: "2026-08-05",
-    published: true,
-    readMinutes: 8,
+    title: "Balkan Fuel Prices: What the February–August 2026 Record Shows",
+    seoTitle: "Balkan Fuel Price History, February–August 2026",
+    description: "A dated look at Albania and nearby fuel-price observations collected between February and August 2026, with limits of the source record.",
+    datePublished: "2026-08-05", dateModified: "2026-10-20", published: true, readMinutes: 4,
     html: `
-      <section class="contentSection">
-        <h2 class="contentHeading">What this dataset is</h2>
-        <p class="contentBody">Since 14 February 2026 this site has recorded country-level petrol, diesel and LPG prices across Europe once a day, every day. As of 5 August 2026 that record holds 173 consecutive daily observations covering 33 European markets, with no gaps. The raw prices come from public aggregators; the historical record, and everything we derive from it below, is ours. Our <a href="/methodology">methodology page</a> documents exactly how each figure is calculated.</p>
-        <p class="contentBody">Six months is long enough for patterns to appear that a daily price snapshot simply cannot show. Here is what ours shows.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Finding 1: Albanian fuel has become dramatically more expensive</h2>
-        <p class="contentBody">On 14 February 2026 Albanian diesel sat at €1.801 per liter. On 5 August 2026 it was €2.207 — a rise of 22.5% in under six months. Petrol went from €1.801 to €2.025 (+12.4%), and LPG from €0.594 to €0.740 (+24.6%). Diesel touched its floor of €1.794 on 28 February and its peak of €2.325 on 29 July.</p>
-        <p class="contentBody">Two things stand out. First, diesel rose almost twice as fast as petrol, which is unusual — the two normally track each other closely because they come off the same barrel. Second, LPG, usually the sleepiest of the three, posted the largest percentage increase of all. A driver who converted to LPG in February to escape rising costs has watched the cheap option get proportionally more expensive than the thing they were escaping.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Finding 2: Albania has quietly become one of the most expensive markets in the region</h2>
-        <p class="contentBody">This is the finding that surprised us most, because it inverts the advice that circulated for years. As of 5 August 2026, Albanian diesel at €2.207 is more expensive than <strong>Greece</strong> (€2.068), more expensive than <strong>Italy</strong> (€2.105), and far more expensive than every other Balkan neighbour we track:</p>
-        <ul class="contentList">
-          <li>Kosovo — €1.465 (€0.742 cheaper than Albania)</li>
-          <li>Bosnia and Herzegovina — €1.696</li>
-          <li>Bulgaria — €1.713</li>
-          <li>Croatia — €1.775</li>
-          <li>Serbia — €1.930</li>
-          <li>Greece — €2.068</li>
-          <li>Italy — €2.105</li>
-          <li><strong>Albania — €2.207</strong></li>
-        </ul>
-        <p class="contentBody">Only Switzerland (€2.326) and the Netherlands (€2.380) sit meaningfully above Albania among the markets in our set. For a country whose average wage is a fraction of the Swiss or Dutch equivalent, that is a striking position to occupy — and it is a recent development, not a longstanding fact.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Finding 3: The old cross-border advice is now wrong</h2>
-        <p class="contentBody">For years the standard guidance for Albanian drivers was: fill up at home before driving to Greece or Italy, because fuel there is dearer. On today's numbers that advice loses you money.</p>
-        <p class="contentBody">Diesel in Greece is €0.139 per liter <em>cheaper</em> than in Albania — about €7 on a 50-litre tank in favour of waiting until you cross. Italian diesel is €0.102 cheaper, roughly €5 a tank. Petrol between Albania and Greece is, as of this reading, exactly level at €2.025. The one piece of old advice that still holds — and holds more strongly than ever — is Kosovo: at €1.465 for diesel, a full 50-litre tank costs about €37 less there than in Albania.</p>
-        <p class="contentBody">We keep the live version of this comparison on the <a href="/compare">compare page</a>, because a gap this volatile can invert again. That is precisely the point: cross-border refuelling advice written once and left alone becomes wrong, quietly.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Finding 4: Some markets barely move, others lurch daily</h2>
-        <p class="contentBody">Measuring the standard deviation of daily percentage price moves across all 173 days gives a clean read on how jumpy each market is. Kosovo is by far the most stable in our set at 0.21% — its retail prices change rarely and in visible steps, consistent with a market where pricing is administered or slow to pass through. Serbia (0.57%) and Belarus (0.67%) are similarly placid.</p>
-        <p class="contentBody">At the other end, Luxembourg (2.78%), Moldova (2.64%) and Poland (2.60%) reprice almost continuously, tracking wholesale costs closely. For a driver, volatility is practical information: in a stable market there is no point timing your fill-up, while in a volatile one waiting a few days genuinely can change what you pay. Current figures for every market are in the <a href="/market-report">daily market report</a>.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">What we cannot tell you</h2>
-        <p class="contentBody">Being straight about the limits matters. Our dataset records country-level averages, not individual stations, so it cannot tell you which pump in Tirana is cheapest today. It began in February 2026, so it cannot speak to multi-year trends. And it records prices, not causes — we can show you that Albanian diesel rose 22.5%, but attributing that split between crude costs, exchange rates, excise changes and retail margins would require data we do not hold.</p>
-        <p class="contentBody">What it does do is turn a daily snapshot into a record, and a record into context: whether today is expensive or cheap by recent standards, which way things have been moving, and where it pays to fill up. Every country page now carries that analysis — see <a href="/fuel-prices/albania">Albania</a> or <a href="/fuel-prices/greece">Greece</a> — and the underlying method is documented in our <a href="/methodology">methodology</a>.</p>
-      </section>
-    `,
+      <section class="contentSection"><h2 class="contentHeading">What was recorded</h2>
+        <p class="contentBody">Our archive starts on 14 February 2026. It stores country-level petrol, diesel and LPG reference readings collected from public sources. A collection-day entry is not proof that a source published a new price that day; unchanged readings may recur. The <a href="/methodology">methodology</a> explains how the record and its statistics are assembled.</p></section>
+      <section class="contentSection"><h2 class="contentHeading">Albania in the dated sample</h2>
+        <p class="contentBody">In the 14 February record, Albanian diesel was €1.801/L; the 5 August record shows €2.207/L, a 22.5% increase between those two collected readings. Petrol moved from €1.801 to €2.025/L, and LPG from €0.594 to €0.740/L. These are reference values, not individual station quotes or a forecast.</p>
+        <p class="contentBody">The 5 August diesel readings were €2.068/L for Greece, €2.105/L for Italy and €1.465/L for Kosovo. Fuel types differed: Albania and Greece both showed €2.025/L for petrol in that archived record. A border conclusion based on diesel must therefore never be applied automatically to petrol or LPG.</p></section>
+      <section class="contentSection"><h2 class="contentHeading">How to use the history</h2>
+        <p class="contentBody">Historical ranges describe the values in this sample. They cannot predict the next price or explain tax, wholesale and retail causes by themselves. For a trip, compare the same fuel in each country using the <a href="/compare">comparison tool</a>, then account for the actual pump, route and consumption in the <a href="/trip-cost-calculator">trip calculator</a>.</p></section>
+      ${archiveNote}`,
   },
   {
     slug: "why-albanian-fuel-costs-more-than-the-balkans",
-    title: "Why Albanian Fuel Now Costs More Than Greece, Italy and Every Balkan Neighbour",
-    seoTitle: "Why Albanian Fuel Costs More Than Greece and Italy",
-    description:
-      "Albania imports nearly every liter it burns, taxes it heavily and buys through a concentrated retail market. What that does to the price at the pump.",
-    datePublished: "2026-07-10",
-    dateModified: "2026-08-05",
-    published: true,
-    readMinutes: 6,
+    title: "Albanian Diesel in the 5 August 2026 Regional Snapshot",
+    seoTitle: "Albania Diesel vs Nearby Markets: August 2026",
+    description: "An archived fuel-specific comparison of Albania, Greece, Italy and Kosovo, with clear limits on what price data can explain.",
+    datePublished: "2026-07-10", dateModified: "2026-10-20", published: true, readMinutes: 3,
     html: `
-      <section class="contentSection">
-        <h2 class="contentHeading">The uncomfortable ranking</h2>
-        <p class="contentBody">As of 5 August 2026, diesel in Albania costs €2.207 per liter. That is more than Greece (€2.068), more than Italy (€2.105), and far more than Bosnia (€1.696), Bulgaria (€1.713), Croatia (€1.775) or Serbia (€1.930). Kosovo, next door, charges €1.465. Among the markets we track, only Switzerland and the Netherlands are meaningfully more expensive.</p>
-        <p class="contentBody">For a country with among the lowest average wages in Europe, that inversion deserves an explanation. Three structural factors do most of the work.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Reason 1: Everything is imported, by sea</h2>
-        <p class="contentBody">Albania has crude oil in the ground — the Patos-Marinza field is one of the largest onshore oilfields in continental Europe — but very little capacity to turn it into usable fuel. The Ballsh refinery has been idle or running far below capacity for most of the past decade. In practice virtually every liter of petrol and diesel sold at Albanian pumps arrives as a refined import, largely by tanker into Durrës and Vlorë from Mediterranean refineries.</p>
-        <p class="contentBody">That chain adds cost at every link: sea freight, port handling, storage, inland distribution across difficult terrain, and the margin of import intermediaries. Serbia, by contrast, has domestic refining capacity at Pančevo, and Bosnia is supplied overland through cheaper Danube-basin logistics. Both sit well below Albania on price.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Reason 2: Tax</h2>
-        <p class="contentBody">Albanian fuel carries excise duty, a circulation tax, a carbon tax, and 20% VAT applied on top of the other levies. Depending on the underlying crude price, roughly half of what a driver pays at the pump is tax — a structure that broadly resembles EU fuel taxation without the EU-level incomes.</p>
-        <p class="contentBody">Kosovo is the clearest natural experiment. It faces nearly identical import logistics to Albania — same region, same sea routes, similar scale — yet charges €0.742 per liter less for diesel. The difference is not geology or shipping; it is overwhelmingly fiscal.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Reason 3: A concentrated retail market</h2>
-        <p class="contentBody">Fuel retail in Albania is dominated by a small number of vertically integrated groups that control import terminals as well as station networks. Concentration at both the wholesale and retail layer means less price competition than the raw station count suggests, and Albania's competition authority has examined the sector more than once. Our own data offers indirect corroboration: Albanian prices move in relatively few discrete steps rather than drifting continuously, which is what you would expect where a handful of players reprice together.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">The currency cushion is thinning</h2>
-        <p class="contentBody">One force has worked in Albanian drivers' favour for years: the lek's appreciation against the euro. Fuel is bought abroad in hard currency, so a stronger lek makes each imported liter cheaper in local terms, and that absorbed much of the post-2022 energy shock.</p>
-        <p class="contentBody">What our 2026 record shows is what happens when that cushion stops expanding while input costs rise: diesel up 22.5% between February and August. The currency can soften an import shock; it cannot cancel one indefinitely.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">What this means in practice</h2>
-        <ul class="contentList">
-          <li>If you drive the Tirana–Pristina corridor, refuelling in Kosovo is now worth about €37 on a 50-litre tank of diesel — the single largest saving available to an Albanian driver.</li>
-          <li>The old rule of "fill up before Greece" no longer applies to diesel: Greek diesel is currently cheaper. Check the <a href="/fuel-prices/greece">Greece page</a> before assuming.</li>
-          <li>Within Albania, differences between stations are small. Convenience beats hunting for a cheaper pump.</li>
-        </ul>
-        <p class="contentBody">Every figure here is dated because every figure moves. Live numbers are on the <a href="/market-report">daily market report</a> and the <a href="/fuel-prices/albania">Albania page</a>.</p>
-      </section>
-    `,
+      <section class="contentSection"><h2 class="contentHeading">The dated diesel comparison</h2>
+        <p class="contentBody">On the 5 August 2026 collection date, Albanian diesel was €2.207/L, compared with Greece at €2.068/L, Italy at €2.105/L and Kosovo at €1.465/L. For an illustrative 50 litres, the Albania–Greece gap was €6.95 and the Albania–Kosovo gap €37.10. Those amounts compare national references; they exclude detours, tolls and actual station prices.</p>
+        <p class="contentBody">Petrol did not have the same direction: the Albania and Greece readings were both €2.025/L. The dated snapshot cannot support a rule that every fuel is dearer or cheaper on one side of a border.</p></section>
+      <section class="contentSection"><h2 class="contentHeading">What the figures cannot establish</h2>
+        <p class="contentBody">Country price data alone cannot isolate the contribution of taxation, imports, exchange rates, distribution or retail competition. Those mechanisms may affect prices, but the reference-price gap is not evidence of any one cause. Check the <a href="/fuel-prices/greece">Greece</a> and <a href="/fuel-prices/kosovo">Kosovo</a> pages for newer readings and their provenance.</p></section>
+      ${archiveNote}`,
   },
   {
     slug: "diesel-petrol-lpg-real-cost-albania",
-    title: "Diesel, Petrol or LPG in Albania: What Each Actually Costs You Per Year",
-    seoTitle: "Diesel, Petrol or LPG in Albania: Real Annual Costs",
-    description:
-      "LPG costs a third of diesel per liter in Albania. The real annual bill for a 15,000 km driver at August 2026 prices, and the catches behind each fuel.",
-    datePublished: "2026-07-10",
-    dateModified: "2026-08-05",
-    published: true,
-    readMinutes: 7,
+    title: "Petrol, Diesel or LPG: An Illustrative Albania Fuel Budget",
+    seoTitle: "Albania Petrol, Diesel and LPG Cost Example",
+    description: "Compare fuel spending using explicit distance and consumption assumptions with archived 5 August 2026 reference prices.",
+    datePublished: "2026-08-05", dateModified: "2026-10-20", published: true, readMinutes: 3,
     html: `
-      <section class="contentSection">
-        <h2 class="contentHeading">The per-liter gap is enormous</h2>
-        <p class="contentBody">As of 5 August 2026, Albanian country-level averages stand at €2.025 per liter for petrol, €2.207 for diesel, and €0.740 for LPG. That last number is not a typo: LPG costs about a third of the diesel price per liter. Gaps this wide change which car is cheap to run — but the per-liter price alone is misleading, because the three fuels differ in consumption, vehicle cost and practicality.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">The honest annual comparison</h2>
-        <p class="contentBody">Take a typical Albanian passenger car driving 15,000 km a year, using realistic rather than brochure consumption figures for a compact car:</p>
-        <ul class="contentList">
-          <li><strong>Petrol:</strong> ~7.0 L/100km → 1,050 L/year → about <strong>€2,125/year</strong> at €2.025/L.</li>
-          <li><strong>Diesel:</strong> ~5.5 L/100km → 825 L/year → about <strong>€1,820/year</strong> at €2.207/L.</li>
-          <li><strong>LPG:</strong> ~8.4 L/100km (LPG burns roughly 20% more volume than petrol) → 1,260 L/year → about <strong>€930/year</strong> at €0.740/L.</li>
-        </ul>
-        <p class="contentBody">Diesel still beats petrol by roughly €300 a year despite costing more per liter, because the consumption advantage more than compensates. LPG beats both by a wide margin — under half the annual fuel bill of petrol — even after accounting for its higher volumetric consumption.</p>
-        <p class="contentBody">One caveat our own data adds: LPG was the fastest-rising of the three fuels between February and August 2026, up 24.6% against diesel's 22.5% and petrol's 12.4%. The LPG advantage is large, but it has been narrowing in relative terms, not widening.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">The catches the pump price hides</h2>
-        <p class="contentBody"><strong>LPG:</strong> a factory-fit or professionally installed conversion costs roughly €800–1,500 up front. At the savings above — close to €1,200 a year against petrol — that pays back inside a year and a half of average driving. The real constraints are practical: refuelling infrastructure is good in Tirana and along main corridors but thin in rural areas and across some borders (our dataset has no reliable LPG average for Kosovo at all), plus lost boot space, slightly reduced power, and periodic tank certification.</p>
-        <p class="contentBody"><strong>Diesel:</strong> modern diesels carry expensive emissions hardware — DPF, EGR, AdBlue on newer models — that dislikes short urban trips. For a Tirana commuter doing 8,000 km a year, one repair can erase several years of fuel savings. Diesel's case strengthens with mileage; above roughly 20,000 km a year it is clearly the better of the two conventional fuels.</p>
-        <p class="contentBody"><strong>Petrol:</strong> the highest running cost of the three at current prices, but the cheapest vehicles, the simplest maintenance, and no conversion or fuel-availability compromises.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Rules of thumb</h2>
-        <ul class="contentList">
-          <li>Under ~10,000 km/year, mostly urban: petrol. Simplicity wins and the total fuel spend is modest anyway.</li>
-          <li>15,000+ km/year with highway driving: diesel remains the conventional choice.</li>
-          <li>High-mileage, cost-focused, mostly domestic driving: LPG has the fastest payback of any fuel decision available in Albania today.</li>
-        </ul>
-        <p class="contentBody">Prices move — and as our six-month record shows, they can move a lot. Recheck the current gap on the <a href="/fuel-prices/albania">Albania page</a> before committing to a conversion or a purchase.</p>
-      </section>
-    `,
+      <section class="contentSection"><h2 class="contentHeading">Set the assumptions first</h2>
+        <p class="contentBody">This example uses 15,000 km per year and the 5 August 2026 Albania collection reading: petrol €2.025/L, diesel €2.207/L and LPG €0.740/L. These vehicle consumption assumptions are examples, not measured averages: petrol 7.0 L/100 km, diesel 5.5 L/100 km and LPG 8.4 L/100 km.</p>
+        <ul class="contentList"><li>Petrol: 1,050 L × €2.025 = €2,126.25.</li><li>Diesel: 825 L × €2.207 = €1,820.78.</li><li>LPG: 1,260 L × €0.740 = €932.40.</li></ul></section>
+      <section class="contentSection"><h2 class="contentHeading">Why this is not a vehicle recommendation</h2>
+        <p class="contentBody">Real consumption, maintenance, conversion cost, fuel availability and resale value vary by vehicle and route. A cheaper reference price per litre does not settle total ownership cost. Enter your own kilometres and consumption into the <a href="/trip-cost-calculator">trip fuel cost calculator</a> and check the source date before planning.</p></section>
+      ${archiveNote}`,
   },
   {
     slug: "cross-border-fill-up-math",
-    title: "Cross-Border Fill-Up Math: Pristina, Thessaloniki and the Bari Ferry",
-    seoTitle: "Cross-Border Fuel Savings: Kosovo, Greece and Italy",
-    description:
-      "What you actually save refuelling across the border from Albania, recalculated at August 2026 prices, where two of the three answers have now flipped.",
-    datePublished: "2026-08-05",
-    published: true,
-    readMinutes: 6,
+    title: "Cross-Border Fuel Math: A Dated 50 L Example",
+    seoTitle: "Albania Border Fuel Price Comparison Example",
+    description: "Archived August 2026 diesel and petrol comparisons for Kosovo, Greece and Italy; see what a 50 L reference-price gap does and does not mean.",
+    datePublished: "2026-08-05", dateModified: "2026-10-20", published: true, readMinutes: 3,
     html: `
-      <section class="contentSection">
-        <h2 class="contentHeading">The method</h2>
-        <p class="contentBody">For each route we assume a 50-litre usable tank and country-level average diesel prices as of 5 August 2026. The question is always the same: given where you are driving, on which side of the border should the tank be full? Two of these three answers have reversed since the spring, which is the whole reason this article needs a date on it.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Tirana → Pristina: fill in Kosovo, emphatically</h2>
-        <p class="contentBody">Kosovo remains the cheapest market in the region and the gap has widened sharply. Diesel there is €1.465 against Albania's €2.207 — a difference of €0.742 per liter, or about <strong>€37 on a 50-litre fill</strong>. The A1 makes this the easiest arbitrage in the Balkans: arrive in Kosovo with a low tank, leave with a full one. A commuter doing this twice a month saves on the order of €900 a year.</p>
-        <p class="contentBody">Kosovo is also the most stable market in our entire dataset — daily volatility of 0.21% — so unlike most cross-border advice, this one is unlikely to invert next month.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Tirana → Thessaloniki: the advice has flipped</h2>
-        <p class="contentBody">The long-standing rule was to fill up in Albania before heading south. For diesel that is now wrong. Greek diesel sits at €2.068 against Albania's €2.207 — €0.139 per liter <em>cheaper</em>, worth about €7 on a tank in favour of waiting until you cross.</p>
-        <p class="contentBody">Petrol is a different story: at €2.025 in both markets, the two are currently identical, so for petrol drivers it genuinely makes no difference and convenience should decide. Check the <a href="/fuel-prices/greece">Greece page</a> before you travel — this pair is close enough that it can swap back.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Durrës → Bari: also flipped, but mind the motorways</h2>
-        <p class="contentBody">Italian diesel at €2.105 is now €0.102 cheaper than Albanian diesel — about €5 a tank in Italy's favour, reversing the old "board the ferry full" rule. Italian petrol (€2.008) is likewise marginally below Albania's €2.025.</p>
-        <p class="contentBody">One important caveat: those are national averages, and Italian <em>autostrada</em> stations routinely price 10–15 cents above them. The refined advice is to cross with a comfortable tank, then refuel at in-town stations rather than motorway service areas, where the headline advantage disappears entirely.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">The general rule, updated</h2>
-        <p class="contentBody">Kosovo beats everyone by a wide margin. Greece and Italy have both moved marginally below Albania on diesel. Montenegro and North Macedonia are not covered by our upstream data source, so we make no claim about them. The honest summary for August 2026: Albania is no longer the cheap side of any border it shares except, arguably, none at all.</p>
-        <p class="contentBody">Because these gaps move, check the <a href="/compare">live comparison tool</a> on the day you travel rather than trusting any article — including this one.</p>
-      </section>
-    `,
+      <section class="contentSection"><h2 class="contentHeading">The 5 August diesel example</h2>
+        <p class="contentBody">Albania's archived diesel reference was €2.207/L. Kosovo was €1.465/L, Greece €2.068/L and Italy €2.105/L. Multiplying the differences by 50 litres gives €37.10, €6.95 and €5.10 respectively. This is arithmetic on national references, not the saving available at a particular border station.</p></section>
+      <section class="contentSection"><h2 class="contentHeading">Fuel type and route change the answer</h2>
+        <p class="contentBody">In the same collection record, Albania and Greece petrol were both €2.025/L, while Italian petrol was €2.008/L. LPG was unavailable for Kosovo in that record. Avoid a single “cheaper country” rule across fuels. For any actual journey, check current dated readings, the pumps you can reach, the fuel already in your tank, detours and tolls. The <a href="/compare">country comparison</a> and <a href="/trip-cost-calculator">route calculator</a> help separate these questions.</p></section>
+      ${archiveNote}`,
   },
   {
     slug: "lek-euro-fuel-prices",
-    title: "The Lek, the Euro, and Your Fuel Bill",
-    description:
-      "Albania buys every liter of fuel abroad in hard currency. How the exchange rate quietly sets the price you pay, and what our 2026 data shows.",
-    datePublished: "2026-08-05",
-    published: true,
-    readMinutes: 5,
+    title: "The Lek, the Euro and a Fuel Price Comparison",
+    description: "How a EUR/L reference can be converted into an indicative lek amount, and why an FX conversion is not a pump quote.",
+    datePublished: "2026-08-05", dateModified: "2026-10-20", published: true, readMinutes: 3,
     html: `
-      <section class="contentSection">
-        <h2 class="contentHeading">A currency story hiding in the pump price</h2>
-        <p class="contentBody">Albanian fuel importers pay for cargoes in hard currency; Albanian drivers pay in lek. Between those two transactions sits the exchange rate, and for several years it worked in the driver's favour: the lek appreciated substantially against the euro, one of the stronger currency runs in Europe.</p>
-        <p class="contentBody">The arithmetic is direct. A wholesale liter costing €1.00 represented roughly 122 lek of import cost at 2021 exchange rates, but under 100 lek at recent ones. That appreciation absorbed a large share of the post-2022 energy shock. Without it, every crude rally of the past few years would have hit Albanian pumps considerably harder.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Why the lek strengthened</h2>
-        <p class="contentBody">Record tourism receipts, sustained remittances, and euro-denominated property investment all push foreign currency into the Albanian economy, bidding up the lek. These flows are structural rather than accidental — but they are not guaranteed, and they are exactly the kind of flows that soften when regional conditions change.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">The asymmetry drivers should understand</h2>
-        <p class="contentBody">Albanian pump prices respond to two largely independent variables: the Mediterranean wholesale fuel price, denominated in euros, and the ALL/EUR rate. They can offset each other or compound. A 5% rise in wholesale costs paired with 5% lek appreciation leaves lek pump prices roughly flat — which is what "stable" years actually looked like.</p>
-        <p class="contentBody">The dangerous case is the compound one: rising input costs with no currency offset. Our own 2026 record is a mild version of exactly that — Albanian diesel up 22.5% between 14 February and 5 August, with no domestic refining buffer to soften the pass-through. A genuinely weakening lek during a crude rally would be considerably worse.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Why we quote prices in euros</h2>
-        <p class="contentBody">This is also why our tables use EUR per liter as the common reference: it strips out the currency layer so Albania can be compared fairly against euro-priced neighbours. When you see Albanian prices flat in euro terms but moving in lek terms, you are watching the exchange rate do its work. Both views are available on the <a href="/fuel-prices/albania">Albania page</a>, and the conversion method is described in our <a href="/methodology">methodology</a>.</p>
-      </section>
-    `,
+      <section class="contentSection"><h2 class="contentHeading">Two different readings</h2>
+        <p class="contentBody">Fuel prices here are stored as EUR per litre so markets can be compared on one unit. The displayed ALL value is an indicative conversion using the available exchange rate. It is not an independently verified Albanian pump quote; bank rates, rounding and local retail pricing can differ.</p>
+        <p class="contentBody">For example, at a purely hypothetical 100 ALL per EUR, a €2.000/L reference converts to 200 ALL/L. If that hypothetical rate changes to 98, the conversion becomes 196 ALL/L even when the EUR reference is unchanged. The example explains the arithmetic, not a historic or current exchange rate.</p></section>
+      <section class="contentSection"><h2 class="contentHeading">Check both timestamps</h2>
+        <p class="contentBody">A fuel source date and an exchange-rate date describe different observations. If the rate is unavailable, rely on the EUR value rather than inventing a local price. See the <a href="/fuel-prices/albania">Albania reading</a> and <a href="/methodology">methodology</a> for source details.</p></section>`,
   },
   {
     slug: "how-albania-fuel-retail-market-works",
-    title: "How Albania's Fuel Retail Market Actually Works",
-    description:
-      "From the tanker at Durres to your local pump: who imports Albania's fuel, how prices are actually set, and why competing stations barely differ.",
-    datePublished: "2026-08-05",
-    published: true,
-    readMinutes: 6,
+    title: "Reading Albania Fuel Prices: Source and Station Limits",
+    description: "What country-level reference prices can reveal about Albania's fuel market, and what requires separate station or regulatory evidence.",
+    datePublished: "2026-08-05", dateModified: "2026-10-20", published: true, readMinutes: 3,
     html: `
-      <section class="contentSection">
-        <h2 class="contentHeading">Three layers between the ship and your tank</h2>
-        <p class="contentBody">Albania's fuel supply chain has three distinct layers: importers with coastal storage terminals, wholesale distributors, and retail station networks. The defining feature of the Albanian market is that its largest players operate across all three at once. That vertical integration shapes everything about how prices behave.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">The players</h2>
-        <p class="contentBody">A small number of large groups dominate both import terminal capacity and branded retail networks, supplying not only their own stations but many of the independents that appear to compete with them. Independent single-site stations remain common across the country, but most buy their product from the same handful of importers — which is why their prices rarely undercut the majors by much. Their input cost is set by the very companies they compete against.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Why prices barely differ between stations</h2>
-        <p class="contentBody">In markets like Germany or the UK, supermarket fuel and aggressive discounters produce spreads of ten cents or more between stations in a single city. In Albania the typical spread within Tirana is a few lek per liter. Concentrated wholesale supply, no supermarket fuel channel, and thin retail margins on a heavily taxed product all compress the room to discount.</p>
-        <p class="contentBody">The practical consequence is that "shopping around" inside Albania has limited value. The meaningful price decisions are cross-border ones — see our <a href="/insights/cross-border-fill-up-math">cross-border fill-up math</a>, where a single crossing into Kosovo is currently worth around €37 a tank.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">What our data suggests about pricing behaviour</h2>
-        <p class="contentBody">Our daily record offers indirect evidence about how the market prices. Across 173 days of observations, Albanian diesel took only a limited number of distinct values — prices move in visible steps rather than drifting continuously, and those steps tend to arrive across the market at once. That is the signature of a market where a few large players reprice periodically, rather than one where hundreds of retailers adjust independently against wholesale costs. Compare that with Luxembourg or Poland, whose daily volatility is more than ten times Kosovo's in our <a href="/market-report">market report</a>.</p>
-      </section>
-
-      <section class="contentSection">
-        <h2 class="contentHeading">Where oversight comes in</h2>
-        <p class="contentBody">Fuel pricing is politically sensitive in a country where transport costs consume a large share of household income, and Albania's competition authority has examined the sector on more than one occasion. During the 2022 energy crisis the government briefly operated a transparency board setting maximum margins — a crisis instrument rather than a permanent fixture, but a telling one.</p>
-        <p class="contentBody">We track the resulting national average daily on the <a href="/fuel-prices/albania">Albania page</a>. For how those numbers are collected, normalised and analysed, see the <a href="/methodology">methodology</a>.</p>
-      </section>
-    `,
+      <section class="contentSection"><h2 class="contentHeading">A country reference is not a pump survey</h2>
+        <p class="contentBody">This site's Albania price is a national reference from an upstream aggregator. The <a href="/stations">station finder</a> uses mapped locations and any listed opening hours; it does not collect each station's current retail price. A visible difference between two country references cannot establish the spread among stations in Tirana or identify the cheapest retailer.</p></section>
+      <section class="contentSection"><h2 class="contentHeading">What can and cannot be inferred</h2>
+        <p class="contentBody">Fuel supply can involve import, distribution, taxation and retail pricing, but our price dataset does not measure the contribution of each factor or prove market concentration. Collection-day price movements also cannot establish why retailers changed a price. We therefore use the record to describe price changes, not to assign a cause.</p>
+        <p class="contentBody">For a practical decision, inspect the source date on the <a href="/fuel-prices/albania">Albania page</a>, compare the same fuel in another market on <a href="/compare">Compare</a>, and verify actual station prices before a special trip.</p></section>`,
   },
 ];
 
 export function getPublishedArticles(): InsightArticle[] {
-  return INSIGHT_ARTICLES.filter((a) => a.published).sort((a, b) =>
+  return INSIGHT_ARTICLES.filter((article) => article.published).sort((a, b) =>
     (b.dateModified ?? b.datePublished).localeCompare(a.dateModified ?? a.datePublished)
   );
 }
 
 export function getArticle(slug: string): InsightArticle | undefined {
-  return INSIGHT_ARTICLES.find((a) => a.slug === slug && a.published);
+  return INSIGHT_ARTICLES.find((article) => article.slug === slug && article.published);
 }

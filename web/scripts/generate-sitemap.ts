@@ -32,8 +32,10 @@ type SitemapEntry = {
 
 async function main() {
   const ctx = await loadPriceContext();
-  // Fallback only if the data files are unreadable; keeps the build alive.
-  const dataLastmod = ctx.ok ? ctx.asOf : new Date().toISOString().split("T")[0];
+  if (!ctx.ok || !/^\d{4}-\d{2}-\d{2}$/.test(ctx.asOf)) {
+    throw new Error("Cannot generate price-page sitemap without a verified source date");
+  }
+  const dataLastmod = ctx.asOf;
 
   const entries: SitemapEntry[] = [
     ...STATIC_ROUTES.filter((r) => !r.noindex).map((r) => ({

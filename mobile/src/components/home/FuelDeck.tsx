@@ -290,6 +290,9 @@ function FreshnessStamp(props: {
   if (f.kind === "fresh") {
     dot = f.stale ? p.warn : p.accent;
     label = `${t.pricesOf(f.asOf)} · ${f.stale ? t.freshStale : t.freshSynced}`;
+  } else if (f.kind === "unverified") {
+    dot = p.warn;
+    label = f.savedAt ? `${t.sourceDateUnverified} · ${f.savedAt}` : t.sourceDateUnverified;
   } else if (f.kind === "offline") {
     dot = f.checking ? p.inkFaint : p.warn;
     label = `${t.pricesOf(f.asOf)} · ${f.checking ? t.freshChecking : f.savedAt ? t.offlineCopy(f.savedAt) : t.showingCached}`;
