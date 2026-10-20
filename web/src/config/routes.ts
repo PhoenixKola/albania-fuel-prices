@@ -11,7 +11,7 @@ export type RouteConfig = {
   changefreq: "daily" | "weekly" | "monthly" | "yearly";
   jsonLdType: "WebSite" | "WebPage" | "Article" | "FAQPage" | "ContactPage";
   noindex?: boolean;
-  /** Page content includes the daily-updated price data (sitemap lastmod = data as_of). */
+  /** Page content includes source-dated price data (sitemap lastmod = data as_of). */
   priceBearing?: boolean;
   /** Last meaningful editorial update, for non-price-bearing pages. */
   lastmod?: string;
@@ -173,7 +173,7 @@ export const STATIC_ROUTES: RouteConfig[] = [
     path: "/fuel-quiz",
     title: "Fuel Price Quiz — Which Country Has Cheaper Fuel? | Fuel Today",
     description:
-      "Test your knowledge of European fuel prices. Guess which country has cheaper petrol or diesel using live market data. Track your score and streak.",
+      "Test your knowledge of dated European petrol and diesel reference prices. Guess the lower country-level value and track your score and streak.",
     priority: 0.8,
     changefreq: "weekly",
     jsonLdType: "WebPage",

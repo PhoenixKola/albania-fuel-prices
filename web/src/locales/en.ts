@@ -106,7 +106,7 @@ export const en = {
     "Karburanti Sot helps drivers compare fuel prices, estimate trip costs, and understand how pricing changes across countries. Instead of showing only raw numbers, the site adds context around price rankings, likely cost differences, exchange-rate effects, and practical travel use cases.",
   heroLiveFallback: "Live price tools and country comparisons",
   heroUpdatedAt: (s: string) => `Updated ${s}`,
-  heroShowcaseBadge: "Updated daily \u00b7 Europe-wide coverage",
+  heroShowcaseBadge: "Source-dated \u00b7 Europe-wide coverage",
   heroShowcaseTitle: "Fuel prices across Europe, made beautifully simple.",
   heroShowcaseSubtitle:
     "Compare countries, track daily updates, and find nearby stations with a premium app built for smarter driving.",
@@ -170,7 +170,7 @@ export const en = {
   homeCalculatorKicker: "ROUTE COMPUTER",
   homeCalculatorTitle: "Turn a pump price into your number.",
   homeCalculatorSubtitle: "Model a fill-up, reverse a budget, or price an entire trip with the market currently selected above.",
-  homeStoryKicker: "TODAY'S MARKET STORY",
+  homeStoryKicker: "LATEST RECORDED MARKET STORY",
   homeStoryTitle: "The numbers, interpreted.",
   homeStorySubtitle: "A generated daily reading of the market, followed by the extremes and spreads worth knowing.",
   homeTransparencyKicker: "OPEN INSTRUMENT PANEL",
@@ -263,16 +263,16 @@ export const en = {
     "Karburanti Sot is an independent fuel price information service that collects, compares, and explains public fuel pricing data across Albania and the wider European region. The project was started to give drivers, commuters, and cross-border travelers a straightforward way to compare fuel costs without needing to visit many separate third-party and industry sources.",
   aboutMissionTitle: "Our mission",
   aboutMissionP1:
-    "Fuel prices vary significantly from country to country in Europe, sometimes by more than 50 percent for the same fuel type. Those differences matter: they affect household budgets, road-trip plans, logistics costs, and cross-border commuting decisions. Unfortunately, publicly available price data is fragmented across multiple third-party feeds, statistics references, and industry sources — each with its own format, update schedule, and reporting method.",
+    "Fuel prices vary between European countries, and the difference depends on the fuel and source date. Those gaps matter for household budgets and road-trip plans. Public price data comes from sources with different formats, schedules and reporting methods.",
   aboutMissionP2:
-    "Karburanti Sot brings that fragmented information together in one place. The goal is not simply to list numbers, but to add context: which country is cheapest right now, how large the price gap is, what exchange-rate effects look like for travelers paying in different currencies, and how nearby stations compare to the national average.",
+    "Karburanti Sot brings that fragmented information together in one place. The goal is to show dated country-level reference prices, fuel-specific gaps and exchange-rate estimates alongside separately mapped station locations. We do not report each station's pump price.",
   aboutDataTitle: "Where the data comes from",
   aboutDataP1:
     "Fuel price data is collected from publicly available third-party fuel price sources and may be supplemented with official or statistical references where available. The site fetches data programmatically and converts it into a consistent format so that values can be compared side by side across countries.",
   aboutDataP2:
     "Exchange-rate conversions use a public FX data source so that comparisons between countries with different currencies remain practical. All conversions are clearly labeled, and users are reminded that converted values are estimates rather than guaranteed pump prices.",
   aboutDataP3:
-    "Update frequency depends on how often upstream sources publish new data. Some countries report weekly, others less frequently. The timestamp shown on each page tells you when the data was last refreshed.",
+    "Update frequency depends on upstream publication. We check for new data regularly, but the source date shown on price pages is the publication or observation date, not the time our system fetched it. A market with an unverified date is labelled accordingly.",
   aboutEditorialTitle: "Editorial approach",
   aboutEditorialP1:
     "Every data point on the site is accompanied by editorial context. Rather than showing only a raw table of numbers, the site explains what the numbers mean: which country has the cheapest petrol, how large the diesel spread is, and what factors — such as taxes, subsidies, or local market conditions — typically drive those differences.",

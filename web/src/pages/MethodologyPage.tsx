@@ -73,14 +73,13 @@ export default function MethodologyPage({ t }: Props) {
       <section className="contentSection">
         <h2 className="contentHeading">How we build our historical record</h2>
         <p className="contentBody">
-          Public price aggregators publish a snapshot of today and nothing else. Since{" "}
-          <strong>{ANALYSIS_META.startLabel || "February 2026"}</strong> we have captured that
-          snapshot once a day and appended it to our own history file, which now holds{" "}
-          <strong>{ANALYSIS_META.daysObserved || 0} consecutive daily readings</strong> across{" "}
-          {ANALYSIS_META.countriesAnalysed || 0} markets, with no gaps. That record is what makes
-          the analysis on this site possible: the upstream sources publish only today's snapshot,
-          so ranges, records and trends simply do not exist unless someone keeps the history. The
-          exact calculations applied to it are described below.
+          Since <strong>{ANALYSIS_META.startLabel || "February 2026"}</strong> we have collected
+          public source readings in our own history file: <strong>{ANALYSIS_META.daysObserved || 0}
+          collection days</strong> across {ANALYSIS_META.countriesAnalysed || 0} markets. Older
+          collection-day records did not always verify the upstream publication date, and repeated
+          values may appear on multiple days. The current snapshot separates its source date from
+          the time our job fetched it. We calculate ranges and trends from the collected record
+          with those limits in mind.
         </p>
       </section>
 
@@ -92,10 +91,10 @@ export default function MethodologyPage({ t }: Props) {
         </p>
         <ul className="contentList">
           <li><strong>Period low, high and average</strong> — the minimum, maximum and arithmetic mean of all daily readings we hold for that country and fuel, with the dates on which the extremes occurred.</li>
-          <li><strong>Position in range (percentile)</strong> — the share of recorded days that were cheaper than today. 0% means today is the cheapest price we have ever recorded; 100% means the most expensive.</li>
+          <li><strong>Observations below (percentile)</strong> — the share of collected readings strictly below the last recorded value. Equal readings are not counted as lower.</li>
           <li><strong>Volatility</strong> — the standard deviation of day-to-day percentage price changes across the full record. Higher values mean a market that reprices frequently and unpredictably.</li>
-          <li><strong>30/90-day change</strong> — the percentage difference between today's price and the reading from 30 or 90 observations earlier.</li>
-          <li><strong>Refuelling verdict</strong> — a plain-language reading of the percentile figure above. It is a description of where today sits in our recorded range, not a price forecast.</li>
+          <li><strong>30/90-observation change</strong> — the percentage difference between the last recorded price and readings 30 or 90 observations earlier.</li>
+          <li><strong>Historical position</strong> — a description of where the last reading sits in our collected range, not a price forecast or refuelling recommendation.</li>
           <li><strong>Cross-border spread history</strong> — the daily difference between two countries' prices, tracked over time.</li>
         </ul>
         <p className="contentBody">

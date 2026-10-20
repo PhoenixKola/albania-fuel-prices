@@ -109,7 +109,7 @@ export default function FuelQuizPage({ data, loading }: Props) {
   if (loading) {
     return (
       <div className="quizPage gameExperience gameExperienceQuiz">
-        <GameHeader variant="quiz" eyebrow="Open play / live data" title="Fuel Price Quiz" subtitle="Loading live fuel data…" status="Connecting to market feed" />
+        <GameHeader variant="quiz" eyebrow="Open play / dated data" title="Fuel Price Quiz" subtitle="Loading fuel data…" status="Connecting to market feed" />
       </div>
     );
   }
@@ -117,14 +117,14 @@ export default function FuelQuizPage({ data, loading }: Props) {
   if (!data || eligible.length < 2) {
     return (
       <div className="quizPage gameExperience gameExperienceQuiz">
-        <GameHeader variant="quiz" eyebrow="Open play / live data" title="Fuel Price Quiz" subtitle="Could not load fuel data. Please refresh the page." status="Market feed unavailable" />
+        <GameHeader variant="quiz" eyebrow="Open play / dated data" title="Fuel Price Quiz" subtitle="Could not load fuel data. Please refresh the page." status="Market feed unavailable" />
       </div>
     );
   }
 
   return (
     <div className="quizPage gameExperience gameExperienceQuiz">
-      <GameHeader variant="quiz" eyebrow="Open play / live data" title="Fuel Price Quiz" subtitle="Read the flags. Trust your instinct. Pick the country with the cheaper pump price." status={`Prices dated ${data.as_of}`} />
+      <GameHeader variant="quiz" eyebrow="Open play / dated data" title="Fuel Price Quiz" subtitle="Read the flags. Pick the country with the lower national reference price." status={`Prices dated ${data.as_of}`} />
 
       <div className="quizStats">
         <div className="quizStat quizStatScore">
@@ -157,9 +157,9 @@ export default function FuelQuizPage({ data, loading }: Props) {
 
       {round && (
         <div className="quizGame">
-          <div className="quizArenaTopline"><span><i aria-hidden="true" />Live matchup</span><span>Lower €/L wins</span></div>
+          <div className="quizArenaTopline"><span><i aria-hidden="true" />Dated matchup</span><span>Lower €/L wins</span></div>
           <p className="quizQuestion">
-            Which country has cheaper <strong>{round.fuel.label}</strong> right now?
+            Which country has the lower <strong>{round.fuel.label}</strong> reference price?
           </p>
 
           <div className="quizBattle">
@@ -206,7 +206,7 @@ export default function FuelQuizPage({ data, loading }: Props) {
         <section className="contentSection">
           <h2 className="contentHeading">How the quiz works</h2>
           <p className="contentBody">
-            Each question shows two countries from the live fuel price data tracked
+            Each question shows two countries from the source-dated fuel data tracked
             on this site. Pick the one you think has cheaper fuel — petrol or diesel
             — and find out how well you know the European fuel market.
           </p>

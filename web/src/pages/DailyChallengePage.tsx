@@ -199,7 +199,7 @@ function DailyChallengeGame({ data, loading }: Props) {
   if (loading) {
     return (
       <div className="quizPage gameExperience gameExperienceDaily">
-        <GameHeader variant="daily" eyebrow="Daily run / five rounds" title="Daily Challenge" subtitle="Loading live fuel data…" status="Preparing today’s matchups" />
+        <GameHeader variant="daily" eyebrow="Daily run / five rounds" title="Daily Challenge" subtitle="Loading dated fuel data…" status="Preparing today’s matchups" />
       </div>
     );
   }
@@ -272,7 +272,7 @@ function DailyChallengeGame({ data, loading }: Props) {
               Every day at midnight UTC a fresh set of 5 questions is generated using a
               seeded algorithm tied to the day's date — so everyone who plays on the same
               day gets the exact same questions in the same order. Prices shown are the
-              same live country-level averages used across the rest of the site.
+              same source-dated country-level references used across the rest of the site.
             </p>
             <p className="contentBody">
               Your result is stored locally in your browser. A streak is awarded for
@@ -300,7 +300,7 @@ function DailyChallengeGame({ data, loading }: Props) {
 
   return (
     <div className="quizPage gameExperience gameExperienceDaily">
-      <GameHeader variant="daily" eyebrow="Daily run / five rounds" title="Daily Challenge" subtitle="Five live-price matchups. The same questions for everyone, every day." status={`Prices dated ${data.as_of}`} />
+      <GameHeader variant="daily" eyebrow="Daily run / five rounds" title="Daily Challenge" subtitle="Five dated-price matchups. The same questions for everyone each day." status={`Prices dated ${data.as_of}`} />
 
       <div className="dailyProgress" role="progressbar" aria-label="Daily challenge progress" aria-valuemin={0} aria-valuemax={QUESTIONS_PER_DAY} aria-valuenow={answers.length}>
         <div className="dailyProgressLabel"><span>Today’s run</span><strong>Round {currentQ + 1} / {QUESTIONS_PER_DAY}</strong></div>
@@ -368,29 +368,22 @@ function DailyChallengeAbout() {
         <h2 className="contentHeading">How the Daily Challenge works</h2>
         <p className="contentBody">
           Every day at midnight, five new questions are generated from the latest European fuel
-          price data collected by this site. Everyone who plays on a given day gets exactly the
-          same five questions, so scores are directly comparable — and because the questions are
-          built from live data rather than a fixed list, the correct answer to a matchup genuinely
-          changes as markets move.
+          available price snapshot. Everyone who plays on a given day gets the same five
+          questions, but a new daily set does not imply a new upstream price publication.
         </p>
         <p className="contentBody">
-          Each question asks you to compare two European countries: which one currently has cheaper
-          petrol or diesel? Answers are checked against the same country-level averages published
-          on our <Link to="/rankings" className="inlineLink">rankings page</Link>, so nothing here
-          is trivia written months ago. After each answer you see both real prices, which is where
-          the learning happens — most players are surprised by at least one pair.
+          Each question compares petrol or diesel reference prices in two European countries.
+          Answers use the dated values on our <Link to="/rankings" className="inlineLink">rankings page</Link>.
+          After each answer you see both national reference values, not individual pump prices.
         </p>
       </section>
 
       <section className="contentSection">
         <h2 className="contentHeading">Why a fuel price quiz is actually useful</h2>
         <p className="contentBody">
-          If you drive across borders in the Balkans — Albania to Kosovo, Greece, Montenegro, or
-          Italy by ferry — an accurate mental map of relative fuel prices saves real money. A wrong
-          assumption about which side of a border is cheaper can cost €20–40 on a single tank, and
-          those gaps shift: Albanian diesel moved from cheaper than Greece to more expensive than
-          Greece during 2026. Playing for a week builds that map faster than reading tables,
-          because the surprises stick.
+          Petrol and diesel comparisons can point in different directions. A national reference
+          gap is an example, not a promise that crossing a border saves money: route, detours,
+          fuel already in the tank and actual pump prices all matter.
         </p>
         <p className="contentBody">
           For the underlying numbers and what has been moving, see the{" "}
@@ -405,8 +398,8 @@ function DailyChallengeAbout() {
       <section className="contentSection">
         <h2 className="contentHeading">Where the questions come from</h2>
         <p className="contentBody">
-          Questions are generated automatically from our daily dataset of country-level average
-          prices, collected from public European fuel price aggregators and restricted to the
+          Questions are generated each day from the latest available country-level reference
+          snapshot, collected from public European fuel price aggregators and restricted to the
           European markets this site tracks. The same figures appear on the{" "}
           <Link to="/" className="inlineLink">homepage</Link> and on each country page, and the
           collection process is documented on our{" "}

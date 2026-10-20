@@ -106,7 +106,7 @@ export const sq = {
     "Karburanti Sot i ndihmon drejtuesit të krahasojnë çmimet e karburantit, të vlerësojnë kostot e udhëtimit dhe të kuptojnë si ndryshojnë çmimet mes vendeve. Në vend që të shfaqë vetëm numra të papërpunuar, faqja shton kontekst për renditjet, diferencat e mundshme të kostos, efektet e kursit të këmbimit dhe rastet praktike të përdorimit.",
   heroLiveFallback: "Mjete live për çmime dhe krahasime mes vendeve",
   heroUpdatedAt: (s: string) => `Përditësuar ${s}`,
-  heroShowcaseBadge: "P\u00ebrdit\u00ebsime ditore \u00b7 Mbulim n\u00eb Evrop\u00eb",
+  heroShowcaseBadge: "T\u00eb dh\u00ebna me dat\u00eb burimi \u00b7 Mbulim n\u00eb Evrop\u00eb",
   heroShowcaseTitle: "\u00c7mimet e karburantit n\u00eb Evrop\u00eb, t\u00eb thjeshtuara bukur.",
   heroShowcaseSubtitle:
     "Krahaso shtetet, ndiq p\u00ebrdit\u00ebsimet ditore dhe gjej pikat m\u00eb t\u00eb af\u00ebrta me nj\u00eb aplikacion premium p\u00ebr vendime m\u00eb t\u00eb zgjuara n\u00eb rrug\u00eb.",
@@ -170,7 +170,7 @@ export const sq = {
   homeCalculatorKicker: "KOMPJUTERI I RRUGËS",
   homeCalculatorTitle: "Ktheje çmimin e pompës në shifrën tënde.",
   homeCalculatorSubtitle: "Llogarit një furnizim, kthe një buxhet në litra ose vlerëso të gjithë udhëtimin me tregun e zgjedhur sipër.",
-  homeStoryKicker: "HISTORIA E TREGUT SOT",
+  homeStoryKicker: "HISTORIA E FUNDIT E REGJISTRUAR E TREGUT",
   homeStoryTitle: "Shifrat, të interpretuara.",
   homeStorySubtitle: "Një lexim i përditshëm i gjeneruar i tregut, i ndjekur nga ekstremet dhe diferencat që vlejnë të njihen.",
   homeTransparencyKicker: "PANEL I HAPUR INSTRUMENTESH",
@@ -268,16 +268,16 @@ export const sq = {
     "Karburanti Sot është një shërbim i pavarur informacioni për çmimet e karburantit që mbledh, krahason dhe shpjegon të dhënat publike të çmimeve të karburantit në Shqipëri dhe rajonin më të gjerë europian. Projekti u nis për t'u dhënë drejtuesve, udhëtarëve dhe atyre që udhëtojnë ndërkufitarisht një mënyrë të thjeshtë për të krahasuar kostot e karburantit pa pasur nevojë të vizitojnë shumë burime të veçanta të palëve të treta dhe industrisë.",
   aboutMissionTitle: "Misioni ynë",
   aboutMissionP1:
-    "Çmimet e karburantit ndryshojnë ndjeshëm nga një vend në tjetrin në Europë, ndonjëherë me më shumë se 50 përqind për të njëjtin lloj karburanti. Këto diferenca kanë rëndësi: ndikojnë buxhetet familjare, planet e udhëtimit, kostot logjistike dhe vendimet e udhëtimit ndërkufitar.",
+    "Çmimet e karburantit ndryshojnë mes vendeve europiane dhe diferenca varet nga lloji i karburantit dhe data e burimit. Këto hendekë kanë rëndësi për buxhetet familjare dhe planet e udhëtimit. Burimet publike përdorin formate, ritme publikimi dhe metoda raportimi të ndryshme.",
   aboutMissionP2:
-    "Karburanti Sot i sjell së bashku këto informacione të shpërndara në një vend. Qëllimi nuk është thjesht të listojë numra, por të shtojë kontekst: cili vend është më i liri tani, sa i madh është hendeku i çmimeve, si duken efektet e kursit të këmbimit për udhëtarët që paguajnë në monedha të ndryshme dhe si krahasohen pikat afër me mesataren kombëtare.",
+    "Karburanti Sot i sjell këto informacione në një vend: çmime orientuese në nivel shteti me datën e burimit, diferenca sipas karburantit, vlerësime të kursit të këmbimit dhe vendndodhje stacionesh të shënuara veçmas. Nuk raportojmë çmimin në pompë për çdo stacion.",
   aboutDataTitle: "Nga vijnë të dhënat",
   aboutDataP1:
     "Të dhënat e çmimeve të karburantit mblidhen nga burime publike të palëve të treta dhe mund të plotësohen me referenca zyrtare ose statistikore kur janë të disponueshme. Faqja i merr të dhënat në mënyrë programatike dhe i konverton në një format konsistent.",
   aboutDataP2:
     "Konvertimet e kursit të këmbimit përdorin një burim publik të dhënash FX në mënyrë që krahasimet mes vendeve me monedha të ndryshme të mbeten praktike. Të gjitha konvertimet janë të etiketuara qartë.",
   aboutDataP3:
-    "Frekuenca e përditësimit varet nga sa shpesh burimet publikojnë të dhëna të reja. Disa vende raportojnë çdo javë, të tjerë më rrallë. Data e treguar në çdo faqe tregon kur të dhënat u rifreskuan për herë të fundit.",
+    "Frekuenca e përditësimit varet nga publikimi i burimit. Ne kontrollojmë rregullisht për të dhëna të reja, por data e burimit në faqet e çmimeve tregon publikimin ose vëzhgimin, jo kohën kur sistemi e shkarkoi. Data e paverifikuar e një tregu shënohet qartë.",
   aboutEditorialTitle: "Qasja editoriale",
   aboutEditorialP1:
     "Çdo pikë e dhënave në faqe shoqërohet me kontekst editorial. Në vend që të shfaqë vetëm një tabelë me numra, faqja shpjegon çfarë nënkuptojnë numrat: cili vend ka benzinën më të lirë, sa i madh është hendeku i naftës dhe cilat faktorë — si taksat, subvencionet apo kushtet e tregut lokal — zakonisht i nxisin ato diferenca.",

@@ -193,8 +193,8 @@ const STATIC_ROUTES: RouteEntry[] = [
         ${HOME_SUMMARY_HTML.en}
         <section class="contentSection">
           <h2 class="contentHeading">One market. Every signal.</h2>
-          <p class="contentBody">Fuel Today (Karburanti Sot) is an independent fuel price comparison website for Albania and Europe. It collects public country-level fuel price data, converts it into a consistent EUR-per-liter format, and presents it with editorial context so drivers can make informed decisions about where and when to refuel.</p>
-          <p class="contentBody">The site tracks petrol (gasoline 95), diesel, and LPG across 33 European markets, with dedicated pages for Albania, Kosovo, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom. Data is sourced from public fuel price aggregators and updated daily. Where our source publishes no prices for a country, we say so rather than estimating.</p>
+          <p class="contentBody">Fuel Today (Karburanti Sot) is an independent fuel price comparison website for Albania and Europe. It collects public country-level fuel price data, converts it into a consistent EUR-per-litre format, and presents dated reference values for trip planning. The readings do not predict future prices or identify the cheapest pump.</p>
+          <p class="contentBody">The site tracks petrol (gasoline 95), diesel, and LPG across 33 European markets, with dedicated pages for Albania, Kosovo, Greece, Italy, Croatia, Portugal, Switzerland, and the United Kingdom. We check public fuel price sources regularly and show their publication date; a new fetch does not mean a new price reading. Where our source publishes no prices for a country, we say so rather than estimating.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">How to interpret country-level prices</h2>
@@ -203,7 +203,7 @@ const STATIC_ROUTES: RouteEntry[] = [
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Albania and Balkan context</h2>
-          <p class="contentBody">Albania sits at the center of several busy cross-border driving corridors: Tirana–Pristina (Kosovo), Tirana–Podgorica (Montenegro), and Tirana–Ioannina (Greece). The price differences at those borders are large enough to be worth planning around, and they change: the Kosovo gap has widened substantially during 2026, while Greece and Italy have moved from being more expensive than Albania to slightly cheaper on diesel. Rather than quoting a fixed figure that will date, we publish the current gaps on the <a href="/compare">comparison page</a> and explain what they mean for a tank of fuel in our <a href="/insights/cross-border-fill-up-math">cross-border fill-up guide</a>.</p>
+          <p class="contentBody">For routes from Albania toward Kosovo, Montenegro and Greece, compare the same fuel in each market before estimating your costs. Petrol and diesel may point in opposite directions, and a country-level price gap does not guarantee a saving at a particular station. The <a href="/compare">comparison page</a> uses the dated source snapshot; the <a href="/insights/cross-border-fill-up-math">cross-border example</a> explains a 50 L difference and its limits.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Drive with context</h2>
@@ -225,7 +225,7 @@ const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/stations",
     title: "Fuel Stations Near Me | Map, Distance & Opening Hours",
-    description: "Find nearby fuel stations by location, distance and available opening hours. Pair the map with current country-level fuel prices for trip planning.",
+    description: "Find mapped fuel stations nearby, approximate straight-line distance and available listed opening hours. Station-level pump prices are not provided.",
     jsonLdType: "WebPage",
     datePublished: "2026-04-01",
     content: `
@@ -599,15 +599,15 @@ const STATIC_ROUTES: RouteEntry[] = [
         <p class="contentBody">The Daily Challenge is a short quiz built from the same fuel price dataset that powers the rest of this site. Every day at midnight, five new questions are generated from the latest European price data — and everyone who plays that day gets exactly the same five questions, so scores are directly comparable.</p>
         <section class="contentSection">
           <h2 class="contentHeading">How the challenge works</h2>
-          <p class="contentBody">Each question asks you to compare two European countries: which one currently has cheaper petrol or diesel? The answers are checked against the current country-level averages listed on our <a href="/rankings">rankings page</a>, so the "correct" answer genuinely reflects today's market data, not trivia written months ago. After each question you see the actual prices, which is where the learning happens — most players are surprised by at least one pair.</p>
+          <p class="contentBody">Each question compares petrol or diesel reference prices in two European countries. Answers use the dated dataset shown on our <a href="/rankings">rankings page</a>. After each question you can see both recorded national values; these are not individual pump prices.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Why a fuel price quiz is genuinely useful</h2>
-          <p class="contentBody">If you drive across borders in the Balkans — Albania to Kosovo, Greece, Montenegro, or Italy by ferry — having an accurate mental map of relative fuel prices saves real money. A wrong assumption about which side of the border is cheaper can cost 10–20 EUR on a single tank. Playing the challenge for a week builds that mental map faster than reading tables, because the surprises stick.</p>
+          <p class="contentBody">Fuel-specific price order can change between dated readings. The game helps you notice that petrol and diesel may point in different directions, but a national reference gap is not a guaranteed saving on a border journey. Use the trip calculator for your distance and consumption, then check actual pumps.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Where the questions come from</h2>
-          <p class="contentBody">Questions are generated automatically from our daily dataset of country-level average prices, collected from public European fuel price aggregators. The same numbers are shown on the <a href="/">homepage</a> and the country pages, and the collection process is documented on the <a href="/methodology">methodology page</a>. Your score and streak are stored only in your browser — no account is needed.</p>
+          <p class="contentBody">Questions are generated each day from the latest available country-level reference snapshot, which may be older than the day of play. The same dated values appear on the <a href="/">homepage</a> and country pages; our <a href="/methodology">methodology page</a> explains collection. Your score and streak stay in your browser.</p>
         </section>
       </article>
     `,
@@ -615,25 +615,25 @@ const STATIC_ROUTES: RouteEntry[] = [
   {
     path: "/fuel-quiz",
     title: "Fuel Price Quiz — Which Country Has Cheaper Fuel? | Fuel Today",
-    description: "Test your knowledge of European fuel prices. Guess which country has cheaper petrol or diesel using live market data. Track your score and streak.",
+    description: "Test your knowledge of dated European petrol and diesel reference prices. Guess the lower country-level value and track your score and streak.",
     jsonLdType: "WebPage",
     datePublished: "2026-06-05",
     priceBearing: true,
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">Fuel Price Quiz: Which Country Has Cheaper Fuel?</h1>
-        <p class="contentBody">This quiz shows you two European countries and asks a single question: which one has cheaper fuel right now? It runs on the same live dataset as the rest of the site, so every answer is verified against current country-level averages rather than static trivia.</p>
+        <p class="contentBody">This quiz compares two European countries using the latest available source-dated national reference prices. Choose the lower petrol or diesel value for the displayed reading; actual station prices can differ.</p>
         <section class="contentSection">
           <h2 class="contentHeading">How to play</h2>
-          <p class="contentBody">Pick petrol or diesel, then choose the country you think is cheaper. The quiz immediately reveals both prices in EUR per liter so you can see how close the pair really is. Some matchups are easy — Switzerland against Kosovo is not a fair fight — but pairs like Croatia vs Slovenia or Hungary vs Romania regularly surprise even drivers who cross those borders. Your running score and best streak are saved in your browser.</p>
+          <p class="contentBody">Pick petrol or diesel, then choose the country with the lower dated reference price. The quiz reveals both values in EUR per litre. Different fuels can reverse a country's ranking; your running score and best streak stay in your browser.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">What the quiz teaches</h2>
-          <p class="contentBody">European fuel prices are driven mostly by national tax policy, which means the price map does not follow intuition about "rich" and "cheap" countries. The quiz is a fast way to internalize the real ranking: where the Balkans sit relative to the eurozone, why island and mountain states price differently, and which neighboring pairs have the biggest gaps. That knowledge feeds directly into practical decisions covered in our <a href="/road-trip-fuel-guide">road trip fuel guide</a>.</p>
+          <p class="contentBody">The exercise makes it easier to see where recorded fuel-specific gaps are large, small or unavailable. Publication dates and country averages matter more than a guess based on geography. For a route estimate using distance and vehicle consumption, see the <a href="/road-trip-fuel-guide">road trip fuel guide</a>.</p>
         </section>
         <section class="contentSection">
           <h2 class="contentHeading">Data behind the questions</h2>
-          <p class="contentBody">Prices come from our daily-updated dataset of European country averages — the same numbers on the <a href="/rankings">rankings page</a> — sourced from public aggregators and documented on the <a href="/methodology">methodology page</a>. Because the data refreshes daily, the correct answer to a matchup can genuinely change from one week to the next when markets move.</p>
+          <p class="contentBody">The values come from the same source-dated dataset shown on the <a href="/rankings">rankings page</a>. We check the upstream sources regularly, but they may not publish a new price each day. See the <a href="/methodology">methodology page</a> for provenance and limits.</p>
         </section>
       </article>
     `,

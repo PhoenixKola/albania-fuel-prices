@@ -103,7 +103,7 @@ type EditorialCopy = {
 
 const en: EditorialCopy = {
   contents: "On this page",
-  liveData: "Live data",
+  liveData: "Source-dated data",
   source: "Source",
   lastUpdated: "Last updated",
   unavailable: "Unavailable",
@@ -274,7 +274,7 @@ const en: EditorialCopy = {
 const sq: EditorialCopy = {
   ...en,
   contents: "Në këtë faqe",
-  liveData: "Të dhëna live",
+  liveData: "Të dhëna me datë burimi",
   source: "Burimi",
   lastUpdated: "Përditësimi i fundit",
   unavailable: "Nuk disponohet",
