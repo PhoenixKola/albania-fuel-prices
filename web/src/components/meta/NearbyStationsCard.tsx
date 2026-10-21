@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { TDict } from "../../locales";
 import { useUserLocationWeb } from "../../hooks/useUserLocationWeb";
 import { useNearbyStationsWeb } from "../../hooks/useNearbyStationsWeb";
 import StationMapPreview from "./StationMapPreview";
+import StationPlacePicker from "./StationPlacePicker";
+import { ALBANIA_STATION_SNAPSHOT_DATE } from "../../config/stationSnapshot";
 
 type Station = {
   id: string | number;
@@ -37,16 +39,15 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
 
   const PAGE_SIZE = 8;
   const [page, setPage] = useState(0);
+  const [placePickerOpen, setPlacePickerOpen] = useState(false);
+  const placeButtonRef = useRef<HTMLButtonElement>(null);
 
   const pageCount = Math.max(1, Math.ceil(nearby.stations.length / PAGE_SIZE));
+  const activePage = Math.min(page, pageCount - 1);
   const shown = useMemo(
-    () => nearby.stations.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
-    [nearby.stations, page]
+    () => nearby.stations.slice(activePage * PAGE_SIZE, activePage * PAGE_SIZE + PAGE_SIZE),
+    [nearby.stations, activePage]
   );
-
-  useEffect(() => {
-    setPage((p) => Math.min(p, Math.max(0, pageCount - 1)));
-  }, [pageCount]);
 
   const radiusDisabled = !loc.coords;
 
@@ -70,7 +71,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
             <div className="nearbyTitleWrap">
               <h1 className="nearbyTitle">{t.stationsNearbyTitle}</h1>
               <div className="nearbySub">
-                {loc.coords ? nearby.error && !nearby.totalCount ? t.stationsSearchUnavailable : nearby.loading && !nearby.totalCount ? t.refreshing : t.stationsFound(nearby.totalCount) : t.stationsUseMyLocation}
+                {loc.place ? `${t.stationsManualMode} · ${t.stationsNearPlace(loc.place.name)}` : loc.coords ? t.stationsGpsMode : t.stationsUseMyLocation}
               </div>
             </div>
           </div>
@@ -95,7 +96,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
         </div>
 
         <p className="tinyNote" style={{ marginTop: 10, lineHeight: 1.7 }}>
-          {nearby.source === "global" ? t.nearbyGuidanceGlobal : t.nearbyGuidance}
+          {nearby.source === "global" ? t.nearbyGuidanceGlobal : `${t.stationsSnapshotDate(ALBANIA_STATION_SNAPSHOT_DATE)}. ${t.nearbyGuidance}`}
         </p>
 
         <div className="nearbyStats">
@@ -139,18 +140,19 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
           </div>
         </div>
 
-        {!loc.coords ? (
-          <div className="nearbyEmptyAction">
+        <div className="nearbyEmptyAction stationLocationActions">
             <button
               className="btn btn-primary nearbyLocateBtn"
               type="button"
-              onClick={loc.request}
-              disabled={loc.loading || loc.checking}
+              onClick={() => { setPage(0); loc.request(); }}
+              disabled={loc.loading}
             >
-              {loc.loading || loc.checking ? t.stationsGettingLocation : t.stationsUseMyLocation}
+              {loc.loading ? t.stationsGettingLocation : t.stationsUseMyLocation}
             </button>
+            <button ref={placeButtonRef} className="btn btn-ghost nearbyLocateBtn" type="button" aria-expanded={placePickerOpen} onClick={() => setPlacePickerOpen((open) => !open)}>{t.stationsChoosePlace}</button>
           </div>
-        ) : (
+        {placePickerOpen ? <StationPlacePicker t={t} onSelect={(place) => { setPage(0); loc.selectPlace(place); setPlacePickerOpen(false); placeButtonRef.current?.focus(); }} onClose={() => { setPlacePickerOpen(false); placeButtonRef.current?.focus(); }} /> : null}
+        {loc.coords ? (
           <div className="nearbyControlBar">
             <div className="badge">
               {nearby.loading ? (
@@ -170,33 +172,35 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                     className="btn btn-ghost"
                     type="button"
                     onClick={() => setPage((p) => Math.max(0, p - 1))}
-                    disabled={nearby.loading || page === 0}
+                    disabled={nearby.loading || activePage === 0}
                   >
-                    Prev
+                    {t.stationsPrevious}
                   </button>
-                  <span className="badge nearbyPageBadge">Page {page + 1} / {pageCount}</span>
+                  <span className="badge nearbyPageBadge">{t.stationsPage(activePage + 1, pageCount)}</span>
                   <button
                     className="btn btn-ghost"
                     type="button"
                     onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-                    disabled={nearby.loading || page >= pageCount - 1}
+                    disabled={nearby.loading || activePage >= pageCount - 1}
                   >
-                    Next
+                    {t.stationsNext}
                   </button>
                 </>
               ) : null}
             </div>
           </div>
-        )}
+        ) : null}
 
-        {loc.error ? <div className="alert nearbyAlert" role="alert">{loc.error}</div> : null}
-        {nearby.error ? <div className="alert nearbyAlert" role="alert">{nearby.error}</div> : null}
+        {loc.error ? <div className="alert nearbyAlert" role="alert">{t.stationsLocationError(loc.error)}</div> : null}
+        {nearby.error ? <div className="alert nearbyAlert" role="alert">{t.stationsProviderError(nearby.error)} {nearby.previouslyLoaded ? t.stationsPreviouslyLoaded : null}</div> : null}
+        {loc.coords && nearby.hasRetrieved && !nearby.loading && !nearby.error ? <p className="tinyNote">{t.stationsRetrievedNow}</p> : null}
 
         {loc.coords ? (
           <div className="nearbyMapListGrid">
             <StationMapPreview
               center={loc.coords}
               stations={shown}
+              t={t}
               onSelect={(station) => {
                 window.open(`https://www.google.com/maps?q=${station.lat},${station.lon}`, "_blank", "noopener,noreferrer");
               }}
@@ -224,10 +228,10 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                   rel="noreferrer"
                 >
                   <div className="nearbyRowLeft">
-                    <div className="nearbyRowIndex">{page * PAGE_SIZE + index + 1}</div>
+                    <div className="nearbyRowIndex">{activePage * PAGE_SIZE + index + 1}</div>
 
                     <div className="nearbyRowText">
-                      <div className="nearbyRowName">{s.name}</div>
+                      <div className="nearbyRowName">{s.name || t.stationsUnnamed}</div>
 
                       {/* <div className="nearbyRowMeta">
                         {s.brand ? `${s.brand} • ` : ""}
@@ -247,7 +251,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                   </div>
 
                   <div className="nearbyRowRight">
-                    <div className="nearbyDistancePill">{s.distanceKm.toFixed(2)} km</div>
+                    <div className="nearbyDistancePill">{t.stationsDistance(s.distanceKm)}</div>
                   </div>
                 </a>
               ))}

@@ -1,5 +1,9 @@
 import { commercialCopy } from "./commercialCopy";
 import type { Lang } from "../models/i18n";
+import { ALBANIA_STATION_SNAPSHOT_DATE } from "./stationSnapshot";
+
+const stationSnapshotDateEn = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${ALBANIA_STATION_SNAPSHOT_DATE}T00:00:00Z`));
+const stationSnapshotDateSq = new Intl.DateTimeFormat("sq-AL", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${ALBANIA_STATION_SNAPSHOT_DATE}T00:00:00Z`));
 
 export type EditorialTextSection = {
   id: string;
@@ -153,7 +157,7 @@ const en: EditorialCopy = {
           id: "location",
           title: "Location and nearby stations",
           paragraphs: [
-            "The station finder requests device location only after you choose to use it. Searches in Albania send selected coordinates to our station lookup service, which uses a stored OpenStreetMap snapshot dated 20 October 2026. Searches outside Albania send selected coordinates to a public global OpenStreetMap/Overpass service. The Android app can also search from the approximate centre of a selected Albanian place without device-location permission, using bundled GeoNames place data (CC BY 4.0). Location is not used to build a profile or for advertising. Permission can be denied or withdrawn; the rest of the service remains available."
+            `The station finder requests device location only after you choose to use it. Both the website and Android app can search from the approximate centre of a selected Albanian place without device-location permission, using bundled GeoNames place data (CC BY 4.0). Searches in Albania send selected coordinates to our station lookup service, which uses a stored OpenStreetMap snapshot last verified as dated ${stationSnapshotDateEn}. The service may update independently of this website. Searches outside Albania send selected coordinates to a public global OpenStreetMap/Overpass service. Location is not used to build a profile or for advertising. Permission can be denied or withdrawn; the rest of the service remains available.`
           ]
         },{ id: "external-data", title: "External data services", paragraphs: ["The website fetches fuel, exchange-rate, map, and related public data from third-party services. Those providers receive the network information required to answer the request and apply their own privacy terms."] },
         { id: "advertising", title: "Advertising and consent", paragraphs: [commercialCopy.en.ads] },
@@ -315,7 +319,7 @@ const sq: EditorialCopy = {
       sections: [
         { id: "collection", title: "Informacioni që mbledhim", paragraphs: ["Nuk kërkojmë emër, numër telefoni, kredenciale llogarie apo informacion pagese. Shërbimi përdoret pa regjistrim.", "Kërkesat teknike standarde mund t’u ekspozojnë ofruesve të hostimit dhe të dhënave adresën IP, llojin e shfletuesit, pajisjen dhe URL-në e kërkuar për të ofruar shërbimin dhe parandaluar abuzimin."] },
         { id: "local-storage", title: "Preferencat në pajisjen tënde", paragraphs: ["Shteti, karburanti, monedha, tema, lista e ndjekjes dhe progresi i lojërave ruhen në shfletues. Një preferencë privatësie me version regjistron nëse reklamat opsionale janë lejuar, refuzuar apo ende të pavendosura. Këto cilësime nuk janë llogari dhe zakonisht mbeten në pajisje derisa të pastrosh të dhënat."] },
-        { id: "location", title: "Vendndodhja dhe pikat afër", paragraphs: ["Gjetësi i pikave kërkon vendndodhjen e pajisjes vetëm pasi zgjedh ta përdorësh. Kërkimet në Shqipëri i dërgojnë koordinatat te shërbimi ynë, i cili përdor një regjistër të ruajtur OpenStreetMap të datës 20 tetor 2026. Kërkimet jashtë Shqipërisë i dërgojnë koordinatat te një shërbim publik botëror OpenStreetMap/Overpass. Aplikacioni Android mund të kërkojë edhe nga qendra e përafërt e një vendbanimi të zgjedhur, pa leje për vendndodhjen, duke përdorur emra vendesh GeoNames të përfshirë në aplikacion (CC BY 4.0). Vendndodhja nuk përdoret për profilizim ose reklama. Leja mund të refuzohet ose hiqet; pjesa tjetër vazhdon të punojë."] },
+        { id: "location", title: "Vendndodhja dhe pikat afër", paragraphs: [`Gjetësi i pikave kërkon vendndodhjen e pajisjes vetëm pasi zgjedh ta përdorësh. Faqja dhe aplikacioni Android mund të kërkojnë nga qendra e përafërt e një vendbanimi të zgjedhur në Shqipëri, pa leje për vendndodhjen, duke përdorur të dhëna GeoNames të përfshira (CC BY 4.0). Kërkimet në Shqipëri i dërgojnë koordinatat te shërbimi ynë, i cili përdor një regjistër të ruajtur OpenStreetMap, i verifikuar së fundi me datën ${stationSnapshotDateSq}. Shërbimi mund të përditësohet pavarësisht kësaj faqeje. Kërkimet jashtë Shqipërisë i dërgojnë koordinatat te një shërbim publik botëror OpenStreetMap/Overpass. Vendndodhja nuk përdoret për profilizim ose reklama. Leja mund të refuzohet ose hiqet; pjesa tjetër vazhdon të punojë.`] },
         { id: "external-data", title: "Shërbimet e jashtme të të dhënave", paragraphs: ["Faqja merr të dhëna publike për karburantin, kursin e këmbimit, hartat dhe shërbime të lidhura. Ofruesit marrin informacionin e rrjetit që nevojitet për t’iu përgjigjur kërkesës dhe zbatojnë politikat e tyre."] },
         { id: "advertising", title: "Reklamat dhe pëlqimi", paragraphs: [commercialCopy.sq.ads] },
         { id: "analytics", title: "Cloudflare Web Analytics", paragraphs: [commercialCopy.sq.analytics] },

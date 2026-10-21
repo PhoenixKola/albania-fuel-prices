@@ -4,6 +4,7 @@ import NearbyStationsCard from "../components/meta/NearbyStationsCard";
 import RoadStatusLink from "../components/road/RoadStatusLink";
 import type { Lang } from "../models/i18n";
 import AdsterraNativeAd from "../components/ads/AdsterraNativeAd";
+import { ALBANIA_PLACE_LIST_RETRIEVED, ALBANIA_STATION_SNAPSHOT_DATE } from "../config/stationSnapshot";
 
 type Props = { t: TDict; lang: Lang; radiusM: number; setRadiusM: (value: number) => void };
 
@@ -18,9 +19,10 @@ export default function StationsPage({ t, lang, radiusM, setRadiusM }: Props) {
         <section className="contentSection">
           <h2 className="contentHeading">{sq ? "Çfarë tregon harta" : "What the map shows"}</h2>
           <p className="contentBody">{sq
-            ? "Me lejen tuaj për vendndodhjen, mjeti kërkon në regjistrin OpenStreetMap për Shqipërinë të datës 20 tetor 2026, ose në një shërbim publik botëror jashtë Shqipërisë. Mbulimi mund të jetë i paplotë. Distancat janë në vijë të drejtë, jo itinerare; oraret mund të jenë të vjetruara."
-            : "With your location permission, this tool searches an Albania OpenStreetMap station snapshot dated 20 October 2026, or a public global service outside Albania. Coverage may be incomplete. Distances are straight-line measurements, not driving routes; listed hours may be outdated."}</p>
+            ? `Mund të përdorni vendndodhjen tuaj ose të zgjidhni një vend në Shqipëri. ${t.stationsSnapshotDate(ALBANIA_STATION_SNAPSHOT_DATE)}; jashtë Shqipërisë kërkimi përdor shërbime publike OpenStreetMap. Mbulimi mund të jetë i paplotë. Distancat janë në vijë të drejtë, jo itinerare; oraret mund të jenë të vjetruara.`
+            : `Use your location or choose an Albanian place. ${t.stationsSnapshotDate(ALBANIA_STATION_SNAPSHOT_DATE)}; searches outside Albania use public OpenStreetMap services. Coverage may be incomplete. Distances are straight-line measurements, not driving routes; listed hours may be outdated.`}</p>
           <p className="contentBody">{sq ? "Të dhënat e hartës: © kontribuesit e OpenStreetMap (ODbL)." : "Map data: © OpenStreetMap contributors (ODbL)."} <a className="inlineLink" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></p>
+          <p className="contentBody">{t.stationsPlacesSource(ALBANIA_PLACE_LIST_RETRIEVED)} <a className="inlineLink" href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames (CC BY 4.0)</a></p>
           <p className="contentBody">{sq
             ? "Kjo faqe nuk shfaq çmime aktuale në pompa të veçanta. Vlerat në faqen kryesore dhe në renditje janë referenca kombëtare të datuara. Konfirmoni çmimin dhe orarin te pika përpara një devijimi të posaçëm."
             : "This page does not show current prices at individual pumps. Home and ranking values are dated country-level references. Confirm the station's price and hours before making a special detour."}</p>

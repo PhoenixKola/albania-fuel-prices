@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { TDict } from "../../locales";
 
 type Station = {
   id: string | number;
@@ -11,6 +12,7 @@ type Station = {
 type Props = {
   center: { lat: number; lon: number };
   stations: Station[];
+  t: TDict;
   onSelect?: (station: Station) => void;
 };
 
@@ -25,7 +27,7 @@ function latToTileY(lat: number, zoom: number) {
   return ((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * 2 ** zoom;
 }
 
-export default function StationMapPreview({ center, stations, onSelect }: Props) {
+export default function StationMapPreview({ center, stations, t, onSelect }: Props) {
   const [zoom, setZoom] = useState(13);
   const centerX = lonToTileX(center.lon, zoom);
   const centerY = latToTileY(center.lat, zoom);
@@ -46,11 +48,11 @@ export default function StationMapPreview({ center, stations, onSelect }: Props)
   };
 
   return (
-    <div className="stationMapPreview" aria-label="Nearby fuel station map">
-      <div className="stationMapControls" aria-label="Station map zoom controls">
-        <button type="button" onClick={() => setZoom((z) => Math.max(12, z - 1))} disabled={zoom <= 12}>-</button>
+    <div className="stationMapPreview" role="region" aria-label={t.stationsMapLabel}>
+      <div className="stationMapControls" role="group" aria-label={t.stationsMapZoomControls}>
+        <button type="button" aria-label={t.stationsZoomOut} onClick={() => setZoom((z) => Math.max(12, z - 1))} disabled={zoom <= 12}>-</button>
         <span>{zoom}</span>
-        <button type="button" onClick={() => setZoom((z) => Math.min(16, z + 1))} disabled={zoom >= 16}>+</button>
+        <button type="button" aria-label={t.stationsZoomIn} onClick={() => setZoom((z) => Math.min(16, z + 1))} disabled={zoom >= 16}>+</button>
       </div>
 
       <div className="stationMapTiles">
@@ -82,7 +84,8 @@ export default function StationMapPreview({ center, stations, onSelect }: Props)
             type="button"
             className="stationMapPin"
             style={{ left: p.x, top: p.y }}
-            title={`${station.name} · ${station.distanceKm.toFixed(2)} km`}
+            title={`${station.name || t.stationsUnnamed} · ${t.stationsDistance(station.distanceKm)}`}
+            aria-label={`${station.name || t.stationsUnnamed}, ${t.stationsDistance(station.distanceKm)}`}
             onClick={() => onSelect?.(station)}
           >
             {index + 1}

@@ -101,6 +101,33 @@ export const sq = {
   stationsShowMore: "Shfaq më shumë",
   stationsShowAll: "Shfaq të gjitha",
   stationsCollapse: "Mbyll",
+  stationsChoosePlace: "Zgjidh një vend",
+  stationsClosePlacePicker: "Mbyll kërkimin e vendeve",
+  stationsSearchPlace: "Kërko qytete dhe fshatra në Shqipëri",
+  stationsSearchPlaceHint: "P.sh. Shkodër, Korçë ose një fshat",
+  stationsPlacesLoading: "Po ngarkohen vendet…",
+  stationsPlacesUnavailable: "Lista e vendeve nuk u ngarkua. Mund të përdorni vendndodhjen tuaj.",
+  stationsPlacePrompt: "Shkruani të paktën dy shkronja për të kërkuar.",
+  stationsPlaceResults: (n: number) => `${n} vende të gjetura`,
+  stationsNoPlaces: "S’u gjet asnjë vend. Provoni një shkrim tjetër.",
+  stationsPlacesSource: (date: string) => `Lista e vendeve u mor më ${new Intl.DateTimeFormat("sq-AL", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`))} nga`,
+  stationsNearPlace: (place: string) => `Pranë vendit ${place}`,
+  stationsGpsMode: "Sipas vendndodhjes suaj",
+  stationsManualMode: "Vend i zgjedhur",
+  stationsPrevious: "Prapa",
+  stationsNext: "Para",
+  stationsPage: (page: number, total: number) => `Faqja ${page} nga ${total}`,
+  stationsUnnamed: "Pikë karburanti pa emër",
+  stationsDistance: (km: number) => km < 1 ? `${Math.round(km * 1000)} m` : `${new Intl.NumberFormat("sq-AL", { maximumFractionDigits: 1 }).format(km)} km`,
+  stationsMapLabel: "Harta e pikave të karburantit pranë",
+  stationsMapZoomControls: "Kontrollet e zmadhimit të hartës",
+  stationsZoomIn: "Zmadho hartën",
+  stationsZoomOut: "Zvogëlo hartën",
+  stationsLocationError: (code: "unsupported" | "insecure" | "denied" | "unavailable" | "timeout") => ({ unsupported: "Ky shfletues nuk e mbështet vendndodhjen. Zgjidhni një vend.", insecure: "Vendndodhja kërkon lidhje të sigurt. Zgjidhni një vend.", denied: "Leja e vendndodhjes u refuzua. Lejojeni te cilësimet e shfletuesit ose zgjidhni një vend.", unavailable: "Vendndodhja nuk gjendet. Kontrolloni cilësimet e pajisjes ose zgjidhni një vend.", timeout: "Marrja e vendndodhjes zgjati tepër. Provoni përsëri ose zgjidhni një vend." })[code],
+  stationsProviderError: (code: "timeout" | "busy" | "provider" | "invalid" | "network") => ({ timeout: "Kërkimi i pikave zgjati tepër. Provoni përsëri ose ulni rrezen.", busy: "Shërbimi i pikave është i ngarkuar. Provoni pak më vonë.", provider: "Shërbimi i pikave nuk disponohet përkohësisht. Provoni përsëri.", invalid: "Shërbimi ktheu përgjigje të pavlefshme. Provoni përsëri.", network: "Lidhja me shërbimin dështoi. Kontrolloni internetin dhe provoni përsëri." })[code],
+  stationsPreviouslyLoaded: "Po shfaqen rezultatet e mëparshme për të njëjtin vend dhe rreze. Rifreskimi dështoi; të dhënat mund të kenë ndryshuar.",
+  stationsSnapshotDate: (date: string) => `Regjistri i pikave në Shqipëri i verifikuar së fundi: ${new Intl.DateTimeFormat("sq-AL", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`))}`,
+  stationsRetrievedNow: "Kërkimi u bë tani; të dhënat e pikave mund të jenë më të vjetra.",
 
   heroTitle: "Çmimet e karburantit në Shqipëri dhe Europë, të shpjeguara qartë",
   heroSubtitle:
@@ -233,7 +260,7 @@ export const sq = {
   watchlistGuidance:
     "Përdor listën e të preferuarave për të mbajtur një grup të vogël krahasimi me vendet që të interesojnë më shumë. Është e dobishme për krahasime të shpejta, por vlerat duhen parë si orientim i përgjithshëm i çmimit.",
   nearbyGuidance:
-    "Vendndodhjet e pikave në Shqipëri vijnë nga një regjistër OpenStreetMap i datës 20 tetor 2026. Mbulimi dhe oraret mund të jenë të paplota; këto nuk janë çmime aktuale në pompë.",
+    "Vendndodhjet e pikave në Shqipëri vijnë nga një regjistër OpenStreetMap me datë. Kërkimi pranë kufirit mund të mos përfshijë pikat përtej tij. Mbulimi dhe oraret mund të jenë të paplota; këto nuk janë çmime aktuale në pompë.",
   nearbyGuidanceGlobal:
     "Jashtë Shqipërisë, pikat kërkohen përmes një shërbimi publik OpenStreetMap. Mbulimi dhe oraret mund të jenë të paplota; këto nuk janë çmime aktuale në pompë.",
   rankingsGuidance:

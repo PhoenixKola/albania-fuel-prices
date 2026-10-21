@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { haversineKm } from "../utils/geo";
 import { stationEndpoint, stationFallbackUrl } from "../utils/stationEndpoint";
+import { stationErrorCode, type StationErrorCode } from "../utils/stationErrors";
 
 export type Station = {
   id: string;
@@ -44,32 +45,16 @@ type OverpassElement = {
   tags?: Record<string, string | number | boolean>;
 };
 
-function stationSearchErrorMessage(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  const name = error instanceof Error ? error.name : "";
-
-  if (message.includes("504") || message.toLowerCase().includes("timeout") || name === "AbortError") {
-    return "Station search is taking longer than expected. Please refresh again or try a smaller radius.";
-  }
-
-  if (message.includes("429")) {
-    return "Station search is busy right now. Please wait a minute and try again.";
-  }
-
-  if (message.includes("502") || message.includes("503") || message.toLowerCase().includes("failed to fetch")) {
-    return "Station search is temporarily unavailable. Please try again in a moment.";
-  }
-
-  return "Could not load nearby stations. Please check your connection and try again.";
-}
-
 export function useNearbyStationsWeb(center: { lat: number; lon: number } | null, radiusM: number) {
   const lat = center?.lat ?? null;
   const lon = center?.lon ?? null;
 
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<StationErrorCode | null>(null);
+  const [resultKey, setResultKey] = useState("");
+  const [previouslyLoaded, setPreviouslyLoaded] = useState(false);
+  const previousRef = useRef<Map<string, Station[]>>(new Map());
 
   const inFlightRef = useRef<{ key: string; controller: AbortController } | null>(null);
   const requestIdRef = useRef(0);
@@ -81,9 +66,7 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
   const key = useMemo(() => {
     if (lat == null || lon == null) return "";
-    const rlat = lat.toFixed(3);
-    const rlon = lon.toFixed(3);
-    return `${rlat},${rlon},${radiusM}`;
+    return `${lat},${lon},${radiusM}`;
   }, [lat, lon, radiusM]);
 
   const refresh = useCallback(async () => {
@@ -98,6 +81,7 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
     setLoading(true);
     setError(null);
+    setPreviouslyLoaded(false);
 
     try {
       const [slat, slon] = key.split(",").slice(0, 2).map(Number);
@@ -165,8 +149,14 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
       parsed.sort((a, b) => a.distanceKm - b.distanceKm);
       if (requestId !== requestIdRef.current) return;
       setStations(parsed);
+      setResultKey(key);
+      previousRef.current.set(key, parsed);
     } catch (e) {
-      if (requestId === requestIdRef.current) setError(stationSearchErrorMessage(e));
+      if (requestId === requestIdRef.current) {
+        const prior = previousRef.current.get(key);
+        if (prior) { setStations(prior); setResultKey(key); setPreviouslyLoaded(true); }
+        setError(stationErrorCode(e));
+      }
     } finally {
       clearTimeout(timeoutId);
       if (requestId === requestIdRef.current) {
@@ -178,7 +168,6 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
   useEffect(() => {
     if (!key) return;
-    setStations([]);
     setError(null);
     refresh();
     return cancelRequest;
@@ -186,5 +175,6 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
   // The view paginates eight results and renders only that page on the map.
   // Do not silently hide valid results beyond the first hundred.
-  return { stations, totalCount: stations.length, loading, error, refresh, source: lat == null || lon == null ? "snapshot" as const : stationEndpoint(lat, lon, radiusM).source };
+  const visible = resultKey === key ? stations : [];
+  return { stations: visible, totalCount: visible.length, loading, error, refresh, hasRetrieved: resultKey === key, previouslyLoaded: previouslyLoaded && resultKey === key, source: lat == null || lon == null ? "snapshot" as const : stationEndpoint(lat, lon, radiusM).source };
 }

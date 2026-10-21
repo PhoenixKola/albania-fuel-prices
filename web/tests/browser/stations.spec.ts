@@ -55,3 +55,35 @@ test("GPS outside Albania uses the global station path", async ({ page, context 
   await expect(page.locator(".nearbyRow")).toContainText("Berlin station");
   expect(globalRequests).toBe(1);
 });
+
+test("place search works without GPS and keeps Albanian feedback on a narrow screen", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("karburanti-privacy-v1", JSON.stringify({ version: 1, necessary: true, advertising: false })));
+  await page.setViewportSize({ width: 360, height: 780 });
+  let failRefresh = false;
+  await page.route("**/*", async (route) => {
+    const url = new URL(route.request().url());
+    if ([origin, "http://127.0.0.1:4175"].includes(url.origin)) return route.fulfill({ response: await route.fetch({ url: `http://127.0.0.1:4175${url.pathname}${url.search}` }) });
+    if (url.hostname === "fuel-proxy.fenixkola.workers.dev") return failRefresh ? route.fulfill({ status: 503, body: "unavailable" }) : route.fulfill({ json: { elements: [station] } });
+    return route.abort();
+  });
+  await page.goto(`${origin}/stations`);
+  await page.getByRole("button", { name: "Choose a place" }).click();
+  const input = page.getByRole("searchbox", { name: "Search Albanian towns and villages" });
+  await expect(input).toBeFocused();
+  await input.fill("Shkoder");
+  await expect(page.locator(".stationPlaceResults button").first()).toContainText("Shkodër");
+  await page.locator(".stationPlaceResults button").first().click();
+  await expect(page.locator(".nearbySub")).toContainText("Near Shkodër");
+  await expect(page.locator(".nearbyRow")).toHaveCount(1);
+  await page.locator(".hamburgerBtn").click();
+  await page.getByRole("button", { name: "AL", exact: true }).click();
+  await expect(page.locator(".nearbySub")).toContainText("Pranë vendit Shkodër");
+  await page.getByRole("button", { name: "10 km" }).click();
+  await expect(page.locator(".nearbyRow")).toHaveCount(1);
+  failRefresh = true;
+  await page.getByRole("button", { name: "Rifresko", exact: true }).click();
+  await expect(page.locator(".nearbyAlert")).toContainText("Shërbimi i pikave nuk disponohet");
+  await expect(page.locator(".nearbyAlert")).toContainText("rezultatet e mëparshme");
+  await expect(page.locator(".nearbyRow")).toHaveCount(1);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+});

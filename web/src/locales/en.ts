@@ -101,6 +101,33 @@ export const en = {
   stationsShowMore: "Show more",
   stationsShowAll: "Show all",
   stationsCollapse: "Collapse",
+  stationsChoosePlace: "Choose a place",
+  stationsClosePlacePicker: "Close place search",
+  stationsSearchPlace: "Search Albanian towns and villages",
+  stationsSearchPlaceHint: "Try Shkodër, Korçë, or a village",
+  stationsPlacesLoading: "Loading places…",
+  stationsPlacesUnavailable: "Places could not load. You can still use your location.",
+  stationsPlacePrompt: "Enter at least two letters to search all places.",
+  stationsPlaceResults: (n: number) => `${n} matching places`,
+  stationsNoPlaces: "No matching places. Try another spelling.",
+  stationsPlacesSource: (date: string) => `Place list retrieved ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`))} from`,
+  stationsNearPlace: (place: string) => `Near ${place}`,
+  stationsGpsMode: "Using your location",
+  stationsManualMode: "Chosen place",
+  stationsPrevious: "Previous",
+  stationsNext: "Next",
+  stationsPage: (page: number, total: number) => `Page ${page} of ${total}`,
+  stationsUnnamed: "Unnamed fuel station",
+  stationsDistance: (km: number) => km < 1 ? `${Math.round(km * 1000)} m` : `${new Intl.NumberFormat("en", { maximumFractionDigits: 1 }).format(km)} km`,
+  stationsMapLabel: "Nearby fuel station map",
+  stationsMapZoomControls: "Station map zoom controls",
+  stationsZoomIn: "Zoom in",
+  stationsZoomOut: "Zoom out",
+  stationsLocationError: (code: "unsupported" | "insecure" | "denied" | "unavailable" | "timeout") => ({ unsupported: "This browser does not support location. Choose a place instead.", insecure: "Location needs a secure connection. Choose a place instead.", denied: "Location permission was denied. Allow it in your browser settings, or choose a place.", unavailable: "Your location is unavailable. Check device location settings or choose a place.", timeout: "Location took too long. Try again or choose a place." })[code],
+  stationsProviderError: (code: "timeout" | "busy" | "provider" | "invalid" | "network") => ({ timeout: "Station search timed out. Try again or use a smaller radius.", busy: "The station service is busy. Please try again shortly.", provider: "The station service is temporarily unavailable. Please retry.", invalid: "The station service returned an invalid response. Please retry.", network: "Could not reach the station service. Check your connection and retry." })[code],
+  stationsPreviouslyLoaded: "Showing results loaded earlier for this exact place and radius. Refresh failed; details may have changed.",
+  stationsSnapshotDate: (date: string) => `Last verified Albania station snapshot: ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`))}`,
+  stationsRetrievedNow: "Search checked now; the underlying station data may be older.",
 
   heroTitle: "Fuel prices in Albania and Europe, explained clearly",
   heroSubtitle:
@@ -233,7 +260,7 @@ export const en = {
   watchlistGuidance:
     "Use the watchlist to keep a small comparison set of countries you care about most. This is helpful for quick side-by-side checks, but the values should still be read as general price guidance rather than a station-by-station guarantee.",
   nearbyGuidance:
-    "Albania station locations come from an OpenStreetMap snapshot dated 20 October 2026. Coverage and listed hours may be incomplete; this is not live pump-price data.",
+    "Albania station locations come from a dated OpenStreetMap snapshot. Border searches may omit stations across the border. Coverage and listed hours may be incomplete; this is not live pump-price data.",
   nearbyGuidanceGlobal:
     "Outside Albania, stations are searched through a public OpenStreetMap service. Availability and listed hours may be incomplete; this is not live pump-price data.",
   rankingsGuidance:
