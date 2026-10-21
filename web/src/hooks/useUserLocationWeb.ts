@@ -14,7 +14,7 @@ export function useUserLocationWeb() {
   const [error, setError] = useState<string | null>(null);
 
   const inFlightRef = useRef(false);
-  const lastReqAtRef = useRef(0);
+  const requestIdRef = useRef(0);
 
   const request = useCallback(() => {
     if (!navigator.geolocation) {
@@ -22,18 +22,17 @@ export function useUserLocationWeb() {
       return;
     }
 
-    const now = Date.now();
     if (inFlightRef.current) return;
-    if (now - lastReqAtRef.current < 3000) return;
 
     inFlightRef.current = true;
-    lastReqAtRef.current = now;
+    const requestId = ++requestIdRef.current;
 
     setLoading(true);
     setError(null);
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        if (requestId !== requestIdRef.current) return;
         const next = { lat: pos.coords.latitude, lon: pos.coords.longitude };
 
         setCoords((prev) => (almostSame(prev, next) ? prev : next));
@@ -42,6 +41,7 @@ export function useUserLocationWeb() {
         setLoading(false);
       },
       (err) => {
+        if (requestId !== requestIdRef.current) return;
         setError(err.message);
         inFlightRef.current = false;
         setLoading(false);
@@ -49,6 +49,8 @@ export function useUserLocationWeb() {
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 60_000 }
     );
   }, []);
+
+  useEffect(() => () => { requestIdRef.current++; inFlightRef.current = false; }, []);
 
   useEffect(() => {
     let cancelled = false;

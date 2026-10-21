@@ -185,12 +185,18 @@ export type TDict = {
   locationServicesOffHint: string;
   browseCityTitle: string;
   browseCityHint: string;
+  searchTownPlaceholder: string;
+  noTownsFound: string;
+  chooseTown: string;
+  updateMyLocation: string;
+  placeSource: (source: string) => string;
   stationsAroundCity: (city: string) => string;
   cityCenterDistanceNote: string;
   useDeviceLocation: string;
   recentPositionNote: string;
-  stationsBackupSource: string;
   stationsLookupHint: string;
+  stationsGlobalLookupHint: string;
+  stationsGlobalSourceNote: string;
   stationsLoadError: string;
   stationsTimeoutCached: string;
   linkUnavailable: string;
@@ -549,13 +555,19 @@ export const i18n: Record<Lang, TDict> = {
     locationServicesOffTitle: "Device location is off",
     locationServicesOffHint: "Turn on Location in your phone settings, then try again. You can also browse by city without device location.",
     browseCityTitle: "Browse by city",
-    browseCityHint: "Search from a city centre instead. Distances will be measured from that centre, not your phone.",
+    browseCityHint: "Choose any Albanian town. Distances are from its approximate centre, not your phone.",
+    searchTownPlaceholder: "Search town or place",
+    noTownsFound: "No matching place in the offline Albania list.",
+    chooseTown: "Choose a town",
+    updateMyLocation: "Update my location",
+    placeSource: (source: string) => `Place names: ${source}`,
     stationsAroundCity: (city: string) => `Stations around ${city}`,
-    cityCenterDistanceNote: "Distances are from the city centre.",
+    cityCenterDistanceNote: "Distances are from this approximate place centre, not your phone.",
     useDeviceLocation: "Use my location",
     recentPositionNote: "Using a recent device position; refresh to try for a new fix.",
-    stationsBackupSource: "OpenStreetMap backup lookup",
-    stationsLookupHint: "Checking mapped stations. If the main lookup is unavailable, a bounded OpenStreetMap backup is tried automatically.",
+    stationsLookupHint: "Searching the Albania OpenStreetMap station snapshot. These are mapped stations, not live pump prices.",
+    stationsGlobalLookupHint: "Searching mapped fuel stations worldwide. This may take longer outside Albania.",
+    stationsGlobalSourceNote: "Outside Albania, station data comes from a public OpenStreetMap lookup and may be unavailable or incomplete. Distances are straight-line; these are not live pump prices. © OpenStreetMap contributors (ODbL).",
     stationsLoadError: "The map lookup is unavailable right now. Check your connection and retry; saved results appear when available.",
     stationsTimeoutCached: "Live station search is taking longer than usual. Your saved results are ready.",
     linkUnavailable: "This link is unavailable right now.",
@@ -631,7 +643,7 @@ export const i18n: Record<Lang, TDict> = {
     hoursOpensAt: (time: string) => `opens ${time}`,
     hoursListedNote: "Based on listed opening hours",
     stationsSourceNote:
-      "Stations and opening hours come from OpenStreetMap and may miss holidays or temporary closures. Distances are straight-line, not driving routes.",
+      "Albania OpenStreetMap station snapshot: 20 Oct 2026. Coverage and listed hours may be incomplete. Distances are straight-line, not driving routes or live pump prices. © OpenStreetMap contributors (ODbL).",
     stationsWithin: (count: number, km: number) => `${count} ${count === 1 ? "station" : "stations"} within ${km} km`,
     stationsMatches: (count: number) => `${count} ${count === 1 ? "match" : "matches"}`,
     otherStations: "More nearby",
@@ -916,13 +928,19 @@ export const i18n: Record<Lang, TDict> = {
     locationServicesOffTitle: "Vendndodhja e pajisjes është fikur",
     locationServicesOffHint: "Aktivizo Vendndodhjen te cilësimet e telefonit dhe provo sërish. Mund të shfletosh edhe sipas qytetit pa vendndodhjen e pajisjes.",
     browseCityTitle: "Shfleto sipas qytetit",
-    browseCityHint: "Kërko nga qendra e një qyteti. Distancat maten nga ajo qendër, jo nga telefoni yt.",
+    browseCityHint: "Zgjidh cilindo vendbanim në Shqipëri. Distancat maten nga qendra e përafërt, jo nga telefoni yt.",
+    searchTownPlaceholder: "Kërko qytet ose vendbanim",
+    noTownsFound: "Nuk u gjet vendbanim në listën vendore të Shqipërisë.",
+    chooseTown: "Zgjidh vendbanim",
+    updateMyLocation: "Përditëso vendndodhjen time",
+    placeSource: (source: string) => `Emrat e vendeve: ${source}`,
     stationsAroundCity: (city: string) => `Pikat rreth ${city}`,
-    cityCenterDistanceNote: "Distancat janë nga qendra e qytetit.",
+    cityCenterDistanceNote: "Distancat janë nga qendra e përafërt e këtij vendbanimi, jo nga telefoni yt.",
     useDeviceLocation: "Përdor vendndodhjen time",
     recentPositionNote: "Po përdoret një pozicion i fundit i pajisjes; rifresko për një pozicion të ri.",
-    stationsBackupSource: "Kërkim rezervë në OpenStreetMap",
-    stationsLookupHint: "Po kontrollohen pikat në hartë. Nëse kërkimi kryesor nuk punon, provohet automatikisht një kërkim rezervë i kufizuar në OpenStreetMap.",
+    stationsLookupHint: "Po kërkohen pikat në regjistrin OpenStreetMap të Shqipërisë. Këto nuk janë çmime aktuale në pompë.",
+    stationsGlobalLookupHint: "Po kërkohen pika karburanti në hartën botërore. Jashtë Shqipërisë mund të zgjasë më shumë.",
+    stationsGlobalSourceNote: "Jashtë Shqipërisë, të dhënat vijnë nga një kërkim publik OpenStreetMap dhe mund të mungojnë ose të jenë të paplota. Distancat janë në vijë ajrore; këto nuk janë çmime aktuale. © kontribuesit e OpenStreetMap (ODbL).",
     stationsLoadError: "Kërkimi në hartë nuk disponohet tani. Kontrollo lidhjen dhe provo sërish; rezultatet e ruajtura shfaqen kur janë të disponueshme.",
     stationsTimeoutCached: "Kërkimi i drejtpërdrejtë po zgjat më shumë se zakonisht. Rezultatet e ruajtura janë gati.",
     linkUnavailable: "Kjo lidhje nuk është e disponueshme tani.",
@@ -993,7 +1011,7 @@ export const i18n: Record<Lang, TDict> = {
     hoursOpensAt: (time: string) => `hapet në ${time}`,
     hoursListedNote: "Sipas orarit të shënuar",
     stationsSourceNote:
-      "Pikat dhe oraret vijnë nga OpenStreetMap dhe mund të mos përfshijnë festat ose mbylljet e përkohshme. Distancat janë në vijë ajrore, jo sipas rrugës.",
+      "Regjistri i pikave OpenStreetMap për Shqipërinë: 20 tetor 2026. Mbulimi dhe oraret mund të jenë të paplota. Distancat janë në vijë ajrore, jo itinerare ose çmime aktuale në pompë. © kontribuesit e OpenStreetMap (ODbL).",
     stationsWithin: (count: number, km: number) => `${count} ${count === 1 ? "pikë" : "pika"} brenda ${km} km`,
     stationsMatches: (count: number) => `${count} ${count === 1 ? "rezultat" : "rezultate"}`,
     otherStations: "Të tjera afër",

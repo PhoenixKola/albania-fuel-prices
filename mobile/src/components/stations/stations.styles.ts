@@ -83,6 +83,14 @@ export const makeStationStyles = (theme: Theme) => {
     cityChipActive: { borderColor: p.accent, backgroundColor: p.accentSoft },
     cityChipText: { color: p.ink, fontSize: f(13), fontWeight: "800" },
     cityChipTextActive: { color: p.accent },
+    placeSearch: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: 9, paddingHorizontal: 12, borderRadius: 13, borderWidth: 1, borderColor: p.chipBorder, backgroundColor: p.chip },
+    placeInput: { flex: 1, minWidth: 0, minHeight: 46, color: p.ink, fontSize: f(15), fontWeight: "700" },
+    placeResults: { gap: 3 },
+    placeResult: { minHeight: 50, flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 11, paddingVertical: 7, borderRadius: 12, backgroundColor: p.chip },
+    placeResultCopy: { flex: 1, minWidth: 0 },
+    placeResultName: { color: p.ink, fontSize: f(14), fontWeight: "800" },
+    placeResultRegion: { color: p.inkSoft, fontSize: f(11), marginTop: 2 },
+    placeAttribution: { color: p.inkSoft, fontSize: f(11), textDecorationLine: "underline" },
 
     // Next stop
     deck: {

@@ -1,5 +1,5 @@
 import React, { useCallback, useDeferredValue, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Linking, RefreshControl, ScrollView, Text, TextInput, View, type ListRenderItem } from "react-native";
+import { ActivityIndicator, FlatList, Keyboard, Linking, RefreshControl, ScrollView, Text, TextInput, View, type ListRenderItem } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -16,6 +16,8 @@ import { makeStationStyles, stationsPalette } from "../components/stations/stati
 import { formatStamp, searchKey, stationTitle } from "../components/stations/stationFormat";
 import { openMaps } from "../utils/maps";
 import { STATION_CITIES } from "../data/stationCities";
+import { PLACE_SOURCE, PLACE_SOURCE_URL, searchAlbaniaPlaces } from "../data/placeSearch";
+import { permissionStep } from "../utils/locationAcquisition";
 import { isTwoPaneStations, makeStationsTabStyles } from "./StationsTab.styles";
 
 type Phase = "checking" | "permission" | "blocked" | "locating" | "locationError" | "loading" | "loadError" | "empty" | "ready";
@@ -36,10 +38,16 @@ export default function StationsTab() {
   const [favoriteOnly, setFavoriteOnly] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [pulling, setPulling] = useState(false);
+  const [placeQuery, setPlaceQuery] = useState("");
+  const [placePickerOpen, setPlacePickerOpen] = useState(false);
+  const placeResults = useMemo(() => searchAlbaniaPlaces(placeQuery), [placeQuery]);
 
   // Listed hours are evaluated against the clock, so re-derive them whenever the tab is shown.
   const recheckHours = nearby.recheckHours;
   useFocusEffect(useCallback(() => recheckHours(), [recheckHours]));
+  const activateLocation = loc.activate;
+  const deactivateLocation = loc.deactivate;
+  useFocusEffect(useCallback(() => { activateLocation(); return deactivateLocation; }, [activateLocation, deactivateLocation]));
 
   const km = Math.round(ctx.radiusM / 1000);
   const needle = searchKey(deferredQuery.trim());
@@ -86,11 +94,9 @@ export default function StationsTab() {
   const busy = nearby.loading || loc.loading;
   const refreshStations = useCallback(async () => {
     if (!loc.coords) { if (loc.permission === "granted") await loc.locate(); return; }
-    if (loc.mode === "city") { await nearby.refresh(); return; }
-    // Re-read the position first: a station finder should answer for where the driver is now.
-    const moved = await loc.locate();
-    if (!moved) await nearby.refresh();
-  }, [loc.coords, loc.mode, loc.permission, loc.locate, nearby.refresh]);
+    // Retrying data must never make the driver wait for another GPS fix.
+    await nearby.refresh();
+  }, [loc.coords, loc.permission, loc.locate, nearby.refresh]);
 
   const onPull = useCallback(() => {
     setPulling(true);
@@ -100,8 +106,8 @@ export default function StationsTab() {
   const hasStations = nearby.stations.length > 0;
   let phase: Phase;
   if (!loc.checked && !loc.coords) phase = "checking";
-  else if (loc.mode !== "city" && loc.permission !== "granted") phase = loc.permission === "denied" && !loc.canAskAgain ? "blocked" : "permission";
-  else if (!loc.coords) phase = loc.loading ? "locating" : "locationError";
+  else if (loc.mode !== "city" && loc.permission !== "granted") phase = permissionStep(loc.permission, loc.canAskAgain) === "settings" ? "blocked" : "permission";
+  else if (!loc.coords) phase = loc.loading || !loc.issue ? "locating" : "locationError";
   else if (hasStations) phase = "ready";
   else if (nearby.loading) phase = "loading";
   else if (nearby.error) phase = "loadError";
@@ -131,16 +137,15 @@ export default function StationsTab() {
     <View style={s.centerCard} accessibilityLiveRegion="polite">
       <View style={s.centerIcon}><Ionicons name="map-outline" size={20} color={p.accent} /></View>
       <View style={s.statusCopy}><Text style={s.statusTitle}>{t.stationsAroundCity(loc.city[lang])}</Text><Text style={s.statusMeta}>{t.cityCenterDistanceNote}</Text></View>
-      {loc.permission === "granted" ? <AnimatedPressable onPress={loc.locate} contentStyle={s.centerAction} reduceMotion={reduce} accessibilityLabel={t.useDeviceLocation}><Ionicons name="locate-outline" size={18} color={p.accent} /><Text style={s.centerActionText}>{t.useDeviceLocation}</Text></AnimatedPressable> : null}
+      {loc.permission === "granted" ? <AnimatedPressable onPress={loc.locate} contentStyle={s.centerAction} reduceMotion={reduce} accessibilityLabel={t.updateMyLocation}><Ionicons name="locate-outline" size={18} color={p.accent} /><Text style={s.centerActionText}>{t.updateMyLocation}</Text></AnimatedPressable> : null}
     </View>
   ) : loc.mode === "lastKnown" && loc.coords ? (
-    <View style={s.centerCard}><Ionicons name="time-outline" size={20} color={p.accent} /><Text style={s.centerHint}>{t.recentPositionNote}</Text></View>
+    <View style={s.centerCard}><Ionicons name="time-outline" size={20} color={p.accent} /><Text style={s.centerHint}>{t.recentPositionNote}</Text><AnimatedPressable onPress={loc.locate} contentStyle={s.centerAction} reduceMotion={reduce} accessibilityLabel={t.updateMyLocation}><Text style={s.centerActionText}>{t.updateMyLocation}</Text></AnimatedPressable></View>
   ) : null;
 
   const statusLine =
     phase === "ready" ? (
       <>
-      {locationContext}
       {refreshFailed ? (
         <View style={s.statusCard} accessibilityLiveRegion="polite">
           <View style={s.statusIcon}>
@@ -150,7 +155,7 @@ export default function StationsTab() {
             <Text style={s.statusTitle}>{t.showingCached}</Text>
             <Text style={s.statusPrimary}>{t.stationsWithin(nearby.totalCount, km)}</Text>
             <Text style={s.statusMeta}>
-              {[stamp ? t.stationsSavedList(stamp) : null, nearby.fromBackup ? t.stationsBackupSource : null, nearby.error === "timeout" ? t.stationsTimeoutCached : t.refreshFailed]
+              {[stamp ? t.stationsSavedList(stamp) : null, nearby.error === "timeout" ? t.stationsTimeoutCached : t.refreshFailed]
                 .filter(Boolean)
                 .join(" · ")}
             </Text>
@@ -172,7 +177,7 @@ export default function StationsTab() {
         <View style={s.statusRow} accessibilityLiveRegion="polite">
           <View style={s.statusReadyIcon}><Ionicons name="checkmark" size={13} color={p.onAccent} /></View>
           <Text style={s.statusText}>
-            {[t.stationsWithin(nearby.totalCount, km), stamp ? t.stationsUpdatedAt(stamp) : null, nearby.fromBackup ? t.stationsBackupSource : null].filter(Boolean).join(" · ")}
+            {[t.stationsWithin(nearby.totalCount, km), stamp ? t.stationsUpdatedAt(stamp) : null].filter(Boolean).join(" · ")}
           </Text>
         </View>
       )}
@@ -225,18 +230,25 @@ export default function StationsTab() {
       </View>
     ) : null;
 
-  const showCities = ["permission", "blocked", "locationError", "locating", "loadError", "empty"].includes(phase) || loc.mode === "city";
+  const showCities = ["permission", "blocked", "locating", "locationError", "loadError", "empty"].includes(phase) || placePickerOpen;
   const cityPicker = showCities ? (
     <View style={s.cityCard}>
       <View style={s.cityHeading}><Ionicons name="map-outline" size={19} color={p.accent} /><Text style={s.cityTitle} accessibilityRole="header">{t.browseCityTitle}</Text></View>
       <Text style={s.cityHint}>{t.browseCityHint}</Text>
-      <View style={s.cityGrid}>{STATION_CITIES.map((city) => (
-        <AnimatedPressable key={city.id} onPress={() => loc.selectCity(city)} contentStyle={[s.cityChip, loc.city?.id === city.id ? s.cityChipActive : null]} reduceMotion={reduce} accessibilityLabel={city[lang]} accessibilityState={{ selected: loc.city?.id === city.id }}>
+      <View style={s.placeSearch}><Ionicons name="search-outline" size={18} color={p.inkSoft} /><TextInput value={placeQuery} onChangeText={setPlaceQuery} style={s.placeInput} placeholder={t.searchTownPlaceholder} placeholderTextColor={p.inkSoft} accessibilityLabel={t.searchTownPlaceholder} autoCorrect={false} returnKeyType="search" /></View>
+      {placeQuery.trim().length >= 2 ? (
+        <View style={s.placeResults}>
+          {placeResults.length ? placeResults.map((place) => <AnimatedPressable key={place.id} onPress={() => { loc.selectCity(place); setPlacePickerOpen(false); setPlaceQuery(""); Keyboard.dismiss(); }} contentStyle={s.placeResult} reduceMotion={reduce} accessibilityLabel={`${place[lang]}, ${place.region}`}><Ionicons name="location-outline" size={17} color={p.accent} /><View style={s.placeResultCopy}><Text style={s.placeResultName}>{place[lang]}</Text>{place.region ? <Text style={s.placeResultRegion}>{place.region}</Text> : null}</View><Ionicons name="arrow-forward" size={16} color={p.inkSoft} /></AnimatedPressable>) : <Text style={s.cityHint}>{t.noTownsFound}</Text>}
+        </View>
+      ) : <View style={s.cityGrid}>{STATION_CITIES.map((city) => (
+        <AnimatedPressable key={city.id} onPress={() => { loc.selectCity(city); setPlacePickerOpen(false); Keyboard.dismiss(); }} contentStyle={[s.cityChip, loc.city?.id === city.id ? s.cityChipActive : null]} reduceMotion={reduce} accessibilityLabel={city[lang]} accessibilityState={{ selected: loc.city?.id === city.id }}>
           <Text style={[s.cityChipText, loc.city?.id === city.id ? s.cityChipTextActive : null]}>{city[lang]}</Text>
         </AnimatedPressable>
-      ))}</View>
+      ))}</View>}
+      <Text style={s.placeAttribution} onPress={() => Linking.openURL(PLACE_SOURCE_URL).catch(() => {})} accessibilityRole="link">{t.placeSource(PLACE_SOURCE)}</Text>
     </View>
   ) : null;
+  const choosePlaceAction = loc.coords && !showCities ? <AnimatedPressable onPress={() => setPlacePickerOpen(true)} contentStyle={s.centerAction} reduceMotion={reduce} accessibilityLabel={t.chooseTown}><Ionicons name="map-outline" size={17} color={p.accent} /><Text style={s.centerActionText}>{t.chooseTown}</Text></AnimatedPressable> : null;
 
   const stage = (() => {
     switch (phase) {
@@ -245,7 +257,7 @@ export default function StationsTab() {
       case "locating":
         return <StationsState s={s} p={p} reduceMotion={reduce} icon="locate-outline" loading title={t.stationsNearbyGettingLocation} body={t.browseCityHint} />;
       case "loading":
-        return <StationsState s={s} p={p} reduceMotion={reduce} icon="map-outline" loading title={t.stationsLookingWithin(km)} body={t.stationsLookupHint} />;
+        return <StationsState s={s} p={p} reduceMotion={reduce} icon="map-outline" loading title={t.stationsLookingWithin(km)} body={nearby.source === "global" ? t.stationsGlobalLookupHint : t.stationsLookupHint} />;
       case "permission":
         return (
           <StationsState
@@ -358,7 +370,7 @@ export default function StationsTab() {
     phase === "ready" ? (
       <View style={s.note}>
         <Ionicons name="information-circle-outline" size={16} color={p.inkSoft} />
-        <Text style={s.noteText}>{t.stationsSourceNote}</Text>
+        <Text style={s.noteText}>{nearby.source === "global" ? t.stationsGlobalSourceNote : t.stationsSourceNote}</Text>
       </View>
     ) : null;
 
@@ -440,6 +452,8 @@ export default function StationsTab() {
           >
             <ScreenTitle theme={theme} title={t.stationsNearbyTitle} action={refreshAction} />
             {statusLine}
+            {locationContext}
+            {choosePlaceAction}
             {controls}
             {stage}
             {cityPicker}
@@ -458,6 +472,8 @@ export default function StationsTab() {
         <View style={layout.header}>
           <ScreenTitle theme={theme} title={t.stationsNearbyTitle} action={refreshAction} />
           {statusLine}
+          {locationContext}
+          {choosePlaceAction}
           {controls}
           {stage}
           {cityPicker}

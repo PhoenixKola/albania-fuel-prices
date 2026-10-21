@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { haversineKm } from "../utils/geo";
+import { stationEndpoint, stationFallbackUrl } from "../utils/stationEndpoint";
 
 export type Station = {
   id: string;
@@ -13,8 +14,7 @@ export type Station = {
   isOpenNow?: boolean | null;
 };
 
-const OVERPASS_URL = "https://fuel-proxy.fenixkola.workers.dev";
-const FETCH_TIMEOUT_MS = 12 * 1000;
+const FETCH_TIMEOUT_MS = 18 * 1000;
 
 function is24Hours(openingHours?: string) {
   if (!openingHours) return false;
@@ -44,16 +44,6 @@ type OverpassElement = {
   tags?: Record<string, string | number | boolean>;
 };
 
-async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    return await fetch(url, { ...init, signal: controller.signal });
-  } finally {
-    clearTimeout(t);
-  }
-}
-
 function stationSearchErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
   const name = error instanceof Error ? error.name : "";
@@ -81,9 +71,13 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const inFlightRef = useRef(false);
-  const lastKeyRef = useRef<string>("");
-  const lastFetchAtRef = useRef<number>(0);
+  const inFlightRef = useRef<{ key: string; controller: AbortController } | null>(null);
+  const requestIdRef = useRef(0);
+  const cancelRequest = useCallback(() => {
+    requestIdRef.current++;
+    inFlightRef.current?.controller.abort();
+    inFlightRef.current = null;
+  }, []);
 
   const key = useMemo(() => {
     if (lat == null || lon == null) return "";
@@ -94,32 +88,45 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
   const refresh = useCallback(async () => {
     if (!key) return;
-    if (inFlightRef.current) return;
+    if (inFlightRef.current?.key === key) return;
+    inFlightRef.current?.controller.abort();
 
-    const now = Date.now();
-    const sameKey = lastKeyRef.current === key;
-    if (sameKey && now - lastFetchAtRef.current < 30_000) return;
-
-    inFlightRef.current = true;
-    lastKeyRef.current = key;
-    lastFetchAtRef.current = now;
+    const controller = new AbortController();
+    const requestId = ++requestIdRef.current;
+    inFlightRef.current = { key, controller };
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
     setLoading(true);
     setError(null);
 
     try {
       const [slat, slon] = key.split(",").slice(0, 2).map(Number);
-      const url = `${OVERPASS_URL}?lat=${encodeURIComponent(slat)}&lon=${encodeURIComponent(slon)}&radiusM=${encodeURIComponent(radiusM)}`;
-
-      const r = await fetchWithTimeout(
-        url,
-        { method: "GET" },
-        FETCH_TIMEOUT_MS
-      );
-
-      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-      const json = await r.json();
-      const elements: OverpassElement[] = Array.isArray(json?.elements) ? json.elements : [];
+      const { url, source } = stationEndpoint(slat, slon, radiusM);
+      const backup = stationFallbackUrl(url, source);
+      let json: { elements?: OverpassElement[] } | null = null;
+      let lastError: unknown;
+      for (const candidate of backup ? [url, backup] : [url]) {
+        if (controller.signal.aborted) break;
+        const attempt = new AbortController();
+        const abortAttempt = () => attempt.abort();
+        controller.signal.addEventListener("abort", abortAttempt, { once: true });
+        const attemptTimeout = setTimeout(abortAttempt, backup ? 8_000 : 17_000);
+        try {
+          const response = await fetch(candidate, { method: "GET", signal: attempt.signal });
+          if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+          json = await response.json();
+          if (!Array.isArray(json?.elements)) throw new Error("Invalid station response");
+          break;
+        } catch (caught) {
+          lastError = caught;
+        } finally {
+          clearTimeout(attemptTimeout);
+          controller.signal.removeEventListener("abort", abortAttempt);
+        }
+      }
+      if (!json) throw lastError ?? new Error("Station search unavailable");
+      if (!Array.isArray(json?.elements)) throw new Error("Invalid station response");
+      const elements: OverpassElement[] = json.elements;
       // The parser is large; only fetch it after a location search returns opening-hour data.
       const hoursParser = elements.some((element) => typeof element.tags?.opening_hours === "string")
         ? (await import("opening_hours")).default : null;
@@ -156,21 +163,28 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
         .filter(Boolean) as Station[];
 
       parsed.sort((a, b) => a.distanceKm - b.distanceKm);
+      if (requestId !== requestIdRef.current) return;
       setStations(parsed);
     } catch (e) {
-      setError(stationSearchErrorMessage(e));
+      if (requestId === requestIdRef.current) setError(stationSearchErrorMessage(e));
     } finally {
-      inFlightRef.current = false;
-      setLoading(false);
+      clearTimeout(timeoutId);
+      if (requestId === requestIdRef.current) {
+        inFlightRef.current = null;
+        setLoading(false);
+      }
     }
   }, [key, radiusM]);
 
   useEffect(() => {
     if (!key) return;
+    setStations([]);
+    setError(null);
     refresh();
-  }, [key, refresh]);
+    return cancelRequest;
+  }, [key, refresh, cancelRequest]);
 
   // The view paginates eight results and renders only that page on the map.
   // Do not silently hide valid results beyond the first hundred.
-  return { stations, totalCount: stations.length, loading, error, refresh };
+  return { stations, totalCount: stations.length, loading, error, refresh, source: lat == null || lon == null ? "snapshot" as const : stationEndpoint(lat, lon, radiusM).source };
 }

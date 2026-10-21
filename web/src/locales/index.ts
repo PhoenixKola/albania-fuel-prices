@@ -99,6 +99,7 @@ export type TDict = {
   stationsHoursUnknown: string;
   stationsRefresh: string;
   stationsNone: string;
+  stationsSearchUnavailable: string;
   stationsShowing: (shown: number, total: number) => string;
   stationsShowMore: string;
   stationsShowAll: string;
@@ -218,6 +219,7 @@ export type TDict = {
 
   watchlistGuidance: string;
   nearbyGuidance: string;
+  nearbyGuidanceGlobal: string;
   rankingsGuidance: string;
 
   sourceUpdatedLabel: string;

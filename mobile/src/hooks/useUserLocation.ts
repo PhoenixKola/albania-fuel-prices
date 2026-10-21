@@ -1,35 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import * as Location from "expo-location";
-import type { StationCity } from "../data/stationCities";
+import type { StationPlace } from "../data/placeSearch";
 import { haversineKm } from "../utils/geo";
+import { LAST_KNOWN_MAX_ACCURACY_M, LAST_KNOWN_MAX_AGE_MS, shouldLocateOnFocus, type Coords } from "../utils/locationPolicy";
+import { acquireLocation } from "../utils/locationAcquisition";
 
-type Coords = { lat: number; lon: number };
 export type LocationPermission = "unknown" | "granted" | "denied";
 export type LocationIssue = "servicesOff" | "noFix" | null;
 const MIN_MOVE_KM = 0.1;
-const FIX_TIMEOUT_MS = 9000;
-const LAST_KNOWN_MAX_AGE_MS = 10 * 60 * 1000;
-const LAST_KNOWN_MAX_ACCURACY_M = 2500;
-
-function validPosition(pos: Location.LocationObject | null): Coords | null {
-  if (!pos) return null;
-  const { latitude: lat, longitude: lon } = pos.coords;
-  return Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null;
-}
-
-/** Native location calls can remain pending; a retry must always become usable. */
-async function withTimeout<T>(promise: Promise<T>, durationMs: number): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error("location-timeout")), durationMs); }),
-    ]);
-  } finally {
-    if (timer) clearTimeout(timer);
-  }
-}
 
 export function useUserLocation() {
   const [permission, setPermission] = useState<LocationPermission>("unknown");
@@ -37,7 +16,7 @@ export function useUserLocation() {
   const [checked, setChecked] = useState(false);
   const [coords, setCoords] = useState<Coords | null>(null);
   const [mode, setMode] = useState<"device" | "lastKnown" | "city">("device");
-  const [city, setCity] = useState<StationCity | null>(null);
+  const [city, setCity] = useState<StationPlace | null>(null);
   const [loading, setLoading] = useState(false);
   const [issue, setIssue] = useState<LocationIssue>(null);
 
@@ -45,10 +24,14 @@ export function useUserLocation() {
   const modeRef = useRef<"device" | "lastKnown" | "city">("device");
   const inFlight = useRef<Promise<boolean> | null>(null);
   const requestId = useRef(0);
+  const lastAttemptAt = useRef(0);
+  const activeRef = useRef(false);
+  const permissionRef = useRef<LocationPermission>("unknown");
 
   const applyPermission = useCallback((p: Location.LocationPermissionResponse) => {
     setCanAskAgain(p.canAskAgain !== false);
     const next: LocationPermission = p.status === "granted" ? "granted" : p.status === "denied" ? "denied" : "unknown";
+    permissionRef.current = next;
     setPermission(next);
     return next;
   }, []);
@@ -57,7 +40,7 @@ export function useUserLocation() {
     if (id !== requestId.current) return false;
     const prev = coordsRef.current;
     const changed = !prev || modeRef.current === "city" || haversineKm(prev, next) >= MIN_MOVE_KM;
-    coordsRef.current = next;
+    if (changed) coordsRef.current = next;
     modeRef.current = nextMode;
     setMode(nextMode);
     setCity(null);
@@ -70,27 +53,24 @@ export function useUserLocation() {
   const locate = useCallback(() => {
     if (inFlight.current) return inFlight.current;
     const id = ++requestId.current;
+    lastAttemptAt.current = Date.now();
+    const startedAt = Date.now();
     const run = (async () => {
       setLoading(true);
       setIssue(null);
       try {
-        const servicesOn = await withTimeout(Location.hasServicesEnabledAsync(), 2500);
-        if (id !== requestId.current) return false;
-        if (!servicesOn) { setIssue("servicesOff"); return false; }
-        try {
-          const current = validPosition(await withTimeout(Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }), FIX_TIMEOUT_MS));
-          if (current) return applyCoords(current, "device", id);
-        } catch {
-          // A recent, accurate enough device fix can still answer a nearby search.
-        }
-        const last = await withTimeout(Location.getLastKnownPositionAsync({
-          maxAge: LAST_KNOWN_MAX_AGE_MS, requiredAccuracy: LAST_KNOWN_MAX_ACCURACY_M,
-        }), 2500).catch(() => null);
-        if (id !== requestId.current) return false;
-        const fallback = validPosition(last);
-        if (fallback) return applyCoords(fallback, "lastKnown", id);
-        setIssue("noFix");
-        return false;
+        const outcome = await acquireLocation({
+          servicesEnabled: Location.hasServicesEnabledAsync,
+          recent: () => Location.getLastKnownPositionAsync({ maxAge: LAST_KNOWN_MAX_AGE_MS, requiredAccuracy: LAST_KNOWN_MAX_ACCURACY_M }),
+          fresh: () => Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+        }, (next, source) => {
+          const changed = applyCoords(next, source, id);
+          if (source === "lastKnown" && id === requestId.current) setLoading(false);
+          return changed;
+        }, () => id === requestId.current, () => !!coordsRef.current);
+        if (__DEV__ && !outcome.cancelled) console.info("[stations]", { phase: "location", status: outcome.issue ?? "ready", source: modeRef.current, durationMs: Date.now() - startedAt });
+        if (id === requestId.current) setIssue(outcome.issue);
+        return outcome.changed;
       } catch {
         if (id === requestId.current) setIssue("noFix");
         return false;
@@ -102,7 +82,7 @@ export function useUserLocation() {
     return run;
   }, [applyCoords]);
 
-  const selectCity = useCallback((selected: StationCity) => {
+  const selectCity = useCallback((selected: StationPlace) => {
     requestId.current++;
     inFlight.current = null;
     const next = { lat: selected.lat, lon: selected.lon };
@@ -120,8 +100,14 @@ export function useUserLocation() {
     try {
       const p = await Location.requestForegroundPermissionsAsync();
       if (applyPermission(p) === "granted" && id === requestId.current) await locate();
-    } catch { setIssue("noFix"); }
+    } catch { if (id === requestId.current) setIssue("noFix"); }
   }, [applyPermission, locate]);
+
+  const activate = useCallback(() => {
+    activeRef.current = true;
+    if (shouldLocateOnFocus(true, permissionRef.current, modeRef.current, !!coordsRef.current, lastAttemptAt.current)) void locate();
+  }, [locate]);
+  const deactivate = useCallback(() => { activeRef.current = false; }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -130,7 +116,9 @@ export function useUserLocation() {
         const p = await Location.getForegroundPermissionsAsync();
         if (cancelled) return;
         const next = applyPermission(p);
-        if (next === "granted" && !coordsRef.current) await locate();
+        if (shouldLocateOnFocus(activeRef.current, next, modeRef.current, !!coordsRef.current, lastAttemptAt.current)) {
+          void locate();
+        }
         else if (next !== "granted" && modeRef.current !== "city" && coordsRef.current) {
           coordsRef.current = null;
           setCoords(null);
@@ -146,5 +134,5 @@ export function useUserLocation() {
     return () => { cancelled = true; requestId.current++; inFlight.current = null; sub.remove(); };
   }, [applyPermission, locate]);
 
-  return { permission, canAskAgain, checked, coords, mode, city, loading, issue, request, locate, selectCity };
+  return { permission, canAskAgain, checked, coords, mode, city, loading, issue, request, locate, selectCity, activate, deactivate };
 }

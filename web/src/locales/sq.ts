@@ -96,6 +96,7 @@ export const sq = {
   stationsHoursUnknown: "Orari i panjohur",
   stationsRefresh: "Rifresko",
   stationsNone: "S’u gjetën pika karburanti afër.",
+  stationsSearchUnavailable: "Kërkimi i pikave nuk disponohet. Rifresko për ta provuar sërish.",
   stationsShowing: (shown: number, total: number) => `Po shfaqen ${shown} nga ${total}`,
   stationsShowMore: "Shfaq më shumë",
   stationsShowAll: "Shfaq të gjitha",
@@ -232,7 +233,9 @@ export const sq = {
   watchlistGuidance:
     "Përdor listën e të preferuarave për të mbajtur një grup të vogël krahasimi me vendet që të interesojnë më shumë. Është e dobishme për krahasime të shpejta, por vlerat duhen parë si orientim i përgjithshëm i çmimit.",
   nearbyGuidance:
-    "Pikat afër janë opsionale dhe shërbejnë si shtresë praktike lokale mbi krahasimin sipas vendeve. Disponueshmëria e pikave dhe të dhënat e orareve mund të jenë të paplota ose të ndryshme nga ajo që shfaqet në pompë.",
+    "Vendndodhjet e pikave në Shqipëri vijnë nga një regjistër OpenStreetMap i datës 20 tetor 2026. Mbulimi dhe oraret mund të jenë të paplota; këto nuk janë çmime aktuale në pompë.",
+  nearbyGuidanceGlobal:
+    "Jashtë Shqipërisë, pikat kërkohen përmes një shërbimi publik OpenStreetMap. Mbulimi dhe oraret mund të jenë të paplota; këto nuk janë çmime aktuale në pompë.",
   rankingsGuidance:
     "Renditjet tregojnë nivelet relative të çmimeve të karburantit mes vendeve për llojin e zgjedhur të karburantit. Janë të dobishme për të dalluar shpejt ndryshimet e tregut, por çmimet lokale të pikave mund të ndryshojnë.",
 

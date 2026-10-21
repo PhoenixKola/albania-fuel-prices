@@ -48,7 +48,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
     setPage((p) => Math.min(p, Math.max(0, pageCount - 1)));
   }, [pageCount]);
 
-  const radiusDisabled = !loc.coords || nearby.loading;
+  const radiusDisabled = !loc.coords;
 
   const onChangeRadius = (v: number) => {
     if (radiusDisabled) return;
@@ -70,7 +70,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
             <div className="nearbyTitleWrap">
               <h1 className="nearbyTitle">{t.stationsNearbyTitle}</h1>
               <div className="nearbySub">
-                {loc.coords ? t.stationsFound(nearby.totalCount) : t.stationsUseMyLocation}
+                {loc.coords ? nearby.error && !nearby.totalCount ? t.stationsSearchUnavailable : nearby.loading && !nearby.totalCount ? t.refreshing : t.stationsFound(nearby.totalCount) : t.stationsUseMyLocation}
               </div>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
         </div>
 
         <p className="tinyNote" style={{ marginTop: 10, lineHeight: 1.7 }}>
-          {t.nearbyGuidance}
+          {nearby.source === "global" ? t.nearbyGuidanceGlobal : t.nearbyGuidance}
         </p>
 
         <div className="nearbyStats">
@@ -106,7 +106,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
 
           <div className="nearbyStat">
             <div className="nearbyStatLabel">{t.stationsNearbyTitle}</div>
-            <div className="nearbyStatValue">{nearby.totalCount}</div>
+            <div className="nearbyStatValue">{nearby.error && !nearby.totalCount ? "—" : nearby.totalCount}</div>
           </div>
 
           <div className="nearbyStat">
@@ -189,8 +189,8 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
           </div>
         )}
 
-        {loc.error ? <div className="alert nearbyAlert">{loc.error}</div> : null}
-        {nearby.error ? <div className="alert nearbyAlert">{nearby.error}</div> : null}
+        {loc.error ? <div className="alert nearbyAlert" role="alert">{loc.error}</div> : null}
+        {nearby.error ? <div className="alert nearbyAlert" role="alert">{nearby.error}</div> : null}
 
         {loc.coords ? (
           <div className="nearbyMapListGrid">
@@ -211,7 +211,7 @@ export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
                 </div>
               ) : null}
 
-              {nearby.stations.length === 0 && !nearby.loading ? (
+              {nearby.stations.length === 0 && !nearby.loading && !nearby.error ? (
                 <div className="mutedBox">{t.stationsNone}</div>
               ) : null}
 

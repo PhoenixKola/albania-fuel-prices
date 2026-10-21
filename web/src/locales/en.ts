@@ -96,6 +96,7 @@ export const en = {
   stationsHoursUnknown: "Hours unknown",
   stationsRefresh: "Refresh",
   stationsNone: "No stations found nearby.",
+  stationsSearchUnavailable: "Station search unavailable. Refresh to retry.",
   stationsShowing: (shown: number, total: number) => `Showing ${shown} of ${total}`,
   stationsShowMore: "Show more",
   stationsShowAll: "Show all",
@@ -232,7 +233,9 @@ export const en = {
   watchlistGuidance:
     "Use the watchlist to keep a small comparison set of countries you care about most. This is helpful for quick side-by-side checks, but the values should still be read as general price guidance rather than a station-by-station guarantee.",
   nearbyGuidance:
-    "Nearby stations are optional and meant as a local convenience layer on top of the country comparison. Station availability and opening-hour data may be incomplete or vary from what is shown at the pump.",
+    "Albania station locations come from an OpenStreetMap snapshot dated 20 October 2026. Coverage and listed hours may be incomplete; this is not live pump-price data.",
+  nearbyGuidanceGlobal:
+    "Outside Albania, stations are searched through a public OpenStreetMap service. Availability and listed hours may be incomplete; this is not live pump-price data.",
   rankingsGuidance:
     "Rankings show relative fuel price levels across countries for the selected fuel type. They are useful for spotting market differences quickly, but local station prices can still vary.",
 

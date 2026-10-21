@@ -18,8 +18,9 @@ export default function StationsPage({ t, lang, radiusM, setRadiusM }: Props) {
         <section className="contentSection">
           <h2 className="contentHeading">{sq ? "Çfarë tregon harta" : "What the map shows"}</h2>
           <p className="contentBody">{sq
-            ? "Me lejen tuaj për vendndodhjen, mjeti kërkon pika karburanti të shënuara në OpenStreetMap brenda rrezes së zgjedhur. Distancat janë afërsisht në vijë të drejtë, jo itinerare drejtimi. Orari shfaqet vetëm kur është listuar dhe mund të jetë i vjetruar."
-            : "With your location permission, the tool looks for fuel stations mapped in OpenStreetMap within your chosen radius. Distances are approximate straight-line distances, not driving routes. Opening hours appear only when listed and may be outdated."}</p>
+            ? "Me lejen tuaj për vendndodhjen, mjeti kërkon në regjistrin OpenStreetMap për Shqipërinë të datës 20 tetor 2026, ose në një shërbim publik botëror jashtë Shqipërisë. Mbulimi mund të jetë i paplotë. Distancat janë në vijë të drejtë, jo itinerare; oraret mund të jenë të vjetruara."
+            : "With your location permission, this tool searches an Albania OpenStreetMap station snapshot dated 20 October 2026, or a public global service outside Albania. Coverage may be incomplete. Distances are straight-line measurements, not driving routes; listed hours may be outdated."}</p>
+          <p className="contentBody">{sq ? "Të dhënat e hartës: © kontribuesit e OpenStreetMap (ODbL)." : "Map data: © OpenStreetMap contributors (ODbL)."} <a className="inlineLink" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></p>
           <p className="contentBody">{sq
             ? "Kjo faqe nuk shfaq çmime aktuale në pompa të veçanta. Vlerat në faqen kryesore dhe në renditje janë referenca kombëtare të datuara. Konfirmoni çmimin dhe orarin te pika përpara një devijimi të posaçëm."
             : "This page does not show current prices at individual pumps. Home and ranking values are dated country-level references. Confirm the station's price and hours before making a special detour."}</p>
@@ -27,8 +28,8 @@ export default function StationsPage({ t, lang, radiusM, setRadiusM }: Props) {
         <section className="contentSection">
           <h2 className="contentHeading">{sq ? "Vendndodhja dhe privatësia" : "Location and privacy"}</h2>
           <p className="contentBody">{sq
-            ? "Kur zgjidhni kërkimin pranë, shfletuesi dërgon koordinatat te shërbimi ynë i kërkimit të pikave. Ky shërbim mund të pyesë OpenStreetMap/Overpass për vendndodhje të hartuara. Nuk e përdorim vendndodhjen për reklama apo për të ndërtuar një historik vendndodhjesh. Mund të refuzoni lejen dhe të përdorni pjesën tjetër të faqes."
-            : "When you choose a nearby search, your browser sends coordinates to our station lookup service. That service may query OpenStreetMap/Overpass for mapped locations. We do not use your location for advertising or to build a location history. You can decline permission and still use the rest of the site."}</p>
+            ? "Kur zgjidhni kërkimin pranë, shfletuesi dërgon koordinatat te shërbimi ynë për Shqipërinë ose te një shërbim publik Overpass jashtë saj. Nuk e përdorim vendndodhjen për reklama apo për të ndërtuar historik lëvizjesh."
+            : "When you choose a nearby search, your browser sends coordinates to our station service for Albania or a public Overpass service elsewhere. We do not use your location for advertising or to build a movement history."}</p>
         </section>
         <section className="contentSection">
           <h2 className="contentHeading">{sq ? "Planifikoni me kontekst" : "Plan with context"}</h2>

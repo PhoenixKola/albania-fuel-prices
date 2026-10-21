@@ -18,7 +18,7 @@ If you grant permission, your device coordinates are sent securely to our statio
 
 `fuel-proxy.fenixkola.workers.dev`
 
-If that service cannot respond, nearby searches of up to 10 km may send the requested coordinates directly to the public OpenStreetMap / Overpass API as a backup. You can also choose an Albanian city centre without granting device-location permission; in that case the city-centre coordinates, not your phone's location, are used. Station results and the chosen search centre may be cached locally on your device.
+For searches in Albania, the service searches a stored OpenStreetMap station snapshot dated 2026-10-20 and does not need a live Overpass request. For searches outside Albania, the app or website sends the selected search coordinates to a public global OpenStreetMap/Overpass service. In the Android app, you can also choose an Albanian town or place without granting device-location permission. Its approximate centre, rather than your phone's location, is then searched. Place names and coordinates are bundled from GeoNames (CC BY 4.0), so place search works offline. Station results and the chosen search centre may be cached locally on your device.
 
 Your location is used only to provide nearby station results. We do not use your location to create a user profile, track your movements, or personalize advertising.
 
@@ -44,7 +44,7 @@ This information is stored locally on your device and can be removed by clearing
 
 The App fetches fuel price information from publicly available online data sources. The App may display the source of this information inside the interface.
 
-The nearby stations feature uses external mapping and geographic data services to retrieve fuel stations around the location you request.
+The nearby stations feature uses our stored OpenStreetMap extract for Albania. Searches outside Albania use a public global OpenStreetMap/Overpass service. The Android Albania place picker uses a bundled GeoNames extract and does not contact a live geocoding service.
 
 ## Advertising
 
@@ -75,10 +75,11 @@ We do not sell your personal data.
 Information may be processed by service providers when necessary to operate App features, including:
 
 - Hosting and station lookup services
-- Mapping and geographic data services
+- OpenStreetMap and GeoNames as sources of geographic data
+- A public Overpass provider for station searches outside Albania
 - Advertising providers
 
-When you use the nearby stations feature, the location coordinates needed for the request may be transmitted to these services in order to return nearby station results.
+When you use nearby stations, the selected search coordinates are sent to our station lookup service for Albania or to a public Overpass provider for searches outside Albania. The Albanian place picker itself makes no geocoding request.
 
 ## Data retention
 
