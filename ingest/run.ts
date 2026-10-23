@@ -4,6 +4,7 @@ import { pathToFileURL } from "url";
 import * as cheerio from "cheerio";
 import { buildTrends } from "./trends";
 import { parseDateFromText, validSourceDate } from "./sourceDate";
+import { canonicalEurope, classifyEurope, hasNewerKosovoReading, type PriceChange } from "./decision";
 
 const SOURCES = [
   {
@@ -64,6 +65,7 @@ function toNum(v: string) {
 async function fetchHtml(url: string) {
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (compatible; albania-fuel-prices/1.0)" },
+    signal: AbortSignal.timeout(15_000),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
   return await res.text();
@@ -71,6 +73,13 @@ async function fetchHtml(url: string) {
 
 function ensureDir(p: string) {
   fs.mkdirSync(p, { recursive: true });
+}
+
+function report(status: string, lines: string[], changes: PriceChange[] = []) {
+  const body = [`## Fuel ingest: ${status}`, ...lines].join("\n");
+  console.log(body);
+  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${body}\n`);
+  if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `status=${status}\nconflict_count=${changes.length}\nconflict_sample=${JSON.stringify(changes.slice(0, 12))}\n`);
 }
 
 function normalizeCountry(s: string) {
@@ -175,8 +184,9 @@ async function fetchKosovoPrices(): Promise<CountryPrices | null> {
 
 export function parseCargopediaEurope(html: string) {
   const $ = cheerio.load(html);
-  const pageText = $("body").text().replace(/\s+/g, " ").trim();
-  const as_of = parseDateFromText(pageText);
+  const headings = $("h1,h2,h3,h4,h5,h6").toArray().map((el) => $(el).text().replace(/\s+/g, " ").trim()).filter(Boolean);
+  const dates = headings.map((text) => parseDateFromText(text)).filter((date): date is string => !!date);
+  const as_of = [...new Set(dates)].length === 1 ? dates[0] : null;
   if (!as_of) throw new Error("Cargopedia publication date is missing or invalid");
 
   const rows: string[] = [];
@@ -212,8 +222,9 @@ export function parseCargopediaEurope(html: string) {
 
 export function parseTollsEurope(html: string) {
   const $ = cheerio.load(html);
-  const pageText = $("body").text().replace(/\s+/g, " ").trim();
-  const as_of = parseDateFromText(pageText);
+  const headings = $("h1,h2,h3,h4,h5,h6").toArray().map((el) => $(el).text().replace(/\s+/g, " ").trim()).filter(Boolean);
+  const dates = headings.map((text) => parseDateFromText(text)).filter((date): date is string => !!date);
+  const as_of = [...new Set(dates)].length === 1 ? dates[0] : null;
   if (!as_of) throw new Error("Tolls publication date is missing or invalid");
 
   const rows: string[] = [];
@@ -256,15 +267,16 @@ async function main() {
       const html = await fetchHtml(s.url);
       const parsed = s.parser(html);
       picked = { source: s.name, url: s.url, as_of: parsed.as_of, countries: parsed.countries };
+      console.log(`Parsed ${s.name}: publication ${parsed.as_of}, ${parsed.countries.length} rows.`);
       break;
-    } catch {}
+    } catch (error) {
+      console.warn(`${s.name} unavailable or invalid: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   if (!picked) throw new Error("All sources failed (cargopedia.net and tolls.eu).");
-  if (picked.countries.filter((country) => country.gasoline95_eur != null || country.diesel_eur != null).length < 20 ||
-      !picked.countries.some((country) => sameCountry(country.country, "Albania"))) {
-    throw new Error("Source table lacks sufficient valid European prices; keeping the previous public snapshot.");
-  }
+  if (!validSourceDate(picked.as_of)) throw new Error("Source publication date is invalid or unverifiable.");
+  canonicalEurope(picked.countries);
 
   const outDir = path.join(process.cwd(), "..", "data");
   ensureDir(outDir);
@@ -278,25 +290,33 @@ async function main() {
     // Fail hard on a corrupt history file: silently starting from an empty
     // series would permanently discard months of accumulated price data.
     const parsed = JSON.parse(fs.readFileSync(historyPath, "utf8"));
-    if (!parsed || !Array.isArray(parsed.series)) {
+    if (!parsed || parsed.region !== "Europe" || parsed.unit !== "EUR_per_liter" || !Array.isArray(parsed.series) || !parsed.series.length ||
+        parsed.series.some((point: HistoryEurope["series"][number]) => !validSourceDate(point.as_of) || !Array.isArray(point.countries))) {
       throw new Error("data/history.json exists but has no valid series — refusing to overwrite it.");
     }
+    for (const point of parsed.series as HistoryEurope["series"]) canonicalEurope(point.countries);
     history = { region: "Europe", unit: "EUR_per_liter", series: parsed.series };
   }
 
   if (fs.existsSync(latestPath)) {
     const previous = JSON.parse(fs.readFileSync(latestPath, "utf8")) as LatestEurope;
-    if (validSourceDate(previous.as_of) && picked.as_of < previous.as_of) {
-      throw new Error(`Source date ${picked.as_of} predates published snapshot ${previous.as_of}; keeping the previous data.`);
+    if (previous.region !== "Europe" || previous.unit !== "EUR_per_liter" || !validSourceDate(previous.as_of)) throw new Error("Stored latest snapshot is invalid; refusing to overwrite it.");
+    const decision = classifyEurope(previous, picked);
+    if (decision.status === "SOURCE_DATE_CONFLICT") {
+      const changedCountries = new Set(decision.changes.map((change) => change.country)).size;
+      const sample = decision.changes.slice(0, 12).map((change) => `- ${change.country} ${change.fuel}: ${change.previous} → ${change.incoming}`).join("\n");
+      console.warn(`::warning::SOURCE_DATE_CONFLICT: ${picked.source} changed ${decision.changes.length} fuel values without advancing publication ${picked.as_of}. Accepted data preserved.`);
+      report("SOURCE_DATE_CONFLICT", [`Source: ${picked.source} (${picked.url})`, `Source publication: ${picked.as_of}; accepted publication: ${previous.as_of}`, `Changed: ${changedCountries} countries, ${decision.changes.length} fuel values. No data files written or deployed.`, "Sample:", sample], decision.changes);
+      return;
     }
-    if (picked.as_of === previous.as_of) {
-      const mainCountries = previous.countries.filter((country) => !sameCountry(country.country, "Kosovo"));
-      const sourceCountries = picked.countries.filter((country) => !sameCountry(country.country, "Kosovo"));
-      if (JSON.stringify(mainCountries) === JSON.stringify(sourceCountries)) {
-        console.log(`Source publication ${picked.as_of} is unchanged; no new observation written.`);
-        return;
-      }
-      throw new Error(`Source values changed without a newer publication date (${picked.as_of}); manual review required.`);
+    if (decision.status === "UNCHANGED") {
+      const kosovoLive = await fetchKosovoPrices();
+      const previousKosovo = previous.countries.find((country) => sameCountry(country.country, "Kosovo"));
+      if (hasNewerKosovoReading(previousKosovo, kosovoLive)) {
+        fs.writeFileSync(latestPath, JSON.stringify({ ...previous, countries: upsertCountry(previous.countries, kosovoLive) }, null, 2), "utf8");
+        report("UPDATED_KOSOVO", [`Europe publication remains ${previous.as_of}; Kosovo has an independently dated reading from ${kosovoLive.source_as_of}.`, "Updated latest.json only; no European history or trend point invented."]);
+      } else report("UNCHANGED", [`Source publication ${picked.as_of} and normalized Europe values are unchanged.`, "No data files written; last accepted fetch time preserved."]);
+      return;
     }
   }
 
@@ -332,8 +352,6 @@ async function main() {
     countries,
   };
 
-  fs.writeFileSync(latestPath, JSON.stringify(latest, null, 2), "utf8");
-
   history.series = history.series.filter((x) => x.as_of !== latest.as_of);
   history.series.push({
     as_of: latest.as_of,
@@ -343,18 +361,19 @@ async function main() {
   });
   history.series.sort((a, b) => a.as_of.localeCompare(b.as_of));
 
-  fs.writeFileSync(historyPath, JSON.stringify(history, null, 2), "utf8");
-
   const trendsPath = path.join(outDir, "trends.json");
-  fs.writeFileSync(trendsPath, JSON.stringify(buildTrends(history)), "utf8");
+  const trends = buildTrends(history);
+  // Finish validation and derivation before touching any accepted file.
+  fs.writeFileSync(latestPath, JSON.stringify(latest, null, 2), "utf8");
+  fs.writeFileSync(historyPath, JSON.stringify(history, null, 2), "utf8");
+  fs.writeFileSync(trendsPath, JSON.stringify(trends), "utf8");
 
-  console.log("Wrote data/latest.json, data/history.json and data/trends.json");
-  console.log("As of:", latest.as_of, "Source:", latest.source);
-  console.log("Countries:", latest.countries.length);
+  report("UPDATED", [`Accepted ${latest.source} publication ${latest.as_of}; wrote latest, history and trends.`, `Countries: ${latest.countries.length}`]);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   main().catch((e) => {
+    if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Fuel ingest: FAILED\n${e instanceof Error ? e.message : String(e)}\n`);
     console.error(e);
     process.exit(1);
   });

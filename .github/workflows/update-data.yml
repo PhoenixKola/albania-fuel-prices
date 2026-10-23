@@ -5,12 +5,12 @@ on:
     - cron: "15 6 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
     steps:
@@ -27,8 +27,42 @@ jobs:
         run: npm ci
 
       - name: Run ingest
+        id: ingest
         working-directory: ingest
         run: npm run run
+
+      - name: Reconcile publication-date review issue
+        if: steps.ingest.outputs.status == 'SOURCE_DATE_CONFLICT' || steps.ingest.outputs.status == 'UPDATED'
+        uses: actions/github-script@v7
+        env:
+          INGEST_STATUS: ${{ steps.ingest.outputs.status }}
+          CONFLICT_COUNT: ${{ steps.ingest.outputs.conflict_count }}
+          CONFLICT_SAMPLE: ${{ steps.ingest.outputs.conflict_sample }}
+        with:
+          script: |
+            const title = 'Fuel source publication-date discrepancy';
+            const { owner, repo } = context.repo;
+            try {
+              const issues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'open', per_page: 100 });
+              const existing = issues.find(item => !item.pull_request && item.title === title);
+              if (process.env.INGEST_STATUS === 'SOURCE_DATE_CONFLICT' && !existing) {
+                const sample = JSON.parse(process.env.CONFLICT_SAMPLE || '[]');
+                const body = [
+                  'The primary European fuel source changed values without advancing its publication date. Accepted data was preserved; no new Europe reading was published.',
+                  `Changed fuel values: ${process.env.CONFLICT_COUNT}.`,
+                  '', 'Sample (EUR/L):',
+                  ...sample.map(row => `- ${row.country} ${row.fuel}: ${row.previous} → ${row.incoming}`),
+                  '', `Review the [ingest run](${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}) and the source publication label before manually resolving this issue.`,
+                ].join('\n');
+                await github.rest.issues.create({ owner, repo, title, body });
+              }
+              if (process.env.INGEST_STATUS === 'UPDATED' && existing) {
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed', state_reason: 'completed' });
+              }
+            } catch (error) {
+              core.warning(`Could not reconcile fuel source review issue: ${error.message}`);
+              await core.summary.addRaw('Issue notification unavailable; review the SOURCE_DATE_CONFLICT summary above.').write();
+            }
 
       - name: Commit changes (if any)
         id: commit
@@ -44,7 +78,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-  # Rebuild and redeploy so the prerendered HTML carries today's prices.
+  # Rebuild only when accepted data actually changes.
   # This must be an explicit call: the push above uses GITHUB_TOKEN, and pushes
   # made with that token deliberately do not trigger other workflows.
   deploy:

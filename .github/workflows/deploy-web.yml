@@ -77,11 +77,18 @@ jobs:
           set -euo pipefail
           REPO_AS_OF=$(python3 -c "import json;print(json.load(open('data/latest.json'))['as_of'])")
           BUILT_AS_OF=$(grep -o '<meta name="data-as-of" content="[^"]*"' web/dist/index.html | sed 's/.*content="//; s/"//')
+          BUILT_SHA=$(grep -o '<meta name="build-sha" content="[^"]*"' web/dist/index.html | sed 's/.*content="//; s/"//')
+          CHECKOUT_SHA=$(git rev-parse HEAD)
           echo "repo data as_of : $REPO_AS_OF"
           echo "built HTML as_of: $BUILT_AS_OF"
+          echo "built commit SHA: $BUILT_SHA"
           echo "pages           : $(find web/dist -name '*.html' | wc -l)"
           if [ "$REPO_AS_OF" != "$BUILT_AS_OF" ]; then
             echo "::error::Built HTML carries $BUILT_AS_OF but the repo has $REPO_AS_OF. Refusing to deploy a stale build."
+            exit 1
+          fi
+          if [ "$BUILT_SHA" != "$CHECKOUT_SHA" ]; then
+            echo "::error::Built HTML commit marker does not match the deployed checkout."
             exit 1
           fi
 

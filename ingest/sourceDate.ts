@@ -7,7 +7,10 @@ export function validSourceDate(value: string, now = new Date()): boolean {
 }
 
 export function parseDateFromText(text: string, now = new Date()): string | null {
-  const match = text.match(/\b(\d{1,2})\.?\s+([A-Za-z]+)\s+(\d{4})\b/);
+  // Callers pass only the source's publication heading. A date in a footer,
+  // article or retrieval timestamp is not evidence of fuel-price publication.
+  const label = text.replace(/\s+/g, " ").trim();
+  const match = label.match(/^(?:(?:european\s+)?(?:average\s+)?(?:fuel\s+)?prices(?:\s+of\s+1\s+litre\s+of\s+fuel\s+in\s+europe)?(?:\s+as\s+of)?\s+)?(\d{1,2})\.?\s+([A-Za-z]+)\s+(\d{4})$/i);
   if (!match) return null;
   const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
   const month = months.indexOf(match[2].toLowerCase()) + 1;

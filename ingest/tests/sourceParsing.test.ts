@@ -11,6 +11,7 @@ const rows = Array.from({ length: 22 }, (_, index) =>
 test("publication date parser accepts the actual undotted source label but never the fetch day", () => {
   assert.equal(parseDateFromText("European fuel prices 12 October 2026", now), "2026-10-12");
   assert.equal(parseDateFromText("Prices 12. October 2026", now), "2026-10-12");
+  assert.equal(parseDateFromText("Average prices of 1 litre of fuel in Europe as of 12. October 2026", now), "2026-10-12");
   assert.equal(parseDateFromText("Fuel prices", now), null);
   assert.equal(parseDateFromText("12 Foober 2026", now), null);
   assert.equal(parseDateFromText("21 October 2026", now), null);
@@ -21,14 +22,15 @@ test("publication date parser accepts the actual undotted source label but never
 test("Europe parser fails closed without a valid source date", () => {
   assert.throws(() => parseCargopediaEurope(`<html><body>Fuel prices<table>${rows}</table></body></html>`), /publication date/);
   assert.throws(() => parseCargopediaEurope(`<html><body>21 October 2026<table>${rows}</table></body></html>`), /publication date/);
-  const parsed = parseCargopediaEurope(`<html><body><p>12 October 2026</p> <table>${rows}</table></body></html>`);
+  assert.throws(() => parseCargopediaEurope(`<html><body><table>${rows}</table><footer>12 October 2026</footer></body></html>`), /publication date/);
+  const parsed = parseCargopediaEurope(`<html><body><h6>12 October 2026</h6> <table>${rows}</table></body></html>`);
   assert.equal(parsed.as_of, "2026-10-12");
   assert.equal(parsed.countries.find((row) => row.country === "Albania")?.lpg_eur, null);
 });
 
 test("source rows reject conflicting duplicates and invalid prices without inventing values", () => {
   const row = "<tr><td>Albania</td> <td>2.143</td> <td>2.394</td> <td>-</td></tr>";
-  const page = (table: string) => `<html><body><p>12 October 2026</p> <table>${table}</table></body></html>`;
+  const page = (table: string) => `<html><body><h6>12 October 2026</h6> <table>${table}</table></body></html>`;
   assert.equal(parseCargopediaEurope(page(row + row)).countries.length, 1);
   assert.throws(() => parseCargopediaEurope(page(row + row.replace("2.394", "2.500"))), /Conflicting source rows/);
   const partial = parseCargopediaEurope(page("<tr><td>Albania</td> <td>15.000</td> <td>2,394</td> <td>-</td></tr>"));

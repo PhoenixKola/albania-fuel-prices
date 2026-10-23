@@ -16,6 +16,7 @@ import { buildRoadRealityPrerenderRoutes } from "./roadRealityPrerender";
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
@@ -42,6 +43,7 @@ import {
   type PriceContext,
 } from "./priceData";
 
+const BUILD_SHA = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "../dist");
 const SITE_URL = "https://karburantisot.com";
@@ -950,6 +952,7 @@ function generateHead(route: RouteEntry, description: string, ctx: PriceContext)
     <link rel="canonical" href="${canonical}" />
     <meta name="data-as-of" content="${ANALYSIS_META.asOf}" />
     <meta name="build-date" content="${new Date().toISOString().slice(0, 10)}" />
+    <meta name="build-sha" content="${BUILD_SHA}" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Fuel Today" />
     <meta property="og:title" content="${escapeHtml(route.title)}" />
