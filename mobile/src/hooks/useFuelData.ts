@@ -1,3 +1,4 @@
+import { validFuelPayload } from "../utils/validateFuel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { LatestEurope } from "../types/fuel";
@@ -14,7 +15,7 @@ function safeParseEnvelope(raw: string | null): CacheEnvelope | null {
     const j = JSON.parse(raw);
     if (!j || typeof j !== "object") return null;
     if (typeof (j as any).savedAtUtc !== "string") return null;
-    if (!(j as any).data || typeof (j as any).data !== "object") return null;
+    if (!validFuelPayload(j.data)) return null;
     return j as CacheEnvelope;
   } catch {
     return null;
@@ -79,7 +80,8 @@ export function useFuelData(opts: { url: string; country: string; setCountry: (c
 
         const r = await fetch(url, { cache: "no-store" });
         if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        const json: LatestEurope = await r.json();
+        const json: unknown = await r.json();
+        if (!validFuelPayload(json)) throw new Error("Invalid fuel data; retained last valid reading");
 
         if (prev) setPrevData(prev);
 

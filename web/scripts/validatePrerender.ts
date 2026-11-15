@@ -24,6 +24,13 @@ const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g,
 for (const route of required) {
   const path = route === "/" ? resolve(dist, "index.html") : resolve(dist, `${route.slice(1)}.html`);
   const html = readFileSync(path, "utf8");
+  if (route === "/fuel-prices/albania" || route === "/fuel-prices/kosovo") {
+    const market = data.countries.find(row => row.country.toLowerCase() === route.split("/").at(-1))!;
+    for (const value of [market.gasoline95_eur, market.diesel_eur]) if (value != null) assert.ok(html.includes(value.toFixed(3)), `${route}: accepted price`);
+    const date = market.source_as_of ?? (market.provenance ? market.last_observed_at : data.as_of);
+    if (date) assert.ok(html.includes(date), `${route}: market date`);
+    for (const target of ["/compare", "/trip-cost-calculator", "/fuel-detour-calculator"]) assert.ok(html.includes(`href="${target}"`), `${route}: crawlable ${target}`);
+  }
   const head = html.match(/<head>([\s\S]*?)<\/head>/)?.[1] ?? "";
   const count = (pattern: RegExp) => [...head.matchAll(pattern)].length;
   assert.equal(count(/<title>/g), 1, `${route}: title`);

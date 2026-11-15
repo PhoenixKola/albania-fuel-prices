@@ -62,9 +62,8 @@ export function getWeeklyDeltaEur(trends: Trends | null, country: string, fuelTy
   let refIdx = -1;
   for (let i = lastIdx - 1; i >= 0; i--) {
     if (typeof series[i] !== "number") continue;
-    refIdx = i;
     const ageDays = (lastDate.getTime() - new Date(trends.dates[i]).getTime()) / 86400000;
-    if (ageDays >= 7) break;
+    if (ageDays >= 7 && ageDays <= 14) { refIdx = i; break; }
   }
   if (refIdx < 0) return null;
 

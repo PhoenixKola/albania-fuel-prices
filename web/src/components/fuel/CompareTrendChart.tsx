@@ -61,7 +61,7 @@ export default function CompareTrendChart({ trends, countries, fuelType }: Props
     <div className="compareTrendPanel">
       <div className="compareTrendHeader">
         <div>
-          <div className="compareTrendTitle">30-day comparison</div>
+          <div className="compareTrendTitle">Recorded comparison</div>
           <div className="compareTrendSub">Your saved countries on the same price scale</div>
         </div>
         <div className="compareTrendRange">

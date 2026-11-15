@@ -4,7 +4,7 @@ import { pathToFileURL } from "url";
 import * as cheerio from "cheerio";
 import { buildTrends } from "./trends";
 import { parseDateFromText, validSourceDate } from "./sourceDate";
-import { canonicalEurope, classifyEurope, hasNewerKosovoReading, type PriceChange } from "./decision";
+import { canonicalEurope, classifyEurope, selectSource, hasNewerKosovoReading, type PriceChange } from "./decision";
 
 const SOURCES = [
   {
@@ -47,6 +47,7 @@ type LatestEurope = {
 type HistoryEurope = {
   region: "Europe";
   unit: "EUR_per_liter";
+  market_observations?: Array<{ as_of: string; source: string; countries: CountryPrices[] }>;
   series: Array<{
     as_of: string;
     source: string;
@@ -111,7 +112,7 @@ export function upsertCountry(countries: CountryPrices[], country: CountryPrices
 }
 
 export function getLastCountryFromHistory(history: HistoryEurope, countryName: string): CountryPrices | null {
-  const newestFirst = [...history.series].sort((a, b) => b.as_of.localeCompare(a.as_of));
+  const newestFirst = [...history.series, ...(history.market_observations ?? [])].sort((a, b) => b.as_of.localeCompare(a.as_of));
 
   for (const point of newestFirst) {
     const found = point.countries.find((country) => sameCountry(country.country, countryName));
@@ -258,25 +259,14 @@ export function parseTollsEurope(html: string) {
 }
 
 async function main() {
-  let picked:
-    | { source: string; url: string; as_of: string; countries: CountryPrices[] }
-    | null = null;
-
-  for (const s of SOURCES) {
-    try {
-      const html = await fetchHtml(s.url);
-      const parsed = s.parser(html);
-      picked = { source: s.name, url: s.url, as_of: parsed.as_of, countries: parsed.countries };
-      console.log(`Parsed ${s.name}: publication ${parsed.as_of}, ${parsed.countries.length} rows.`);
-      break;
-    } catch (error) {
-      console.warn(`${s.name} unavailable or invalid: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-
-  if (!picked) throw new Error("All sources failed (cargopedia.net and tolls.eu).");
-  if (!validSourceDate(picked.as_of)) throw new Error("Source publication date is invalid or unverifiable.");
-  canonicalEurope(picked.countries);
+  const acceptedPath = path.join(process.cwd(), "..", "data", "latest.json");
+  const previousAccepted = fs.existsSync(acceptedPath) ? JSON.parse(fs.readFileSync(acceptedPath,"utf8")) : undefined;
+  if (previousAccepted) { canonicalEurope(previousAccepted.countries); if (!validSourceDate(previousAccepted.as_of)) throw new Error("Corrupt accepted publication"); }
+  const picked = await selectSource(SOURCES.map(s => ({ name: s.name, load: async () => {
+    const parsed = s.parser(await fetchHtml(s.url));
+    console.log(`Parsed ${s.name}: publication ${parsed.as_of}, ${parsed.countries.length} rows`);
+    return { source: s.name, url: s.url, ...parsed };
+  } })), previousAccepted);
 
   const outDir = path.join(process.cwd(), "..", "data");
   ensureDir(outDir);
@@ -295,7 +285,8 @@ async function main() {
       throw new Error("data/history.json exists but has no valid series — refusing to overwrite it.");
     }
     for (const point of parsed.series as HistoryEurope["series"]) canonicalEurope(point.countries);
-    history = { region: "Europe", unit: "EUR_per_liter", series: parsed.series };
+    if (parsed.market_observations !== undefined && (!Array.isArray(parsed.market_observations) || parsed.market_observations.some((p: HistoryEurope["series"][number]) => !validSourceDate(p.as_of) || !Array.isArray(p.countries) || p.countries.some(c => c.country !== "Kosovo" || !validSourceDate(c.source_as_of ?? ""))))) throw new Error("Corrupt independently dated market history");
+    history = { region: "Europe", unit: "EUR_per_liter", series: parsed.series, ...(parsed.market_observations ? { market_observations: parsed.market_observations } : {}) };
   }
 
   if (fs.existsSync(latestPath)) {
@@ -313,14 +304,20 @@ async function main() {
       const kosovoLive = await fetchKosovoPrices();
       const previousKosovo = previous.countries.find((country) => sameCountry(country.country, "Kosovo"));
       if (hasNewerKosovoReading(previousKosovo, kosovoLive)) {
+        history.market_observations = [...(history.market_observations ?? []).filter(p => p.as_of !== kosovoLive.source_as_of), { as_of: kosovoLive.source_as_of!, source: kosovoLive.source!, countries: [kosovoLive] }];
+        const trends = buildTrends(history);
         fs.writeFileSync(latestPath, JSON.stringify({ ...previous, countries: upsertCountry(previous.countries, kosovoLive) }, null, 2), "utf8");
-        report("UPDATED_KOSOVO", [`Europe publication remains ${previous.as_of}; Kosovo has an independently dated reading from ${kosovoLive.source_as_of}.`, "Updated latest.json only; no European history or trend point invented."]);
+        fs.writeFileSync(historyPath, JSON.stringify(history, null, 2), "utf8");
+        fs.writeFileSync(path.join(outDir, "trends.json"), JSON.stringify(trends), "utf8");
+        report("UPDATED_KOSOVO", [`Europe publication remains ${previous.as_of}; Kosovo has an independently dated reading from ${kosovoLive.source_as_of}.`, "Updated independent Kosovo history and trends; European publication unchanged."]);
       } else report("UNCHANGED", [`Source publication ${picked.as_of} and normalized Europe values are unchanged.`, "No data files written; last accepted fetch time preserved."]);
       return;
     }
   }
 
-  const kosovoLive = await fetchKosovoPrices();
+  const fetchedKosovo = await fetchKosovoPrices();
+  const acceptedKosovo = previousAccepted?.countries.find((row: CountryPrices) => row.country === "Kosovo") as CountryPrices | undefined;
+  const kosovoLive = fetchedKosovo && (!acceptedKosovo?.source_as_of || fetchedKosovo.source_as_of! > acceptedKosovo.source_as_of) ? fetchedKosovo : acceptedKosovo?.source_as_of ? acceptedKosovo : fetchedKosovo;
   const kosovoFallback = kosovoLive ? null : getLastCountryFromHistory(history, "Kosovo");
   const kosovo = kosovoLive ?? kosovoFallback;
   const europeanCountries = kosovo ? upsertCountry(picked.countries, kosovo) : upsertCountry(picked.countries, {
@@ -357,8 +354,9 @@ async function main() {
     as_of: latest.as_of,
     source: latest.source,
     // A historical Kosovo fallback is not a new Kosovo observation.
-    countries: latest.countries.filter((country) => country.provenance !== "historical-fallback"),
+    countries: latest.countries.filter((country) => country.country !== "Kosovo" && country.provenance !== "historical-fallback"),
   });
+  if (kosovoLive?.source_as_of) history.market_observations = [...(history.market_observations ?? []).filter(p => p.as_of !== kosovoLive.source_as_of), { as_of: kosovoLive.source_as_of, source: kosovoLive.source!, countries: [kosovoLive] }];
   history.series.sort((a, b) => a.as_of.localeCompare(b.as_of));
 
   const trendsPath = path.join(outDir, "trends.json");

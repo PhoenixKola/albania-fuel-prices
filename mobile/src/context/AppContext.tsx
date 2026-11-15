@@ -178,7 +178,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const loc = useUserLocation();
-  const nearby = useNearbyStations({ center: loc.coords, radiusM });
+  const nearby = useNearbyStations({ center: loc.coords, radiusM, knownAlbanianPlace: loc.mode === "city" });
 
   const t = i18n[lang];
 

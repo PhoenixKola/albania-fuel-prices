@@ -128,3 +128,9 @@ test("cache distinguishes current, stale and different centre/radius", () => {
   assert.equal(readStationCache(raw, { lat: 42.3, lon: 19.5 }, 5000, false, now), null);
   assert.equal(readStationCache(raw, center, 2000, false, now), null);
 });
+
+test("Novosej known Albanian selection uses snapshot beyond coarse boundary", async () => {
+ let url="";
+ const result=await requestStations({lat:41.98278,lon:20.58806},5000,new AbortController().signal,async(input)=>{url=String(input);return {ok:true,json:async()=>({elements:[]})} as Response;},true);
+ assert.equal(result.source,"snapshot");assert.match(url,/workers\.dev/);
+});

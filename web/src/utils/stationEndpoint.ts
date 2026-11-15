@@ -13,8 +13,8 @@ export function inAlbaniaSnapshotArea(lat: number, lon: number) {
   return inside;
 }
 
-export function stationEndpoint(lat: number, lon: number, radiusM: number): { url: string; source: StationSource } {
-  const snapshot = inAlbaniaSnapshotArea(lat, lon);
+export function stationEndpoint(lat: number, lon: number, radiusM: number, knownAlbanianPlace = false): { url: string; source: StationSource } {
+  const snapshot = knownAlbanianPlace || inAlbaniaSnapshotArea(lat, lon);
   return snapshot
     ? { source: "snapshot", url: `https://fuel-proxy.fenixkola.workers.dev?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&radiusM=${encodeURIComponent(radiusM)}` }
     : { source: "global", url: `https://overpass.private.coffee/api/interpreter?data=${encodeURIComponent(`[out:json][timeout:15];(node["amenity"="fuel"](around:${radiusM},${lat},${lon});way["amenity"="fuel"](around:${radiusM},${lat},${lon}););out center;`)}` };

@@ -51,8 +51,9 @@ function thirtyDayDelta(trends: Trends | null, country: string, fuel: FuelType) 
   const values = series.map((value, index) => ({ value, index })).filter((point): point is { value: number; index: number } => typeof point.value === "number" && Number.isFinite(point.value));
   if (values.length < 2) return null;
   const latest = values[values.length - 1];
-  const targetIndex = Math.max(0, latest.index - 30);
-  const earlier = [...values].reverse().find((point) => point.index <= targetIndex) ?? values[0];
+  const target = Date.parse(trends!.dates[latest.index]) - 30 * 86400000;
+  const earlier = [...values].reverse().find(point => Date.parse(trends!.dates[point.index]) <= target);
+  if (!earlier || target - Date.parse(trends!.dates[earlier.index]) > 7 * 86400000) return null;
   return latest.value - earlier.value;
 }
 
@@ -96,13 +97,11 @@ export default function CountryFuelPricesPage({
     .sort((a, b) => a.price - b.price) ?? [];
   const average = markets.length ? markets.reduce((total, item) => total + item.price, 0) / markets.length : null;
   const rank = selectedPrice == null ? null : markets.filter((item) => item.price < selectedPrice).length + 1;
-  const delta30 = thirtyDayDelta(trends, countryName, fuelType);
+  const delta30 = selectedPrice != null && getTrendSeries(trends, countryName, fuelType)?.filter(v => v != null).at(-1) === selectedPrice ? thirtyDayDelta(trends, countryName, fuelType) : null;
   const localCurrency = getCurrencyForCountry(countryName);
   const localValue = hasRate(localCurrency, fxRates) ? convertEur(selectedPrice, localCurrency, fxRates) : null;
   const userValue = currency === "local" && localValue != null ? formatMoney(localValue, localCurrency) : formatMoney(selectedPrice, "EUR");
-  const updated = row?.provenance === "date-unverified" || row?.provenance === "historical-fallback"
-    ? (lang === "sq" ? "datë e paverifikuar" : "date unverified")
-    : data?.as_of ?? (lang === "sq" ? "datë e panjohur" : "date unknown");
+  const updated = row?.source_as_of ?? (row?.provenance ? (row.last_observed_at ? `${lang === "sq" ? "Vëzhguar" : "Observed"} ${row.last_observed_at}` : (lang === "sq" ? "E paverifikuar" : "Unverified")) : data?.as_of ?? "Unavailable");
   const sourceStale = ANALYSIS_META.stale || !data?.as_of || row?.provenance === "date-unverified" || row?.provenance === "historical-fallback";
   const analysisHtml = getCountryAnalysis(slug);
   const decisionCopy = lang === "sq" ? {
@@ -255,6 +254,7 @@ export default function CountryFuelPricesPage({
       </EditorialSection>
 
       <EditorialSection id="country-explore" title={c.explore} tone="accent">
+        <p className="contentBody"><Link to="/fuel-detour-calculator">{lang === "sq" ? "Krahaso devijimin për furnizim" : "Compare a refuelling detour"}</Link>{" \u00b7 "}<Link to="/stations">{lang === "sq" ? "Gjej stacione" : "Find listed stations"}</Link></p>
         <div className="editorialHeroActions"><Link className="editorialAction editorialActionPrimary" to="/" onClick={() => setCountry(countryName)}>{c.dashboardCta}</Link><Link className="editorialAction" to="/rankings">{c.rankingsCta}</Link><Link className="editorialAction" to="/compare">{c.compareCta}</Link></div>
       </EditorialSection>
     </EditorialShell>

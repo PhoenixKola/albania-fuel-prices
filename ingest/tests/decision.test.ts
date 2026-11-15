@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { classifyEurope, compareEurope, hasNewerKosovoReading, type PriceRow } from "../decision";
+import { classifyEurope, selectSource, compareEurope, hasNewerKosovoReading, type PriceRow } from "../decision";
 
 const now = new Date("2026-10-23T12:00:00Z");
 const rows: PriceRow[] = Array.from({ length: 22 }, (_, index) => ({ country: index === 0 ? "Albania" : `Market ${index}`, gasoline95_eur: 2.143, diesel_eur: 2.394, lpg_eur: null }));
@@ -34,4 +34,14 @@ test("a separately dated Kosovo reading can advance without changing Europe's pu
   assert.equal(hasNewerKosovoReading(old, { source_as_of: "2026-10-24" }, now), false);
   assert.equal(hasNewerKosovoReading(old, null, now), false);
   assert.equal(classifyEurope(previous, { as_of: previous.as_of, countries: rows }, now).status, "UNCHANGED");
+});
+
+test("provider selection validates primary before fallback and preserves conflict gate", async () => {
+ const backup={as_of:"2026-11-09",countries:rows};
+ assert.equal(await selectSource([{name:"invalid primary",load:async()=>({...backup,countries:[]})},{name:"backup",load:async()=>backup}],previous),backup);
+ assert.equal(await selectSource([{name:"old primary",load:async()=>({...backup,as_of:"2026-10-01"})},{name:"backup",load:async()=>backup}],previous),backup);
+ const changed={as_of:previous.as_of,countries:rows.map(r=>({...r,diesel_eur:2.5}))};
+ const selected=await selectSource([{name:"same date",load:async()=>changed}],previous);
+ assert.equal(classifyEurope(previous,selected).status,"SOURCE_DATE_CONFLICT");
+ await assert.rejects(()=>selectSource([{name:"unknown date",load:async()=>({...backup,as_of:"?"})}],previous));
 });

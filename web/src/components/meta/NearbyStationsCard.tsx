@@ -26,7 +26,7 @@ type Props = {
 
 export default function NearbyStationsCard({ t, radiusM, setRadiusM }: Props) {
   const loc = useUserLocationWeb();
-  const nearby = useNearbyStationsWeb(loc.coords, radiusM);
+  const nearby = useNearbyStationsWeb(loc.coords, radiusM, !!loc.place);
 
   const radiusItems = useMemo(
     () => [

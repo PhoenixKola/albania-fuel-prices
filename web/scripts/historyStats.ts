@@ -99,7 +99,7 @@ export function loadHistory(): HistoryContext {
   let series: HistoryEntry[];
   try {
     const raw = JSON.parse(readFileSync(resolve(DATA_DIR, "history.json"), "utf-8"));
-    series = raw?.series;
+    series = [...(raw?.series ?? []), ...(raw?.market_observations ?? [])];
     if (!Array.isArray(series) || series.length < 30) {
       console.warn("⚠ historyStats: history.json too short for analysis — skipping.");
       return empty;
@@ -109,6 +109,7 @@ export function loadHistory(): HistoryContext {
     return empty;
   }
 
+  const latest = JSON.parse(readFileSync(resolve(DATA_DIR, "latest.json"), "utf-8"));
   const sorted = [...series].sort((a, b) => a.as_of.localeCompare(b.as_of));
   const names = new Set<string>();
   for (const entry of sorted) {
@@ -127,6 +128,14 @@ export function loadHistory(): HistoryContext {
           points.push({ date: entry.as_of, value: v });
         }
       }
+      const accepted = latest.countries.find((row: { country: string }) => row.country === name);
+      const acceptedDate = accepted?.source_as_of ?? (name === "Kosovo" ? accepted?.last_observed_at : latest.as_of);
+      if (!accepted || !acceptedDate) continue;
+      const bounded = points.filter(p => p.date < acceptedDate);
+      const currentValue = accepted[FIELD[fuel]];
+      if (typeof currentValue !== "number") continue;
+      bounded.push({ date: acceptedDate, value: currentValue });
+      points.splice(0, points.length, ...bounded);
       // Need a meaningful window before claiming anything statistical.
       if (points.length >= 30) {
         const s = computeFuelStats(fuel, points);
@@ -172,9 +181,10 @@ function computeFuelStats(fuel: FuelKey, points: Point[]): FuelStats | null {
   const percentile = Math.round((cheaper / values.length) * 100);
 
   const back = (days: number): number | null => {
-    const idx = values.length - 1 - days;
-    if (idx < 0) return null;
-    const past = values[idx];
+    const target = Date.parse(points[points.length - 1].date) - days * 86400000;
+    const point = points.slice().reverse().find(p => Date.parse(p.date) <= target);
+    if (!point || target - Date.parse(point.date) > 7 * 86400000) return null;
+    const past = point.value;
     return past > 0 ? ((current - past) / past) * 100 : null;
   };
 

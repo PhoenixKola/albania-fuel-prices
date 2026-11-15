@@ -101,7 +101,7 @@ export default function TrendCard({ t, trends, country, fuelType, setFuelType }:
       <div className="body">
         <div className="trendStatsRow">
           <div className="trendStat">
-            <span className="trendStatLabel">{t.trendCurrent}</span>
+            <span className="trendStatLabel">{`Through ${chart.lastDate}`}</span>
             <span className="trendStatValue">{chart.last.toFixed(3)} EUR/L</span>
           </div>
           <div className="trendStat">

@@ -157,12 +157,16 @@ function fmtAll(valueEur: number | null, allPerEur: number | null): string {
 }
 
 /** 30-day change from the first to the last non-null point of a series. */
-function seriesChange(series: (number | null)[] | undefined): { from: number; to: number; pct: number } | null {
+function seriesChange(series: (number | null)[] | undefined, dates: string[], accepted: number | null | undefined): { from: number; to: number; pct: number } | null {
   if (!series) return null;
-  const values = series.filter((v): v is number => v != null);
-  if (values.length < 2) return null;
-  const from = values[0];
-  const to = values[values.length - 1];
+  const points = series.map((value,i) => ({ value, date: dates[i] })).filter((p): p is { value: number; date: string } => typeof p.value === "number" && !!p.date);
+  const last = points.at(-1);
+  if (!last || last.value !== accepted) return null;
+  const target = Date.parse(last.date) - 30 * 86400000;
+  const earlier = points.slice().reverse().find(p => Date.parse(p.date) <= target);
+  if (!earlier || target - Date.parse(earlier.date) > 7 * 86400000) return null;
+  const from = earlier.value;
+  const to = last.value;
   if (from === 0) return null;
   return { from, to, pct: ((to - from) / from) * 100 };
 }
@@ -202,7 +206,7 @@ export function renderCountryPriceSection(
   const prices = ctx.prices.get(country.dataCountryName);
   const market = ctx.latest?.countries.find((row) => row.country === country.dataCountryName);
   const marketDate = market?.provenance === "historical-fallback" || market?.provenance === "date-unverified"
-    ? market.source_as_of ?? "date unverified"
+    ? market.source_as_of ?? (market.last_observed_at ? `observed ${market.last_observed_at}` : "unverified")
     : market?.source_as_of ?? ctx.asOfLabel;
 
   if (!prices) {
@@ -217,7 +221,7 @@ export function renderCountryPriceSection(
   const trend = ctx.trends[country.dataCountryName];
 
   const rows = FUEL_ROWS.map((fuel) => {
-    const change = seriesChange(trend?.[fuel.trendKey]);
+    const change = seriesChange(trend?.[fuel.trendKey], ctx.trendDates, prices[fuel.key]);
     const allCell = showAll ? `<td>${fmtAll(prices[fuel.key], ctx.allPerEur)}</td>` : "";
     return `
             <tr>
@@ -242,6 +246,7 @@ export function renderCountryPriceSection(
             </tbody>
           </table>
           <p class="contentBody">${renderTrendSentence(ctx, country)}</p>
+          <p class="contentBody">Plan with the <a href="/trip-cost-calculator">trip fuel budget</a>, <a href="/fuel-detour-calculator">compare a refuelling detour</a>, or <a href="/stations">find listed stations</a>.</p>
           <p class="contentBodyMuted">Country-level reference reading; source date ${esc(marketDate)}, from ${esc(market?.source ?? (market?.provenance ? "previous collected value; market source unverified" : ctx.source))}${showAll ? ". ALL values are indicative conversions at a mid-market exchange rate" : ""}. Individual station prices vary — see <a href="/methodology">our methodology</a>.</p>
         </section>`;
 }
@@ -256,8 +261,8 @@ export function renderTrendSentence(
 
   const parts: string[] = [];
   for (const fuel of FUEL_ROWS) {
-    const change = seriesChange(trend[fuel.trendKey]);
-    if (!change) continue;
+    const change = seriesChange(trend[fuel.trendKey], ctx.trendDates, ctx.prices.get(country.dataCountryName)?.[fuel.key]);
+    if (!change || change.to !== ctx.prices.get(country.dataCountryName)?.[fuel.trendKey === "gasoline95" ? "petrol" : fuel.trendKey]) continue;
     if (Math.abs(change.pct) < 0.05) {
       parts.push(`${fuel.shortName} held steady at ${fmtEur(change.to)}`);
     } else {
@@ -268,7 +273,7 @@ export function renderTrendSentence(
     }
   }
   if (!parts.length) return "";
-  return `Over the past 30 days in ${esc(country.label)}, ${parts.join(", ")} per liter.`;
+  return `Over the 30-day comparison ending ${esc(ctx.trendDates.at(-1) ?? "")} in ${esc(country.label)}, ${parts.join(", ")} per liter.`;
 }
 
 /** Homepage snapshot: all 10 covered countries, sorted cheapest petrol first. */

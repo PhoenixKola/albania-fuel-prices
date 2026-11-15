@@ -13,3 +13,8 @@ test("Albanian locations use the snapshot; nearby foreign and German GPS use glo
   const albanian = stationEndpoint(41.3275, 19.8187, 5000);
   assert.equal(stationFallbackUrl(albanian.url, albanian.source), null);
 });
+
+test("known Albanian places bypass coarse boundary, international GPS remains global", () => {
+ assert.equal(stationEndpoint(41.98278, 20.58806, 5000, true).source, "snapshot");
+ assert.equal(stationEndpoint(52.52, 13.405, 5000).source, "global");
+});

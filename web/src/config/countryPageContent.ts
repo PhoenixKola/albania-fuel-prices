@@ -33,7 +33,7 @@ export function countryPageContent(editorial: CountryEditorial, data: LatestEuro
   const sourceLabel = row?.source ?? (row?.provenance === "date-unverified" || row?.provenance === "historical-fallback"
     ? (lang === "sq" ? "vlerë e ruajtur më parë; burimi i këtij tregu i paverifikuar" : "previously collected value; market source unverified")
     : data?.source ?? (lang === "sq" ? "burimi nuk disponohet" : "source unavailable"));
-  const dateLabel = marketDate ?? (lang === "sq" ? "datë e paverifikuar" : "date unverified");
+  const dateLabel = marketDate ?? (isValidSourceDate(row?.last_observed_at) ? `${lang === "sq" ? "Vezhguar" : "Observed"} ${row.last_observed_at}; ${lang === "sq" ? "publikimi i paverifikuar" : "publication date unverified"}` : (lang === "sq" ? "E paverifikuar" : "Unverified"));
   const baseline = name === "Albania" ? "Greece" : "Albania";
   const comparison = (fuel: FuelType, a = name, b = baseline) => comparisonSentence(compareCountries(data, a, b, fuel), a, b, fuel, lang);
   const borderAdvice = name === "Albania"

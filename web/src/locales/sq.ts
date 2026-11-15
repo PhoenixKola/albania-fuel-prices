@@ -52,7 +52,7 @@ export const sq = {
   rankingsGlobalTitle: "Përtej Europës",
   rankingsGlobalNote: "Vlerësime referencë për tregjet globale",
 
-  trendTitle: "Ecuria e çmimit në 30 ditë",
+  trendTitle: "Ecuria e regjistruar e karburantit",
   trendCurrent: "Aktual",
   trendLow: "Më i ulëti (30 ditë)",
   trendHigh: "Më i larti (30 ditë)",

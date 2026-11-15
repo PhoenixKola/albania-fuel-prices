@@ -22,8 +22,9 @@ export async function requestStations(
   radiusM: number,
   signal: AbortSignal,
   fetcher: typeof fetch = fetch,
+  knownAlbanianPlace = false,
 ): Promise<{ json: unknown; source: StationSource }> {
-  const snapshot = inAlbaniaSnapshotArea(center);
+  const snapshot = knownAlbanianPlace || inAlbaniaSnapshotArea(center);
   const source: StationSource = snapshot ? "snapshot" : "global";
   const url = snapshot
     ? `${OVERPASS_URL}?lat=${encodeURIComponent(center.lat)}&lon=${encodeURIComponent(center.lon)}&radiusM=${encodeURIComponent(radiusM)}`

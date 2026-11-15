@@ -44,7 +44,8 @@ function withFreshHours(stations: Station[]): Station[] {
   }));
 }
 
-export function useNearbyStations(opts: { center: { lat: number; lon: number } | null; radiusM?: number }) {
+export function useNearbyStations(opts: { center: { lat: number; lon: number } | null; radiusM?: number; knownAlbanianPlace?: boolean }) {
+  const knownAlbanianPlace = !!opts.knownAlbanianPlace;
   const radiusM = opts.radiusM ?? 5000;
   const centerLat = opts.center?.lat ?? null;
   const centerLon = opts.center?.lon ?? null;
@@ -59,13 +60,13 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
   const abortRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
   const resultKeyRef = useRef("");
-  const key = centerLat === null || centerLon === null ? "" : `${centerLat.toFixed(4)},${centerLon.toFixed(4)},${radiusM}`;
+  const key = centerLat === null || centerLon === null ? "" : `${centerLat.toFixed(4)},${centerLon.toFixed(4)},${radiusM},${knownAlbanianPlace}`;
 
   // strict=true enforces the TTL; strict=false accepts any age for the same centre and radius.
   const loadCache = useCallback(async (strict: boolean, requestId: number) => {
     if (centerLat === null || centerLon === null) return null;
     const env = readStationCache(await AsyncStorage.getItem(STORAGE_STATIONS_CACHE_KEY).catch(() => null), { lat: centerLat, lon: centerLon }, radiusM, strict);
-    if (!env || requestId !== requestIdRef.current) return null;
+    if (!env || requestId !== requestIdRef.current || (knownAlbanianPlace && env.source !== "snapshot")) return null;
 
     setStations(withFreshHours(env.stations));
     setFromCache(true);
@@ -73,7 +74,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     setCacheSavedAtUtc(env.savedAtUtc);
     resultKeyRef.current = key;
     return env;
-  }, [centerLat, centerLon, radiusM, key]);
+  }, [centerLat, centerLon, radiusM, key, knownAlbanianPlace]);
 
   const refresh = useCallback(async () => {
     if (centerLat === null || centerLon === null) return;
@@ -90,7 +91,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
     try {
-      const { json, source: fetchedSource } = await requestStations({ lat: centerLat, lon: centerLon }, radiusM, controller.signal);
+      const { json, source: fetchedSource } = await requestStations({ lat: centerLat, lon: centerLon }, radiusM, controller.signal, fetch, knownAlbanianPlace);
       if (requestId !== requestIdRef.current) return;
       const parsed = parseStationSnapshot(json, { lat: centerLat, lon: centerLon });
 
@@ -122,7 +123,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
       clearTimeout(timeoutId);
       if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, [centerLat, centerLon, radiusM, loadCache, key]);
+  }, [centerLat, centerLon, radiusM, loadCache, key, knownAlbanianPlace]);
 
   useEffect(() => {
     const requestId = ++requestIdRef.current;
@@ -132,7 +133,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
       setFromCache(false);
       setCacheSavedAtUtc(null);
       setError(null);
-      if (centerLat !== null && centerLon !== null) setSource(inAlbaniaSnapshotArea({ lat: centerLat, lon: centerLon }) ? "snapshot" : "global");
+      if (centerLat !== null && centerLon !== null) setSource((knownAlbanianPlace || inAlbaniaSnapshotArea({ lat: centerLat, lon: centerLon })) ? "snapshot" : "global");
     }
     (async () => {
       await loadCache(true, requestId);
@@ -145,7 +146,7 @@ export function useNearbyStations(opts: { center: { lat: number; lon: number } |
       abortRef.current = null;
       controller?.abort();
     };
-  }, [centerLat, centerLon, radiusM, loadCache, refresh, key]);
+  }, [centerLat, centerLon, radiusM, loadCache, refresh, key, knownAlbanianPlace]);
 
   const recheckHours = useCallback(() => {
     setStations((prev) => (prev.length ? withFreshHours(prev) : prev));

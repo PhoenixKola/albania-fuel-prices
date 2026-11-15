@@ -52,7 +52,7 @@ export const en = {
   rankingsGlobalTitle: "Beyond Europe",
   rankingsGlobalNote: "Reference estimates for global markets",
 
-  trendTitle: "30-day price trend",
+  trendTitle: "Recorded price trend",
   trendCurrent: "Current",
   trendLow: "30-day low",
   trendHigh: "30-day high",

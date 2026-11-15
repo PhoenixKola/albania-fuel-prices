@@ -2,7 +2,7 @@
   "expo": {
     "name": "Karburanti Sot",
     "slug": "karburanti-sot",
-    "version": "1.4.3",
+    "version": "1.4.4",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",

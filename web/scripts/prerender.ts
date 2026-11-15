@@ -901,7 +901,7 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
       graph.push({
         "@type": "Dataset",
         name: `Fuel reference prices in ${editorial.label}`,
-        description: `Country-level petrol (gasoline 95), diesel, and LPG reference prices in ${editorial.label}, in EUR per liter. Source date ${marketDate ?? "unverified"}; source publication schedules vary.`,
+        description: `Country-level petrol (gasoline 95), diesel, and LPG reference prices in ${editorial.label}, in EUR per liter. ${marketRow?.provenance && marketRow.last_observed_at ? `Last observed ${marketRow.last_observed_at}; publication date unverified` : `Source date ${marketDate ?? "unverified"}`}; source publication schedules vary.`,
         url: canonical,
         dateModified: marketDate ?? undefined,
         isBasedOn: marketRow?.source_url ?? (marketRow?.provenance ? undefined : ctx.sourceUrl || undefined),

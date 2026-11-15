@@ -1,3 +1,5 @@
+import { evaluatePriceAlerts, type PriceAlertRule } from "./evaluateAlerts";
+export { evaluatePriceAlerts, type PriceAlertRule } from "./evaluateAlerts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as BackgroundTask from "expo-background-task";
 import * as Notifications from "expo-notifications";
@@ -8,17 +10,8 @@ import { DATA_URL } from "../constants/urls";
 import { STORAGE_LANG_KEY, STORAGE_PRICE_ALERTS_KEY } from "../constants/storage";
 import { i18n, type Lang, type TDict } from "../i18n";
 import type { FuelType, LatestEurope } from "../types/fuel";
-import { fuelLabel, getFuelPrice } from "../utils/fuel";
+import { fuelLabel } from "../utils/fuel";
 
-export type PriceAlertRule = {
-  id: string;
-  country: string;
-  fuelType: FuelType;
-  direction: "below" | "above";
-  targetEur: number;
-  createdAtUtc: string;
-  lastTriggeredKey?: string;
-};
 
 export const PRICE_ALERT_TASK = "karburanti-price-alert-check-v1";
 const ALERT_CHANNEL_ID = "fuel-price-alerts";
@@ -58,30 +51,6 @@ export function parsePriceAlertRules(raw: string | null): PriceAlertRule[] {
   }
 }
 
-export function evaluatePriceAlerts(data: LatestEurope, rules: PriceAlertRule[], now = new Date()) {
-  const publishedAt = new Date(`${data.as_of}T00:00:00Z`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data.as_of) || !Number.isFinite(publishedAt.getTime()) ||
-      publishedAt.toISOString().slice(0, 10) !== data.as_of || publishedAt.getTime() > now.getTime() ||
-      now.getTime() - publishedAt.getTime() > 3 * 86_400_000) {
-    return { next: rules, triggered: [] as PriceAlertRule[] };
-  }
-  const byCountry = new Map(data.countries.map((row) => [row.country, row]));
-  const triggered: PriceAlertRule[] = [];
-  const next = rules.map((rule) => {
-    const market = byCountry.get(rule.country);
-    if (!market || market.provenance === "historical-fallback" || market.provenance === "date-unverified" ||
-        (market.source_as_of && market.source_as_of !== data.as_of)) return rule;
-    const price = getFuelPrice(market, rule.fuelType);
-    if (price == null) return rule;
-    const hit = rule.direction === "below" ? price <= rule.targetEur : price >= rule.targetEur;
-    const triggerKey = `${data.as_of}_${price.toFixed(3)}`;
-    if (!hit || rule.lastTriggeredKey === triggerKey) return rule;
-    const updated = { ...rule, lastTriggeredKey: triggerKey };
-    triggered.push(updated);
-    return updated;
-  });
-  return { next, triggered };
-}
 
 export async function preparePriceAlertNotificationsAsync() {
   if (Platform.OS === "android") {

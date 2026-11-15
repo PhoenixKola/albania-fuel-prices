@@ -45,7 +45,7 @@ type OverpassElement = {
   tags?: Record<string, string | number | boolean>;
 };
 
-export function useNearbyStationsWeb(center: { lat: number; lon: number } | null, radiusM: number) {
+export function useNearbyStationsWeb(center: { lat: number; lon: number } | null, radiusM: number, knownAlbanianPlace = false) {
   const lat = center?.lat ?? null;
   const lon = center?.lon ?? null;
 
@@ -66,8 +66,8 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
   const key = useMemo(() => {
     if (lat == null || lon == null) return "";
-    return `${lat},${lon},${radiusM}`;
-  }, [lat, lon, radiusM]);
+    return `${lat},${lon},${radiusM},${knownAlbanianPlace}`;
+  }, [lat, lon, radiusM, knownAlbanianPlace]);
 
   const refresh = useCallback(async () => {
     if (!key) return;
@@ -85,7 +85,7 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
 
     try {
       const [slat, slon] = key.split(",").slice(0, 2).map(Number);
-      const { url, source } = stationEndpoint(slat, slon, radiusM);
+      const { url, source } = stationEndpoint(slat, slon, radiusM, knownAlbanianPlace);
       const backup = stationFallbackUrl(url, source);
       let json: { elements?: OverpassElement[] } | null = null;
       let lastError: unknown;
@@ -164,7 +164,7 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
         setLoading(false);
       }
     }
-  }, [key, radiusM]);
+  }, [key, radiusM, knownAlbanianPlace]);
 
   useEffect(() => {
     if (!key) return;
@@ -176,5 +176,5 @@ export function useNearbyStationsWeb(center: { lat: number; lon: number } | null
   // The view paginates eight results and renders only that page on the map.
   // Do not silently hide valid results beyond the first hundred.
   const visible = resultKey === key ? stations : [];
-  return { stations: visible, totalCount: visible.length, loading, error, refresh, hasRetrieved: resultKey === key, previouslyLoaded: previouslyLoaded && resultKey === key, source: lat == null || lon == null ? "snapshot" as const : stationEndpoint(lat, lon, radiusM).source };
+  return { stations: visible, totalCount: visible.length, loading, error, refresh, hasRetrieved: resultKey === key, previouslyLoaded: previouslyLoaded && resultKey === key, source: lat == null || lon == null ? "snapshot" as const : stationEndpoint(lat, lon, radiusM, knownAlbanianPlace).source };
 }

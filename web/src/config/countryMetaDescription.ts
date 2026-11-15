@@ -12,7 +12,8 @@ export function countryMetaDescription(base: string, country: string, data: Late
       !isValidSourceDate(data?.as_of)) return base;
   const unverified = row.provenance === "historical-fallback" || row.provenance === "date-unverified";
   const sourceDate = isValidSourceDate(row.source_as_of) ? row.source_as_of : unverified ? null : data.as_of;
-  const full = `Petrol €${petrol.toFixed(3)}/L, diesel €${diesel.toFixed(3)}/L; source ${sourceDate ?? "date unverified"}. ${base}`;
+  const dateLabel = sourceDate ? `source ${sourceDate}` : isValidSourceDate(row.last_observed_at) ? `observed ${row.last_observed_at}; publication unverified` : "publication date unverified";
+  const full = `Petrol €${petrol.toFixed(3)}/L, diesel €${diesel.toFixed(3)}/L; ${dateLabel}. ${base}`;
   if (full.length <= 158) return full;
   const cut = full.slice(0, 158);
   return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\s]+$/, "")}…`;

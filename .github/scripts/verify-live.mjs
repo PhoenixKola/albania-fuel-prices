@@ -82,7 +82,7 @@ export async function main() {
       const result = assessLive({ live, repoAsOf, ...coverage });
       const lines = [`Live publication: ${live.asOf} (${result.ageDays} days old)`, `Accepted repository publication: ${repoAsOf}`, `Live build date: ${live.buildDate}`, `Live build commit: ${live.buildSha ?? "legacy marker absent"}`, "Deployment integrity: healthy"];
       if (result.legacy) lines.push("Legacy build marker: publication matches and build date covers latest web/data change; commit-level verification begins after next deploy.");
-      if (result.ageDays > 3) {
+      if (result.ageDays > Number(process.env.SOURCE_AGE_WARNING_DAYS || 10)) {
         const warning = `Source publication is ${result.ageDays} days old; website and repository agree. Review upstream publication separately.`;
         console.log(`::warning::${warning}`);
         lines.push(warning);

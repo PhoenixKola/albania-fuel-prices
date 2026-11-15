@@ -63,3 +63,17 @@ export function hasNewerKosovoReading(
   const nextDate = incoming?.source_as_of;
   return !!nextDate && validSourceDate(nextDate, now) && nextDate > (previous?.source_as_of ?? previous?.last_observed_at ?? "0000-00-00");
 }
+
+/** Each provider must pass the same gates before it can win selection. */
+export async function selectSource<T extends { as_of: string; countries: PriceRow[] }>(candidates: Array<{ name: string; load: () => Promise<T> }>, previous?: { as_of: string; countries: PriceRow[] }) {
+  for (const candidate of candidates) {
+    try {
+      const result = await candidate.load();
+      if (!validSourceDate(result.as_of)) throw new Error("Invalid publication date");
+      canonicalEurope(result.countries);
+      if (previous) classifyEurope(previous, result);
+      return result;
+    } catch (error) { console.warn(`${candidate.name} unavailable or invalid: ${error instanceof Error ? error.message : String(error)}`); }
+  }
+  throw new Error("All sources failed validation");
+}
