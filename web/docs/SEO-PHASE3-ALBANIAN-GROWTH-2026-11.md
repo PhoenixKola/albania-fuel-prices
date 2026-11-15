@@ -1,6 +1,6 @@
 # Phase 3 — Albanian search pilot
 
-Research and implementation: **15 November 2026**, Europe/Berlin. Branch `main`; starting checkout and synchronized remote `fffe8fa`. The release commit and deployment verification are recorded below after the release gate.
+Research and implementation: **15 November 2026**, Europe/Berlin. Branch `main`; starting checkout and synchronized remote `fffe8fa`. Implementation commit: **`2478683cb0943734aa6bbb105fe2ce1431e3a740`**, pushed normally to `origin/main`. A documentation-only follow-up records this verification; the final handoff identifies that follow-up commit.
 
 ## Evidence and decision
 
@@ -50,7 +50,7 @@ Technical files: route configuration, `App` language selection, `RouteSeo`/`Seo`
 - Headless browser: no-JS direct 200 and Albanian answer, desktop/mobile, both themes, URL language-switch round trip despite stored English, 200% text, keyboard link focus and runtime errors. Screenshots reviewed; this is not physical-device or screen-reader certification.
 - Existing large-chunk build warning remains; no dependency was added. Generated build-timestamp-only differences are excluded from the commit.
 
-Release status: pending final commit/push and direct production verification. No EAS or Play action is part of this phase.
+Release status: implementation [Deploy web run 43701206722](https://github.com/PhoenixKola/albania-fuel-prices/actions/runs/43701206722) **succeeded**. Direct no-cache HTTP source requests on **2026-11-15** verified status 200, one H1 and the implementation build SHA on the [live Albanian URL](https://karburantisot.com/sq/cmimet-e-karburanteve-ne-shqiperi), English Albania, Kosovo and homepage. SQ is `lang="sq"`, with its self-canonical and reciprocal EN/SQ links; accepted diesel appears as `2,309 €` and its structured data parses with `inLanguage: "sq"`. English Albania retains its original title/H1/canonical and links back. Kosovo retains its title/URL and its own observation date; homepage title/H1/canonical are unchanged. The public sitemap includes the SQ URL. No EAS or Play action was run. This proves deployment, not Google indexing or search growth.
 
 ## Measurement and next decisions
 
