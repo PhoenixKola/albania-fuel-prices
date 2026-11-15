@@ -4,6 +4,7 @@ import RentalReferral from "../components/ads/RentalReferral";
 import RoadStatusLink from "../components/road/RoadStatusLink";
 import { TravelLinks } from "../components/content/TravelLinks";
 import { Link } from "react-router-dom";
+import { SQ_ALBANIA_PATH } from "../config/localizedAlbania";
 import type { Lang } from "../models/i18n";
 import type { Currency } from "../models/currency";
 import type { FuelType, LatestEurope, CountryPrices } from "../models/fuel";
@@ -155,7 +156,7 @@ export default function CountryFuelPricesPage({
       variant="newsroom"
       eyebrow={c.eyebrow}
       title={c.title(editorial.label)}
-      lede={c.lede(editorial.label)}
+      lede={slug === "albania" || slug === "kosovo" ? safe.openingAnswer : c.lede(editorial.label)}
       status={sourceStale ? c.stale : c.fresh}
       updated={c.dataUpdated(updated)}
       sections={sections}
@@ -174,6 +175,7 @@ export default function CountryFuelPricesPage({
       }
       actions={<><Link className="editorialAction editorialActionPrimary" to="/" onClick={() => setCountry(countryName)}>{c.openDashboard(editorial.label)}</Link><Link className="editorialAction" to="/compare">{c.compareCta}</Link></>}
     >
+      {slug === "albania" ? <p className="contentBody"><Link to={SQ_ALBANIA_PATH} lang="sq" hrefLang="sq">Në shqip: çmimet e karburanteve në Shqipëri →</Link></p> : null}
       {sourceStale ? <p className="editorialStaleNotice" role="status">{lang === "sq" ? `Leximi burimor është i datës ${updated}; kontrollo çmimet në pompë para udhëtimit.` : `The source reading is dated ${updated}; check pump prices before travelling.`}</p> : null}
 
       <EditorialSection id="country-prices" index="01" title={c.currentPrices(editorial.label)} intro={c.currentIntro} tone="accent">

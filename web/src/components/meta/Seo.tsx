@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { albaniaAlternates } from "../../config/localizedAlbania";
 
 const SITE_URL = "https://karburantisot.com";
 
@@ -9,6 +10,7 @@ export type SeoProps = {
   ogTitle?: string;
   ogDescription?: string;
   noindex?: boolean;
+  jsonLd?: object;
 };
 
 function setOrCreateMeta(selector: string, attrs: Record<string, string>) {
@@ -40,6 +42,7 @@ export default function Seo({
   ogTitle,
   ogDescription,
   noindex = false,
+  jsonLd,
 }: SeoProps) {
   useEffect(() => {
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
@@ -47,6 +50,22 @@ export default function Seo({
 
     document.title = title;
     setCanonical(canonical);
+    document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach(link => link.remove());
+    for (const alternate of albaniaAlternates(cleanPath)) {
+      const link = document.createElement("link");
+      link.rel = "alternate";
+      link.hreflang = alternate.lang;
+      link.href = `${SITE_URL}${alternate.path}`;
+      document.head.appendChild(link);
+    }
+    if (jsonLd) {
+      document.head.querySelectorAll('script[type="application/ld+json"]').forEach(script => script.remove());
+      const script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.dataset.pairedSeo = "true";
+      script.textContent = JSON.stringify(jsonLd);
+      document.head.appendChild(script);
+    } else document.head.querySelectorAll('script[data-paired-seo]').forEach(script => script.remove());
 
     setOrCreateMeta('meta[name="description"]', {
       name: "description",
@@ -89,7 +108,7 @@ export default function Seo({
       name: "twitter:description",
       content: ogDescription ?? description,
     });
-  }, [title, description, path, ogTitle, ogDescription, noindex]);
+  }, [title, description, path, ogTitle, ogDescription, noindex, jsonLd]);
 
   return null;
 }

@@ -49,7 +49,7 @@ async function main() {
       path: `/fuel-prices/${c.slug}`,
       priority: 0.8,
       changefreq: "daily",
-      lastmod: dataLastmod,
+      lastmod: c.lastmod && c.lastmod > dataLastmod ? c.lastmod : dataLastmod,
     })),
     ...getPublishedArticles().map((a) => ({
       path: `/insights/${a.slug}`,

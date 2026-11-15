@@ -343,8 +343,8 @@ export default function Navbar({
           {ALBANIAN_ENABLED && <button
             className="btn btn-ghost"
             onClick={onToggleLang}
-            aria-label={lang === "en" ? "Switch to Albanian" : "Switch to English"}
-            title={lang === "en" ? "Switch to Albanian" : "Switch to English"}
+            aria-label={lang === "en" ? "Switch to Albanian" : "Lexo në anglisht"}
+            title={lang === "en" ? "Switch to Albanian" : "Lexo në anglisht"}
           >
             {lang === "en" ? t.langSQ : t.langEN}
           </button>}

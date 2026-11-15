@@ -9,10 +9,23 @@ import type { LatestEurope } from "../models/fuel";
 import { normalizeCanonicalPath } from "../utils/canonical";
 import { getRoadRoute } from "../data/roadRoutes";
 import { roadRouteDescription, roadRouteTitle } from "../utils/roadSeo";
+import { SQ_ALBANIA_PATH, EN_ALBANIA_PATH, sqAlbaniaSchema } from "../config/localizedAlbania";
+import acceptedSnapshot from "../../../data/latest.json";
+import { countryPageContent } from "../config/countryPageContent";
 
 export default function RouteSeo({ data }: { data: LatestEurope | null }) {
   const { pathname } = useLocation();
   const canonicalPath = normalizeCanonicalPath(pathname);
+  const pairedSchema = useMemo(() => {
+    const reading = data ?? acceptedSnapshot as LatestEurope;
+    if (canonicalPath === SQ_ALBANIA_PATH) return sqAlbaniaSchema(reading);
+    if (canonicalPath === EN_ALBANIA_PATH) {
+      const editorial = getCountryEditorial("albania")!;
+      const copy = countryPageContent(editorial, reading, "en");
+      return { "@context": "https://schema.org", "@type": "WebPage", inLanguage: "en", url: `https://karburantisot.com${EN_ALBANIA_PATH}`, name: editorial.metaTitle, mainEntity: { "@type": "FAQPage", mainEntity: copy.faqs.map(f => ({ "@type": "Question", name: f.question, acceptedAnswer: { "@type": "Answer", text: f.answer } })) } };
+    }
+    return undefined;
+  }, [canonicalPath, data]);
 
   const meta = useMemo(() => {
     const configured = getRouteConfig(canonicalPath);
@@ -62,6 +75,7 @@ export default function RouteSeo({ data }: { data: LatestEurope | null }) {
       description={meta.description}
       path={meta.path}
       noindex={meta.noindex}
+      jsonLd={pairedSchema}
     />
   );
 }

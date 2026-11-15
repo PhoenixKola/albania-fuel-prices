@@ -44,6 +44,7 @@ export type PriceContext = {
   sourceUrl: string;
   /** Indicative ALL per EUR rate for the Albania page, null = omit column. */
   allPerEur: number | null;
+  fxDate?: string | null;
   prices: Map<string, FuelPrices>;
   trendDates: string[];
   trends: Record<string, TrendSeries>;
@@ -98,6 +99,7 @@ export async function loadPriceContext(): Promise<PriceContext> {
     console.warn("⚠ priceData: could not read data/trends.json — trend summaries omitted.");
   }
 
+  const fx = await fetchAllPerEur();
   return {
     ok: true,
     latest,
@@ -105,7 +107,8 @@ export async function loadPriceContext(): Promise<PriceContext> {
     asOfLabel: formatDate(latest.as_of),
     source: latest.source ?? "public fuel price aggregators",
     sourceUrl: latest.source_url ?? "",
-    allPerEur: await fetchAllPerEur(),
+    allPerEur: fx?.rate ?? null,
+    fxDate: fx?.date ?? null,
     prices,
     trendDates,
     trends,
@@ -113,7 +116,7 @@ export async function loadPriceContext(): Promise<PriceContext> {
 }
 
 /** Omit ALL conversion when the current indicative rate cannot be fetched. */
-async function fetchAllPerEur(): Promise<number | null> {
+async function fetchAllPerEur(): Promise<{ rate: number; date: string | null } | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5000);
   try {
@@ -122,9 +125,9 @@ async function fetchAllPerEur(): Promise<number | null> {
       { signal: controller.signal }
     );
     if (!r.ok) throw new Error(`${r.status}`);
-    const json = (await r.json()) as { eur?: { all?: number } };
+    const json = (await r.json()) as { date?: string; eur?: { all?: number } };
     const rate = json.eur?.all;
-    if (typeof rate === "number" && rate > 50 && rate < 250) return rate;
+    if (typeof rate === "number" && rate > 50 && rate < 250) return { rate, date: json.date ?? null };
     throw new Error("rate out of plausible range");
   } catch {
     console.warn("FX fetch failed; ALL conversion unavailable.");

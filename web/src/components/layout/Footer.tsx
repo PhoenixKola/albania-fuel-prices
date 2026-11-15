@@ -10,6 +10,7 @@ import { isCountryIndexable } from "../../generated/indexableCountries";
 import { ANALYSIS_META } from "../../generated/analysisMeta";
 import { PLAY_STORE_URL } from "../../config/constants";
 import logo from "../../assets/Logo.webp";
+import { sqDate } from "../../config/localizedAlbania";
 
 type Props = {
   t: TDict;
@@ -63,9 +64,10 @@ export default function Footer({ t, lang, dataAsOf }: Props) {
 
   const updatedLabel = (() => {
     if (!asOf) return null;
+    if (lang === "sq") return sqDate(asOf);
     const d = new Date(`${asOf}T00:00:00Z`);
     if (Number.isNaN(d.getTime())) return asOf;
-    return d.toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
+    return d.toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
       year: "numeric",

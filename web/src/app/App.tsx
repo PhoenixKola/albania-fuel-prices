@@ -1,6 +1,11 @@
 import { ALBANIAN_ENABLED } from "../config/features";
 import { useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { Routes, Route, useLocation, useParams } from "react-router-dom";
+import { Routes, Route, useLocation, useParams, useNavigate } from "react-router-dom";
+import AlbaniaSqPage from "../pages/AlbaniaSqPage";
+import acceptedSnapshot from "../../../data/latest.json";
+import { SQ_ALBANIA_PATH, EN_ALBANIA_PATH, pairedAlbaniaPath, sqDate } from "../config/localizedAlbania";
+import "../styles/sq-fuel.css";
+import { normalizeCanonicalPath } from "../utils/canonical";
 import type { Lang } from "../models/i18n";
 import type { FuelType } from "../models/fuel";
 import type { LatestEurope } from "../models/fuel";
@@ -100,6 +105,8 @@ function RoadStatusRoute({ lang }: { lang: Lang }) {
 
 export default function App() {
   const { pathname, hash } = useLocation();
+  const navigate = useNavigate();
+  const localePath = normalizeCanonicalPath(pathname);
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -119,7 +126,7 @@ export default function App() {
     deserialize: (raw) => (raw === "sq" ? "sq" : "en"),
   });
 
-  const lang: Lang = ALBANIAN_ENABLED ? preferredLang : "en";
+  const lang: Lang = localePath === SQ_ALBANIA_PATH ? "sq" : localePath === EN_ALBANIA_PATH ? "en" : ALBANIAN_ENABLED ? preferredLang : "en";
 
   useEffect(() => {
     document.documentElement.lang = lang === "sq" ? "sq" : "en";
@@ -127,7 +134,11 @@ export default function App() {
 
   const t = i18n[lang];
 
-  const toggleLang = () => setLang(lang === "en" ? "sq" : "en");
+  const toggleLang = () => {
+    setLang(lang === "en" ? "sq" : "en");
+    const counterpart = pairedAlbaniaPath(localePath);
+    if (counterpart) navigate(counterpart);
+  };
 
   // ── Shared state lifted from HomePage ──
   const [country, setCountry] = useLocalStorageState<string>(STORAGE_COUNTRY_KEY, "Albania");
@@ -161,10 +172,11 @@ export default function App() {
 
   const subtitle = useMemo(() => {
     if (!data) return t.subtitleLoading;
+    if (lang === "sq") return t.subtitleAsOf(sqDate(data.as_of));
     const parsed = new Date(`${data.as_of}T00:00:00Z`);
     const pretty = Number.isNaN(parsed.getTime())
       ? data.as_of
-      : parsed.toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
+      : parsed.toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
           year: "numeric",
@@ -206,6 +218,7 @@ export default function App() {
           }
         >
         <Routes>
+          <Route path={SQ_ALBANIA_PATH} element={<AlbaniaSqPage data={data ?? acceptedSnapshot as LatestEurope} fx={fx.rates?.ALL && fx.date ? { rate: fx.rates.ALL, date: fx.date } : null} />} />
           <Route
             path="/"
             element={

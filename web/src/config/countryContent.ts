@@ -5,12 +5,14 @@ export type CountryEditorial = {
   dataCountryName: string;
   metaTitle: string;
   metaDescription: string;
+  lastmod?: string;
   relatedLinks: { label: string; to: string }[];
 };
 
 export const COUNTRY_EDITORIAL: CountryEditorial[] = [
   {
     slug: "albania",
+    lastmod: "2026-11-15",
     label: "Albania",
     dataCountryName: "Albania",
     metaTitle: "Albania Fuel Prices | Petrol, Diesel & LPG per Litre",
@@ -26,6 +28,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
   },
   {
     slug: "kosovo",
+    lastmod: "2026-11-15",
     label: "Kosovo",
     dataCountryName: "Kosovo",
     metaTitle: "Kosovo Fuel Prices | Petrol, Diesel & LPG | Fuel Today",

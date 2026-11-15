@@ -1,3 +1,4 @@
+import { SQ_ALBANIA_PATH, SQ_ALBANIA_TITLE, SQ_ALBANIA_DESCRIPTION, SQ_ALBANIA_UPDATED } from "./localizedAlbania";
 /**
  * Central route configuration — single source of truth for all public routes,
  * their SEO metadata, JSON-LD types, and prerender/sitemap eligibility.
@@ -21,6 +22,7 @@ export const SITE_URL = "https://karburantisot.com";
 export const SITE_NAME = "Fuel Today";
 
 export const STATIC_ROUTES: RouteConfig[] = [
+  { path: SQ_ALBANIA_PATH, title: SQ_ALBANIA_TITLE, description: SQ_ALBANIA_DESCRIPTION, priority: 0.9, changefreq: "weekly", jsonLdType: "WebPage", priceBearing: true, lastmod: SQ_ALBANIA_UPDATED },
   {
     path: "/road-status",
     title: "Albania Road Conditions & Route Status | Karburanti Sot",

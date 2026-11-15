@@ -42,6 +42,7 @@ export function countryPageContent(editorial: CountryEditorial, data: LatestEuro
   const contextText = context[name]?.[lang] ?? (lang === "sq" ? "Përdorni këto vlera për planifikimin e udhëtimit." : "Use these values for trip planning.");
 
   if (lang === "sq") return {
+    openingAnswer: `${values}. Data e publikimit/vëzhgimit: ${dateLabel}. Vlera kombëtare orientuese, jo çmime të garantuara në pompë.`,
     marketOverview: `${contextText} Vlerat kombëtare orientuese: ${values}. Data e burimit për këtë treg: ${dateLabel}.`,
     albaniaContext: `Krahasimi me Shqipërinë përdor të njëjtin lloj karburanti dhe çmimet në EUR/L. Për rrugën tuaj, vendosni distancën dhe konsumin te llogaritësi i udhëtimit.`,
     travelRelevance: `${contextText} Shikoni edhe kushtet e rrugës dhe stacionet e listuara përpara nisjes; kjo faqe nuk raporton çmime në pompa të veçanta.`,
@@ -56,6 +57,7 @@ export function countryPageContent(editorial: CountryEditorial, data: LatestEuro
     ],
   };
   return {
+    openingAnswer: `Diesel in ${editorial.label}: ${typeof row?.diesel_eur === "number" ? `€${row.diesel_eur.toFixed(3)}/L` : "unavailable"}; petrol 95: ${typeof row?.gasoline95_eur === "number" ? `€${row.gasoline95_eur.toFixed(3)}/L` : "unavailable"}. ${marketDate ? "Published" : "Publication/observation status"}: ${dateLabel}. National reference values, not guaranteed individual pump prices.`,
     marketOverview: `${contextText} National reference values: ${values}. Source date for this market: ${dateLabel}.`,
     albaniaContext: "The Albania comparison uses the same fuel type and EUR/L reference prices. Enter your own distance and consumption in the trip calculator for a route estimate.",
     travelRelevance: `${contextText} Check listed stations and road conditions before departure; this page does not report individual pump prices.`,

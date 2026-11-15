@@ -17,6 +17,10 @@ import { buildRoadRealityPrerenderRoutes } from "./roadRealityPrerender";
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import AlbaniaSqPage from "../src/pages/AlbaniaSqPage";
+import { SQ_ALBANIA_PATH, SQ_ALBANIA_TITLE, SQ_ALBANIA_DESCRIPTION, SQ_ALBANIA_UPDATED, albaniaAlternates, sqAlbaniaSchema } from "../src/config/localizedAlbania";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
@@ -726,6 +730,7 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
       description: countryMetaDescription(c.metaDescription, c.dataCountryName, ctx.latest),
       jsonLdType: "FAQPage",
       datePublished: "2026-05-26",
+      dateModified: c.lastmod,
       priceBearing: true,
       noindex: !isCountryIndexable(c.slug),
       content: `
@@ -733,7 +738,8 @@ function buildCountryRoutes(ctx: PriceContext): RouteEntry[] {
         <header class="contentHero editorialHero">
           <p class="contentHeroBadge">Country market briefing</p>
           <h1 class="contentHeroTitle">${escapeHtml(c.label)} fuel prices</h1>
-          <p class="contentHeroText">Dated petrol, diesel and LPG reference prices in ${escapeHtml(c.label)}. Source reading: ${escapeHtml(ctx.asOf)}; check each market's provenance below.</p>
+          <p class="contentHeroText">${c.slug === "albania" || c.slug === "kosovo" ? escapeHtml(safe.openingAnswer) : `Dated petrol, diesel and LPG reference prices in ${escapeHtml(c.label)}. Source reading: ${escapeHtml(ctx.asOf)}; check each market's provenance below.`}</p>
+          ${c.slug === "albania" ? `<p class="contentBody"><a href="${SQ_ALBANIA_PATH}" lang="sq" hreflang="sq">Në shqip: çmimet e karburanteve në Shqipëri →</a></p>` : ""}
         </header>
         ${freshnessNotice()}
         <section id="country-prices">${renderCountryPriceSection(ctx, c)}</section>
@@ -849,6 +855,7 @@ function buildInsightRoutes(): RouteEntry[] {
 // ─── HTML generation ────────────────────────────────────────────────────────
 
 function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContext): string {
+  if (route.path === SQ_ALBANIA_PATH) return JSON.stringify(sqAlbaniaSchema(ctx.latest));
   const canonical = `${SITE_URL}${route.path === "/" ? "" : route.path}`;
 
   const publisher = {
@@ -950,6 +957,7 @@ function generateHead(route: RouteEntry, description: string, ctx: PriceContext)
     <meta name="description" content="${escapeHtml(description)}" />
     <meta name="robots" content="${robots}" />
     <link rel="canonical" href="${canonical}" />
+    ${albaniaAlternates(route.path).map(a => `<link rel="alternate" hreflang="${a.lang}" href="${SITE_URL}${a.path}" />`).join("\n    ")}
     <meta name="data-as-of" content="${ANALYSIS_META.asOf}" />
     <meta name="build-date" content="${new Date().toISOString().slice(0, 10)}" />
     <meta name="build-sha" content="${BUILD_SHA}" />
@@ -1018,6 +1026,7 @@ async function main() {
   }
 
   const routes = [...STATIC_ROUTES.map(redesignedStaticContent).map((route) => ({ ...route, dateModified: ROUTE_CONFIGS.find((config) => config.path === route.path)?.lastmod ?? route.dateModified })), ...buildRoadRealityPrerenderRoutes(), ...buildCountryRoutes(ctx), ...buildInsightRoutes()];
+  routes.push({ path: SQ_ALBANIA_PATH, title: SQ_ALBANIA_TITLE, description: SQ_ALBANIA_DESCRIPTION, jsonLdType: "WebPage", datePublished: SQ_ALBANIA_UPDATED, dateModified: SQ_ALBANIA_UPDATED, priceBearing: true, content: renderToStaticMarkup(createElement(AlbaniaSqPage, { data: ctx.latest, fx: ctx.allPerEur && ctx.fxDate ? { rate: ctx.allPerEur, date: ctx.fxDate } : null })) });
 
   let count = 0;
   for (const route of routes) {
@@ -1033,10 +1042,13 @@ async function main() {
     const head = generateHead(route, description, ctx);
 
     let html = template.replace("</head>", `${head}\n  </head>`);
+    if (route.path === SQ_ALBANIA_PATH) html = html.replace('<html lang="en"', '<html lang="sq"');
 
     // Keep the first paint close to the SPA shell so the navbar does not push
     // the entire prerendered article down when React takes over.
-    const shell = `<div class="page"><div class="container"><nav class="prerenderNav" aria-label="Primary navigation"><a class="prerenderBrand" href="/">Fuel Today</a><div class="prerenderNavLinks"><a href="/">Home</a><a href="/market-report">Market report</a><a href="/compare">Compare</a><a href="/rankings">Rankings</a><a href="/stations">Stations</a></div></nav>${content}</div></div>`;
+    const shell = route.path === SQ_ALBANIA_PATH
+      ? `<div class="page"><div class="container"><nav class="prerenderNav" aria-label="Menuja kryesore"><a class="prerenderBrand" href="/">Karburanti Sot</a><div class="prerenderNavLinks"><a href="/">Kryefaqja</a><a href="/compare">Krahaso</a><a href="/stations">Stacionet</a></div></nav>${content}<footer class="sqPrerenderFooter" aria-label="Informacion ligjor"><a href="/methodology">Metodologjia</a><a href="/privacy">Privatësia</a><a href="/terms">Kushtet e përdorimit</a><a href="/contact">Na kontaktoni</a></footer></div></div>`
+      : `<div class="page"><div class="container"><nav class="prerenderNav" aria-label="Primary navigation"><a class="prerenderBrand" href="/">Fuel Today</a><div class="prerenderNavLinks"><a href="/">Home</a><a href="/market-report">Market report</a><a href="/compare">Compare</a><a href="/rankings">Rankings</a><a href="/stations">Stations</a></div></nav>${content}</div></div>`;
     html = html.replace('<div id="root"></div>', `<div id="root">${shell}</div>`);
 
     // Flat .html output: Cloudflare Pages serves /foo from foo.html with a

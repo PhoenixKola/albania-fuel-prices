@@ -9,11 +9,13 @@ import { isCountryIndexable } from "../src/generated/indexableCountries";
 import type { LatestEurope } from "../src/models/fuel";
 import { calculateFuelDetour, DEFAULT_DETOUR } from "../src/models/fuelDetour";
 import { fuelDetourCopy } from "../src/config/fuelDetourCopy";
+import { SQ_ALBANIA_PATH, EN_ALBANIA_PATH, albaniaAlternates, albaniaSqModel, sqAlbaniaSchema } from "../src/config/localizedAlbania";
 
 const dist = resolve(import.meta.dirname, "../dist");
 const data = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../data/latest.json"), "utf8")) as LatestEurope;
 const sitemap = readFileSync(resolve(dist, "sitemap.xml"), "utf8");
 const required = [
+  SQ_ALBANIA_PATH,
   "/", "/fuel-prices/albania", "/fuel-prices/kosovo", "/fuel-prices/greece",
   "/fuel-prices/italy", "/fuel-prices/croatia", "/fuel-prices/portugal",
   "/compare", "/trip-cost-calculator", "/fuel-detour-calculator", "/stations", "/road-status",
@@ -37,11 +39,24 @@ for (const route of required) {
   assert.equal(count(/<meta name="description"/g), 1, `${route}: description`);
   assert.equal(count(/<link rel="canonical"/g), 1, `${route}: canonical`);
   assert.equal([...html.matchAll(/<h1\b/g)].length, 1, `${route}: H1`);
-  assert.match(html, /<html[^>]+lang="en"/, `${route}: language`);
+  assert.match(html, route === SQ_ALBANIA_PATH ? /<html[^>]+lang="sq"/ : /<html[^>]+lang="en"/, `${route}: language`);
   assert.match(html, /<meta name="robots" content="index,follow/, `${route}: robots`);
   const canonical = `https://karburantisot.com${route === "/" ? "" : route}`;
   assert.ok(html.includes(`<link rel="canonical" href="${canonical}"`), `${route}: canonical destination`);
   assert.ok(sitemap.includes(`<loc>${canonical}</loc>`), `${route}: sitemap`);
+  for (const alternate of albaniaAlternates(route)) assert.ok(head.includes(`<link rel="alternate" hreflang="${alternate.lang}" href="https://karburantisot.com${alternate.path}"`), `${route}: reciprocal ${alternate.lang}`);
+  if (route === EN_ALBANIA_PATH) assert.ok(html.includes(`href="${SQ_ALBANIA_PATH}"`), "English page links to its Albanian counterpart");
+  if (route === SQ_ALBANIA_PATH) {
+    const model = albaniaSqModel(data);
+    assert.ok(html.includes(escapeHtml(model.answer)), "Albanian page: accepted source-dated first answer");
+    for (const fuel of model.fuels) assert.ok(html.includes(escapeHtml(model.price(fuel.eur))), "Albanian page: accepted per-litre prices");
+    for (const target of [EN_ALBANIA_PATH, "/methodology", "/stations", "/trip-cost-calculator", "/fuel-prices/kosovo", "/fuel-prices/greece"]) assert.ok(html.includes(`href="${target}"`), `Albanian crawlable link: ${target}`);
+    const json = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    assert.ok(json);
+    assert.deepEqual(JSON.parse(json[1]), sqAlbaniaSchema(data));
+    for (const faq of model.faqs.filter((_, i) => i !== 3)) assert.ok(html.includes(escapeHtml(faq.answer)), "Albanian visible/schema FAQ parity");
+    assert.ok(!html.includes("Country market briefing"), "Albanian page has no English editorial shell");
+  }
   if (route === "/fuel-detour-calculator") {
     const copy = fuelDetourCopy.en;
     const result = calculateFuelDetour(DEFAULT_DETOUR, data);
