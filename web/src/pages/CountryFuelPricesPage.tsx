@@ -22,6 +22,7 @@ import { fuelLabel, getEurPrice } from "../utils/fuel";
 import { isEuropeanCountry } from "../utils/regions";
 import { convertEur, getCurrencyForCountry, hasRate } from "../utils/currency";
 import { formatMoney } from "../utils/money";
+import { marketSource } from "../models/marketDate";
 import TrendCard from "../components/fuel/TrendCard";
 import { EditorialCallout, EditorialMetrics, EditorialSection, EditorialShell } from "../components/content/EditorialLayout";
 
@@ -103,6 +104,7 @@ export default function CountryFuelPricesPage({
   const localValue = hasRate(localCurrency, fxRates) ? convertEur(selectedPrice, localCurrency, fxRates) : null;
   const userValue = currency === "local" && localValue != null ? formatMoney(localValue, localCurrency) : formatMoney(selectedPrice, "EUR");
   const updated = row?.source_as_of ?? (row?.provenance ? (row.last_observed_at ? `${lang === "sq" ? "Vëzhguar" : "Observed"} ${row.last_observed_at}` : (lang === "sq" ? "E paverifikuar" : "Unverified")) : data?.as_of ?? "Unavailable");
+  const source = marketSource(row, data, lang);
   const sourceStale = ANALYSIS_META.stale || !data?.as_of || row?.provenance === "date-unverified" || row?.provenance === "historical-fallback";
   const analysisHtml = getCountryAnalysis(slug);
   const decisionCopy = lang === "sq" ? {
@@ -246,7 +248,7 @@ export default function CountryFuelPricesPage({
       {countryName === "Albania" ? <><TravelLinks lang={lang} /><RoadStatusLink lang={lang} /><RentalReferral lang={lang} placement="albania" /></> : null}
       <EditorialSection id="country-coverage" index={analysisHtml ? "07" : "06"} title={c.limitations}>
         <p>{safe.dataLimitations}</p><p>{safe.sourceTransparency}</p>
-        {data?.source ? <EditorialCallout label={copy.source}>{data.source} · {c.dataUpdated(updated)}</EditorialCallout> : null}
+        {source.name ? <EditorialCallout label={copy.source}>{source.url ? <a href={source.url} target="_blank" rel="noopener noreferrer">{source.name}</a> : source.name} · {c.dataUpdated(updated)}</EditorialCallout> : null}
       </EditorialSection>
 
       <AdsterraBannerAd location="country-after-coverage" enabled={hasAnyPrice && !loading} />

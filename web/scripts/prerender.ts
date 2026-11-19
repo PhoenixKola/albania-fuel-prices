@@ -138,7 +138,7 @@ function redesignedStaticContent(route: RouteEntry): RouteEntry {
   if (route.path === "/about") {
     return { ...route, content: `
       <article class="contentPage aboutPage">
-        <header class="aboutHero"><p class="aboutEyebrow">${escapeHtml(copy.about.eyebrow)}</p><h1>${escapeHtml(copy.about.title)}</h1><p class="aboutLede">${escapeHtml(copy.about.lede)}</p><p class="aboutStatus">${escapeHtml(copy.about.status)}</p><dl class="aboutFigures"><div><dt>${escapeHtml(copy.about.metrics[0])}</dt><dd>${ANALYSIS_META.countriesAnalysed}</dd><p>European markets</p></div><div><dt>${escapeHtml(copy.about.metrics[1])}</dt><dd>${ANALYSIS_META.daysObserved}</dd><p>consecutive days recorded</p></div><div><dt>${escapeHtml(copy.about.metrics[2])}</dt><dd>None</dd><p>over rankings or conclusions</p></div></dl></header>
+        <header class="aboutHero"><p class="aboutEyebrow">${escapeHtml(copy.about.eyebrow)}</p><h1>${escapeHtml(copy.about.title)}</h1><p class="aboutLede">${escapeHtml(copy.about.lede)}</p><p class="aboutStatus">${escapeHtml(copy.about.status)}</p><dl class="aboutFigures"><div><dt>${escapeHtml(copy.about.metrics[0])}</dt><dd>${ANALYSIS_META.countriesAnalysed}</dd><p>European markets</p></div><div><dt>${escapeHtml(copy.about.metrics[1])}</dt><dd>${ANALYSIS_META.daysObserved}</dd><p>days with a recorded reading</p></div><div><dt>${escapeHtml(copy.about.metrics[2])}</dt><dd>Ads and referral links</dd><p>disclosed; see the editorial policy</p></div></dl></header>
         ${renderEditorialSections(copy.about.sections)}
       </article>` };
   }
@@ -508,6 +508,12 @@ const STATIC_ROUTES: RouteEntry[] = [
           <p class="contentBody">Karburanti Sot pulls fuel price data from publicly available third-party fuel price sources. These sources publish data at different intervals depending on each publisher's reporting schedule.</p>
         </section>
         <section class="contentSection">
+          <h2 class="contentHeading">${escapeHtml(i18n.en.methodologyNamedSourceTitle)}</h2>
+          <p class="contentBody">${escapeHtml(i18n.en.methodologyNamedSourceP1)} <a href="https://www.cargopedia.net/europe-fuel-prices" target="_blank" rel="noopener noreferrer" class="inlineLink">cargopedia.net ↗</a></p>
+          <p class="contentBody">${escapeHtml(i18n.en.methodologyNamedSourceP2)}</p>
+          <p class="contentBody">${escapeHtml(i18n.en.methodologyNamedSourceP3)}</p>
+        </section>
+        <section class="contentSection">
           <h2 class="contentHeading">Data processing</h2>
           <p class="contentBody">Raw data is normalized into a consistent format: fuel prices expressed per liter with EUR as the common reference currency. No manual adjustments or editorial rounding are applied to the underlying price values.</p>
         </section>
@@ -835,7 +841,7 @@ function buildInsightRoutes(): RouteEntry[] {
     content: `
       <article class="contentPage">
         <h1 class="contentPageTitle">${escapeHtml(a.title)}</h1>
-        <p class="contentBodyMuted">By the Karburanti Sot team · Published ${a.datePublished} · ${a.readMinutes} min read</p>
+        <p class="contentBodyMuted">By the Karburanti Sot team · Published ${a.datePublished}${a.dateModified ? ` · Updated ${a.dateModified}` : ""} · ${a.readMinutes} min read</p>
         ${a.html}
         <section class="contentSection">
           <h2 class="contentHeading">Keep exploring</h2>
@@ -914,8 +920,17 @@ function generateJsonLd(route: RouteEntry, description: string, ctx: PriceContex
         isBasedOn: marketRow?.source_url ?? (marketRow?.provenance ? undefined : ctx.sourceUrl || undefined),
         creator: publisher,
         temporalCoverage: marketDate ? `${ANALYSIS_META.startDate}/${marketDate}` : undefined,
-        measurementTechnique:
-          "Daily capture of published country-level average fuel prices, normalised to EUR per liter",
+        measurementTechnique: marketRow?.provenance
+          ? "Previously collected country-level reference values, normalised to EUR per liter; the source and publication date of this market's value are unverified."
+          : "Daily capture of published country-level average fuel prices, normalised to EUR per liter",
+        isAccessibleForFree: true,
+        variableMeasured: [
+          ["gasoline95_eur", "Gasoline 95 reference price"],
+          ["diesel_eur", "Diesel reference price"],
+          ["lpg_eur", "LPG (autogas) reference price"],
+        ]
+          .filter(([key]) => typeof marketRow?.[key as "gasoline95_eur" | "diesel_eur" | "lpg_eur"] === "number")
+          .map(([, name]) => ({ "@type": "PropertyValue", name, unitText: "EUR per litre" })),
       });
     }
 

@@ -37,12 +37,12 @@ export default function AboutPage({ lang }: { lang: Lang }) {
           <div>
             <dt>{page.metrics[1]}</dt>
             <dd>{ANALYSIS_META.daysObserved || 0}</dd>
-            <p>{sq ? "ditë të ruajtura pa ndërprerje" : "consecutive days recorded"}</p>
+            <p>{sq ? "ditë me lexim të regjistruar" : "days with a recorded reading"}</p>
           </div>
           <div>
             <dt>{page.metrics[2]}</dt>
-            <dd>{sq ? "I pavarur" : "Independent"}</dd>
-            <p>{sq ? "pa renditje ose përfundime me pagesë" : "no paid rankings or conclusions"}</p>
+            <dd>{sq ? "Reklama dhe lidhje referimi" : "Ads and referral links"}</dd>
+            <p>{sq ? "të shënuara; shih politikën editoriale" : "disclosed; see the editorial policy"}</p>
           </div>
         </dl>
       </header>

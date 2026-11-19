@@ -403,6 +403,10 @@ export type TDict = {
   methodologySourcesTitle: string;
   methodologySourcesP1: string;
   methodologySourcesP2: string;
+  methodologyNamedSourceTitle: string;
+  methodologyNamedSourceP1: string;
+  methodologyNamedSourceP2: string;
+  methodologyNamedSourceP3: string;
   methodologyProcessTitle: string;
   methodologyProcessP1: string;
   methodologyProcessP2: string;

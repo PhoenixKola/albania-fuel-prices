@@ -469,6 +469,14 @@ export const sq = {
     "Karburanti Sot merr të dhëna çmimesh nga burime publike të palëve të treta dhe mund të plotësojë mbulimin me referenca zyrtare ose statistikore kur janë të disponueshme.",
   methodologySourcesP2:
     "Burimet specifike mund të ndryshojnë me kohën ndërsa ofruesit përditësojnë formatet. Qëllimi është të ruhet një feed transparent, i përditësuar dhe i krahasueshëm.",
+  methodologyNamedSourceTitle: "Burimi i emërtuar evropian",
+  methodologyNamedSourceP1:
+    "Pjesa më e madhe e leximeve evropiane në këtë faqe vijnë nga tabela e çmimeve të karburantit në Evropë e Cargopedia, një agregator i palës së tretë për çmime orientuese kombëtare. Cargopedia nuk është rregullator apo autoritet i karburanteve dhe nuk publikon shifër për çdo treg. Faqja e burimit:",
+  methodologyNamedSourceP2:
+    "Këto janë vlera orientuese kombëtare. Nuk janë kufij maksimalë zyrtarë, si tavanet e Bordit të Transparencës në Shqipëri, të cilat kjo faqe nuk i publikon, dhe nuk janë çmime në një pompë të caktuar. Koha kur sistemi ynë mori skedarin nuk është data e publikimit të shifrës, ndaj çdo faqe tregon datën e burimit që mund të verifikohet.",
+  methodologyNamedSourceP3:
+    "Një treg që feed-i nuk e mbulon, ose data e të cilit nuk verifikohet, nuk merr datën e Cargopedia. Shfaqet me datën e vet të vëzhgimit ose të shënuar si i paverifikuar, dhe vlera e mbledhur më parë mbetet e dukshme si rezervë. Kosova është një shembull i tregut që mund të shfaqet kështu.",
+
   methodologyProcessTitle: "Përpunimi i të dhënave",
   methodologyProcessP1:
     "Të dhënat normalizohen: çmimet shprehen për litër dhe EUR përdoret si referencë. Vlerat në monedhë lokale ruhen gjithashtu.",

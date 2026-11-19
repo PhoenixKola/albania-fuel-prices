@@ -12,6 +12,7 @@ import { getFlagImgUrl, getIso2ForCountry } from "../../utils/countryFlag";
 import TripSelect from "../content/TripSelect";
 import LoadingRow from "../feedback/LeadingRow";
 import type { HomeHeroModel } from "../content/HeroIntro";
+import { marketDate, describeMarketDate, marketSource } from "../../models/marketDate";
 
 type Props = {
   t: TDict;
@@ -112,10 +113,12 @@ export default function FuelPulse({
   }, [series, trends]);
 
   const format = (value: number | null) => formatFuelPrice(country, value, currency, fxRates);
+  const dated = useMemo(() => describeMarketDate(marketDate(selected, data?.as_of), lang), [data?.as_of, lang, selected]);
+  const source = useMemo(() => marketSource(selected, data, lang), [data, lang, selected]);
   const shareText = useMemo(() => {
     const rows = FUEL_TYPES.map((fuel) => `${fuelLabel(t, fuel)}: ${formatFuelPrice(country, getEurPrice(selected, fuel), currency, fxRates)}`);
-    return ["Fuel Today | Karburanti Sot", `${country} · ${data?.as_of ?? ""}`, ...rows, `${c.source}: ${data?.source ?? t.notAvailable}`, "https://karburantisot.com"].filter(Boolean).join("\n");
-  }, [c.source, country, currency, data?.as_of, data?.source, fxRates, selected, t]);
+    return ["Fuel Today | Karburanti Sot", `${country} · ${data ? dated.plain : ""}`, ...rows, `${c.source}: ${source.name ?? t.notAvailable}`, "https://karburantisot.com"].filter(Boolean).join("\n");
+  }, [c.source, country, currency, data, dated.plain, fxRates, selected, source.name, t]);
 
   return (
     <section id="price-tool" className="homeFuelPulse" aria-labelledby="home-command-title">
@@ -182,7 +185,7 @@ export default function FuelPulse({
 
         <footer className="homePulseFooter">
           <p>{c.scope}</p>
-          <p><b>{c.source}:</b> {data?.source_url ? <a href={data.source_url} target="_blank" rel="noopener noreferrer">{data.source ?? t.notAvailable} ↗</a> : data?.source ?? t.notAvailable} · {data?.as_of ?? t.notAvailable}</p>
+          <p><b>{c.source}:</b> {source.url ? <a href={source.url} target="_blank" rel="noopener noreferrer">{source.name ?? t.notAvailable} ↗</a> : source.name ?? t.notAvailable} · {data ? dated.plain : t.notAvailable}</p>
         </footer>
       </div>
     </section>

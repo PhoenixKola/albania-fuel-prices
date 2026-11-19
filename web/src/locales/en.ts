@@ -472,6 +472,14 @@ export const en = {
   methodologySourcesP2:
     "The specific sources used can change over time as providers update their reporting formats or APIs. When a source changes, the site's data pipeline is updated to match. The goal is to keep a transparent, timely, and comparable public feed for each covered country.",
 
+  methodologyNamedSourceTitle: "Named European source",
+  methodologyNamedSourceP1:
+    "Most of the European readings on this site come from Cargopedia's Europe fuel prices table, a third-party aggregator of national reference prices. Cargopedia is not a regulator or fuel authority, and it does not publish a figure for every market. Source page:",
+  methodologyNamedSourceP2:
+    "These are national reference values. They are not official regulatory maximums, such as ceilings set by Albania's Transparency Board, which this site does not publish, and they are not prices at an individual pump. The time our job fetched the feed is also not the date a figure was published, so each page shows the source date it can verify.",
+  methodologyNamedSourceP3:
+    "A market that the feed does not cover, or whose date cannot be verified, is not given Cargopedia's date. It is shown with its own observation date, or marked unverified, and its previously collected value stays visible as a fallback. Kosovo is an example of a market that can appear this way.",
+
   methodologyProcessTitle: "Data processing",
   methodologyProcessP1:
     "Raw data from different countries arrives in different formats, units, and currencies. The processing pipeline normalizes everything into a consistent format: fuel prices are expressed per liter, and a common reference currency (EUR) is used for cross-country comparisons. Local-currency values are also preserved and displayed when the user selects the local-currency mode.",

@@ -46,6 +46,7 @@ export const INSIGHT_ARTICLES: InsightArticle[] = [
         <p class="contentBody">Petrol did not have the same direction: the Albania and Greece readings were both €2.025/L. The dated snapshot cannot support a rule that every fuel is dearer or cheaper on one side of a border.</p></section>
       <section class="contentSection"><h2 class="contentHeading">What the figures cannot establish</h2>
         <p class="contentBody">Country price data alone cannot isolate the contribution of taxation, imports, exchange rates, distribution or retail competition. Those mechanisms may affect prices, but the reference-price gap is not evidence of any one cause. Check the <a href="/fuel-prices/greece">Greece</a> and <a href="/fuel-prices/kosovo">Kosovo</a> pages for newer readings and their provenance.</p></section>
+      <p class="contentBodyMuted">This address was first published on 10 July 2026 as a different, broader article. On 20 October 2026 it was replaced by this dated comparison of the 5 August 2026 collection readings.</p>
       ${archiveNote}`,
   },
   {

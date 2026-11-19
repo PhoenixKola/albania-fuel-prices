@@ -11,6 +11,7 @@ import { fuelLabel, getEurPrice } from "../../utils/fuel";
 import { formatFuelPrice } from "../../utils/priceDisplay";
 import { getFlagImgUrl, getIso2ForCountry } from "../../utils/countryFlag";
 import { claimHomeIntro, settleHomeIntro } from "../../utils/homeIntro";
+import { marketDate, describeMarketDate, marketSource } from "../../models/marketDate";
 import TripSelect from "./TripSelect";
 
 export type HomeHeroModel = {
@@ -80,18 +81,6 @@ const copy = {
   },
 } as const;
 
-function formatDate(value: string | undefined, lang: Lang, fallback: string) {
-  if (!value) return fallback;
-  const date = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) return fallback;
-  return date.toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
 function signed(value: number | null) {
   if (value == null || !Number.isFinite(value)) return null;
   if (Math.abs(value) < 0.0005) return "0.000";
@@ -120,7 +109,9 @@ export default function HeroIntro({
   const iso2 = getIso2ForCountry(model.country);
   const average = signed(model.averageDifference);
   const week = signed(model.weeklyDelta);
-  const date = formatDate(data?.as_of, lang, t.notAvailable);
+  const dated = describeMarketDate(marketDate(selected, data?.as_of), lang);
+  const source = marketSource(selected, data, lang);
+  const shown = data && dated.unverified ? { state: "stale" as const, shortLabel: dated.badge } : freshness;
   const valueKey = `${model.country}|${model.fuelType}`;
 
   const heroReady = readyTheme === theme;
@@ -170,7 +161,7 @@ export default function HeroIntro({
       <div className="homeJourneyGrid">
         <div className="homeHeroCopy">
           <div className="homeEyebrow homeHeroEyebrow">
-            <span className={`homeStatusDot homeStatusDot-${freshness.state}`} aria-hidden="true" />
+            <span className={`homeStatusDot homeStatusDot-${shown.state}`} aria-hidden="true" />
             {t.homeCockpitKicker}
           </div>
           <h1 id="home-hero-title" className="homeHeroTitle" aria-label={t.homeCockpitTitle}>
@@ -199,7 +190,7 @@ export default function HeroIntro({
                 <span className="homeBoardEyebrow">{c.board}</span>
                 <strong key={model.country} className="homeBoardResolve">{iso2 ? <img src={getFlagImgUrl(iso2)} alt="" aria-hidden="true" /> : null}{model.country}</strong>
               </div>
-              <span className={`homeFreshnessBadge homeFreshnessBadge-${freshness.state}`}>{freshness.shortLabel}</span>
+              <span className={`homeFreshnessBadge homeFreshnessBadge-${shown.state}`}>{shown.shortLabel}</span>
             </div>
             <div className="homeBoardCountrySelect">
               <TripSelect label={c.selectMarket} value={model.country} options={countries.map((country) => ({ value: country, label: country }))} onChange={onSelectCountry} />
@@ -222,8 +213,8 @@ export default function HeroIntro({
               <div><dt>{c.week}</dt><dd key={valueKey} className={`homeBoardResolve ${model.weeklyDelta != null && model.weeklyDelta <= 0 ? "is-good" : "is-warm"}`}>{week == null ? t.notAvailable : week === "0.000" ? t.homeGaugeWeekFlat : `${week} EUR/L`}</dd></div>
             </dl>
             <div className="homeBoardProvenance">
-              <span><b>{c.dated}</b>{date}</span>
-              <span><b>{c.source}</b>{data?.source_url ? <a href={data.source_url} target="_blank" rel="noopener noreferrer">{data.source ?? t.notAvailable} ↗</a> : data?.source ?? t.notAvailable}</span>
+              <span><b>{data ? dated.label : c.dated}</b>{data ? dated.value : t.notAvailable}</span>
+              <span><b>{c.source}</b>{source.url ? <a href={source.url} target="_blank" rel="noopener noreferrer">{source.name ?? t.notAvailable} ↗</a> : source.name ?? t.notAvailable}</span>
             </div>
           </div>
         </div>

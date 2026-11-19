@@ -116,7 +116,7 @@ const en: EditorialCopy = {
     title: "Built for the decision before the next fill.",
     lede: "Karburanti Sot turns fragmented public fuel data into a calm, useful view of Albania and Europe—so drivers can compare with context, not guesswork.",
     status: "Independent · Tirana, Albania",
-    metrics: ["Markets analysed", "Days of history", "Editorial model"],
+    metrics: ["Markets analysed", "Days of history", "Funding"],
     methodCta: "Read our methodology",
     contactCta: "Send a correction",
     sections: [
@@ -287,7 +287,7 @@ const sq: EditorialCopy = {
     title: "Ndërtuar për vendimin para furnizimit tjetër.",
     lede: "Karburanti Sot i kthen të dhënat publike të shpërndara në një pamje të qartë dhe të dobishme për Shqipërinë dhe Evropën—që shoferët të krahasojnë me kontekst, jo me hamendje.",
     status: "I pavarur · Tiranë, Shqipëri",
-    metrics: ["Tregje të analizuara", "Ditë histori", "Modeli editorial"],
+    metrics: ["Tregje të analizuara", "Ditë histori", "Financimi"],
     methodCta: "Lexo metodologjinë",
     contactCta: "Dërgo një korrigjim",
     sections: [

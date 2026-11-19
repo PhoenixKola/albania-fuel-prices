@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { COUNTRY_EDITORIAL } from "../src/config/countryContent";
 import { isEuropeanCountry } from "../src/utils/regions";
 import type { LatestEurope } from "../src/models/fuel";
+import { marketDate, describeMarketDate } from "../src/models/marketDate";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "../../data");
@@ -189,6 +190,25 @@ function esc(str: string): string {
     .replace(/>/g, "&gt;");
 }
 
+/** A market whose date differs from the feed-wide reading says so in its own row. */
+export function marketRowNote(ctx: PriceContext, country: string): string {
+  const info = marketDate(ctx.latest?.countries.find((row) => row.country === country), ctx.asOf);
+  if (info.status === "verified" && info.date === ctx.asOf) return "";
+  const described = describeMarketDate(info, "en", "long");
+  return info.status === "verified" ? `Source date ${described.plain}` : described.plain;
+}
+
+function sourceLink(ctx: PriceContext, market: { source?: string; source_url?: string; provenance?: string } | undefined): string {
+  if (market?.source) return market.source_url ? `<a href="${esc(market.source_url)}" target="_blank" rel="noopener noreferrer">${esc(market.source)}</a>` : esc(market.source);
+  if (market?.provenance) return "previous collected value; market source unverified";
+  return ctx.sourceUrl ? `<a href="${esc(ctx.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(ctx.source)}</a>` : esc(ctx.source);
+}
+
+function rowLabel(ctx: PriceContext, country: string, inner: string): string {
+  const note = marketRowNote(ctx, country);
+  return note ? `${inner}<br><small>${esc(note)}</small>` : inner;
+}
+
 const FUEL_ROWS: { key: keyof FuelPrices; trendKey: keyof TrendSeries; label: string; shortName: string }[] = [
   { key: "petrol", trendKey: "gasoline95", label: "Petrol (Gasoline 95)", shortName: "petrol" },
   { key: "diesel", trendKey: "diesel", label: "Diesel", shortName: "diesel" },
@@ -250,7 +270,7 @@ export function renderCountryPriceSection(
           </table>
           <p class="contentBody">${renderTrendSentence(ctx, country)}</p>
           <p class="contentBody">Plan with the <a href="/trip-cost-calculator">trip fuel budget</a>, <a href="/fuel-detour-calculator">compare a refuelling detour</a>, or <a href="/stations">find listed stations</a>.</p>
-          <p class="contentBodyMuted">Country-level reference reading; source date ${esc(marketDate)}, from ${esc(market?.source ?? (market?.provenance ? "previous collected value; market source unverified" : ctx.source))}${showAll ? ". ALL values are indicative conversions at a mid-market exchange rate" : ""}. Individual station prices vary — see <a href="/methodology">our methodology</a>.</p>
+          <p class="contentBodyMuted">Country-level reference reading; source date ${esc(marketDate)}, from ${sourceLink(ctx, market)}${showAll ? ". ALL values are indicative conversions at a mid-market exchange rate" : ""}. Individual station prices vary — see <a href="/methodology">our methodology</a>.</p>
         </section>`;
 }
 
@@ -293,7 +313,7 @@ export function renderHomeSnapshot(ctx: PriceContext): string {
     .map(
       ({ c, p }) => `
             <tr>
-              <th scope="row"><a href="/fuel-prices/${c.slug}">${esc(c.label)}</a></th>
+              <th scope="row">${rowLabel(ctx, c.dataCountryName, `<a href="/fuel-prices/${c.slug}">${esc(c.label)}</a>`)}</th>
               <td>${fmtEur(p!.petrol)}</td>
               <td>${fmtEur(p!.diesel)}</td>
               <td>${fmtEur(p!.lpg)}</td>
@@ -303,7 +323,7 @@ export function renderHomeSnapshot(ctx: PriceContext): string {
 
   return `
         <section class="contentSection">
-          <h2 class="contentHeading">Today's fuel prices at a glance (${ctx.asOfLabel})</h2>
+          <h2 class="contentHeading">Fuel prices at a glance (main source reading: ${ctx.asOfLabel})</h2>
           <table class="contentTable">
             <thead>
               <tr>
@@ -316,7 +336,7 @@ export function renderHomeSnapshot(ctx: PriceContext): string {
             <tbody>${rows}
             </tbody>
           </table>
-          <p class="contentBodyMuted">Prices last updated ${ctx.asOfLabel}. Sorted by petrol price, cheapest first. Click a country for the full market breakdown, 30-day trend, and border-crossing advice.</p>
+          <p class="contentBodyMuted">Main source reading dated ${ctx.asOfLabel}; a market with a note under its name has its own date or an unverified one. Sorted by petrol price, cheapest first. Click a country for the full market breakdown, 30-day trend, and border-crossing advice.</p>
         </section>`;
 }
 
@@ -335,7 +355,7 @@ export function renderRankingsTable(ctx: PriceContext): string {
   const rows = europe
     .map(([name, p], i) => {
       const slug = covered.get(name);
-      const label = slug ? `<a href="/fuel-prices/${slug}">${esc(name)}</a>` : esc(name);
+      const label = rowLabel(ctx, name, slug ? `<a href="/fuel-prices/${slug}">${esc(name)}</a>` : esc(name));
       return `
             <tr${name === "Albania" ? ' class="contentTableHighlight"' : ""}>
               <td>${i + 1}</td>
@@ -348,7 +368,7 @@ export function renderRankingsTable(ctx: PriceContext): string {
 
   return `
         <section class="contentSection">
-          <h2 class="contentHeading">European fuel price ranking (${ctx.asOfLabel})</h2>
+          <h2 class="contentHeading">European fuel price ranking (main source reading: ${ctx.asOfLabel})</h2>
           <p class="contentBody">All covered European markets ranked by petrol price, cheapest first. Diesel is shown alongside for comparison.</p>
           <table class="contentTable">
             <thead>
@@ -362,7 +382,7 @@ export function renderRankingsTable(ctx: PriceContext): string {
             <tbody>${rows}
             </tbody>
           </table>
-          <p class="contentBodyMuted">Country-level averages as of ${ctx.asOfLabel}, in EUR per liter. Non-eurozone prices converted at mid-market rates.</p>
+          <p class="contentBodyMuted">Country-level averages from the main source reading dated ${ctx.asOfLabel}, in EUR per liter; a market with a note under its name has its own date or an unverified one. Non-eurozone prices converted at mid-market rates.</p>
         </section>`;
 }
 
@@ -382,7 +402,7 @@ export function renderComparePairs(ctx: PriceContext): string {
   const rows = partners
     .map(({ name, p }) => {
       const slug = covered.get(name);
-      const label = slug ? `<a href="/fuel-prices/${slug}">${esc(name)}</a>` : esc(name);
+      const label = rowLabel(ctx, name, slug ? `<a href="/fuel-prices/${slug}">${esc(name)}</a>` : esc(name));
       const delta = (theirs: number | null, ours: number | null): string => {
         if (theirs == null || ours == null) return "n/a";
         const d = theirs - ours;

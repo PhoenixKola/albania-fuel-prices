@@ -22,6 +22,16 @@ export default function MethodologyPage({ t }: Props) {
       </section>
 
       <section className="contentSection">
+        <h2 className="contentHeading">{t.methodologyNamedSourceTitle}</h2>
+        <p className="contentBody">
+          {t.methodologyNamedSourceP1}{" "}
+          <a href="https://www.cargopedia.net/europe-fuel-prices" target="_blank" rel="noopener noreferrer" className="inlineLink">cargopedia.net ↗</a>
+        </p>
+        <p className="contentBody">{t.methodologyNamedSourceP2}</p>
+        <p className="contentBody">{t.methodologyNamedSourceP3}</p>
+      </section>
+
+      <section className="contentSection">
         <h2 className="contentHeading">{t.methodologyProcessTitle}</h2>
         <p className="contentBody">{t.methodologyProcessP1}</p>
         <p className="contentBody">{t.methodologyProcessP2}</p>
