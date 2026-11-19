@@ -67,3 +67,21 @@ test("rendering a stored road review cannot advance its review timestamp", () =>
   assert.equal(route.lastCheckedAt, before);
   assert.equal(before, ROAD_DATA_CHECKED_AT);
 });
+
+test("an unverified market date is named in words, never shown as a bare question mark", () => {
+  const data: LatestEurope = {
+    ...fixture,
+    countries: [
+      fixture.countries[0],
+      { country: "Kosovo", gasoline95_eur: 1.412, diesel_eur: 1.609, lpg_eur: null, last_observed_at: "2026-10-01", provenance: "historical-fallback" },
+    ],
+  };
+  const result = compareCountries(data, "Albania", "Kosovo", "diesel", 50, now)!;
+  assert.equal(result.provisional, true);
+  const en = comparisonSentence(result, "Albania", "Kosovo", "diesel", "en");
+  const sq = comparisonSentence(result, "Albania", "Kosovo", "diesel", "sq");
+  assert.ok(!en.includes("?") && !sq.includes("?"));
+  assert.match(en, /Kosovo unverified/);
+  assert.match(sq, /Kosovo e paverifikuar/);
+  assert.match(en, /not verified as matching/);
+});

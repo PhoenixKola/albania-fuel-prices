@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { albaniaAlternates } from "../../config/localizedAlbania";
+import { jsonLdAction } from "../../utils/jsonLdPlan";
 
 const SITE_URL = "https://karburantisot.com";
 
@@ -44,6 +45,7 @@ export default function Seo({
   noindex = false,
   jsonLd,
 }: SeoProps) {
+  const prerenderedPath = useRef<string | null | undefined>(undefined);
   useEffect(() => {
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
     const canonical = cleanPath === "/" ? SITE_URL : `${SITE_URL}${cleanPath}`;
@@ -58,14 +60,21 @@ export default function Seo({
       link.href = `${SITE_URL}${alternate.path}`;
       document.head.appendChild(link);
     }
-    if (jsonLd) {
+    if (prerenderedPath.current === undefined) {
+      prerenderedPath.current = document.head.querySelector('script[type="application/ld+json"]:not([data-paired-seo])') ? cleanPath : null;
+    }
+    const action = jsonLdAction(prerenderedPath.current, cleanPath, Boolean(jsonLd));
+    if (action !== "keep") {
+      prerenderedPath.current = null;
       document.head.querySelectorAll('script[type="application/ld+json"]').forEach(script => script.remove());
-      const script = document.createElement("script");
-      script.type = "application/ld+json";
-      script.dataset.pairedSeo = "true";
-      script.textContent = JSON.stringify(jsonLd);
-      document.head.appendChild(script);
-    } else document.head.querySelectorAll('script[data-paired-seo]').forEach(script => script.remove());
+      if (jsonLd) {
+        const script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.dataset.pairedSeo = "true";
+        script.textContent = JSON.stringify(jsonLd);
+        document.head.appendChild(script);
+      }
+    }
 
     setOrCreateMeta('meta[name="description"]', {
       name: "description",

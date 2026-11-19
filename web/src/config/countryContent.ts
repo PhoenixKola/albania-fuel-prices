@@ -17,7 +17,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Albania",
     metaTitle: "Albania Fuel Prices | Petrol, Diesel & LPG per Litre",
     metaDescription:
-      "Dated Albania petrol, diesel and LPG reference prices per litre, with EUR/ALL estimates, 50 L costs and fuel-specific Greece and Kosovo comparisons.",
+      "Albania reference prices per litre with EUR/ALL estimates, 50 L costs and Greece and Kosovo comparisons.",
     relatedLinks: [
       { label: "Calculate an Albania road trip", to: "/trip-cost-calculator" },
       { label: "Kosovo fuel prices", to: "/fuel-prices/kosovo" },
@@ -78,7 +78,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Greece",
     metaTitle: "Greece Fuel Prices | Petrol & Diesel vs Albania",
     metaDescription:
-      "Dated Greece petrol, diesel and LPG reference prices per litre. Compare each fuel with Albania and calculate an illustrative 50 L difference.",
+      "Greece reference prices per litre; compare each fuel with Albania and a 50 L difference.",
     relatedLinks: [
       { label: "Albania fuel prices", to: "/fuel-prices/albania" },
       { label: "Calculate an Albania–Greece trip", to: "/trip-cost-calculator" },
@@ -93,7 +93,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Italy",
     metaTitle: "Italy Fuel Prices | Petrol, Diesel & LPG vs Albania",
     metaDescription:
-      "Dated Italy petrol, diesel and LPG reference prices per litre, with fuel-specific comparison to Albania and practical trip-budget context.",
+      "Italy reference prices per litre, fuel-specific comparison with Albania and trip-budget context.",
     relatedLinks: [
       { label: "Compare Albania vs Italy", to: "/compare" },
       { label: "European fuel rankings", to: "/rankings" },
@@ -108,7 +108,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Croatia",
     metaTitle: "Croatia Fuel Prices | Petrol, Diesel & LPG per Litre",
     metaDescription:
-      "Dated Croatia petrol, diesel and LPG reference prices per litre, with Albania comparison, historical movement and Adriatic trip planning links.",
+      "Croatia reference prices per litre, Albania comparison, price history and Adriatic trip links.",
     relatedLinks: [
       { label: "Albania fuel prices", to: "/fuel-prices/albania" },
       { label: "Italy fuel prices", to: "/fuel-prices/italy" },
@@ -123,7 +123,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Portugal",
     metaTitle: "Portugal Fuel Prices | Petrol, Diesel & LPG per Litre",
     metaDescription:
-      "Dated Portugal petrol, diesel and LPG reference prices per litre, historical movement and a fuel-specific comparison with Albania.",
+      "Portugal reference prices per litre, price history and a fuel-specific comparison with Albania.",
     relatedLinks: [
       { label: "Albania fuel prices", to: "/fuel-prices/albania" },
       { label: "Calculate a Portugal road trip", to: "/trip-cost-calculator" },
@@ -138,7 +138,7 @@ export const COUNTRY_EDITORIAL: CountryEditorial[] = [
     dataCountryName: "Switzerland",
     metaTitle: "Switzerland Fuel Prices | Petrol, Diesel & LPG | Fuel Today",
     metaDescription:
-      "Swiss petrol, diesel and LPG reference prices with source-date context and fuel-specific comparisons against Albania.",
+      "Swiss petrol, diesel and LPG reference prices, source-date context and comparisons with Albania.",
     relatedLinks: [
       { label: "Europe fuel comparison", to: "/europe-fuel-comparison" },
       { label: "How fuel prices work", to: "/how-fuel-prices-work" },

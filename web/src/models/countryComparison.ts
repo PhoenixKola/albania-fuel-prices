@@ -79,9 +79,10 @@ export function comparisonSentence(result: Comparison | null, countryA: string, 
     : `The ${fuelName} comparison between ${countryA} and ${countryB} is unavailable for this source reading.`;
   const gap = `€${Math.abs(result.differencePerLitre).toFixed(3)}/L`;
   const tank = `€${Math.abs(result.differenceForTank).toFixed(2)}`;
+  const unverified = lang === "sq" ? "e paverifikuar" : "unverified";
   const dates = result.sourceDateA === result.sourceDateB && result.sourceDateA
     ? result.sourceDateA
-    : `${result.sourceDateA ?? "?"} / ${result.sourceDateB ?? "?"}`;
+    : `${countryA} ${result.sourceDateA ?? unverified} / ${countryB} ${result.sourceDateB ?? unverified}`;
   if (lang === "sq") {
     const direction = result.direction === "equal" ? `${countryA} dhe ${countryB} kanë të njëjtin çmim orientues` :
       result.direction === "a-higher" ? `${fuelName} kushton ${gap} më shumë në ${countryA} sesa në ${countryB}` : `${fuelName} kushton ${gap} më pak në ${countryA} sesa në ${countryB}`;
